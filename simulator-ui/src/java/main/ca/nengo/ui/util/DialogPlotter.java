@@ -51,7 +51,6 @@ public class DialogPlotter extends DefaultPlotter {
 	private JDialog parent;
 
 	public DialogPlotter(JDialog parentPanel) {
-		super();
 		this.parent = parentPanel;
 	}
 

@@ -40,10 +40,6 @@ public abstract class AbstractConstructable implements IConfigurable {
 
 	private Object model;
 
-	public AbstractConstructable() {
-		super();
-	}
-
 	/**
 	 * This function is called from a common thread, so it is not safe to put UI
 	 * stuff here If there's UI Stuff to be done, put it in afterModelCreated

@@ -59,8 +59,6 @@ public abstract class AbstractFn implements IConfigurable, ConfigurableFunction 
      * @param functionType
      */
     public AbstractFn(String typeName, Class<? extends Function> functionType) {
-        super();
-
         this.typeName = typeName;
         this.functionType = functionType;
     }

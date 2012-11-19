@@ -18,7 +18,6 @@ public abstract class AbstractStatusHandler extends PBasicInputEventHandler {
 	 *            World this handler belongs to
 	 */
 	public AbstractStatusHandler(WorldImpl world) {
-		super();
 		this.world = world;
 	}
 

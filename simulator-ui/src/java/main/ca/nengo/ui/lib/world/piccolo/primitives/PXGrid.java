@@ -68,7 +68,6 @@ public class PXGrid extends PXLayer {
 	private double gridSpacing;
 
 	public PXGrid(Color gridPaint, double gridSpacing) {
-		super();
 		this.gridPaint = gridPaint;
 		this.gridSpacing = gridSpacing;
 		setPickable(false);
@@ -115,7 +114,6 @@ class CameraPropertyChangeListener implements PropertyChangeListener {
 	private PLayer gridLayer;
 
 	public CameraPropertyChangeListener(PCamera camera, PLayer gridLayer) {
-		super();
 		this.camera = camera;
 		this.gridLayer = gridLayer;
 	}

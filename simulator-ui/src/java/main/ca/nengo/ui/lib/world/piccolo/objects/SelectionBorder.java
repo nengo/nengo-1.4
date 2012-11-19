@@ -33,7 +33,6 @@ public class SelectionBorder implements Listener {
 	 *            World, whose sky, this border shall be added to.
 	 */
 	public SelectionBorder(World world) {
-		super();
 		init(world);
 	}
 
@@ -44,7 +43,6 @@ public class SelectionBorder implements Listener {
 	 *            Object to select initially
 	 */
 	public SelectionBorder(World world, WorldObject objSelected) {
-		super();
 		init(world);
 		setSelected(objSelected);
 	}

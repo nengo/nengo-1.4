@@ -44,7 +44,6 @@ public class TooltipBuilder {
 	 *            Name of this tooltip
 	 */
 	public TooltipBuilder(String name) {
-		super();
 		this.name = name;
 		tooltipParts = new Vector<ITooltipPart>(10);
 	}

@@ -8,7 +8,6 @@ public class ElasticVertex extends LeanSparseVertex {
 	private final ElasticObject myObject;
 
 	public ElasticVertex(ElasticObject nodeUI) {
-		super();
 		this.myObject = nodeUI;
 	}
 

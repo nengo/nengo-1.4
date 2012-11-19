@@ -31,7 +31,6 @@ public class ElasticLayoutRunner {
 	private final ElasticGround myParent;
 
 	public ElasticLayoutRunner(ElasticGround world) {
-		super();
 		this.myParent = world;
 		init();
 	}

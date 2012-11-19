@@ -34,10 +34,6 @@ import ca.nengo.ui.configurable.descriptors.PString;
 public abstract class ConstructableNode extends AbstractConstructable {
 	protected static final Property pName = new PString("Name", "Name of the item to create", "");
 
-	public ConstructableNode() {
-		super();
-	}
-
 	@Override
 	protected final Object configureModel(ConfigResult configuredProperties) throws ConfigException {
 		String name = (String) configuredProperties.getValue(pName);

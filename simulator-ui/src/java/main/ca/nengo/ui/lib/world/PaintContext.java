@@ -7,7 +7,6 @@ public class PaintContext {
 	private double scale;
 
 	public PaintContext(Graphics2D graphics, double scale) {
-		super();
 		this.graphics = graphics;
 		this.scale = scale;
 	}

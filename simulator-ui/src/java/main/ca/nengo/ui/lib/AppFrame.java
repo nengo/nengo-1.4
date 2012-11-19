@@ -6,7 +6,7 @@ import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.KeyEventDispatcher;
+//import java.awt.KeyEventDispatcher;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
@@ -14,22 +14,23 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+//import java.io.ByteArrayOutputStream;
+//import java.io.File;
+//import java.io.FileInputStream;
+//import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+//import java.io.ObjectInputStream;
+//import java.io.ObjectOutputStream;
+//import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventListener;
 import java.util.Iterator;
-import java.util.LinkedList;
+//import java.util.LinkedList;
+import java.util.prefs.Preferences;
 
-import javax.swing.FocusManager;
+//import javax.swing.FocusManager;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -41,6 +42,7 @@ import org.simplericity.macify.eawt.ApplicationEvent;
 import org.simplericity.macify.eawt.ApplicationListener;
 
 import ca.nengo.plot.Plotter;
+import ca.nengo.ui.NengoConfig;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.ExitAction;
 import ca.nengo.ui.lib.actions.ReversableActionManager;
@@ -52,7 +54,7 @@ import ca.nengo.ui.lib.world.World;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.Search.SearchInputHandler;
 import ca.nengo.ui.lib.world.elastic.ElasticWorld;
-import ca.nengo.ui.lib.world.piccolo.WorldImpl;
+//import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.PXGrid;
 import ca.nengo.ui.lib.world.piccolo.primitives.Universe;
@@ -68,17 +70,9 @@ import edu.umd.cs.piccolo.util.PUtil;
  * @author Shu Wu
  */
 public abstract class AppFrame extends JFrame implements ApplicationListener {
-    private static final long serialVersionUID = 2769082313231407201L;
+    private static final long serialVersionUID = 6L;
 
-    /**
-     * TODO
-     */
     public static int MENU_SHORTCUT_KEY_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-
-    /**
-     * Name of the directory where UI Files are stored
-     */
-    public static final String USER_FILE_DIR = "UIFiles";
 
     /**
      * A String which briefly describes some commands used in this application
@@ -89,33 +83,21 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
             + "Hold CTRL/CMD >> Hover over objects for tooltips";
 
     private ReversableActionManager actionManager;
-
     private EventListener escapeFullScreenModeListener;
-
     private GraphicsDevice graphicsDevice;
-
     private boolean isFullScreenMode;
-
-    private UserPreferences preferences;
-
+//    private UserPreferences preferences;
     private ShortcutKey[] shortcutKeys;
-
     private Window topWindow;
-
     private Universe universe;
-
     private MenuBuilder worldMenu;
-
     protected MenuBuilder editMenu;
-
     protected MenuBuilder runMenu;
-
-    /**
-     * TODO
-     */
+    private SearchInputHandler searchHandler;
+    
     public AppFrame() {
-        super(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-                .getDefaultConfiguration());
+        super(GraphicsEnvironment.getLocalGraphicsEnvironment()
+        		.getDefaultScreenDevice().getDefaultConfiguration());
 
         if (!SwingUtilities.isEventDispatchThread()) {
             try {
@@ -175,7 +157,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
         helpMenu.addAction(new OpenURLAction("Documentation (opens in browser)",
                 "http://www.nengo.ca/documentation"), KeyEvent.VK_F1);
-        helpMenu.addAction(new TipsAction("Tips and Commands", false), KeyEvent.VK_T);
+        helpMenu.addAction(new WelcomeAction("Tips and Commands", false), KeyEvent.VK_T);
         boolean isMacOS = System.getProperty("mrj.version") != null;
         if (!isMacOS) {
             helpMenu.addAction(new AboutAction("About"), KeyEvent.VK_A);
@@ -242,41 +224,37 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
      * @param menuBar
      *            is attached to the frame
      */
-    protected void initFileMenu(MenuBuilder menu) {
-
-    }
+    protected void initFileMenu(MenuBuilder menu) { }
 
     protected void initialize() {
         /*
          * Initialize shortcut keys
          */
-        FocusManager.getCurrentManager().addKeyEventDispatcher(new KeyEventDispatcher() {
-            public boolean dispatchKeyEvent(KeyEvent e) {
-                if (getShortcutKeys() != null && e.getID() == KeyEvent.KEY_PRESSED) {
-                    for (ShortcutKey shortcutKey : getShortcutKeys()) {
-                        if (shortcutKey.getModifiers() == e.getModifiers()) {
-                            if (shortcutKey.getKeyCode() == e.getKeyCode()) {
-                                shortcutKey.getAction().doAction();
-                                return true;
-                            }
-                        }
-                    }
-                }
-                return false;
-            }
-        });
+//        FocusManager.getCurrentManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+//            public boolean dispatchKeyEvent(KeyEvent e) {
+//                if (getShortcutKeys() != null && e.getID() == KeyEvent.KEY_PRESSED) {
+//                    for (ShortcutKey shortcutKey : getShortcutKeys()) {
+//                        if (shortcutKey.getModifiers() == e.getModifiers()) {
+//                            if (shortcutKey.getKeyCode() == e.getKeyCode()) {
+//                                shortcutKey.getAction().doAction();
+//                                return true;
+//                            }
+//                        }
+//                    }
+//                }
+//                return false;
+//            }
+//        });
 
+        Preferences prefs = NengoConfig.getPrefs();
+    	
         graphicsDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        loadPreferences();
         UIEnvironment.setInstance(this);
 
-        if (preferences.isWelcomeScreen()) {
-            preferences.setWelcomeScreen(false);
-
+        if (prefs.getBoolean(NengoConfig.B_WELCOME, NengoConfig.B_WELCOME_DEF)) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-
-                    (new TipsAction("", true)).doAction();
+                    (new WelcomeAction("", true)).doAction();
                 }
             });
         }
@@ -314,16 +292,13 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
         /*
          * Initialize shortcut keys
          */
-        LinkedList<ShortcutKey> shortcuts = new LinkedList<ShortcutKey>();
-        constructShortcutKeys(shortcuts);
-        this.shortcutKeys = shortcuts.toArray(new ShortcutKey[] {});
+//        LinkedList<ShortcutKey> shortcuts = new LinkedList<ShortcutKey>();
+//        constructShortcutKeys(shortcuts);
+//        this.shortcutKeys = shortcuts.toArray(new ShortcutKey[] {});
 
         validate();
         setFullScreenMode(false);
-
     }
-
-    private SearchInputHandler searchHandler;
 
     /**
      * @param enabled TODO
@@ -335,10 +310,10 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
     }
 
-    protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
-        shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_0, new ZoomToFitAction(
-                "Zoom to fit")));
-    }
+//    protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
+//        shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_0, new ZoomToFitAction(
+//                "Zoom to fit")));
+//    }
 
     class ZoomToFitAction extends StandardAction {
 
@@ -385,70 +360,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
      * @param menuBar
      *            is attached to the frame
      */
-    protected void initViewMenu(JMenuBar menuBar) {
-
-    }
-
-    /**
-     * Loads saved preferences related to the application
-     */
-    protected void loadPreferences() {
-        File file = new File(USER_FILE_DIR);
-        if (!file.exists()) {
-            file.mkdir();
-        }
-
-        File preferencesFile = new File(USER_FILE_DIR, "userSettings");
-
-        if (preferencesFile.exists()) {
-            FileInputStream fis;
-            try {
-                fis = new FileInputStream(preferencesFile);
-
-                ObjectInputStream ois = new ObjectInputStream(fis);
-                try {
-                    preferences = (UserPreferences) ois.readObject();
-                } catch (ClassNotFoundException e) {
-                    System.out.println("Could not load preferences");
-                }
-            } catch (IOException e1) {
-                System.out.println("Could not read preferences file");
-            }
-        }
-
-        if (preferences == null) {
-            preferences = new UserPreferences();
-
-        }
-        preferences.apply(this);
-    }
-
-    /**
-     * Save preferences to file
-     */
-    protected void savePreferences() {
-        File file = new File(USER_FILE_DIR);
-        if (!file.exists()) {
-            file.mkdir();
-        }
-
-        File preferencesFile = new File(USER_FILE_DIR, "userSettings");
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos;
-        try {
-            oos = new ObjectOutputStream(bos);
-
-            oos.writeObject(preferences);
-
-            FileOutputStream fos = new FileOutputStream(preferencesFile);
-            fos.write(bos.toByteArray());
-            fos.flush();
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    protected void initViewMenu(JMenuBar menuBar) { }
 
     /**
      * Updates the menu 'edit'
@@ -477,6 +389,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
      * Updates the menu 'world'
      */
     protected void updateWorldMenu() {
+    	Preferences prefs = NengoConfig.getPrefs();
         worldMenu.reset();
         worldMenu.addAction(new CloseAllPlots(), KeyEvent.VK_M);
 
@@ -486,10 +399,10 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
             // worldMenu.addAction(new TurnOffFullScreen(), KeyEvent.VK_F);
         }
 
-        if (!preferences.isEnableTooltips()) {
-            worldMenu.addAction(new TurnOnTooltips(), KeyEvent.VK_T);
+        if (prefs.getBoolean(NengoConfig.B_TOOLTIPS, NengoConfig.B_TOOLTIPS_DEF)) {
+        	worldMenu.addAction(new TurnOffTooltips(), KeyEvent.VK_T);
         } else {
-            worldMenu.addAction(new TurnOffTooltips(), KeyEvent.VK_T);
+            worldMenu.addAction(new TurnOnTooltips(), KeyEvent.VK_T);
         }
 
         if (!PXGrid.isGridVisible()) {
@@ -559,7 +472,8 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
      * Called when the user closes the Application window
      */
     public void exitAppFrame() {
-        savePreferences();
+        // Used to save B_GRID, B_TOOLTIPS, and B_WELCOME here.
+    	// But I don't think it's necessary now...
         System.exit(0);
     }
 
@@ -710,6 +624,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
         new AboutAction("About").doAction();
         event.setHandled(true);
     }
+    
     public void handleOpenApplication(ApplicationEvent event) {}
 
     public void handleOpenFile(ApplicationEvent event) {}
@@ -717,6 +632,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
     public void handlePreferences(ApplicationEvent event) {}
 
     public void handlePrintFile(ApplicationEvent event) {
+    	// Maybe this should save to PDF?
         JOptionPane.showMessageDialog(this, "Sorry, printing not implemented");
     }
 
@@ -996,14 +912,15 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 	                			ran = true;
 	                			break;
 	                		}
-                		} catch (InterruptedException e) {
-                			ran = false;
-                		}
+                		} catch (InterruptedException e) { }
+                    }
+                	
+                	if (!ran) {
                 		JOptionPane.showMessageDialog(UIEnvironment.getInstance(),
                 				"Could not open browser automatically. " + 
                 				"Please navigate to" + this.url,
                 				"URL can't be opened", JOptionPane.INFORMATION_MESSAGE);
-                    }
+                	}
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -1016,14 +933,14 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
      * 
      * @author Shu Wu
      */
-    class TipsAction extends StandardAction {
+    class WelcomeAction extends StandardAction {
 
         private static final long serialVersionUID = 1L;
 
         private boolean welcome;
 
-        public TipsAction(String actionName, boolean isWelcomeScreen) {
-            super("Show UI tips", actionName);
+        public WelcomeAction(String actionName, boolean isWelcomeScreen) {
+            super("Show welcome dialog", actionName);
 
             this.welcome = isWelcomeScreen;
         }
@@ -1109,7 +1026,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
         @Override
         protected void action() throws ActionException {
-            preferences.setGridVisible(false);
+        	NengoConfig.getPrefs().putBoolean(NengoConfig.B_GRID, false);
             updateWorldMenu();
         }
 
@@ -1130,7 +1047,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
         @Override
         protected void action() throws ActionException {
-            preferences.setEnableTooltips(false);
+        	NengoConfig.getPrefs().putBoolean(NengoConfig.B_TOOLTIPS, false);
             updateWorldMenu();
         }
 
@@ -1172,8 +1089,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
         @Override
         protected void action() throws ActionException {
-            preferences.setGridVisible(true);
-
+        	NengoConfig.getPrefs().putBoolean(NengoConfig.B_GRID, true);
             updateWorldMenu();
         }
 
@@ -1194,7 +1110,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
         @Override
         protected void action() throws ActionException {
-            preferences.setEnableTooltips(true);
+        	NengoConfig.getPrefs().putBoolean(NengoConfig.B_TOOLTIPS, true);
             updateWorldMenu();
         }
 
@@ -1249,48 +1165,48 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 /**
  * @author Shu
  */
-class UserPreferences implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-    private boolean enableTooltips = true;
-    private boolean gridVisible = true;
-    private boolean isWelcomeScreen = true;
-
-    /**
-     * Applies preferences
-     * 
-     * @param applyTo
-     *            The application in which to apply the preferences to
-     */
-    public void apply(AppFrame applyTo) {
-        setEnableTooltips(enableTooltips);
-        setGridVisible(gridVisible);
-    }
-
-    public boolean isEnableTooltips() {
-        return enableTooltips;
-    }
-
-    public boolean isGridVisible() {
-        return gridVisible;
-    }
-
-    public boolean isWelcomeScreen() {
-        return isWelcomeScreen;
-    }
-
-    public void setEnableTooltips(boolean enableTooltips) {
-        this.enableTooltips = enableTooltips;
-        WorldImpl.setTooltipsVisible(this.enableTooltips);
-    }
-
-    public void setGridVisible(boolean gridVisible) {
-        this.gridVisible = gridVisible;
-        PXGrid.setGridVisible(gridVisible);
-    }
-
-    public void setWelcomeScreen(boolean isWelcomeScreen) {
-        this.isWelcomeScreen = isWelcomeScreen;
-    }
-
-}
+//class UserPreferences implements Serializable {
+//
+//    private static final long serialVersionUID = 1L;
+//    private boolean enableTooltips = true;
+//    private boolean gridVisible = true;
+//    private boolean isWelcomeScreen = true;
+//
+//    /**
+//     * Applies preferences
+//     * 
+//     * @param applyTo
+//     *            The application in which to apply the preferences to
+//     */
+//    public void apply(AppFrame applyTo) {
+//        setEnableTooltips(enableTooltips);
+//        setGridVisible(gridVisible);
+//    }
+//
+//    public boolean isEnableTooltips() {
+//        return enableTooltips;
+//    }
+//
+//    public boolean isGridVisible() {
+//        return gridVisible;
+//    }
+//
+//    public boolean isWelcomeScreen() {
+//        return isWelcomeScreen;
+//    }
+//
+//    public void setEnableTooltips(boolean enableTooltips) {
+//        this.enableTooltips = enableTooltips;
+//        WorldImpl.setTooltipsVisible(this.enableTooltips);
+//    }
+//
+//    public void setGridVisible(boolean gridVisible) {
+//        this.gridVisible = gridVisible;
+//        PXGrid.setGridVisible(gridVisible);
+//    }
+//
+//    public void setWelcomeScreen(boolean isWelcomeScreen) {
+//        this.isWelcomeScreen = isWelcomeScreen;
+//    }
+//
+//}

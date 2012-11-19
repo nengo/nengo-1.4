@@ -12,7 +12,6 @@ public abstract class LineWell extends WorldObjectImpl {
 	private LineOriginIcon myIcon;
 
 	public LineWell() {
-		super();
 		myIcon = new LineOriginIcon();
 
 		addChild(myIcon);
@@ -53,9 +52,7 @@ class CreateLineEndHandler extends PBasicInputEventHandler {
 	private LineConnector newLineEnd;
 
 	public CreateLineEndHandler(LineWell lineEndWell) {
-		super();
 		this.lineEndWell = lineEndWell;
-
 	}
 
 	@Override

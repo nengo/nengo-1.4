@@ -22,10 +22,6 @@ public class PanEventHandler extends PPanEventHandler {
 	private boolean isInverted = false;
 	private SelectionHandler selectionHandler = null;
 
-	public PanEventHandler() {
-		super();
-	}
-
 	/**
 	 * Do auto panning even when the mouse is not moving.
 	 */

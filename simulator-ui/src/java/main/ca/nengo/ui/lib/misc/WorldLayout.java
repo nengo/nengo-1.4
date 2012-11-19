@@ -45,7 +45,6 @@ public class WorldLayout implements Serializable {
 	 *            Viewer containing nodes
 	 */
 	public WorldLayout(String layoutName, World world, boolean elasticMode) {
-		super();
 		this.layoutName = layoutName;
 		this.elasticMode = elasticMode;
 

@@ -36,12 +36,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
+//import java.util.LinkedList;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
+//import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
@@ -77,8 +77,8 @@ import ca.nengo.ui.lib.actions.DisabledAction;
 import ca.nengo.ui.lib.actions.DragAction;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.actions.UserCancelledException;
-import ca.nengo.ui.lib.misc.ShortcutKey;
-import ca.nengo.ui.lib.objects.lines.LineConnector;
+//import ca.nengo.ui.lib.misc.ShortcutKey;
+//import ca.nengo.ui.lib.objects.lines.LineConnector;
 import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.UserMessages;
@@ -183,8 +183,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
      * Constructor; displays a splash screen
      */
     public NengoGraphics() {
-        super();
-
         // Setup icon
         try {
             Image image = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/nengologo256.png"));
@@ -488,10 +486,10 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         return (NengoWorld) getWorld();
     }
 
-    @Override
-    protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
-        super.constructShortcutKeys(shortcuts);
-    }
+//    @Override
+//    protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
+//        super.constructShortcutKeys(shortcuts);
+//    }
 
     /**
      * Prompt user to save models in NengoGraphics.
@@ -968,7 +966,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         Object currentObj;
 
         public ConfigurationPane(Container mainPanel) {
-            super();
             auxSplitPane = new AuxillarySplitPane(mainPanel, null, "Inspector",
                     AuxillarySplitPane.Orientation.Right);
             auxSplitPane.getAuxPaneWrapper().setBackground(NengoStyle.COLOR_CONFIGURE_BACKGROUND);

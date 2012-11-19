@@ -29,7 +29,6 @@ public class ElasticObject extends WorldObjectImpl {
 	private int positionLock = 0;
 
 	public ElasticObject() {
-		super();
 		init();
 	}
 
@@ -208,7 +207,6 @@ class Anchor implements Destroyable, Listener {
 	private Path line;
 
 	public Anchor(ElasticObject obj) {
-		super();
 		this.obj = obj;
 		WorldLayer ground = obj.getWorldLayer();
 

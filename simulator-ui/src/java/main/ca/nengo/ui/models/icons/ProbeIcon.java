@@ -67,8 +67,6 @@ class Triangle extends PXPath {
 	static final double probeIconSize = 20;
 
 	public Triangle() {
-		super();
-
 		float x = 0;
 		float y = 0;
 

@@ -42,7 +42,6 @@ class SearchBox extends WorldObjectImpl {
 	private int currentResultIndex;
 
 	public SearchBox(World world) {
-		super();
 		this.world = world;
 		searchingText = new Text("Searching: ");
 

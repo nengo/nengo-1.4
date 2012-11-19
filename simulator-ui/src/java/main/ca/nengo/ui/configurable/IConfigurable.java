@@ -38,7 +38,7 @@ public interface IConfigurable {
      * 
      * @param props A set of properties
      * @throws ConfigException Exception thrown if there is an error during
-     *             pre-configuration.
+     *         configuration.
      */
     public void completeConfiguration(ConfigResult props) throws ConfigException;
 
@@ -47,7 +47,7 @@ public interface IConfigurable {
      * 
      * @param props A set of properties
      * @throws ConfigException Exception thrown if there is an error during
-     *             pre-configuration.
+     *         pre-configuration.
      */
     public void preConfiguration(ConfigResult props) throws ConfigException;
 

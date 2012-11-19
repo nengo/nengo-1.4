@@ -23,7 +23,6 @@ public class LineTerminationIcon extends WorldObjectImpl {
 	private Color myColor = NengoStyle.COLOR_LINEIN;
 
 	public LineTerminationIcon() {
-		super();
 		this.setBounds(0, 0, LINE_IN_WIDTH, LINE_IN_HEIGHT);
 	}
 

@@ -9,7 +9,6 @@ public class ShortcutKey {
 	private int modifiers;
 
 	public ShortcutKey(int modifiers, int keyCode, StandardAction action) {
-		super();
 		this.modifiers = modifiers;
 		this.keyCode = keyCode;
 		this.action = action;

@@ -287,7 +287,6 @@ class ConfigurableFunctionArray implements IConfigurable {
      */
     public ConfigurableFunctionArray(int inputDimension, int outputDimension,
             Function[] defaultValues) {
-        super();
         this.defaultValues = defaultValues;
         init(inputDimension, outputDimension);
 

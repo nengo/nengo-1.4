@@ -434,7 +434,6 @@ public class DataListView extends JPanel implements TreeSelectionListener {
         TreeNode nodeParent;
 
         public UndoInfo(TreeNode nodeParent, int nodeIndex) {
-            super();
             this.nodeParent = nodeParent;
             this.nodeIndex = nodeIndex;
         }
@@ -453,7 +452,6 @@ class DataPath {
     private Collection<String> position;
 
     public DataPath(DataTreeNode dataNode, Collection<String> position) {
-        super();
         this.dataNode = dataNode;
         this.position = position;
     }
@@ -694,10 +692,8 @@ class ExportFileChooser extends JFileChooser {
     private static final long serialVersionUID = 1L;
 
     public ExportFileChooser() {
-        super();
         setAcceptAllFileFilterUsed(false);
     }
-
 }
 
 class ExportMatlabAction extends ExportAction {
@@ -771,7 +767,6 @@ class ExtensionFileFilter extends FileExtensionFilter {
     private String extension;
 
     public ExtensionFileFilter(String description, String extension) {
-        super();
         this.description = description;
         this.extension = extension;
     }

@@ -19,8 +19,6 @@ public class TrackedStatusMsg {
 	}
 
 	public TrackedStatusMsg(String taskName, WorldObjectImpl wo) {
-		super();
-
 		if (wo != null) {
 			taskText = new Text(taskName);
 			taskText.setPaint(NengoStyle.COLOR_NOTIFICATION);

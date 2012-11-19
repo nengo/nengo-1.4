@@ -55,7 +55,6 @@ public class SearchInputHandler implements Destroyable {
 	private WorldImpl world;
 
 	public SearchInputHandler(WorldImpl world) {
-		super();
 		this.world = world;
 
 		searchUI = new SearchBox(world);
@@ -244,7 +243,6 @@ class SortWrapper implements Comparable<SortWrapper> {
 	private WorldObject worldObject;
 
 	public SortWrapper(double sortValue, WorldObject worldObject) {
-		super();
 		this.sortValue = sortValue;
 		this.worldObject = worldObject;
 	}

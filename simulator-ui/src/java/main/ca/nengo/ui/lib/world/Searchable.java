@@ -11,7 +11,6 @@ public interface Searchable {
 		private String value;
 
 		public SearchValuePair(String name, String value) {
-			super();
 			this.name = name;
 			this.value = value;
 		}

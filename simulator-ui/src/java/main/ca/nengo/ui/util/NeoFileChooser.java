@@ -52,7 +52,6 @@ public class NeoFileChooser {
 	private JFileChooser fileChooser;
 
 	public NeoFileChooser() {
-		super();
 		fileChooser = new JFileChooser();
 		
 		Preferences prefs = NengoConfig.getPrefs();

@@ -67,7 +67,6 @@ public class ModelIcon extends WorldObjectImpl implements Listener {
 	 *            Scale of the Icon
 	 */
 	public ModelIcon(ModelObject parent, WorldObject icon) {
-		super();
 		this.parent = parent;
 		this.iconReal = icon;
 

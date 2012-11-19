@@ -46,26 +46,25 @@ public class ConfigSchemaImpl implements ConfigSchema {
     }
 
     /**
-     * @param property TODO
+     * @param property A single property
      */
     public ConfigSchemaImpl(Property property) {
         this(new Property[] { property }, new Property[] {});
     }
 
     /**
-     * @param properties TODO
+     * @param properties An array of properties
      */
     public ConfigSchemaImpl(Property[] properties) {
         this(properties, new Property[] {});
     }
 
     /**
-     * @param properties TODO
-     * @param advancedProperties TODO
+     * @param properties Properties always shown
+     * @param advancedProperties Properties only shown in advanced mode
      */
     public ConfigSchemaImpl(Property[] properties,
             Property[] advancedProperties) {
-        super();
         this.properties = new ArrayList<Property>(properties.length);
         for (Property property : properties) {
             this.properties.add(property);
@@ -78,13 +77,11 @@ public class ConfigSchemaImpl implements ConfigSchema {
     }
 
     /**
-     * @param propDesc
-     *            Property Descriptor
-     * @param position
-     *            Location to insert into the property list
+     * @param prop Property to add
+     * @param position Location to insert into the property list
      */
-    public void addProperty(Property propDesc, int position) {
-        properties.add(position, propDesc);
+    public void addProperty(Property prop, int position) {
+        properties.add(position, prop);
     }
 
     public List<Property> getAdvancedProperties() {
@@ -94,5 +91,4 @@ public class ConfigSchemaImpl implements ConfigSchema {
     public List<Property> getProperties() {
         return properties;
     }
-
 }

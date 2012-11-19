@@ -69,7 +69,6 @@ public class NodeLayout implements Serializable {
 	 *            Viewer containing nodes
 	 */
 	public NodeLayout(String layoutName, NodeViewer world, boolean elasticMode) {
-		super();
 		this.layoutName = layoutName;
 		this.elasticMode = elasticMode;
 

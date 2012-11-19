@@ -32,7 +32,6 @@ public class ScriptWorldWrapper {
 	private NengoGraphics nengoGraphics;
 
 	public ScriptWorldWrapper(NengoGraphics neoGraphics) {
-		super();
 		this.nengoGraphics = neoGraphics;
 	}
 

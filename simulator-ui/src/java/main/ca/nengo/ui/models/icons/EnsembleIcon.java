@@ -56,7 +56,6 @@ public class EnsembleIcon extends NodeContainerIcon {
 		private static final int Padding = 4;
 
 		public VectorIcon() {
-			super();
 			int iconSize = 44 + CircleDiameter + Padding * 2;
 			this.setBounds(0, 0, iconSize, iconSize);
 		}

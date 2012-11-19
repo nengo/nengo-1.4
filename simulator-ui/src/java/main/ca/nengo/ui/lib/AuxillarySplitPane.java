@@ -302,7 +302,6 @@ public class AuxillarySplitPane extends JSplitPane {
         private Container hideButton;
 
         public HideButtonListener(Container hideButton) {
-            super();
             this.hideButton = hideButton;
         }
 

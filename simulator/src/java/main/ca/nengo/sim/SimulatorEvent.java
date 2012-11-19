@@ -36,7 +36,6 @@ public class SimulatorEvent {
 	private boolean interrupt=false;
 
 	public SimulatorEvent(float progress, Type type) {
-		super();
 		myProgress = progress;
 		myType = type;
 	}

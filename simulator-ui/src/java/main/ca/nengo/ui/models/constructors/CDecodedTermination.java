@@ -46,7 +46,6 @@ public class CDecodedTermination extends ProjectionConstructor {
 	private Property pTransformMatrix;
 
 	public CDecodedTermination(NEFEnsemble nefEnsembleParent) {
-		super();
 		this.nefEnsembleParent = nefEnsembleParent;
 	}
 

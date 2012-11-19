@@ -38,7 +38,6 @@ class TooltipTitle implements ITooltipPart {
 	String titleName;
 
 	public TooltipTitle(String titleName) {
-		super();
 		this.titleName = titleName;
 	}
 

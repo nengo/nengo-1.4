@@ -87,7 +87,6 @@ class PXText extends PXNode {
 	protected double greekThreshold = DEFAULT_GREEK_THRESHOLD;
 
 	public PXText() {
-		super();
 		setTextPaint(Color.BLACK);
 		init();
 	}

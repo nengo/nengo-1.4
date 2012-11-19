@@ -809,7 +809,6 @@ public class MultiLevelKLNetworkPartitioner implements NetworkPartitioner {
 		Node myNode;
 		
 		public NodeVertex(Node node){
-			super();
 			setNode(node);
 		}
 		

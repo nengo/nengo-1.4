@@ -61,7 +61,6 @@ public class ModelsContextMenu {
 	private PopupMenuBuilder menuBuilder;
 
 	protected ModelsContextMenu(PopupMenuBuilder menuBuilder, Collection<ModelObject> models) {
-		super();
 		this.menuBuilder = menuBuilder;
 		this.selectedObjects = models;
 		init();

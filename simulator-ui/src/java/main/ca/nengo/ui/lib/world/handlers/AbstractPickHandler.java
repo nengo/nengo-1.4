@@ -30,7 +30,6 @@ public abstract class AbstractPickHandler extends PBasicInputEventHandler {
 	private final WorldImpl world;
 
 	public AbstractPickHandler(WorldImpl parent) {
-		super();
 		this.world = parent;
 		controlTimer = new Timer();
 		controlTimer.start();

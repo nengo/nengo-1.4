@@ -91,7 +91,6 @@ public class PXEdge extends PXPath implements PropertyChangeListener, Destroyabl
 	 *            Whether the direction of this edge matters
 	 */
 	public PXEdge(WorldObjectImpl startNode, WorldObjectImpl endNode, boolean isDirected) {
-		super();
 		this.myStartNode = startNode;
 		this.myEndNode = endNode;
 		this.isDirected = isDirected;

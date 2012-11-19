@@ -17,7 +17,6 @@ public class TransientStatusMessage {
 	private String myMessage;
 
 	public TransientStatusMessage(String msg, long duration) {
-		super();
 		myMessage = msg;
 		myDuration = duration;
 

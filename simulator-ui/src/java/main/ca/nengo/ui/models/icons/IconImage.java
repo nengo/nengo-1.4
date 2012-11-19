@@ -70,7 +70,6 @@ class IconImageNode extends PXImage {
 	private double prevScale = 0;
 
 	public IconImageNode() {
-		super();
 		init();
 	}
 

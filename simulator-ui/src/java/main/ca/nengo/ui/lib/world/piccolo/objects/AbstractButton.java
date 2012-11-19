@@ -32,7 +32,6 @@ public abstract class AbstractButton extends WorldObjectImpl {
 	 *            Action to execute when the button is pressed
 	 */
 	public AbstractButton(Runnable action) {
-		super();
 		this.myAction = action;
 
 		this.setChildrenPickable(false);
@@ -110,7 +109,6 @@ class ButtonStateHandler extends PBasicInputEventHandler {
 	private AbstractButton button;
 
 	public ButtonStateHandler(AbstractButton button) {
-		super();
 		this.button = button;
 	}
 

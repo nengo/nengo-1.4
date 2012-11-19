@@ -60,37 +60,37 @@ public abstract class ConfigManager {
     /**
      * Name of directory where to store saved configuration
      */
-    static final String SAVED_CONFIG_DIR = NengoGraphics.USER_FILE_DIR + "/Config";
+//    static final String SAVED_CONFIG_DIR = NengoGraphics.USER_FILE_DIR + "/Config";
     
-    static final String DEV_DIST_DIR = "dist-files/" + NengoGraphics.USER_FILE_DIR + "/Config";
+//    static final String DEV_DIST_DIR = "dist-files/" + NengoGraphics.USER_FILE_DIR + "/Config";
 
     /**
      * Creates a saved objects folder if it isn't already there
      * 
      * @return The Saved Objects folder
      */
-    private static File getSavedObjectsFolder() {
-        File file = new File(SAVED_CONFIG_DIR);
-        if (!file.exists()) {
-            file.mkdir();
-            
-            // If we are building from source, find the dev config file
-            // directory and copy it to the directory it's expecting to find config files
-            File devConfigDir = new File(DEV_DIST_DIR);
-            if (devConfigDir.exists()) {
-            	File[] devConfigFiles = devConfigDir.listFiles();
-            	for (File devConfigFile : devConfigFiles) {
-            		File newConfigFile = new File(SAVED_CONFIG_DIR + "/" + devConfigFile.getName());
-            		try {
-            			Util.copyFile(devConfigFile, newConfigFile);
-            		} catch (IOException e) {
-            			System.out.println(e.getMessage());
-            		}
-            	}
-            }
-        }
-        return file;
-    }
+//    private static File getSavedObjectsFolder() {
+//        File file = new File(SAVED_CONFIG_DIR);
+//        if (!file.exists()) {
+//            file.mkdir();
+//            
+//            // If we are building from source, find the dev config file
+//            // directory and copy it to the directory it's expecting to find config files
+//            File devConfigDir = new File(DEV_DIST_DIR);
+//            if (devConfigDir.exists()) {
+//            	File[] devConfigFiles = devConfigDir.listFiles();
+//            	for (File devConfigFile : devConfigFiles) {
+//            		File newConfigFile = new File(SAVED_CONFIG_DIR + "/" + devConfigFile.getName());
+//            		try {
+//            			Util.copyFile(devConfigFile, newConfigFile);
+//            		} catch (IOException e) {
+//            			System.out.println(e.getMessage());
+//            		}
+//            	}
+//            }
+//        }
+//        return file;
+//    }
 
     /**
      * TODO
@@ -201,7 +201,6 @@ public abstract class ConfigManager {
      *            Object to be configured
      */
     public ConfigManager(IConfigurable configurable) {
-        super();
         properties = new SimpleAttributeSet();
         this.configurable = configurable;
 
@@ -217,18 +216,18 @@ public abstract class ConfigManager {
      * @param name
      *            filename prefix
      */
-    protected void deletePropertiesFile(String name) {
-        File file = new File(getSavedObjectsFolder(), getFileNamePrefix(configurable) + name);
-
-        System.gc();
-        if (file.exists()) {
-            boolean val = file.delete();
-            if (val == false) {
-                UserMessages.showError("Could not delete file");
-            }
-
-        }
-    }
+//    protected void deletePropertiesFile(String name) {
+//        File file = new File(getSavedObjectsFolder(), getFileNamePrefix(configurable) + name);
+//
+//        System.gc();
+//        if (file.exists()) {
+//            boolean val = file.delete();
+//            if (val == false) {
+//                UserMessages.showError("Could not delete file");
+//            }
+//
+//        }
+//    }
 
     /**
      * @return Object to be configured
@@ -256,96 +255,96 @@ public abstract class ConfigManager {
     /**
      * @return List of fileNames which point to saved configuration files
      */
-    protected String[] getPropertyFiles() {
-        File file = getSavedObjectsFolder();
-        /*
-         * Gets a list of property files
-         */
-        String[] files = file.list(new ConfigFilesFilter(configurable));
-
-        /*
-         * Return the file names without the prefix
-         */
-        String[] files0 = new String[files.length];
-        for (int i = 0; i < files.length; i++) {
-            files0[i] = files[i].substring(getFileNamePrefix(configurable).length(), files[i]
-                    .length());
-        }
-        return files0;
-
-    }
+//    protected String[] getPropertyFiles() {
+//        File file = getSavedObjectsFolder();
+//        /*
+//         * Gets a list of property files
+//         */
+//        String[] files = file.list(new ConfigFilesFilter(configurable));
+//
+//        /*
+//         * Return the file names without the prefix
+//         */
+//        String[] files0 = new String[files.length];
+//        for (int i = 0; i < files.length; i++) {
+//            files0[i] = files[i].substring(getFileNamePrefix(configurable).length(), files[i]
+//                    .length());
+//        }
+//        return files0;
+//
+//    }
 
     /**
      * @param name
      *            Name of the properties set to be loaded
      */
-    protected void loadPropertiesFromFile(String name) {
-
-        FileInputStream f_in;
-
-        try {
-            f_in = new FileInputStream(SAVED_CONFIG_DIR + "/" + getFileNamePrefix(configurable)
-                    + name);
-
-            ObjectInputStream obj_in = new ObjectInputStream(f_in);
-
-            Object obj;
-
-            obj = obj_in.readObject();
-
-            if (obj == null) {
-                UserMessages.showError("Could not load file: " + name);
-            } else {
-
-                this.properties = (MutableAttributeSet) obj;
-            }
-            obj_in.close();
-
-        } catch (FileNotFoundException e) {
-            System.out.println(e);
-        } catch (ClassNotFoundException e) {
-            System.out.println("Class not found exception");
-        } catch (InvalidClassException e) {
-            System.out.println("Invalid class exception");
-        } catch (NotSerializableException e) {
-            Util.debugMsg("Loading properties not serializable: " + e.getMessage());
-        } catch (IOException e) {
-            Util.debugMsg("IO Error serializing properties: " + e.getMessage());
-        }
-    }
+//    protected void loadPropertiesFromFile(String name) {
+//
+//        FileInputStream f_in;
+//
+//        try {
+//            f_in = new FileInputStream(SAVED_CONFIG_DIR + "/" + getFileNamePrefix(configurable)
+//                    + name);
+//
+//            ObjectInputStream obj_in = new ObjectInputStream(f_in);
+//
+//            Object obj;
+//
+//            obj = obj_in.readObject();
+//
+//            if (obj == null) {
+//                UserMessages.showError("Could not load file: " + name);
+//            } else {
+//
+//                this.properties = (MutableAttributeSet) obj;
+//            }
+//            obj_in.close();
+//
+//        } catch (FileNotFoundException e) {
+//            System.out.println(e);
+//        } catch (ClassNotFoundException e) {
+//            System.out.println("Class not found exception");
+//        } catch (InvalidClassException e) {
+//            System.out.println("Invalid class exception");
+//        } catch (NotSerializableException e) {
+//            Util.debugMsg("Loading properties not serializable: " + e.getMessage());
+//        } catch (IOException e) {
+//            Util.debugMsg("IO Error serializing properties: " + e.getMessage());
+//        }
+//    }
 
     /**
      * @param name
      *            name of the properties set to be saved
      */
-    protected void savePropertiesFile(String name) {
-
-        // Write to disk with FileOutputStream
-        FileOutputStream f_out;
-        try {
-            File objectsFolder = getSavedObjectsFolder();
-            File file = new File(objectsFolder, getFileNamePrefix(configurable) + name);
-
-            if (file.exists()) {
-                Util.debugMsg("Replaced existing file: " + file.getName());
-            }
-            f_out = new FileOutputStream(file);
-
-            ObjectOutputStream obj_out = new ObjectOutputStream(f_out);
-            obj_out.writeObject(properties);
-            obj_out.close();
-
-            f_out.close();
-
-        } catch (NotSerializableException e) {
-            Util.debugMsg("Did not save settings to template because " + e.getMessage());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
+//    protected void savePropertiesFile(String name) {
+//
+//        // Write to disk with FileOutputStream
+//        FileOutputStream f_out;
+//        try {
+//            File objectsFolder = getSavedObjectsFolder();
+//            File file = new File(objectsFolder, getFileNamePrefix(configurable) + name);
+//
+//            if (file.exists()) {
+//                Util.debugMsg("Replaced existing file: " + file.getName());
+//            }
+//            f_out = new FileOutputStream(file);
+//
+//            ObjectOutputStream obj_out = new ObjectOutputStream(f_out);
+//            obj_out.writeObject(properties);
+//            obj_out.close();
+//
+//            f_out.close();
+//
+//        } catch (NotSerializableException e) {
+//            Util.debugMsg("Did not save settings to template because " + e.getMessage());
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
 
     protected void setProperty(String name, Object value) {
         getProperties().addAttribute(name, value);
@@ -358,24 +357,23 @@ public abstract class ConfigManager {
  * 
  * @author Shu
  */
-class ConfigFilesFilter implements FilenameFilter {
-    IConfigurable parent;
-
-    public ConfigFilesFilter(IConfigurable parent) {
-        super();
-        this.parent = parent;
-    }
-
-    public boolean accept(File file, String name) {
-
-        if (name.startsWith(ConfigManager.getFileNamePrefix(parent))) {
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-}
+//class ConfigFilesFilter implements FilenameFilter {
+//    IConfigurable parent;
+//
+//    public ConfigFilesFilter(IConfigurable parent) {
+//        this.parent = parent;
+//    }
+//
+//    public boolean accept(File file, String name) {
+//
+//        if (name.startsWith(ConfigManager.getFileNamePrefix(parent))) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//
+//    }
+//}
 
 class Configureable implements IConfigurable {
 
@@ -386,7 +384,6 @@ class Configureable implements IConfigurable {
     private String description;
 
     public Configureable(ConfigSchema configSchema, String typeName, String description) {
-        super();
         this.schema = configSchema;
         this.typeName = typeName;
         this.description = description;

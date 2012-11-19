@@ -30,8 +30,7 @@ import ca.nengo.ui.lib.util.Util;
 
 /**
  * Describes a configuration parameter of a IConfigurable object
- */
-/**
+ * 
  * @author Shu
  */
 public abstract class Property implements Serializable {
@@ -46,23 +45,23 @@ public abstract class Property implements Serializable {
     private String name;
 
     /**
-     * @param name TODO
+     * @param name
      */
     public Property(String name) {
         this(name, null, null);
     }
 
     /**
-     * @param name TODO
-     * @param defaultValue TODO
+     * @param name
+     * @param defaultValue
      */
     public Property(String name, Object defaultValue) {
         this(name, null, defaultValue);
     }
 
     /**
-     * @param name TODO
-     * @param description TODO
+     * @param name
+     * @param description
      */
     public Property(String name, String description) {
         this(name, description, null);
@@ -70,14 +69,10 @@ public abstract class Property implements Serializable {
 
     /**
      * @param name
-     *            Name to be given to the parameter
      * @param description
-     *            Description of the parameter
      * @param defaultValue
-     *            Default value of this parameter
      */
     public Property(String name, String description, Object defaultValue) {
-        super();
         this.description = description;
         this.defaultValue = defaultValue;
         this.name = name;
@@ -91,22 +86,21 @@ public abstract class Property implements Serializable {
     protected abstract PropertyInputPanel createInputPanel();
 
     /**
-     * @return Default value of this parameter
+     * @return Default value of this property
      */
     public Object getDefaultValue() {
         return defaultValue;
     }
 
     /**
-     * @return TODO
+     * @return Description string
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * Gets the input panel.
-     * @return TODO
+     * @return the input panel
      */
     public PropertyInputPanel getInputPanel() {
         // Instantiate a new input panel for each call, this is ok.
@@ -124,14 +118,14 @@ public abstract class Property implements Serializable {
     }
 
     /**
-     * @return Name of this parameter
+     * @return Name of this property
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @return TODO
+     * @return String to be displayed in a tooltip
      */
     public String getTooltip() {
         String nodeDescription = "Type: " + getTypeName();
@@ -139,9 +133,8 @@ public abstract class Property implements Serializable {
         if (description != null) {
             return "<html><b>" + description + "</b><br>" + nodeDescription
                     + "</html>";
-        } else {
-            return nodeDescription;
         }
+        return nodeDescription;
     }
 
     /**
@@ -155,30 +148,28 @@ public abstract class Property implements Serializable {
     public abstract String getTypeName();
 
     /**
-     * @return TODO
+     * @return Whether this property can be changed from its default value
      */
     public boolean isEditable() {
         return isEditable;
     }
 
     /**
-     * @param defaultValue TODO
+     * @param defaultValue
      */
     public void setDefaultValue(Object defaultValue) {
         this.defaultValue = defaultValue;
     }
 
     /**
-     * @param description TODO
+     * @param description
      */
     public void setDescription(String description) {
         this.description = description;
     }
 
     /**
-     * Sets whether this property can be changed from its default value
-     * 
-     * @param bool
+     * @param bool Whether this property can be changed from its default value
      */
     public void setEditable(boolean bool) {
         isEditable = bool;

@@ -13,7 +13,6 @@ public class Wrapper extends WorldObjectImpl {
 	private WorldObject myPackage;
 
 	public Wrapper(WorldObject obj) {
-		super();
 		setPickable(false);
 		setPackage(obj);
 	}

@@ -68,15 +68,10 @@ public class PXImage extends PXNode {
 
 	private transient Image image;
 
-	public PXImage() {
-		super();
-	}
-
 	/**
 	 * Construct a new PImage wrapping the given java.awt.Image.
 	 */
 	public PXImage(Image newImage) {
-		this();
 		setImage(newImage);
 	}
 
@@ -95,9 +90,9 @@ public class PXImage extends PXNode {
 	 * be missing.
 	 */
 	public PXImage(java.net.URL url) {
-		this();
-		if (url != null)
+		if (url != null) {
 			setImage(Toolkit.getDefaultToolkit().getImage(url));
+		}
 	}
 
 	/**

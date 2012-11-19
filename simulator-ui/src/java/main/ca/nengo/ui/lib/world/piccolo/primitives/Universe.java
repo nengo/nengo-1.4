@@ -53,8 +53,6 @@ public class Universe extends PCanvas implements Destroyable {
 	private Collection<WorldImpl> worlds;
 
 	public Universe() {
-
-		super();
 		setZoomEventHandler(null);
 		setPanEventHandler(null);
 

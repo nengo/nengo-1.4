@@ -59,7 +59,6 @@ public abstract class PropertyInputPanel {
      *            A description of the Configuration parameter to be configured
      */
     public PropertyInputPanel(Property property) {
-        super();
         this.propDescriptor = property;
         outerPanel = new JPanel();
         outerPanel.setName(property.getName());

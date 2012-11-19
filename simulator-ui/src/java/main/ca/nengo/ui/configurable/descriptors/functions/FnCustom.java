@@ -349,8 +349,6 @@ class JCustomPanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     public JCustomPanel() {
-        super();
-
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setAlignmentY(TOP_ALIGNMENT);
         setAlignmentX(LEFT_ALIGNMENT);

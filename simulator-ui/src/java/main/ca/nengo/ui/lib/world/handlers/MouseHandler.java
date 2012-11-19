@@ -69,7 +69,6 @@ public class MouseHandler extends PBasicInputEventHandler {
 	private WorldImpl world;
 
 	public MouseHandler(WorldImpl world) {
-		super();
 		frame = new SelectionBorder(world);
 		frame.setFrameColor(NengoStyle.COLOR_TOOLTIP_BORDER);
 		this.world = world;

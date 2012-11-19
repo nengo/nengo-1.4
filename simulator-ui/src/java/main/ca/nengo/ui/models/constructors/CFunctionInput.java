@@ -39,7 +39,6 @@ import ca.nengo.ui.models.nodes.UIFunctionInput;
 public class CFunctionInput extends ConstructableNode {
 
 	public CFunctionInput() {
-		super();
 		pName.setDescription("Name of function input");
 		pFunctions.setDescription("Defines the function to be used as an input to other components");
 	}

@@ -63,7 +63,6 @@ package ca.nengo.ui.configurable.matrixEditor;
 //	 *            Starting values for the matrix
 //	 */
 //	public ConfigurableMatrix(float[][] matrixValues) {
-//		super();
 //		this.fromSize = matrixValues[0].length;
 //		this.toSize = matrixValues.length;
 //
@@ -78,7 +77,6 @@ package ca.nengo.ui.configurable.matrixEditor;
 //	 *            To size of the matrix to be created
 //	 */
 //	public ConfigurableMatrix(int fromSize, int toSize) {
-//		super();
 //		this.fromSize = fromSize;
 //		this.toSize = toSize;
 //

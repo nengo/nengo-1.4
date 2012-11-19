@@ -162,7 +162,6 @@ class GroundNode extends PXNode {
 	private PNode edgeHolder;
 
 	public GroundNode() {
-		super();
 		this.edgeHolder = new PNode();
 	}
 

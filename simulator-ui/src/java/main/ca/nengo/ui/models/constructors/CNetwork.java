@@ -33,7 +33,6 @@ import ca.nengo.ui.models.nodes.UINetwork;
 
 public class CNetwork extends ConstructableNode {
 	public CNetwork() {
-		super();
 		pName.setDescription("Name of the network");
 	}
 

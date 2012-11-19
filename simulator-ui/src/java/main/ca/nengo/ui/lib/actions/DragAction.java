@@ -204,7 +204,6 @@ class ObjectState {
 	private Point2D fOffset;
 
 	protected ObjectState(WorldObject initialParent, Point2D initialOffset) {
-		super();
 		this.iParent = new WeakReference<WorldObject>(initialParent);
 		this.iOffset = initialOffset;
 	}

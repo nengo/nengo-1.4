@@ -43,7 +43,6 @@ public class FnAdvanced implements ConfigurableFunction {
      * @param type TODO
      */
     public FnAdvanced(Class<? extends Function> type) {
-        super();
         this.type = type;
     }
 

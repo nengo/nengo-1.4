@@ -119,7 +119,6 @@ class BrainImageWrapper extends WorldObjectImpl {
     Text myLabel;
 
     public BrainImageWrapper(AbstractBrainImage2D brainImage) {
-        super();
         myBrainImage = brainImage;
         addChild(new WorldObjectImpl(new PXImage(brainImage)));
 

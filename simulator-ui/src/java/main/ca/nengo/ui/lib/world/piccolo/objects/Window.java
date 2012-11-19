@@ -72,7 +72,6 @@ public class Window extends WorldObjectImpl implements Interactable {
 	 *            Node containing the contents of this Window
 	 */
 	public Window(WorldObjectImpl source, WorldObjectImpl content) {
-		super();
 		mySourceRef = new WeakReference<WorldObjectImpl>(source);
 		setSelectable(true);
 		this.myContent = content;
@@ -325,7 +324,6 @@ class MenuBar extends WorldObjectImpl implements PInputEventListener {
 	private Text title;
 
 	public MenuBar(Window window) {
-		super();
 		this.myWindow = window;
 		init();
 	}

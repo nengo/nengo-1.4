@@ -36,7 +36,6 @@ public class ReversableActionManager {
 	 *            Application parent of this manager
 	 */
 	public ReversableActionManager(AppFrame parent) {
-		super();
 		reversableActions = new Vector<ReversableAction>(
 				MAX_NUM_OF_UNDO_ACTIONS + 1);
 		this.parent = parent;

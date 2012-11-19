@@ -27,7 +27,6 @@ public class Border extends WorldObjectImpl implements Listener {
 	 *            Color of border
 	 */
 	public Border(WorldObjectImpl target, Color color) {
-		super();
 		this.myColor = color;
 		this.myTarget = target;
 

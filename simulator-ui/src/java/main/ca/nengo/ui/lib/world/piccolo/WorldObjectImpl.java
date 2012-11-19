@@ -113,8 +113,6 @@ public class WorldObjectImpl implements WorldObject {
 	private PNode myPNode;
 
 	protected WorldObjectImpl(String name, PiccoloNodeInWorld pNode) {
-		super();
-
 		if (pNode == null) {
 			pNode = new PXNode();
 		}
@@ -924,7 +922,6 @@ class PiccoloChangeListener implements PropertyChangeListener {
 	Listener woChangeListener;
 
 	public PiccoloChangeListener(Listener worldListener) {
-		super();
 		this.woChangeListener = worldListener;
 	}
 

@@ -36,12 +36,12 @@ import java.util.List;
 public interface ConfigSchema {
 
     /**
-     * @return TODO
+     * @return Properties shown at all times
      */
     public List<Property> getProperties();
 
     /**
-     * @return TODO
+     * @return Properties only shown if advanced is clicked
      */
     public List<Property> getAdvancedProperties();
 }

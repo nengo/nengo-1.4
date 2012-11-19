@@ -50,8 +50,6 @@ public class Tooltip extends WorldObjectImpl {
 	}
 
 	public Tooltip(TooltipBuilder tooltipBuilder, double width) {
-		super();
-
 		this.tooltipBuilder = tooltipBuilder;
 		this.tooltipWidth = width;
 		init();

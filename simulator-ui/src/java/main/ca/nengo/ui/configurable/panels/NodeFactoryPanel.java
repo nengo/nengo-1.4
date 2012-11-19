@@ -188,7 +188,6 @@ abstract class ConstructableNodeFactory extends AbstractConstructable {
     private Class<? extends NodeFactory> type;
 
     public ConstructableNodeFactory(String name, Class<? extends NodeFactory> type) {
-        super();
         this.name = name;
         this.type = type;
     }
@@ -442,7 +441,6 @@ class CSpikingNeuronFactory extends ConstructableNodeFactory {
         Class<?> type;
 
         public ClassWrapper(Class<?> type) {
-            super();
             this.type = type;
         }
 

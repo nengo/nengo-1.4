@@ -146,7 +146,6 @@ public class ConfigUtil {
 		 * @param o Object to configure
 		 */
 		public ConfigurationPane(Object o) {
-			super();
 			init(o);
 
 			//note: setting preferred size of tree itself prevents viewport from expanding

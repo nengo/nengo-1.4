@@ -30,7 +30,6 @@ public class TooltipWrapper extends WorldObjectImpl implements Listener {
 	 *            Target which this tooltip shall be attached to
 	 */
 	public TooltipWrapper(WorldSky parent, WorldObject tooltip, WorldObject target) {
-		super();
 		this.tooltip = tooltip;
 		this.target = target;
 		this.parent = parent;

@@ -25,10 +25,8 @@ public class LineOriginIcon extends WorldObjectImpl {
 	private Color color = NengoStyle.COLOR_FOREGROUND;
 
 	public LineOriginIcon() {
-		super();
 		this.setBounds(0, 0, _LINE_END_WIDTH, _LINE_END_HEIGHT);
 		setColor(NengoStyle.COLOR_LINEENDWELL);
-
 	}
 
 	@Override

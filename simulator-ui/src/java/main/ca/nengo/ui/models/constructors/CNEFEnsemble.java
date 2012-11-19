@@ -86,7 +86,6 @@ public class CNEFEnsemble extends ConstructableNode {
             pEncodingSign, pNoise });
 
     public CNEFEnsemble() {
-        super();
         pDim.setDescription("Number of dimensions that are represented by the ensemble");
         pName.setDescription("Name of the ensemble");
         pApproximator.setDescription("Limit the decoders to be all positive or all negative");
@@ -459,7 +458,6 @@ class SignItem {
     Sign type;
 
     public SignItem(String name, Sign type) {
-        super();
         this.name = name;
         this.type = type;
     }

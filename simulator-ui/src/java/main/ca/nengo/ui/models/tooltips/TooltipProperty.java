@@ -39,7 +39,6 @@ class TooltipProperty implements ITooltipPart {
 	private String propertyValue;
 
 	public TooltipProperty(String propertyName, String propertyValue) {
-		super();
 		this.propertyName = propertyName;
 		this.propertyValue = propertyValue;
 	}

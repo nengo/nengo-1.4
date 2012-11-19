@@ -26,10 +26,6 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.constructors;
 
-//import java.util.List;
-
-import javax.swing.JComboBox;
-
 import ca.nengo.math.Function;
 import ca.nengo.model.Origin;
 import ca.nengo.model.StructuralException;
@@ -39,7 +35,6 @@ import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.ConfigSchema;
 import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.Property;
-import ca.nengo.ui.configurable.PropertyInputPanel;
 import ca.nengo.ui.configurable.descriptors.PFunctionArray;
 import ca.nengo.ui.configurable.descriptors.PString;
 import ca.nengo.ui.models.nodes.widgets.UIDecodedOrigin;
@@ -51,13 +46,9 @@ public class CDecodedOrigin extends ProjectionConstructor {
 
 	private Property pFunctions;
 
-	//private Property pNodeOrigin;
-
 	public CDecodedOrigin(NEFEnsemble enfEnsembleParent) {
-		super();
 		this.enfEnsembleParent = enfEnsembleParent;
 		pName.setDescription("Name of the origin");
-
 	}
 
 	@Override
@@ -65,15 +56,8 @@ public class CDecodedOrigin extends ProjectionConstructor {
 		pFunctions = new PFunctionArray("Functions", enfEnsembleParent.getDimension());
 		pFunctions.setDescription("The function to compute");
 
-		// Find common nodes
-		//Node[] nodes = enfEnsembleParent.getNodes();
-		//List<String> commonNodes = AbstractEnsemble.findCommon1DOrigins(nodes);
-
-		//pNodeOrigin = new OriginSelector("Node Origin Name", commonNodes.toArray(new String[0]));
-
-		Property[] zProperties = { pName, pFunctions};//, pNodeOrigin };
+		Property[] zProperties = {pName, pFunctions};
 		return new ConfigSchemaImpl(zProperties);
-
 	}
 
 	public String getTypeName() {
@@ -94,8 +78,9 @@ public class CDecodedOrigin extends ProjectionConstructor {
 		Origin origin = null;
 
 		try {
-			origin = enfEnsembleParent.addDecodedOrigin(uniqueName, (Function[]) configuredProperties
-					.getValue(pFunctions), "AXON");//(String) configuredProperties.getValue(pNodeOrigin));
+			origin = enfEnsembleParent.addDecodedOrigin(
+					uniqueName, (Function[]) configuredProperties
+					.getValue(pFunctions), "AXON");
 
 		} catch (StructuralException e) {
 			throw new ConfigException(e.getMessage());
@@ -103,8 +88,6 @@ public class CDecodedOrigin extends ProjectionConstructor {
 
 		return origin;
 	}
-
-
 }
 
 /**
@@ -112,78 +95,75 @@ public class CDecodedOrigin extends ProjectionConstructor {
  *
  * @author Shu Wu
  */
-class OriginInputPanel extends PropertyInputPanel {
-
-	/**
-	 * Selector of the Node Origin
-	 */
-	private JComboBox comboBox;
-
-	String[] origins;
-
-	public OriginInputPanel(OriginSelector property, String[] originNames) {
-		super(property);
-		this.origins = originNames;
-
-		comboBox = new JComboBox(origins);
-		add(comboBox);
-	}
-
-	@Override
-	public String getValue() {
-		return (String) comboBox.getSelectedItem();
-	}
-
-	@Override
-	public boolean isValueSet() {
-		return true;
-	}
-
-	@Override
-	public void setValue(Object value) {
-		if (value != null && value instanceof String) {
-			for (int i = 0; i < comboBox.getItemCount(); i++) {
-				String item = (String) comboBox.getItemAt(i);
-
-				if (item.compareTo((String) value) == 0) {
-					comboBox.setSelectedIndex(i);
-					return;
-				}
-
-			}
-		}
-	}
-
-}
+//class OriginInputPanel extends PropertyInputPanel {
+//
+//	/**
+//	 * Selector of the Node Origin
+//	 */
+//	private JComboBox comboBox;
+//
+//	String[] origins;
+//
+//	public OriginInputPanel(OriginSelector property, String[] originNames) {
+//		super(property);
+//		this.origins = originNames;
+//
+//		comboBox = new JComboBox(origins);
+//		add(comboBox);
+//	}
+//
+//	@Override
+//	public String getValue() {
+//		return (String) comboBox.getSelectedItem();
+//	}
+//
+//	@Override
+//	public boolean isValueSet() {
+//		return true;
+//	}
+//
+//	@Override
+//	public void setValue(Object value) {
+//		if (value != null && value instanceof String) {
+//			for (int i = 0; i < comboBox.getItemCount(); i++) {
+//				String item = (String) comboBox.getItemAt(i);
+//
+//				if (item.compareTo((String) value) == 0) {
+//					comboBox.setSelectedIndex(i);
+//					return;
+//				}
+//			}
+//		}
+//	}
+//}
 
 /**
  * Selects an available Node Origin
  *
  * @author Shu Wu
  */
-class OriginSelector extends Property {
-
-	private static final long serialVersionUID = 1L;
-	String[] origins;
-
-	public OriginSelector(String name, String description, String[] originNames) {
-		super(name, description);
-		this.origins = originNames;
-	}
-
-	@Override
-	protected OriginInputPanel createInputPanel() {
-		return new OriginInputPanel(this, origins);
-	}
-
-	@Override
-	public Class<String> getTypeClass() {
-		return String.class;
-	}
-
-	@Override
-	public String getTypeName() {
-		return "Node Origin Selector";
-	}
-
-}
+//class OriginSelector extends Property {
+//
+//	private static final long serialVersionUID = 1L;
+//	String[] origins;
+//
+//	public OriginSelector(String name, String description, String[] originNames) {
+//		super(name, description);
+//		this.origins = originNames;
+//	}
+//
+//	@Override
+//	protected OriginInputPanel createInputPanel() {
+//		return new OriginInputPanel(this, origins);
+//	}
+//
+//	@Override
+//	public Class<String> getTypeClass() {
+//		return String.class;
+//	}
+//
+//	@Override
+//	public String getTypeName() {
+//		return "Node Origin Selector";
+//	}
+//}

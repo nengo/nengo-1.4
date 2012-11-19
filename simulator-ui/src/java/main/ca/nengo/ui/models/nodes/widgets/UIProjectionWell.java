@@ -39,7 +39,6 @@ public class UIProjectionWell extends LineWell {
 	private final UIOrigin myOrigin;
 
 	public UIProjectionWell(UIOrigin myOrigin) {
-		super();
 		this.myOrigin = myOrigin;
 	}
 
@@ -71,7 +70,6 @@ public class UIProjectionWell extends LineWell {
 		private UIProjection projection;
 
 		public RemoveProjectionListener(UIProjection projection) {
-			super();
 			this.projection = projection;
 		}
 

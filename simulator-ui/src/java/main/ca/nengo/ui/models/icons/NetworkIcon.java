@@ -62,7 +62,6 @@ public class NetworkIcon extends NodeContainerIcon {
 		private static final int Padding = 4;
 
 		public VectorIcon() {
-			super();
 			this.setBounds(0, 0, Padding * 2 + CircleDiameter + (NumberOfNodeColumns - 1) * ColumnWidth, Padding * 2
 					+ CircleDiameter + (NumberOfNodeRows - 1) * RowHeight);
 		}

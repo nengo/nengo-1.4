@@ -65,10 +65,6 @@ public interface NodeContainer {
 	public static class ContainerException extends UIException {
 		private static final long serialVersionUID = 1L;
 
-		public ContainerException() {
-			super();
-		}
-
 		public ContainerException(String arg0) {
 			super(arg0);
 		}

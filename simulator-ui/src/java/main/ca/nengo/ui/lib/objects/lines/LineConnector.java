@@ -34,7 +34,6 @@ public abstract class LineConnector extends WorldObjectImpl implements Interacta
 	private final LineWell myWell;
 
 	public LineConnector(LineWell well) {
-		super();
 		this.myWell = well;
 
 		setSelectable(true);
@@ -228,7 +227,6 @@ class DestroyListener implements Listener {
 	private LineConnector parent;
 
 	public DestroyListener(LineConnector parent) {
-		super();
 		this.parent = parent;
 	}
 

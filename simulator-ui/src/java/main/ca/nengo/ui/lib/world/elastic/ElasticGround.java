@@ -40,7 +40,6 @@ public class ElasticGround extends WorldGroundImpl {
 	private Hashtable<ElasticObject, ElasticVertex> myVertexMap = new Hashtable<ElasticObject, ElasticVertex>();
 
 	public ElasticGround() {
-		super();
 		getPiccolo().addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
 				if (evt.getPropertyName().compareTo(PNode.PROPERTY_CHILDREN) == 0) {
@@ -463,7 +462,6 @@ public class ElasticGround extends WorldGroundImpl {
 		private boolean graphUpdated;
 
 		public UpdateGraphResult(boolean graphUpdated, Collection<ElasticVertex> addedVertices) {
-			super();
 			this.graphUpdated = graphUpdated;
 			this.addedVertices = addedVertices;
 		}

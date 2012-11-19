@@ -42,7 +42,6 @@ public class ConfigResult implements Serializable {
      * @param properties TODO
      */
     public ConfigResult(MutableAttributeSet properties) {
-        super();
         this.properties = properties;
     }
 

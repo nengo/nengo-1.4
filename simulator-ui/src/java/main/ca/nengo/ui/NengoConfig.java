@@ -7,6 +7,15 @@ import javax.swing.JFrame;
 public class NengoConfig {
 	private static Preferences prefs = Preferences.userNodeForPackage(NengoGraphics.class);
 	
+	public static final String B_GRID = "show_grid";
+	public static final boolean B_GRID_DEF = true;
+	
+	public static final String B_TOOLTIPS = "show_tooltips";
+	public static final boolean B_TOOLTIPS_DEF = false;
+	
+	public static final String B_WELCOME = "show_welcome";
+	public static final boolean B_WELCOME_DEF = true;
+	
 	public static final String F_PLOTTER_TAU = "plotter_tau";
 	public static final float F_PLOTTER_TAU_DEF = 0.01f;
 	

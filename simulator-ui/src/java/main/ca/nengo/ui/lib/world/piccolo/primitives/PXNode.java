@@ -32,8 +32,6 @@ public class PXNode extends PNode implements PiccoloNodeInWorld {
 
 	private WorldObject worldObjectParent;
 	public PXNode() {
-		super();
-
 		addPropertyChangeListener(PNode.PROPERTY_TRANSFORM, new TransformChangeListener());
 	}
 

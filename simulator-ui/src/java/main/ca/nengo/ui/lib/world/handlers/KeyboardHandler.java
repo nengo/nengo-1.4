@@ -22,7 +22,6 @@ public class KeyboardHandler extends PBasicInputEventHandler implements Destroya
 	private final SearchInputHandler searchHandler;
 
 	public KeyboardHandler(WorldImpl world) {
-		super();
 		this.searchHandler = new SearchInputHandler(world);
 	}
 
