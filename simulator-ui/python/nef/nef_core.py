@@ -193,6 +193,9 @@ class Network:
         else:        
             ef.approximatorFactory.noise=decoder_noise
         if eval_points is not None:
+            if len(eval_points[0]) != dimensions:
+                raise Exception('Dimensions of evaluation points (%d) must match specified ensemble dimensions (%d)' %
+                                (len(eval_points[0]), dimensions))
             ef.evalPointFactory=generators.FixedEvalPointGenerator(eval_points)
         if isinstance(radius,list):
             r=radius
