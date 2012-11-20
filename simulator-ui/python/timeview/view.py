@@ -379,12 +379,23 @@ class ViewPanel(JPanel):
             tname = prefix + termination.node.name
 
             self.paintProjection(oname, tname, g)
+
+            # Check to see if the termination or origin is wrapped. If it is, then use that,
+            # otherwise, just use the termination / origin itself. 
+            # Note: This may or may not have unintended consequences when checking what object
+            #       the termination / origin is connected to (see next code block - 
+            #       ... isinstance(termination.node, NetworkImpl) ...)
+            if hasattr(termination, 'wrappedTermination' ):
+                termination = termination.wrappedTermination
+            if hasattr(origin, 'wrappedOrigin' ):
+                origin = origin.wrappedOrigin
+    
             if isinstance(termination.node, NetworkImpl):
-                self.paintProjection(oname, tname + ':' + termination.wrappedTermination.node.name, g)
+                self.paintProjection(oname, tname + ':' + termination.node.name, g)
                 if isinstance(origin.node, NetworkImpl):
-                    self.paintProjection(oname + ':' + origin.wrappedOrigin.name, tname + ':' + termination.wrappedTermination.name, g)
+                    self.paintProjection(oname + ':' + origin.name, tname + ':' + termination.name, g)
             if isinstance(origin.node, NetworkImpl):
-                self.paintProjection(oname + ':' + origin.wrappedOrigin.node.name, tname, g)
+                self.paintProjection(oname + ':' + origin.node.name, tname, g)
 
         for n in network.nodes:
             if isinstance(n, NetworkImpl):
