@@ -67,7 +67,7 @@ public abstract class NodeContainerIcon extends ModelIcon {
 
 		myNumOfNodes = numOfNodes;
 
-		String neuronsText = myNumOfNodes + " neuron" + (myNumOfNodes == 1 ? "" : "s");
+		String neuronsText = myNumOfNodes + " Neuron" + (myNumOfNodes == 1 ? "" : "s");
 		if (getModelParent().getModel().getMode() == SimulationMode.DIRECT) {
 			neuronsText = "Direct Mode";
 		}
@@ -112,7 +112,7 @@ public abstract class NodeContainerIcon extends ModelIcon {
 		super.modelUpdated();
 		updateIconScale();
 	}
-
+	
 	@Override
 	public UINodeViewable getModelParent() {
 

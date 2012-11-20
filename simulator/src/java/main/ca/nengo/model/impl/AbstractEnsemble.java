@@ -163,6 +163,9 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		for (Node myNode : myNodes) {
 			myNode.setMode(mode);
 		}
+		
+		// Added for issue #310: Setting mode can now be a visible change
+		fireVisibleChangeEvent();
 	}
 
 
