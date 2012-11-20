@@ -137,6 +137,10 @@ class Graph(core.DataViewComponent):
                 for dim in sel_dim:                         # Iterate and restore the saved state
                     if(dim < data_dim):
                         self.indices[dim] = True
+            
+                # Check if all of the indices are selected
+                # Just in case someone altered the layout file and didn't set things right
+                self.sel_all = all(self.indices)
 
             self.fix_popup()                            # Update the pop-up box
 
@@ -287,6 +291,8 @@ class Graph(core.DataViewComponent):
                     break
             else:
                 return
+
+        self.sel_all = all(self.indices)
 
         filtered = []
         for i, draw in enumerate(self.indices):
