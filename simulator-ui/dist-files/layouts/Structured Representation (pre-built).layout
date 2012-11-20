@@ -1,23 +1,21 @@
-({'state': 0, 'height': 530, 'width': 948, 'x': -4, 'y': 22},
- [(u'B', None, {'label': 0, 'height': 32, 'width': 23, 'x': 310, 'y': 90}),
-  (u'A', None, {'label': 0, 'height': 32, 'width': 23, 'x': 311, 'y': 297}),
+({'state': 0, 'height': 530, 'width': 948, 'x': 2129, 'y': 206},
+ [(u'B', None, {'label': 0, 'height': 32, 'width': 23, 'x': 320, 'y': 296}),
+  (u'A', None, {'label': 0, 'height': 32, 'width': 23, 'x': 323, 'y': 88}),
   (u'C', None, {'label': 0, 'height': 32, 'width': 24, 'x': 576, 'y': 297}),
   (u'Bind', None, {'label': 0, 'height': 32, 'width': 49, 'x': 462, 'y': 297}),
-  (u'D', None, {'label': 0, 'height': 32, 'width': 24, 'x': 571, 'y': 90}),
-  (u'D', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': 618, 'smooth_normalize': 0, 'fixed_y': None, 'show_graph': True, 'show_pairs': 0, 'autozoom': 0, 'y': 7}),
-  (u'B', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': 1, 'smooth_normalize': 0, 'fixed_y': None, 'show_graph': True, 'show_pairs': 0, 'autozoom': 0, 'y': 1}),
-  (u'C', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': 621, 'smooth_normalize': 0, 'fixed_y': None, 'show_graph': True, 'show_pairs': 0, 'autozoom': 0, 'y': 208}),
-  (u'A', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 300, 'x': -1, 'smooth_normalize': 0, 'fixed_y': None, 'show_graph': True, 'show_pairs': 0, 'autozoom': 0, 'y': 208}),
-  (u'add', None, {'label': False, 'height': 32, 'width': 43, 'x': 441, 'y': 90})],
+  (u'B', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2], 'last_maxy': 1.0000000000000007, 'sel_all': False, 'height': 200, 'width': 300, 'x': 14, 'smooth_normalize': 0, 'fixed_y': None, 'show_graph': True, 'show_pairs': 0, 'autozoom': False, 'y': 218}),
+  (u'C', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2, 5], 'last_maxy': 1.0000000000000007, 'sel_all': False, 'height': 200, 'width': 300, 'x': 621, 'smooth_normalize': 0, 'fixed_y': None, 'show_graph': True, 'show_pairs': True, 'autozoom': 0, 'y': 208}),
+  (u'A', 'semantic pointer', {'label': 0, 'normalize': 1, 'sel_dim': [0, 1, 2], 'last_maxy': 1.0000000000000007, 'sel_all': False, 'height': 200, 'width': 300, 'x': 13, 'smooth_normalize': 0, 'fixed_y': None, 'show_graph': True, 'show_pairs': 0, 'autozoom': False, 'y': 17}),
+  (u'Sum', None, {'label': False, 'height': 32, 'width': 51, 'x': 492, 'y': 90}),
+  (u'Sum', 'semantic pointer', {'label': True, 'normalize': True, 'sel_dim': [0, 1, 2, 3, 4, 5], 'last_maxy': 1.0000000000000007, 'sel_all': False, 'height': 200, 'width': 300, 'x': 621, 'smooth_normalize': False, 'fixed_y': None, 'show_graph': True, 'show_pairs': True, 'autozoom': False, 'y': 9})],
  {'dt': 0, 'show_time': 0.5, 'sim_spd': 4, 'filter': 0.03, 'rcd_time': 4.0}) 
 ##############################
 ### Nengo Workspace layout ###
 ##############################
 # elasticmode=false
-# viewbounds=PBounds[x=47.3721972300109,y=233.33334350585935,width=976.5007408472902,height=604.5784788131713]
-# Bind (Network)=Point2D.Double[527.0801738986694, 606.21817279245]
-# A (NEFEnsemble)=Point2D.Double[260.41545149948826, 302.12588452963087]
-# B (NEFEnsemble)=Point2D.Double[254.16618059979527, 640.5891627407622]
-# C (NEFEnsemble)=Point2D.Double[780.2048093485156, 642.6722530406595]
-# D (NEFEnsemble)=Point2D.Double[756.249270899693, 301.08433937968215]
-# add (NEFEnsemble)=Point2D.Double[568.741979896622, 302.12588452963087]
+# viewbounds=PBounds[x=47.37217815781676,y=233.3333435058595,width=976.5007608718665,height=604.5784912109375]
+# Bind (Network)=Point2D.Double[527.0802001953125, 606.2182006835938]
+# C (NEFEnsemble)=Point2D.Double[782.1202748704976, 663.7420909582867]
+# Sum (NEFEnsemble)=Point2D.Double[568.7420043945312, 302.1258850097656]
+# A (NEFEnsemble)=Point2D.Double[260.41546630859375, 302.1258850097656]
+# B (NEFEnsemble)=Point2D.Double[254.1661834716797, 640.5891723632812]
