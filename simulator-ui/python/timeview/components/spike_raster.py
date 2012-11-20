@@ -25,13 +25,15 @@ class SpikeRaster(core.DataViewComponent):
         self.neurons = len(self.data.get_first())
         self.sample = 10
         self.popup.add(JPopupMenu.Separator())
-        self.popup.add(JMenuItem('show all', actionPerformed=lambda x: self.set_sample(1)))
-        self.popup.add(JMenuItem('show 50%', actionPerformed=lambda x: self.set_sample(2)))
-        self.popup.add(JMenuItem('show 33%', actionPerformed=lambda x: self.set_sample(3)))
-        self.popup.add(JMenuItem('show 25%', actionPerformed=lambda x: self.set_sample(4)))
-        self.popup.add(JMenuItem('show 20%', actionPerformed=lambda x: self.set_sample(5)))
-        self.popup.add(JMenuItem('show 10%', actionPerformed=lambda x: self.set_sample(10)))
-        self.popup.add(JMenuItem('show 5%', actionPerformed=lambda x: self.set_sample(20)))
+        
+        self.sample_menu_items = {}
+        self.sample_menu_items[1] = self.popup.add(JCheckBoxMenuItem('show all', self.sample == 1, actionPerformed=lambda x: self.set_sample(1)))
+        self.sample_menu_items[2] = self.popup.add(JCheckBoxMenuItem('show 50%', self.sample == 2, actionPerformed=lambda x: self.set_sample(2)))
+        self.sample_menu_items[3] = self.popup.add(JCheckBoxMenuItem('show 33%', self.sample == 3, actionPerformed=lambda x: self.set_sample(3)))
+        self.sample_menu_items[4] = self.popup.add(JCheckBoxMenuItem('show 25%', self.sample == 4, actionPerformed=lambda x: self.set_sample(4)))
+        self.sample_menu_items[5] = self.popup.add(JCheckBoxMenuItem('show 20%', self.sample == 5, actionPerformed=lambda x: self.set_sample(5)))
+        self.sample_menu_items[10] = self.popup.add(JCheckBoxMenuItem('show 10%', self.sample == 10, actionPerformed=lambda x: self.set_sample(10)))
+        self.sample_menu_items[20] = self.popup.add(JCheckBoxMenuItem('show 5%', self.sample == 20, actionPerformed=lambda x: self.set_sample(20)))
         self.usemap = usemap
         self.mouse_location = None
 
@@ -44,6 +46,9 @@ class SpikeRaster(core.DataViewComponent):
 
     def set_sample(self, x):
         self.sample = x
+        # Set appropriate states for each sample checkbox item.
+        for i in self.sample_menu_items.keys():
+            self.sample_menu_items[i].setState(i == x)
 
     def save(self):
         d = core.DataViewComponent.save(self)
@@ -53,6 +58,10 @@ class SpikeRaster(core.DataViewComponent):
     def restore(self, d):
         core.DataViewComponent.restore(self, d)
         self.sample = d.get('sample', 1)
+        
+        # Set appropriate states for each sample checkbox item.
+        for i in self.sample_menu_items.keys():
+            self.sample_menu_items[i].setState(i == self.sample)
 
     def initialize_map(self):
         data = self.data.get_first()
