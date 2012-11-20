@@ -204,7 +204,7 @@ class Graph(core.DataViewComponent):
                         sub_menus[n].add(new_menu)
                         self.popup_dim_menus.append(new_menu)
                         sub_menus[n + 1] = new_menu
-            menu_item = JCheckBoxMenuItem(self.label_for_index(i), draw, stateChanged=lambda x, index=i, self=self: self.select_index(index, x))
+            menu_item = JCheckBoxMenuItem(self.label_for_index(i), draw, actionPerformed=lambda x, index=i, self=self: self.select_index(index, x))
             self.selection_menu_items.append(menu_item)
             sub_menus[num_sub - 1].add(menu_item)
 
