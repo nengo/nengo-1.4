@@ -1260,6 +1260,10 @@ def save_layout_file(name, view, layout, controls):
     # - If it does, extract java layout information, otherwise just make a new file
     java_layout = ""
     if java.io.File(fn).exists():
+        # Save a backup of the layout file
+        fp = java.io.File(fn).getCanonicalPath()
+        copyfile(fp, fp + '.bak')
+
         f = file(fn, 'r')
         data = f.read()
         for line in data.split('\n'):
@@ -1271,13 +1275,20 @@ def save_layout_file(name, view, layout, controls):
 
     layout_text = ',\n  '.join([repr(x) for x in layout])
 
-    f.write('(%s,\n [%s],\n %s) %s' % (
-        view, layout_text, controls, java_layout))
+    f.write('(%s,\n [%s],\n %s) %s' % (view, layout_text, controls, java_layout))
     f.close()
 
 
-def load_layout_file(name, try_backup=True):
-    fn = '%s.layout' % name
+def load_layout_file(name, try_backup = True):
+    # Support for loading a file using just the name, and a file extension 
+    # (useful for loading backup files)
+    if(isinstance(name, list)):
+        fn = '.'.join(name)
+    else:
+        fn = '%s.layout' % name
+
+    read_fail = False 
+    data = []
     if not java.io.File(fn).exists():
         make_layout_dir(java.io.File('layouts'))
         fn = 'layouts/' + fn
@@ -1290,19 +1301,38 @@ def load_layout_file(name, try_backup=True):
         if text[0] == '#':
             return None
         data = eval(text)
+    except SyntaxError, e:
+        warnings.warn('Could not parse layout file "%s"' % fn, RuntimeWarning)
+        warnings.warn(e, RuntimeWarning)
+        read_fail = True       
     except Exception, e:
         warnings.warn('Could not parse layout file "%s"' % fn, RuntimeWarning)
-        return None
+        warnings.warn(e, RuntimeWarning)
+        read_fail = True
     except IndexError, e:
         warnings.warn('Could not parse layout file "%s"' % fn, RuntimeWarning)
-        return None
+        warnings.warn(e, RuntimeWarning)
+        read_fail = True
 
-    if len(data) != 3:
+    if len(data) != 3 and not read_fail:
         warnings.warn('Could not parse layout file "%s"' % fn, RuntimeWarning)
-        return None
+        read_fail = True
 
-    # Save a backup of the layout file
-    fp = java.io.File(fn).getCanonicalPath()
-    copyfile(fp, fp + '.bak')
+    # Read fail logic -
+    # If try_backup, then try loading backup file, otherwise, just return None
+    if read_fail:
+        if try_backup:
+            warnings.warn('Attempting to load backup file "%s.bak"' %fn, RuntimeWarning)
+            result = load_layout_file([fn,'bak'], try_backup = False)
+            if result is None:
+                warnings.warn('Backup load failed. Using default layout', RuntimeWarning)
+            return result
+        else:
+            return None
+    
+    # Save a backup of the layout file (but only if we are going to use it)
+    if(not read_fail and try_backup):
+        fp = java.io.File(fn).getCanonicalPath()
+        copyfile(fp, fp + '.bak')
 
     return data
