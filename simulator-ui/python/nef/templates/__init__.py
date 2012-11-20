@@ -8,6 +8,7 @@ import networkarray
 import gate
 import learned_termination
 import thalamus
+import interneuron
 
 templates=[
     networkarray,
@@ -20,4 +21,5 @@ templates=[
     thalamus,
     gate,
     learned_termination,
+    interneuron,
     ]

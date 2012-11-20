@@ -251,7 +251,7 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
         if hasattr(constructor,'test_drop'):
             node = None
             for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
-                if isinstance(n3,ca.nengo.ui.models.UINeoNode):
+                if isinstance(n3,ca.nengo.ui.models.UINeoNode) or isinstance(n3, ca.nengo.ui.models.nodes.widgets.UITermination) or isinstance(n3, ca.nengo.ui.models.nodes.widgets.UIOrigin):
                     node = n3.model
             return constructor.test_drop(net.model,node)
 
@@ -273,7 +273,7 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
 
             node = None
             for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
-                if isinstance(n3,ca.nengo.ui.models.UINeoNode):
+                if isinstance(n3,ca.nengo.ui.models.UINeoNode) or isinstance(n3, ca.nengo.ui.models.nodes.widgets.UITermination) or isinstance(n3, ca.nengo.ui.models.nodes.widgets.UIOrigin):
                     node = n3
 
             if drop_on_ensemble:
@@ -323,9 +323,9 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
             pass
     
     def configureAndWait(self, node, user_configurer):
-        if node is not None:
-            origins = node.model.getOrigins()
-            terminations = node.model.getTerminations()
+        #if node is not None:
+        #    origins = node.model.getOrigins()
+        #    terminations = node.model.getTerminations()
 
         try:
           user_configurer.configureAndWait()

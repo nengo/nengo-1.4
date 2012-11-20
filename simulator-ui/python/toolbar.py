@@ -34,45 +34,11 @@ class LayoutComboBox(JComboBox):
             self.viewer.doSortByNameLayout()
 
 ################################################################################
-from ca.nengo.ui.configurable.descriptors import *
-from ca.nengo.ui.configurable import *
-
-class ParisianTransform(IConfigurable):
-    p_num_interneurons=PInt('Number of interneurons')
-    p_tau_interneurons=PFloat('Post-synaptic time constant of interneurons')
-    p_excitatory=PBoolean('Excitatory')
-    p_optimize=PBoolean('Optimize bias function')
-    properties=[p_num_interneurons,p_tau_interneurons,p_excitatory,p_optimize]
-
-    def __init__(self):
-        self.button=make_button('parisian',self.do_transform,'create interneurons')
-        self.projection=None
-        self.button.enabled=False
-
-    def set_projection(self,projection):
-        self.projection=projection
-        self.button.enabled=projection is not None
-
-    def do_transform(self,event):
-        uc=ca.nengo.ui.configurable.managers.UserTemplateConfigurer(self)
-        uc.configureAndWait()
-    
-    def completeConfiguration(self,props):
-        if self.projection is not None:
-            self.projection.addBias(props.getValue(self.p_num_interneurons),props.getValue(self.p_tau_interneurons),self.projection.termination.tau,props.getValue(self.p_excitatory),props.getValue(self.p_optimize))
-    def preConfiguration(self,props):
-        pass
-    def getSchema(self):
-        return ConfigSchemaImpl(self.properties,[])
-    def getTypeName(self):
-        return 'ParisianTransform'
-    def getDescription(self):
-        return 'Create Interneurons'
-
-################################################################################
 from ca.nengo.math.impl import WeightedCostApproximator
 from ca.nengo.util.impl import NEFGPUInterface, NodeThreadPool
 from ca.nengo.ui.configurable.panels import BooleanPanel, IntegerPanel
+from ca.nengo.ui.configurable.descriptors import *
+from ca.nengo.ui.configurable import *
 
 class GpuCountPanel(IntegerPanel):
 
@@ -200,8 +166,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
 
         self.toolbar.add(Box.createHorizontalGlue())
         
-        self.parisian=ParisianTransform()
-        self.toolbar.add(self.parisian.button)
         self.toolbar.add(JLabel("layout:"))
         self.layoutcombo=LayoutComboBox()
         self.toolbar.add(self.layoutcombo)
@@ -239,18 +203,6 @@ class ToolBar(ca.nengo.ui.lib.world.handlers.SelectionHandler.SelectionListener,
     def update(self):
     
         selected=self.ng.getSelectedObj()
-
-        projection=None
-        if selected is not None and (hasattr(selected, 'model') and 
-                isinstance(selected.model,ca.nengo.model.nef.impl.DecodedTermination)):
-            term=selected.model
-            network=selected.nodeParent.networkParent.model
-            for p in network.getProjections():
-                if p.termination==term:
-                    if isinstance(p.origin,ca.nengo.model.nef.impl.DecodedOrigin):
-                        projection=p
-                    break
-        self.parisian.set_projection(projection)
 
         net=self.get_current_network()
         self.button_run.enabled=net is not None
