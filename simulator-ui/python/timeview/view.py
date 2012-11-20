@@ -23,7 +23,6 @@ from ca.nengo.model.neuron.impl import SpikingNeuron
 
 from java.lang.System.err import println
 from java.lang import Exception
-from shutil import copyfile
 import traceback
 import math
 import shelve
@@ -1150,3 +1149,12 @@ def load_layout_file(name, try_backup = True):
         copyfile(fp, fp + '.bak')
 
     return data
+
+
+def copyfile(file1, file2):
+    f = file(file1, 'r')
+    text = f.read()
+    f.close()
+    f = file(file2, 'w')
+    f.write(text)
+    f.close()
