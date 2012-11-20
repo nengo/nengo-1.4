@@ -178,9 +178,9 @@ class Network:
                 it=pdfs.ListPDF(intercept)
             ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc,tauRef=tau_ref,maxRate=mr,intercept=it)
         # Check if encoder dimensions match ensemble dimensions
-        if len(encoders[0]) != dimensions:
-            raise Exception('Encoder dimensions (%d) must match specified ensemble dimensions (%d)' % (len(encoders[0]), dimensions))
         if encoders is not None:
+            if len(encoders[0]) != dimensions:
+                raise Exception('Encoder dimensions (%d) must match specified ensemble dimensions (%d)' % (len(encoders[0]), dimensions))
             try:
                 ef.encoderFactory=generators.FixedVectorGenerator(encoders)
             except:
