@@ -46,6 +46,7 @@ class Graph(core.DataViewComponent):
         self.name = name
         self.func = func
         self.indices = None
+        self.sel_all = False
         if func is not None:
             self.data = self.view.watcher.watch(name, func, args=args)
         else:
@@ -101,6 +102,7 @@ class Graph(core.DataViewComponent):
                 sel_dim += [n]
 
         save_info['sel_dim'] = sel_dim              # Save the checkbox states
+        save_info['sel_all'] = self.sel_all         # Save select all status
         save_info['autozoom'] = self.autozoom
         save_info['last_maxy'] = self.last_maxy
         save_info['fixed_y'] = self.fixed_y
@@ -109,6 +111,8 @@ class Graph(core.DataViewComponent):
 
     def restore(self, d):
         core.DataViewComponent.restore(self, d)
+
+        self.sel_all = d.get('sel_all', False)
 
         if self.data is not None:
             dd = self.data.get_first()
@@ -122,13 +126,17 @@ class Graph(core.DataViewComponent):
             data_dim = len(self.rawdata[0])
 
         if data_dim > 0:
-            self.indices = [False] * data_dim
+            if self.sel_all:
+                # If select all is selected, select all indicies
+                self.indices = [True] * data_dim
+            else:
+                self.indices = [False] * data_dim
 
-            sel_dim = d.get('sel_dim', range(min(data_dim, self.default_selected)))
-
-            for dim in sel_dim:                         # Iterate and restore the saved state
-                if(dim < data_dim):
-                    self.indices[dim] = True
+                sel_dim = d.get('sel_dim', range(min(data_dim, self.default_selected)))
+                
+                for dim in sel_dim:                         # Iterate and restore the saved state
+                    if(dim < data_dim):
+                        self.indices[dim] = True
 
             self.fix_popup()                            # Update the pop-up box
 
@@ -172,7 +180,7 @@ class Graph(core.DataViewComponent):
 
         if not self.added_popup_separator:
             self.popup.add(JPopupMenu.Separator())
-            self.popup.add(JMenuItem('select all', actionPerformed=self.select_all))
+            self.sel_all_menu_item = self.popup.add(JCheckBoxMenuItem('select all', self.sel_all, actionPerformed=self.select_all))
             self.popup.add(JMenuItem('select none', actionPerformed=self.select_none))
             self.added_popup_separator = True
 
@@ -192,17 +200,26 @@ class Graph(core.DataViewComponent):
                         sub_menus[n].add(new_menu)
                         self.popup_dim_menus.append(new_menu)
                         sub_menus[n + 1] = new_menu
-            menu_item = JCheckBoxMenuItem(self.label_for_index(i), draw, stateChanged=lambda x, index=i, self=self: self.indices.__setitem__(index, x.source.state))
+            menu_item = JCheckBoxMenuItem(self.label_for_index(i), draw, stateChanged=lambda x, index=i, self=self: self.select_index(index, x))
             self.selection_menu_items.append(menu_item)
             sub_menus[num_sub - 1].add(menu_item)
 
     def select_all(self, event):
         for item in self.selection_menu_items:
             item.setState(True)
+        self.sel_all = True
+        self.sel_all_menu_item.setState(self.sel_all)
+
+    def select_index(self, index, x):
+        self.indices[index] = x.source.state
+        self.sel_all = all(self.indices)
+        self.sel_all_menu_item.setState(self.sel_all)
 
     def select_none(self, event):
         for item in self.selection_menu_items:
             item.setState(False)
+        self.sel_all = False
+        self.sel_all_menu_item.setState(self.sel_all)
 
     def post_process(self, data, start, dt_tau):
         return data
@@ -220,7 +237,6 @@ class Graph(core.DataViewComponent):
 
         g.color = Color(0.8, 0.8, 0.8)
         g.drawLine(self.border_left, border_top, self.border_left, self.size.height - self.border_bottom)
-        #g.drawLine(self.border_left,self.height-self.border_bottom,self.size.width-self.border_right,self.size.height-self.border_bottom)
 
         dt_tau = None
         if self.filter and self.view.tau_filter > 0:
@@ -260,12 +276,6 @@ class Graph(core.DataViewComponent):
             bounds = g.font.getStringBounds(txt, g.fontRenderContext)
             g.drawString(txt, self.border_left - bounds.width / 2 + int(i * dx), self.size.height - self.border_bottom + bounds.height)
 
-#                        txt='%4g'%((start+pts)*self.view.dt)
-#                        bounds=g.font.getStringBounds(txt,g.fontRenderContext)
-#                        g.drawString(txt,self.size.width-self.border_right-bounds.width/2,self.size.height-self.border_bottom+bounds.height)
- #                       txt='%4g'%((start)*self.view.dt)
- #                       bounds=g.font.getStringBounds(txt,g.fontRenderContext)
- #                       g.drawString(txt,self.border_left-bounds.width/2,self.size.height-self.border_bottom+bounds.height)
         if self.indices is None:
             for x in data:
                 if x is not None:
