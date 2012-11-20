@@ -259,12 +259,6 @@ public class ProjectionImpl implements Projection {
 	    	tempOrigin = ((OriginWrapper) tempOrigin).getWrappedOrigin();
 	    }
 	    
-	    originNodeFullName.append(tempOrigin.getNode().getName());
-	    
-	    py.append("\'" + originNodeFullName + "\'");
-	    
-	    
-	    
 	    StringBuilder terminationNodeFullName = new StringBuilder();
 	    Termination tempTermination = myTermination;
 
@@ -274,10 +268,6 @@ public class ProjectionImpl implements Projection {
 	    	tempTermination = ((TerminationWrapper) tempTermination).getWrappedTermination();
 	    }
 	    
-	    terminationNodeFullName.append(tempTermination.getNode().getName());
-	    
-	    py.append(", \'" + terminationNodeFullName + "\'");
-	    
 	    DecodedTermination dTermination; 
 	    StringBuilder transformString = new StringBuilder();
 	    
@@ -286,10 +276,13 @@ public class ProjectionImpl implements Projection {
 	    {
 	    	dTermination = (DecodedTermination) tempTermination;
 	    	transformString.append(getTransformScript(dTermination, "transform = ".length()));
+	    	terminationNodeFullName.append(tempTermination.getNode().getName());
 	    }
 	    else if(tempTermination instanceof EnsembleTermination && 
 	    		tempTermination.getNode().getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6")
 	    {
+	    	terminationNodeFullName.deleteCharAt(terminationNodeFullName.length()-1);
+	    	
 	    	boolean first = true;
 	    	for(Node node : tempTermination.getNode().getChildren())
 	    	{
@@ -297,7 +290,7 @@ public class ProjectionImpl implements Projection {
 	    		{
 	    			first = false;
 	    		}else {
-	    			transformString.append(new String(new char["transform = ".length() + 1]).replace("\0", " "));
+	    			transformString.append(",\n" + new String(new char["transform = ".length() + 1]).replace("\0", " "));
 	    		}
 	    		
 	    		// this relies on the decoded terminations in the child nodes having the 
@@ -318,22 +311,23 @@ public class ProjectionImpl implements Projection {
 
 	    transformString.append("]\n");
 	   
-	    py.insert(0, "transform = " + transformString.toString());
-	    py.append(", transform=transform");
-	    
 	    // Now handle origin function if there is one
-	   
+	    String funcString = "";
+	    
 	    if(!(tempOrigin.getNode() instanceof FunctionInput))
 	    {
 		    DecodedOrigin dOrigin; 
 		    if(tempOrigin instanceof DecodedOrigin)
 		    {
 		    	dOrigin = (DecodedOrigin) tempOrigin;
+		    	originNodeFullName.append(tempOrigin.getNode().getName());
 		    }
 		    else if(tempOrigin.getClass().getCanonicalName() == "org.python.proxies.nef.array$ArrayOrigin$5" && 
 		    		tempOrigin.getNode().getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6")
 		    {
+		    	originNodeFullName.deleteCharAt(originNodeFullName.length()-1);
 		    	Node node = tempOrigin.getNode().getChildren()[0];
+		    	
 		    	try{
 		    		dOrigin = (DecodedOrigin) node.getOrigin(tempOrigin.getName());
 		    	}catch(StructuralException e){
@@ -345,15 +339,21 @@ public class ProjectionImpl implements Projection {
 		    	throw new ScriptGenException("Trying to generate script of non decoded origin which is not supported.");
 		    }
 		    
-		    String funcString = getFunctionScript(dOrigin);
+		    funcString = getFunctionScript(dOrigin);
+	    }
+	    
+	    py.append("\'" + originNodeFullName + "\'");
+	    py.append(", \'" + terminationNodeFullName + "\'");
+	    
+	    py.insert(0, "transform = " + transformString);
+	    py.append(", transform=transform");
+	    
+	    if(!funcString.equals(""))
+	    {
+		    py.insert(0, "    return [" + funcString + "]\n\n");
+		    py.insert(0, "def function(x):\n");
 		    
-		    if(!funcString.equals(""))
-		    {
-			    py.insert(0, "    return [" + funcString + "]\n\n");
-			    py.insert(0, "def function(x):\n");
-			    
-			    py.append(", func=function");
-		    }
+		    py.append(", func=function");
 	    }
 	    
 	    py.append(")\n\n");

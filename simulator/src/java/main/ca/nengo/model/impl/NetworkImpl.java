@@ -647,13 +647,8 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 */
 	public void exposeOrigin(Origin origin, String name) {
 		Origin temp;
-		
-		if(origin.getNode().equals(this))
-		{
-			temp = origin;
-		}else{
-			temp = new OriginWrapper(this, origin, name);
-		}
+
+		temp = new OriginWrapper(this, origin, name);
 
 		myExposedOrigins.put(name, temp );
 		myExposedOriginNames.put(origin, name);
@@ -728,18 +723,11 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	public void exposeTermination(Termination termination, String name) {
 		Termination term;
 		
-		if(termination.getNode().equals(this))
-		{
-			myExposedTerminations.put(termination.getName(), termination);
-			myExposedTerminationNames.put(termination, termination.getName());
-			OrderedExposedTerminations.add(termination);
-		}else{
 			term = new TerminationWrapper(this, termination, name);
 			
 			myExposedTerminations.put(name, term);
 			myExposedTerminationNames.put(termination, name);
 			OrderedExposedTerminations.add(term);
-		}
 		
 		fireVisibleChangeEvent();
 	}
@@ -751,14 +739,6 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		Termination term = myExposedTerminations.get(name);
 		
 		if(term == null) return;
-		
-		if(!(term instanceof TerminationWrapper))
-		{
-			OrderedExposedTerminations.remove(term);
-			myExposedTerminations.remove(name);
-			myExposedTerminationNames.remove(term);
-			return;
-		}
 		
 		OrderedExposedTerminations.remove(term);
 		TerminationWrapper termination = (TerminationWrapper)myExposedTerminations.remove(name);
