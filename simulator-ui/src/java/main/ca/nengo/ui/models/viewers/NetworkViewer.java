@@ -73,6 +73,7 @@ import edu.umd.cs.piccolo.util.PBounds;
 public class NetworkViewer extends NodeViewer implements NodeContainer {
     private static final boolean ELASTIC_LAYOUT_ENABLED_DEFAULT = false;
     private File layoutFile;
+    private File backupLayoutFile;
 
     /**
      * @param pNetwork
@@ -80,7 +81,9 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
      */
     public NetworkViewer(UINetwork pNetwork) {
         super(pNetwork);
-        this.layoutFile = new File("layouts/" + pNetwork.getName() + ".layout");
+        String layoutFileName = "layouts/" + pNetwork.getName() + ".layout";
+        this.layoutFile = new File(layoutFileName);
+        this.backupLayoutFile = new File(layoutFileName + ".bak");
     }
 
     @Override
@@ -443,61 +446,121 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
      * @return Whether the operation was successful
      */
     public boolean restoreNodeLayout() {
+    	File fileToOpen = layoutFile;
+    	boolean loadFromBackup = false;
+    	boolean readFailed = false;
+    	
         if (!layoutFile.exists()) {
-            return false;
+            if (!backupLayoutFile.exists()) {
+            	return false;
+            }
+            else {
+            	System.err.println("NetworkViewer.restoreNodeLayout() - Layout file not found, attempting to restore from backup.");
+            	fileToOpen = backupLayoutFile;
+            	loadFromBackup = true;
+            }
         }
-
+        
         getGround().setElasticEnabled(false);
         boolean enableElasticMode = false;
 
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new FileReader(layoutFile));
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
         HashMap<String, Float[]> nodeXY = new HashMap<String, Float[]>();
         String line = null;
         PBounds fullBounds = null;
-
-        try {
-            while((line = reader.readLine()) != null) {
-                if (line.length() >= 2 && line.substring(0, 2).equals("# ")) {
-                    if (line.indexOf("elasticmode=") != -1) {
-                        enableElasticMode = Boolean.parseBoolean(
-                                line.substring(line.indexOf('=') + 1));
-                    } else if (line.indexOf("viewbounds=") != -1) {
-                        float x = Float.parseFloat(line.substring(
-                                line.indexOf("x=") + 2, line.indexOf(',')));
-                        float y = Float.parseFloat(line.substring(
-                                line.indexOf("y=") + 2, line.indexOf(',', line.indexOf("y="))));
-                        float width = Float.parseFloat(line.substring(
-                                line.indexOf("width=") + 6, line.indexOf(',', line.indexOf("width="))));
-                        float height = Float.parseFloat(line.substring(
-                                line.indexOf("height=") + 7, line.indexOf(']', line.indexOf("height="))));
-                        // Hax
-                        x += 161.5;
-                        y += 100;
-                        width -= 323;
-                        height -= 200;
-                        fullBounds = new PBounds(x, y, width, height);
-                    } else {
-                        float x = Float.parseFloat(line.substring(
-                                line.indexOf(")=Point2D.Double[") + 17, line.indexOf(',',
-                                        line.indexOf(")=Point2D.Double["))));
-                        float y = Float.parseFloat(line.substring(
-                                line.indexOf(",", line.indexOf(")=Point2D.Double[")) + 1,
-                                line.indexOf(']', line.indexOf(")=Point2D.Double["))));
-                        String fullName = line.substring(2,
-                                line.indexOf("=Point2D.Double["));
-                        nodeXY.put(fullName, new Float[]{x, y});
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+        
+        while (true) {
+	        BufferedReader reader = null;
+	        try {
+	            reader = new BufferedReader(new FileReader(fileToOpen));
+	        } catch (IOException e) {
+	            System.err.println("NetworkViewer.restoreNodeLayout() - IOException encountered attempting to create BufferedReader: " 
+	            		           + e.getMessage());
+	            readFailed = true;
+	        }
+	
+	        try {
+	            while((line = reader.readLine()) != null) {
+	                if (line.length() >= 2 && line.substring(0, 2).equals("# ")) {
+	                    if (line.indexOf("elasticmode=") != -1) {
+	                        enableElasticMode = Boolean.parseBoolean(
+	                                line.substring(line.indexOf('=') + 1));
+	                    } else if (line.indexOf("viewbounds=") != -1) {
+	                        float x = Float.parseFloat(line.substring(
+	                                line.indexOf("x=") + 2, line.indexOf(',')));
+	                        float y = Float.parseFloat(line.substring(
+	                                line.indexOf("y=") + 2, line.indexOf(',', line.indexOf("y="))));
+	                        float width = Float.parseFloat(line.substring(
+	                                line.indexOf("width=") + 6, line.indexOf(',', line.indexOf("width="))));
+	                        float height = Float.parseFloat(line.substring(
+	                                line.indexOf("height=") + 7, line.indexOf(']', line.indexOf("height="))));
+	                        // TODO: Hax
+	                        x += 161.5;
+	                        y += 100;
+	                        width -= 323;
+	                        height -= 200;
+	                        fullBounds = new PBounds(x, y, width, height);
+	                    } else {
+	                        float x = Float.parseFloat(line.substring(
+	                                line.indexOf(")=Point2D.Double[") + 17, line.indexOf(',',
+	                                        line.indexOf(")=Point2D.Double["))));
+	                        float y = Float.parseFloat(line.substring(
+	                                line.indexOf(",", line.indexOf(")=Point2D.Double[")) + 1,
+	                                line.indexOf(']', line.indexOf(")=Point2D.Double["))));
+	                        String fullName = line.substring(2,
+	                                line.indexOf("=Point2D.Double["));
+	                        nodeXY.put(fullName, new Float[]{x, y});
+	                    }
+	                }
+	            }
+		        reader.close();
+	        } catch (IOException e) {
+	            System.err.println("NetworkViewer.restoreNodeLayout() - IOException encountered attempting to parse file: " + 
+	            		           e.getMessage());
+	            readFailed = true;
+	        } catch (StringIndexOutOfBoundsException e) {
+	        	System.err.println("NetworkViewer.restoreNodeLayout() - StringIndexOutOfBoundsException encountered attempting to parse file: " + 
+	        			           e.getMessage());
+	        	readFailed = true;
+	        } catch (NumberFormatException e) {
+	        	System.err.println("NetworkViewer.restoreNodeLayout() - NumberFormatException encountered attempting to parse file: " + 
+	        			           e.getMessage());
+	        	readFailed = true;
+	        }
+	        
+	        if (readFailed) {
+	        	// If backup file does not exists, don't bother trying to load from it.
+	            if (!backupLayoutFile.exists()) {
+	            	return false;
+	            }
+	            if (!loadFromBackup) {
+	            	System.err.println("NetworkViewer.restoreNodeLayout() - Attempting to load from backup layout file.");
+	            	fileToOpen = backupLayoutFile;
+	            	loadFromBackup = true;
+	            	readFailed = false;
+	            }
+	            else {
+	            	System.err.println("NetworkViewer.restoreNodeLayout() - Failed loading backup layout file.");
+	            	return false;
+	            }
+	        }
+	        else {
+	        	// Successful loading of layout file information
+	        	break;
+	        }
         }
-
+        
+        // Load successful, make a backup copy of the layout file. (only if not loading from backup)
+        // TODO: Perhaps we should call the save function here instead of just making a copy? This will ensure that even if 
+        //       the original file read failed, it will still save a new working version of the layout file?
+        if (!loadFromBackup) {
+	        try {
+	            Util.copyFile(layoutFile, backupLayoutFile);
+	        } catch(IOException e) {
+	            System.err.println("NetworkViewer.restoreNodeLayout() - IOException encountered attempting to copyFile: " + 
+	            		           e.getMessage());
+	        }
+        }
+        
         for (UINeoNode node : getUINodes()) {
             Float[] xy = nodeXY.get(node.getFullName());
 
@@ -527,15 +590,15 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
     public void saveNodeLayout() {
         StringBuilder newfile = new StringBuilder();
         if (layoutFile.exists()) {
-            File backup = new File(layoutFile.getAbsolutePath() + ".bak");
             try {
-                Util.copyFile(layoutFile, backup);
+                Util.copyFile(layoutFile, backupLayoutFile);
             } catch(IOException e) {
-                System.out.println(e.getMessage());
+                System.err.println("NetworkViewer.saveNodeLayout() - IOException encountered attempting to copyFile: " + 
+                		           e.getMessage());
             }
 
             try {
-                BufferedReader reader = new BufferedReader(new FileReader(backup));
+                BufferedReader reader = new BufferedReader(new FileReader(backupLayoutFile));
                 String line = null;
 
                 while((line = reader.readLine()) != null) {
@@ -545,7 +608,8 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
                 }
                 reader.close();
             } catch(IOException e) {
-                System.out.println(e.getMessage());
+                System.err.println("NetworkViewer.saveNodeLayout() - IOException encountered attempting to create BufferedReader: " +
+                		           e.getMessage());
             }
         }
 
@@ -567,7 +631,7 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
             bw.write(newfile.toString());
             bw.close();
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.err.println("NetworkViewer.saveNodeLayout() - IOException encountered attempting to write to file: " + e.getMessage());
         }
     }
 
