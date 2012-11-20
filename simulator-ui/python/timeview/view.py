@@ -45,6 +45,7 @@ class Icon:
 class ShadedIcon:
     pass
 
+
 for name in 'pause play configure end start backward forward restart arrowup arrowdown save restore refresh data pdf'.split():
     setattr(Icon, name, ImageIcon('python/images/%s.png' % name))
     setattr(ShadedIcon, name, ImageIcon('python/images/%s-pressed.png' % name))
@@ -91,15 +92,10 @@ class EnsembleWatch:
             ('voltage graph', components.Graph, dict(func=self.voltage, split=True, ylimits=(0, 1), filter=False, neuronmapped=True, label=obj.name)),
             ('firing rate', components.Grid, dict(func=self.spikes, min=0, max=lambda self: 200 * self.view.dt, filter=True, label=obj.name, audio=True)),
             ('spike raster', components.SpikeRaster, dict(func=self.spikes, label=obj.name)),
-            #('voltage grid',lambda view,name,type: components.Grid(view,name,type,self.voltage,sfunc=self.spikes_only)),
-            #('voltage graph',lambda view,name,type: components.Graph(view,name,type,self.voltage,split=True,ylimits=(0,1),filter=False,neuronmapped=True,label=name)),
-            #('firing rate',lambda view,name,type: components.Grid(view,name,type,self.spikes,min=0,max=lambda view=view: 200*view.dt,filter=True)),
-            #('spike raster',lambda view,name,type: components.SpikeRaster(view,name,type,self.spikes)),
         ]
         if obj.dimension == 2:
             r += [
                 ('preferred directions', components.PreferredDirection, dict(func=self.spikes, min=0, max=lambda self: 500 * self.view.dt, filter=True, label=obj.name)),
-                #('decoders',components.PreferredDirection,dict(func=self.spikes,min=0,max=lambda self: 0.1*self.view.dt,filter=True,decoders=True)),
             ]
         return r
 
@@ -114,11 +110,6 @@ class NeuronWatch:
     def spikes(self, obj):
         return obj.getOrigin('AXON').getValues().getValues()
 
-#    def spikes(self,obj):
-#        if obj.mode in [SimulationMode.CONSTANT_RATE,SimulationMode.RATE]:
-#            return [n.getOrigin('AXON').getValues().values[0]*0.0005]
-#        else:
-#            return obj.getOrigin('AXON').getValues().values
     def views(self, obj):
         r = [('input', components.Graph, dict(func=self.current, label=obj.name + ":input")),
              ('output', components.Graph, dict(func=self.spikes, label=obj.name + ":output"))]
@@ -185,16 +176,10 @@ class NodeWatch:
 
         r = []
         for name in origins:
-            #if name == default:
             text = 'value'
             text_grid = 'value (grid)'
             label = obj.name
             xy = 'XY plot'
-            #else:
-            #    text='value: '+name
-            #    text_grid='value (grid): ' + name
-            #    label=obj.name+': '+name
-            #    xy='XY plot: '+name
 
             if(num_origins > 1):
                 label = obj.name + ": " + name
@@ -411,6 +396,9 @@ class ViewPanel(JPanel):
         self.paintProjections(self.network, g)
 
     def screenshot(self, filename):
+        # TODO: Make this function compatible with both mac and windows systems. The current solution
+        #       is kinda hacky.
+
         #pt=self.getLocationOnScreen()
         #image=java.awt.Robot().createScreenCapture(java.awt.Rectangle(pt.x,pt.y,self.width,self.height))
         #javax.imageio.ImageIO.write(image,'png', java.io.File(filename));
@@ -627,32 +615,6 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                 v = value
 
             origin.setValues(RealOutputImpl(v, ov.getUnits(), ov.getTime()))
-    """
-    def save(self):
-        dir=java.io.File('layouts')
-        if not dir.exists(): dir.mkdirs()
-        try:
-            db=shelve.open('layouts/'+self.network.name)
-        except:
-            db=shelve.open('python/timeview/layout.db')
-        key=self.network.name
-        layout=[]
-        for comp in self.area.components:
-            if isinstance(comp,components.core.DataViewComponent):
-                layout.append((comp.name,comp.type,comp.save()))
-
-        # Save time control settings
-        controls = dict()
-        controls['sim_spd'] = self.time_control.rate_combobox.getSelectedIndex()
-        controls['dt'] = self.time_control.dt_combobox.getSelectedIndex()
-        controls['rcd_time'] = self.time_control.record_time_spinner.getValue()
-        controls['filter'] = self.time_control.filter_spinner.getValue()
-        controls['show_time'] = self.time_control.time_shown_spinner.getValue()
-
-        db[key]=self.view_save(),layout,controls
-
-        db.close()
-        """
 
     def save(self):
         key = self.network.name
@@ -676,8 +638,7 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
     def restore(self):
         data = load_layout_file(self.network.name)
         if data is None:
-            #return False
-            return self.restore_old()
+            return False
         view, layout, controls = data
 
         control_keys = controls.keys()
@@ -711,147 +672,7 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                                 break
 
         # Restore time control settings
-
         self.view_restore(view)
-        self.area.repaint()
-        return True
-
-    # TODO: remove this when we no longer want to support old-style layout files
-    def restore_old(self):
-        (filename, db) = self.doRestoreOpenFile()
-        try:
-            ret_val = self.doRestore(db)
-            self.delete_old_files(filename)
-            return ret_val
-        except Exception, e:
-            error_msg = '[Warning]: Failed to restore ' + filename + '. Layout file possibly corrupt. Retrying restore from backup.'
-            warnings.warn(error_msg, RuntimeWarning)
-
-            # Close the existing db
-            db.close()
-            try:
-                # Restore fail! Restore backup file and try again
-                if(java.io.File(filename + '.dat.bak').exists() and java.io.File(filename + '.dir.bak') and
-                   java.io.File(filename + '.bak.bak').exists()):
-                    copyfile(filename + '.dat.bak', filename + '.dat')
-                    copyfile(filename + '.dir.bak', filename + '.dir')
-                    copyfile(filename + '.bak.bak', filename + '.bak')
-                else:
-                    error_msg = '[Error]: Backup layout file not found.'
-                    warnings.warn(error_msg, RuntimeWarning)
-                    raise e
-
-                (filename, db) = self.doRestoreOpenFile()
-                ret_val = self.doRestore(db)
-                self.delete_old_files(filename)
-                return ret_val
-            except Exception, e:
-                # Ultimate failz
-                error_msg = '[Error]: Failed to restore backup layout file.'
-                warnings.warn(error_msg, RuntimeWarning)
-
-                # Close the existing db
-                db.close()
-                raise e
-
-    def delete_old_files(self, filename):
-        # Remove old backup files
-        java.io.File(filename + '.dat').delete()
-        java.io.File(filename + '.dir').delete()
-        java.io.File(filename + '.bak').delete()
-        if(java.io.File(filename + '.dat.bak').exists() and java.io.File(filename + '.dir.bak') and
-           java.io.File(filename + '.bak.bak').exists()):
-            java.io.File(filename + '.dat.bak').delete()
-            java.io.File(filename + '.dir.bak').delete()
-            java.io.File(filename + '.bak.bak').delete()
-
-    # TODO: remove this when we no longer want to support old-style layout files
-    def doRestoreOpenFile(self):
-        dir = java.io.File('layouts')
-        fp = ""
-        if not dir.exists():
-            dir.mkdirs()
-
-        filenames = ['layouts/' + self.network.name, self.network.name]
-        for fn in filenames:
-            if java.io.File(fn + '.dat').exists() and java.io.File(fn + '.dir').exists() and java.io.File(fn + '.bak').exists():
-                fp = java.io.File(fn + '.dat').getCanonicalPath()[:-4]
-                db = shelve.open(fn)
-                break
-        else:
-            ### Legacy Code
-            fp = java.io.File('python/timeview/layout.db.dat').getCanonicalPath()[:-4]
-            db = shelve.open('python/timeview/layout.db')
-
-        return (fp, db)
-
-    # TODO: remove this when we no longer want to support old-style layout files
-    def doRestore(self, db):
-        key = self.network.name
-
-        # Auto convert layout file
-        for k in db.keys():
-            save_layout_file(k, *db[k])
-
-        if key not in db.keys():
-            return False
-
-        saved_info = db[key]
-
-        if(len(saved_info) == 2):   # Old control saving format - control saves global
-            view_data, layout = saved_info
-
-            db_keys = db.keys()
-            if('sim_spd' in db_keys):
-                self.time_control.rate_combobox.setSelectedIndex(db['sim_spd'])
-            if('dt' in db_keys):
-                self.time_control.dt_combobox.setSelectedIndex(db['dt'])
-            if('rcd_time' in db_keys):
-                self.time_control.record_time_spinner.setValue(db['rcd_time'])
-            if('filter' in db_keys):
-                self.time_control.filter_spinner.setValue(db['filter'])
-            if('show_time' in db_keys):
-                self.time_control.time_shown_spinner.setValue(db['show_time'])
-
-        else:                           # New control saving format - control saves tied to network name
-            view_data, layout, controls = saved_info
-
-            control_keys = controls.keys()
-            if('sim_spd' in control_keys):
-                self.time_control.rate_combobox.setSelectedIndex(controls['sim_spd'])
-            if('dt' in control_keys):
-                self.time_control.dt_combobox.setSelectedIndex(controls['dt'])
-            if('rcd_time' in control_keys):
-                self.time_control.record_time_spinner.setValue(controls['rcd_time'])
-            if('filter' in control_keys):
-                self.time_control.filter_spinner.setValue(controls['filter'])
-            if('show_time' in control_keys):
-                self.time_control.time_shown_spinner.setValue(controls['show_time'])
-
-        self.clear_all()
-        for name, type, data in layout:
-            if name in self.watcher.objects.keys():
-                if type is None:
-                    c = self.add_item(name)
-                    c.restore(data)
-                else:
-                    for (t, klass, args) in self.watcher.list(name):
-                        if t == type:
-                            if not isinstance(args, dict):
-                                pass
-                                # TODO: figure out why we sometimes get a javax.swing.JMenu here
-                                #print 'restoration error:',t,klass,args
-                            else:
-                                c = klass(self, name, **args)
-                                c.type = type
-                                c.restore(data)
-                                self.area.add(c)
-                                break
-
-        # Restore time control settings
-
-        self.view_restore(view_data)
-        db.close()
         self.area.repaint()
         return True
 
@@ -928,7 +749,6 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                         self.screenshot_index += 1
 
                     if self.current_tick >= self.timelog.tick_count - 1:
-                        #self.network.simulator.run(now,now+self.dt,self.dt)
                         self.simulating = True
                         sim.step(now, now + self.dt)
                         self.simulating = False
@@ -953,8 +773,6 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                         sleep = self.delay - delta
                         if sleep < 0:
                             sleep = 0
-                        #if sleep<1:
-                        #    sleep=1
                         java.lang.Thread.sleep(int(sleep))
                     last_frame_time = this_frame_time
 
@@ -985,7 +803,6 @@ class TimeControl(JPanel, ChangeListener, ActionListener):
         self.view = view
         self.background = Color.white
         self.config_panel_height = 60
-        #self.config_panel_width = 675
 
         mainPanel = JPanel(background=self.background, layout=BorderLayout())
         mainPanel.border = RoundedBorder()
@@ -1009,14 +826,11 @@ class TimeControl(JPanel, ChangeListener, ActionListener):
         self.max_time = JLabel(' 0.0000 ', opaque=True, background=self.background)
 
         self.left_panel = JPanel(background=self.background)
-        #self.config_button=JButton(Icon.configure,rolloverIcon=ShadedIcon.configure,toolTipText='configure',actionPerformed=self.configure,borderPainted=False,focusPainted=False,contentAreaFilled=False)
         self.left_panel.add(JButton(Icon.restart, rolloverIcon=ShadedIcon.restart, toolTipText='restart', actionPerformed=self.start, borderPainted=False, focusPainted=False, contentAreaFilled=False))
         self.left_panel.add(self.min_time)
-        #self.left_panel.add(JButton(icon=Icon.backward,rolloverIcon=ShadedIcon.backward,toolTipText='backward one frame',actionPerformed=self.backward_one_frame))
         self.left_panel.add(JButton(icon=Icon.start, rolloverIcon=ShadedIcon.start, toolTipText='jump to beginning', actionPerformed=lambda x: self.slider.setValue(self.slider.minimum), borderPainted=False, focusPainted=False, contentAreaFilled=False))
 
         self.right_panel = JPanel(background=self.background)
-        #self.right_panel.add(JButton(icon=Icon.forward,rolloverIcon=ShadedIcon.forward,toolTipText='forward one frame',actionPerformed=self.forward_one_frame))
         self.right_panel.add(JButton(icon=Icon.end, rolloverIcon=ShadedIcon.end, toolTipText='jump to end', actionPerformed=lambda x: self.slider.setValue(self.slider.maximum), borderPainted=False, focusPainted=False, contentAreaFilled=False))
         self.right_panel.add(self.max_time)
         self.playpause_button = JButton(Icon.play, actionPerformed=self.pause, rolloverIcon=ShadedIcon.play, toolTipText='continue', borderPainted=False, focusPainted=False, contentAreaFilled=False)
