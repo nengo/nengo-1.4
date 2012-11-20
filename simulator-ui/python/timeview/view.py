@@ -1105,27 +1105,34 @@ def load_layout_file(name, try_backup = True):
     if not java.io.File(fn).exists():
         make_layout_dir(java.io.File('layouts'))
         fn = 'layouts/' + fn
+        bckup_fn = fn + '.bak'
         if not java.io.File(fn).exists():
-            return None
-    try:
-        f = file(fn, 'r')
-        text = f.read()
-        f.close()
-        if text[0] == '#':
-            return None
-        data = eval(text)
-    except SyntaxError, e:
-        warnings.warn('Could not parse layout file "%s"' % fn, RuntimeWarning)
-        warnings.warn(e, RuntimeWarning)
-        read_fail = True       
-    except Exception, e:
-        warnings.warn('Could not parse layout file "%s"' % fn, RuntimeWarning)
-        warnings.warn(e, RuntimeWarning)
-        read_fail = True
-    except IndexError, e:
-        warnings.warn('Could not parse layout file "%s"' % fn, RuntimeWarning)
-        warnings.warn(e, RuntimeWarning)
-        read_fail = True
+            if not java.io.File(bckup_fn).exists():
+                return None
+            else:
+                warnings.warn('Could not load layout file "%s"' % fn, RuntimeWarning)
+                read_fail = True
+    
+    if not read_fail:
+        try:
+            f = file(fn, 'r')
+            text = f.read()
+            f.close()
+            if text[0] == '#':
+                return None
+            data = eval(text)
+        except SyntaxError, e:
+            warnings.warn('Could not parse layout file "%s"' % fn, RuntimeWarning)
+            warnings.warn(e, RuntimeWarning)
+            read_fail = True       
+        except Exception, e:
+            warnings.warn('Could not parse layout file "%s"' % fn, RuntimeWarning)
+            warnings.warn(e, RuntimeWarning)
+            read_fail = True
+        except IndexError, e:
+            warnings.warn('Could not parse layout file "%s"' % fn, RuntimeWarning)
+            warnings.warn(e, RuntimeWarning)
+            read_fail = True
 
     if len(data) != 3 and not read_fail:
         warnings.warn('Could not parse layout file "%s"' % fn, RuntimeWarning)
