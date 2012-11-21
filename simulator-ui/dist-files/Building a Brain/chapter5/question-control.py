@@ -10,10 +10,10 @@ import nef.templates.gate as gating
 import nef.templates.basalganglia as bgtemplate
 import nef.templates.basalganglia_rule as bg_rule
 
-net = nef.Network('Question Answering with Control (pre-built)',seed=1)
+net = nef.Network('Question Answering with Control (pre-built)',seed=15)
 
 # Define the vocabulary of vectors
-vocab = hrr.Vocabulary(D,max_similarity=0.05)
+vocab = hrr.Vocabulary(D)
 vocab.parse('CIRCLE+BLUE+RED+SQUARE+QUESTION+STATEMENT')
 
 # Input, output, and intermediate ensembles
