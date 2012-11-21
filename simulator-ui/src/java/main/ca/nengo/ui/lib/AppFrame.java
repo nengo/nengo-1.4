@@ -985,6 +985,8 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
                 		} catch (InterruptedException e) {
                 			ran = false;
                 		}
+                	}
+                	if (!ran) {
                 		JOptionPane.showMessageDialog(UIEnvironment.getInstance(),
                 				"Could not open browser automatically. " + 
                 				"Please navigate to" + this.url,
