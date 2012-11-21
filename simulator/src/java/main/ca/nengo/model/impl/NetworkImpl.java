@@ -295,7 +295,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			 * 
 			 * Also only do the swap if the node being changed is already in myNodeMap.
 			 */
-			if ((Node)ne.getObject() == getNode(ne.getOldName()) && !ne.getOldName().equals(ne.getNewName())) {
+			if (!ne.getOldName().equals(ne.getNewName()) && ((Node)ne.getObject() == getNode(ne.getOldName()))) {
 				myNodeMap.put(ne.getNewName(), (Node)ne.getObject());
 				myNodeMap.remove(ne.getOldName());
 			}
