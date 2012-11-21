@@ -2,6 +2,7 @@ package ca.nengo.ui.lib;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
@@ -23,6 +24,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventListener;
@@ -30,12 +33,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.swing.FocusManager;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 import org.simplericity.macify.eawt.ApplicationEvent;
 import org.simplericity.macify.eawt.ApplicationListener;
@@ -88,7 +94,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
             + "CTRL/CMD F >> Search the current window<BR>" + "SHIFT >> Multiple select<BR>"
             + "SHIFT + Drag >> Marquee select<BR>" + "<H3>Additional Help</H3>" 
             + "<a href=\"http://nengo.ca/docs/html/index.html\">Full documentation</a> (http://nengo.ca/docs/html/index.html)<BR>"
-            + "<a href=\"http://nengo.ca/faq\">Frequent Asked Questions</a> (http://nengo.ca/faq)";
+            + "<a href=\"http://nengo.ca/faq\">Frequently Asked Questions</a> (http://nengo.ca/faq)";
 
     private ReversableActionManager actionManager;
 
@@ -1012,15 +1018,33 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
         @Override
         protected void action() throws ActionException {
-            JLabel editor;
+            JEditorPane editor;
 
             if (welcome) {
                 String appendum = "To show this message again, click <b>Help -> Tips and Commands</b>";
-                editor = new JLabel("<html><H2>Welcome to " + getAppName() + "</H2>" + getHelp()
+                editor = new JEditorPane("text/html", "<html><H2>Welcome to " + getAppName() + "</H2>" + getHelp()
                         + "<BR><BR>" + appendum + "</html>");
             } else {
-                editor = new JLabel("<html>" + getHelp() + "</html>");
+                editor = new JEditorPane("text/html", "<html>" + getHelp() + "</html>");
             }
+            
+            editor.setEditable(false);
+            editor.setOpaque(false);
+            editor.addHyperlinkListener(new HyperlinkListener() {
+            	public void hyperlinkUpdate(HyperlinkEvent hle) {
+            		if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+	            		if (Desktop.isDesktopSupported()) {
+	            			try {
+	            				Desktop.getDesktop().browse(new URI(hle.getDescription()));
+	            			} catch (IOException e) {
+	            				// could not open web page
+	            			} catch (URISyntaxException e) {
+	            				// malformed URL
+	            			}
+	            		}
+            		}            		
+            	}
+            });
 
             JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, getAppName()
                     + " Tips", JOptionPane.PLAIN_MESSAGE);
