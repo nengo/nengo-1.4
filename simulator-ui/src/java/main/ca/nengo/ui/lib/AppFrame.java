@@ -2,7 +2,6 @@ package ca.nengo.ui.lib;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
@@ -24,8 +23,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventListener;
@@ -47,6 +44,7 @@ import org.simplericity.macify.eawt.ApplicationEvent;
 import org.simplericity.macify.eawt.ApplicationListener;
 
 import ca.nengo.plot.Plotter;
+import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.ExitAction;
 import ca.nengo.ui.lib.actions.ReversableActionManager;
@@ -1033,15 +1031,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
             editor.addHyperlinkListener(new HyperlinkListener() {
             	public void hyperlinkUpdate(HyperlinkEvent hle) {
             		if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
-	            		if (Desktop.isDesktopSupported()) {
-	            			try {
-	            				Desktop.getDesktop().browse(new URI(hle.getDescription()));
-	            			} catch (IOException e) {
-	            				// could not open web page
-	            			} catch (URISyntaxException e) {
-	            				// malformed URL
-	            			}
-	            		}
+            			new OpenURLAction(hle.getDescription(),hle.getDescription()).doAction();
             		}            		
             	}
             });
