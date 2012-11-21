@@ -1,5 +1,7 @@
 from ca.nengo.math.impl import AbstractFunction, PiecewiseConstantFunction
 
+import java
+
 class PythonFunction(AbstractFunction):
     serialVersionUID=1
     def __init__(self,func,dimensions=1,time=False,index=None,use_cache=False):
@@ -49,7 +51,7 @@ class Interpolator:
             if length is not None and length!=len(v):
                 raise Exception('invalid data for defining function (time %4g has %d items instead of %d)'%(k,len(v),length))
             length=len(v)   
-            row=[float(x) for x in [k]+v]
+            row=[float(x) for x in [k]+list(v)]
             self.data.append(row)
             
     def init_from_file(self,filename):
@@ -60,6 +62,15 @@ class Interpolator:
                 if N is None: N=len(row)
                 while len(row)<N: row.append(0.0)  
                 self.data.append(row)
+    def create_function_list(self):
+        funcs=[]
+        for i,d in enumerate(self.data):
+            print i,len(d),d
+        
+        for i in range(len(self.data[0])-1):
+            f=PiecewiseConstantFunction([x[0] for x in self.data],[0]+[x[i+1] for x in self.data])
+            funcs.append(f)
+        return funcs        
                 
     def load_into_function(self,input):
         funcs=[]

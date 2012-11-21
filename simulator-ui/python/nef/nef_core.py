@@ -315,8 +315,8 @@ class Network:
         
         if isinstance(values,basestring) or (hasattr(values,'items') and callable(values.items)):
             values=functions.Interpolator(values)
-        
-        if callable(values):
+            funcs=values.create_function_list()
+        elif callable(values):
             d=values(0)
             if isinstance(d,(tuple,list)):
                 for i in range(len(d)):
