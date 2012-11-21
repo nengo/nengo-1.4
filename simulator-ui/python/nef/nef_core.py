@@ -69,6 +69,9 @@ class Network:
         if seed is not None:
             self.random=random.Random()
             self.random.seed(seed)
+            PDFTools.setSeed(seed)    
+            random.seed(seed)
+            
         
     def make(self,name,neurons,dimensions,
                   tau_rc=0.02,tau_ref=0.002,
