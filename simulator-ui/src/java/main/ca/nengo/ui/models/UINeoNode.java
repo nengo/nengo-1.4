@@ -238,26 +238,25 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		
 		menu.addAction(new CopyAction("Copy", arrayOfMe));
 		menu.addAction(new CutAction("Cut", arrayOfMe));
+
+		SimulationMode mode = ((UINeoNode) arrayOfMe.toArray()[0]).getModel().getMode();
+
+		int selected = -1;
+		if (mode == SimulationMode.DEFAULT) {
+			selected = 0;
+		} else if (mode == SimulationMode.RATE) {
+			selected = 1;
+		} else if (mode == SimulationMode.DIRECT) {
+			selected = 2;
+		}
 		
-		SimulationMode selected = ((UINeoNode) arrayOfMe.toArray()[0]).getModel().getMode();
-		AbstractMenuBuilder modeMenu = menu.addSubMenu("Mode");
-		
-		if (selected == SimulationMode.DEFAULT) {
-			modeMenu.addAction(new DefaultModeAction("\u25cf Spiking", arrayOfMe));
-			modeMenu.addAction(new RateModeAction("   Rate", arrayOfMe));
-			modeMenu.addAction(new DirectModeAction("   Direct", arrayOfMe));
-		} else if (selected == SimulationMode.RATE) {
-			modeMenu.addAction(new DefaultModeAction("   Spiking", arrayOfMe));
-			modeMenu.addAction(new RateModeAction("\u25cf Rate", arrayOfMe));
-			modeMenu.addAction(new DirectModeAction("   Direct", arrayOfMe));
-		} else if (selected == SimulationMode.DIRECT) {
-			modeMenu.addAction(new DefaultModeAction("   Spiking", arrayOfMe));
-			modeMenu.addAction(new RateModeAction("   Rate", arrayOfMe));
-			modeMenu.addAction(new DirectModeAction("\u25cf Direct", arrayOfMe));
-		} else {
-			modeMenu.addAction(new DefaultModeAction("   Spiking", arrayOfMe));
-			modeMenu.addAction(new RateModeAction("   Rate", arrayOfMe));
-			modeMenu.addAction(new DirectModeAction("   Direct", arrayOfMe));
+		if (selected >= 0) {
+			AbstractMenuBuilder modeMenu = menu.addSubMenu("Mode");
+			modeMenu.addActionsRadio(new StandardAction[]{
+					new DefaultModeAction("Spiking", arrayOfMe),
+					new RateModeAction("Rate", arrayOfMe),
+					new DirectModeAction("Direct", arrayOfMe)
+				}, selected);
 		}
 
 //		menu.addSection("File");
