@@ -111,7 +111,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	protected int myNumJavaThreads = 1;
 	protected boolean myUseGPU = true;
 
-    private transient final Collection<StepListener> myStepListeners;
+    private transient Collection<StepListener> myStepListeners;
 
 
 	/**
@@ -1251,13 +1251,22 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	}
 	
 	public void addStepListener(StepListener listener) {
+		if (myStepListeners == null) {
+			myStepListeners = new ArrayList<StepListener>(1);
+		}
         myStepListeners.add(listener);
 	}
 	public void removeStepListener(StepListener listener) {
+		if (myStepListeners == null) {
+			myStepListeners = new ArrayList<StepListener>(1);
+		}
         myStepListeners.remove(listener);
 	}
 	
 	public void fireStepListeners(float time) {
+		if (myStepListeners == null) {
+			myStepListeners = new ArrayList<StepListener>(1);
+		}
 		for (StepListener listener: myStepListeners) {
 			listener.stepStarted(time);
 		}
