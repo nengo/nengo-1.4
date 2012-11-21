@@ -1,7 +1,5 @@
 from ca.nengo.math.impl import AbstractFunction, PiecewiseConstantFunction
 
-import java
-
 class PythonFunction(AbstractFunction):
     serialVersionUID=1
     def __init__(self,func,dimensions=1,time=False,index=None,use_cache=False):
