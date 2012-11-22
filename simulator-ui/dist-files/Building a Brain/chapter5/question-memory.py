@@ -25,38 +25,78 @@ conv2=nef.convolution.make_convolution(net,'Unbind','Memory','C','E',N_conv,inve
 
 net.connect('Memory','Memory',pstc=0.4)
 
-CIRCLE=vocab.parse('CIRCLE')
-BLUE=vocab.parse('BLUE')
-RED=vocab.parse('RED')
-SQUARE=vocab.parse('SQUARE')
+#Create input to model
+CIRCLE=vocab.parse('CIRCLE').v 
+BLUE=vocab.parse('BLUE').v
+RED=vocab.parse('RED').v
+SQUARE=vocab.parse('SQUARE').v
 ZERO=[0]*D
 
-class Input(nef.SimpleNode):
-  def origin_A(self):
-    t=(self.t_start)
-    if 0<t<0.25: return RED.v
-    if 0.25<t<0.5: return BLUE.v
-    return ZERO
-  def origin_B(self):
-    t=(self.t_start)
-    if 0.0<t<0.25: return CIRCLE.v
-    if 0.25<t<0.5: return SQUARE.v
-    return ZERO
-  def origin_C(self):
-    t=self.t_start
-    if t<0.5: return ZERO
-    t=t%0.5
-    if 0.0<t<0.1: return CIRCLE.v
-    if 0.1<t<0.2: return RED.v
-    if 0.2<t<0.3: return SQUARE.v
-    if 0.3<t<0.4: return BLUE.v
-    return ZERO
+inputA={}
+inputA[0]=RED
+inputA[0.25]=BLUE
+inputA[0.5]=ZERO
+net.make_input('inputA',inputA)
+net.connect('inputA','A')
 
-input=Input('input')
-net.add(input)
-net.connect(input.getOrigin('A'),'A')
-net.connect(input.getOrigin('B'),'B')
-net.connect(input.getOrigin('C'),'C')
+inputB={}
+inputB[0]=CIRCLE
+inputB[0.25]=SQUARE
+inputB[0.5]=ZERO
+net.make_input('inputB',inputB)
+net.connect('inputB','B')
+
+inputC={}
+inputC[0]=ZERO
+inputC[0.5]=CIRCLE
+inputC[0.6]=RED
+inputC[0.7]=SQUARE
+inputC[0.8]=BLUE
+inputC[0.9]=ZERO
+inputC[1.0]=CIRCLE
+inputC[1.1]=RED
+inputC[1.2]=SQUARE
+inputC[1.3]=BLUE
+inputC[1.4]=ZERO
+inputC[1.5]=CIRCLE
+inputC[1.6]=RED
+inputC[1.7]=SQUARE
+inputC[1.8]=BLUE
+inputC[1.9]=ZERO
+inputC[2.0]=CIRCLE
+inputC[2.1]=RED
+inputC[2.2]=SQUARE
+inputC[2.3]=BLUE
+inputC[2.4]=ZERO
+inputC[2.5]=CIRCLE
+inputC[2.6]=RED
+inputC[2.7]=SQUARE
+inputC[2.8]=BLUE
+inputC[2.9]=ZERO
+inputC[3.0]=CIRCLE
+inputC[3.1]=RED
+inputC[3.2]=SQUARE
+inputC[3.3]=BLUE
+inputC[3.4]=ZERO
+inputC[3.5]=CIRCLE
+inputC[3.6]=RED
+inputC[3.7]=SQUARE
+inputC[3.8]=BLUE
+inputC[3.9]=ZERO
+inputC[4.0]=CIRCLE
+inputC[4.1]=RED
+inputC[4.2]=SQUARE
+inputC[4.3]=BLUE
+inputC[4.4]=ZERO
+inputC[4.5]=CIRCLE
+inputC[4.6]=RED
+inputC[4.7]=SQUARE
+inputC[4.8]=BLUE
+inputC[4.9]=ZERO
+
+net.make_input('inputC',inputC)
+net.connect('inputC','C')
+
 net.connect('D', 'Memory')
 
 net.add_to_nengo()
