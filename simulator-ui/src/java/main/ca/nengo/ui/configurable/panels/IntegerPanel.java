@@ -89,7 +89,7 @@ public class IntegerPanel extends PropertyInputPanel {
             }
 
         } catch (NumberFormatException e) {
-        	setStatusMsg("invalid number format");
+        	setStatusMsg("Invalid number format");
             return false;
         }
 

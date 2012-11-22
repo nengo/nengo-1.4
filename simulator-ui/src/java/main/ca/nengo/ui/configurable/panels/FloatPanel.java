@@ -66,10 +66,10 @@ public class FloatPanel extends PropertyInputPanel {
         String textValue = tf.getText();
 
         if (textValue == null || textValue.equals("")) {
-        	setStatusMsg("value not set");
+        	setStatusMsg("Value not set");
             return false;
-        } else if (!textValue.matches("\\s*-??[0-9]*[.]??[0-9]*\\s*")) {
-        	setStatusMsg("invalid number format");
+        } else if (!textValue.matches("\\s*-??[0-9]*[.]??[0-9]*([eE][-|\\+]??[0-9]+)??\\s*")) {
+        	setStatusMsg("Invalid number format");
             return false;
         } else {
         	setStatusMsg("");

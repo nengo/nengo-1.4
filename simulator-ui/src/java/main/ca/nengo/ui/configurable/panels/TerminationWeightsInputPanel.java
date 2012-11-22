@@ -219,7 +219,7 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
             }
             return true; // default to identity matrix when applicable, if not already set
         }
-        setStatusMsg("matrix not set");
+        setStatusMsg("Matrix not set");
         return false;
     }
 
