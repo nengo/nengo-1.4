@@ -1,8 +1,7 @@
-from ca.nengo.ui.JNumeric.JNumeric import *
-
+from com.github.jnumeric.JNumeric import *
 
 # gets fft() and inverse_fft()
-import ca.nengo.ui.JNumeric.FFT as FFT
+import com.github.jnumeric.FFT as FFT
 
 
 def diag(values,typecode='f'):
@@ -16,7 +15,7 @@ eye=identity
 def norm(data,axis=0):
     return sqrt(sum(data*data,axis=axis))
     
-_fft_cache={}    
+_fft_cache={}
 def fft(x):
     N=len(x)
     if N in [1<<i for i in range(16)]: return FFT.fft(x)
