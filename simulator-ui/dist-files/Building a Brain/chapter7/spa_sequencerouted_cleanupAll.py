@@ -40,6 +40,6 @@ import nef
 # Record data.
 log=nef.Log(model.net,filename='NengoDemoOutput.csv')
 log.add('cleanup')
-log.add('state')
+log.add('state', origin='state')
 log.add_spikes('cleanup',name='cleanup_spikes')
 log.add_vocab('state',vocab)
