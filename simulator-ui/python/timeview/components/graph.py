@@ -209,8 +209,9 @@ class Graph(core.DataViewComponent):
             sub_menus[num_sub - 1].add(menu_item)
 
     def select_all(self, event):
-        for item in self.selection_menu_items:
+        for index,item in enumerate(self.selection_menu_items):
             item.setState(True)
+            self.indices[index] = True
         self.sel_all = True
         self.sel_all_menu_item.setState(self.sel_all)
 
@@ -220,8 +221,9 @@ class Graph(core.DataViewComponent):
         self.sel_all_menu_item.setState(self.sel_all)
 
     def select_none(self, event):
-        for item in self.selection_menu_items:
+        for index,item in enumerate(self.selection_menu_items):
             item.setState(False)
+            self.indices[index] = False
         self.sel_all = False
         self.sel_all_menu_item.setState(self.sel_all)
 
@@ -293,6 +295,7 @@ class Graph(core.DataViewComponent):
                 return
 
         self.sel_all = all(self.indices)
+        self.sel_all_menu_item.setState(self.sel_all)
 
         filtered = []
         for i, draw in enumerate(self.indices):
