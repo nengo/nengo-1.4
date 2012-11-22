@@ -223,5 +223,6 @@
 	</target>
 	
 	<target description="Generate all artifacts: javadoc, junit tests, FindBugs, CPD, PMD, CheckStyle, and Cobertura." name="all"
-			depends="javadoc,test,findbugs,cpd,pmd,checkstyle,cobertura" />
+			depends="javadoc,test,findbugs,cpd,pmd,checkstyle" />
 </project>
+
