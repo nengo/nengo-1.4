@@ -32,6 +32,7 @@
     <cp>lib/qdox-1.6.3.jar</cp>
     <cp>lib/ssj.jar</cp>
     <cp>lib/jgrapht-jdk1.5-0.7.3.jar</cp>
+    <cp>lib/itextpdf-5.3.4.jar</cp>
     <cp>nengo-BUILDNUMBER.jar</cp>
   </classPath>
   <jre>
