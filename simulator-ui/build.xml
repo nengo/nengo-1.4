@@ -73,6 +73,9 @@
 		<exec executable="make" dir="${dest.artifacts.sphinx}/latex">
 			<arg value="LATEXOPTS='--interaction=nonstopmode'"/>
 		</exec>
+		<exec executable="make" dir="${dest.artifacts.sphinx}/latex">
+		    <arg value="LATEXOPTS='--interaction=nonstopmode'"/>
+		</exec>
 	</target>
 	
 	<target description="Run the FindBugs code analysis tool."
