@@ -71,10 +71,10 @@
 			<arg value="latex"/>
 		</exec>
 		<exec executable="make" dir="${dest.artifacts.sphinx}/latex">
-			<arg value="LATEXOPTS='--interaction=nonstopmode'"/>
-		</exec>
+            <arg value="LATEXOPTS='--interaction=batchmode'"/>
+        </exec>
 		<exec executable="make" dir="${dest.artifacts.sphinx}/latex">
-		    <arg value="LATEXOPTS='--interaction=nonstopmode'"/>
+			<arg value="LATEXOPTS='--interaction=nonstopmode'"/>
 		</exec>
 	</target>
 	
