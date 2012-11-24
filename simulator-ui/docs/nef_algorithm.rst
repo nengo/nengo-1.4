@@ -1,4 +1,4 @@
-A Minimal Implementation of the NEF Algorithm
+The NEF Algorithm
 ================================================
 
 While Nengo provides a flexible, general-purpose approach to neural modelling,
