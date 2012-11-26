@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.KeyEventDispatcher;
 //import java.awt.KeyEventDispatcher;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -27,10 +28,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventListener;
 import java.util.Iterator;
+import java.util.LinkedList;
 //import java.util.LinkedList;
 import java.util.prefs.Preferences;
 
 //import javax.swing.FocusManager;
+import javax.swing.FocusManager;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -230,21 +233,21 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
         /*
          * Initialize shortcut keys
          */
-//        FocusManager.getCurrentManager().addKeyEventDispatcher(new KeyEventDispatcher() {
-//            public boolean dispatchKeyEvent(KeyEvent e) {
-//                if (getShortcutKeys() != null && e.getID() == KeyEvent.KEY_PRESSED) {
-//                    for (ShortcutKey shortcutKey : getShortcutKeys()) {
-//                        if (shortcutKey.getModifiers() == e.getModifiers()) {
-//                            if (shortcutKey.getKeyCode() == e.getKeyCode()) {
-//                                shortcutKey.getAction().doAction();
-//                                return true;
-//                            }
-//                        }
-//                    }
-//                }
-//                return false;
-//            }
-//        });
+        FocusManager.getCurrentManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                if (getShortcutKeys() != null && e.getID() == KeyEvent.KEY_PRESSED) {
+                    for (ShortcutKey shortcutKey : getShortcutKeys()) {
+                        if (shortcutKey.getModifiers() == e.getModifiers()) {
+                            if (shortcutKey.getKeyCode() == e.getKeyCode()) {
+                                shortcutKey.getAction().doAction();
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+        });
 
         Preferences prefs = NengoConfig.getPrefs();
     	
@@ -292,9 +295,9 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
         /*
          * Initialize shortcut keys
          */
-//        LinkedList<ShortcutKey> shortcuts = new LinkedList<ShortcutKey>();
-//        constructShortcutKeys(shortcuts);
-//        this.shortcutKeys = shortcuts.toArray(new ShortcutKey[] {});
+        LinkedList<ShortcutKey> shortcuts = new LinkedList<ShortcutKey>();
+        constructShortcutKeys(shortcuts);
+        this.shortcutKeys = shortcuts.toArray(new ShortcutKey[] {});
 
         validate();
         setFullScreenMode(false);
@@ -310,10 +313,10 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
     }
 
-//    protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
-//        shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_0, new ZoomToFitAction(
-//                "Zoom to fit")));
-//    }
+    protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
+        shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_0, new ZoomToFitAction(
+                "Zoom to fit")));
+    }
 
     class ZoomToFitAction extends StandardAction {
 
