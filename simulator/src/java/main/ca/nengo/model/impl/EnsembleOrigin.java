@@ -27,6 +27,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.impl;
 
+import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -34,6 +35,7 @@ import ca.nengo.model.PreciseSpikeOutput;
 import ca.nengo.model.RealOutput;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.SpikeOutput;
+import ca.nengo.model.StructuralException;
 import ca.nengo.model.Units;
 
 /**
@@ -189,8 +191,22 @@ public class EnsembleOrigin implements Origin {
 	 * access to here.   
 	 */
 	@Override
-	public Origin clone() throws CloneNotSupportedException {
+	public EnsembleOrigin clone() throws CloneNotSupportedException {
 		return new EnsembleOrigin(myNode, myName, myNodeOrigins);
+	}
+	
+	@Override
+	public EnsembleOrigin clone(Ensemble ensemble) throws CloneNotSupportedException {
+		EnsembleOrigin result = new EnsembleOrigin(myNode, myName, new Origin[myNodeOrigins.length]);
+		
+		// get origins for nodes in new ensemble
+		try {
+			for (int i = 0; i < myNodeOrigins.length; i++)
+				result.myNodeOrigins[i] = ensemble.getNodes()[i].getOrigin(myNodeOrigins[i].getName());
+		} catch (StructuralException e) {
+			throw new CloneNotSupportedException("Error cloning EnsembleOrigin: " + e.getMessage());
+		}
+		return result;
 	}
 
 }

@@ -27,6 +27,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.neuron.impl;
 
+import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -143,11 +144,16 @@ public class SpikeGeneratorOrigin implements Origin {
     }
 
     @Override
-    public Origin clone() throws CloneNotSupportedException {
+    public SpikeGeneratorOrigin clone() throws CloneNotSupportedException {
         SpikeGeneratorOrigin result = (SpikeGeneratorOrigin) super.clone();
         result.myOutput = myOutput.clone();
         return result;
     }
+    
+	@Override
+	public SpikeGeneratorOrigin clone(Ensemble e) throws CloneNotSupportedException {
+		return this.clone();
+	}	
     
     public void setRequiredOnCPU(boolean val){
         myRequiredOnCPU = val;

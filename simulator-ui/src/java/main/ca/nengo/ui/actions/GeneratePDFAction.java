@@ -9,7 +9,6 @@ import ca.nengo.ui.lib.world.piccolo.primitives.Universe;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfContentByte;
 

@@ -40,6 +40,7 @@ import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
 import ca.nengo.math.impl.FixedSignalFunction;
 import ca.nengo.math.impl.WeightedCostApproximator;
+import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Noise;
@@ -566,7 +567,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	}
 
 	@Override
-	public Origin clone() throws CloneNotSupportedException {
+	public DecodedOrigin clone() throws CloneNotSupportedException {
 		Function[] functions = new Function[myFunctions.length];
 		for (int i = 0; i < functions.length; i++) {
 			functions[i] = myFunctions[i].clone();
@@ -582,6 +583,11 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		} catch (StructuralException e) {
 			throw new CloneNotSupportedException("Error trying to clone: " + e.getMessage());
 		}
+	}
+	
+	@Override
+	public DecodedOrigin clone(Ensemble e) throws CloneNotSupportedException {
+		return this.clone();
 	}
 
 	/**

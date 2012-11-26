@@ -572,7 +572,7 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 				result.myDecodedOrigins.put(newOrigin.getName(), newOrigin);
 				newOrigin.reset(false);
 			} catch (StructuralException e) {
-				throw new CloneNotSupportedException("Problem cloneing DecodedOrigin: " + e.getMessage());
+				throw new CloneNotSupportedException("Error cloning DecodedOrigin: " + e.getMessage());
 			}
 		}
 		
