@@ -358,6 +358,10 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	public Collection<WorldObject> getSelection() {
 		return selectionEventHandler.getSelection();
 	}
+	
+	public SelectionHandler getSelectionHandler() {
+		return selectionEventHandler;
+	}
 
 	/**
 	 * @return Context menu for currently selected items, null is none is to be

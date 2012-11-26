@@ -234,7 +234,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     public void setToolbar(JToolBar bar) {
     	toolbarPanel = bar;
     }
-
+    
     /**
      * @return Top Node Container available in the Application Window. Null, if
      *          the Top Window is not a Node Container
@@ -577,7 +577,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         StandardAction pasteAction = null;
         StandardAction removeAction = null;
         
-        Collection<WorldObject> selectedObjects = getSelectedObjects();
+        Collection<WorldObject> selectedObjects = SelectionHandler.getActiveSelection();
         
         if (selectedObjects != null && selectedObjects.size() > 0) {
         	ArrayList<UINeoNode> selectedArray = new ArrayList<UINeoNode>();
@@ -643,7 +643,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         StandardAction simulateAction = null;
         StandardAction interactivePlotsAction = null;
         UINeoNode node = null;
-        WorldObject selectedObj = getSelectedObj();
+        WorldObject selectedObj = SelectionHandler.getActiveObject();
 
         if (selectedObj != null) {
             if (selectedObj instanceof UINeoNode) {
@@ -681,18 +681,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
                 0));
     }
     
-    protected void updateConfigurationPane() {
-    	if (configPane.toJComponent().isAuxVisible()) {
-    		Object model = getSelectedModel();
-    		configPane.configureObj( model );
-    	}
-    }
-    
-    protected void updateScriptConsole() {
-    	Object model = getSelectedModel();
-    	scriptConsole.setCurrentObject(model);
-    }
-
     @Override
     protected ElasticWorld createWorld() {
         return new NengoWorld();
@@ -819,59 +807,48 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     }
 
     /**
-     * @return TODO
+     * @return the script console
      */
     public ScriptConsole getScriptConsole() {
         return scriptConsole;
     }
-
+    
     /**
-     * @return TODO
+     * @return is the script console pane visible
      */
-    public Collection<WorldObject> getSelectedObjects() {
-    	return SelectionHandler.getActiveSelection();
-    }
-
-    /**
-     * @return the last element in the list of selected objects
-     */
-    public WorldObject getSelectedObj() {
-    	Collection<WorldObject> s = getSelectedObjects();
-    	if (!s.isEmpty()) {
-    		// return the last item
-    		Iterator<WorldObject> i = s.iterator();
-    		WorldObject last = i.next();
-    		while(i.hasNext())
-    			last = i.next();
-    		
-    		return last;
-    	} else
-    		return null;
+    public boolean isScriptConsoleVisible() {
+        return scriptConsolePane.isAuxVisible();
     }
     
-    public Object getSelectedModel() {
-    	WorldObject obj = getSelectedObj();
-	    while (obj != null)
-	    	if (obj instanceof ModelObject)
-	    		return ((ModelObject) obj).getModel();
-	    	else
-	    		obj = obj.getParent();
-	    
-	    return null;
+    protected void updateScriptConsole() {
+    	Object model = SelectionHandler.getActiveModel();
+    	scriptConsole.setCurrentObject(model);
     }
     
     /**
-     * @return TODO
+     * TODO
+     * 
+     * @author TODO
      */
-    public ConfigurationPane getConfigPane() {
-        return configPane;
-    }
+    public class ToggleScriptPane extends StandardAction {
 
-    /**
-     * @return TODO
-     */
-    public AuxillarySplitPane getScriptConsolePane() {
-        return this.scriptConsolePane;
+        private static final long serialVersionUID = 1L;
+        private AuxillarySplitPane splitPane;
+
+        /**
+         * @param description TODO
+         * @param spliPane TODO
+         */
+        public ToggleScriptPane(String description, AuxillarySplitPane spliPane) {
+            super(description);
+            this.splitPane = spliPane;
+        }
+
+        @Override
+        protected void action() throws ActionException {
+            splitPane.setAuxVisible(!splitPane.isAuxVisible());
+        }
+
     }
 
     @Override
@@ -970,39 +947,24 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     public void setDataViewerVisible(boolean isVisible) {
         dataViewerPane.setAuxVisible(isVisible);
     }
-
+    
     /**
-     * TODO
-     * 
-     * @author TODO
+     * @return the configuration (inspector) pane
      */
-    public class ToggleScriptPane extends StandardAction {
-
-        private static final long serialVersionUID = 1L;
-        private AuxillarySplitPane splitPane;
-
-        /**
-         * @param description TODO
-         * @param spliPane TODO
-         */
-        public ToggleScriptPane(String description, AuxillarySplitPane spliPane) {
-            super(description);
-            this.splitPane = spliPane;
-        }
-
-        @Override
-        protected void action() throws ActionException {
-            splitPane.setAuxVisible(!splitPane.isAuxVisible());
-        }
-
+    public ConfigurationPane getConfigPane() {
+        return configPane;
+    }
+    
+    protected void updateConfigurationPane() {
+    	if (configPane.toJComponent().isAuxVisible()) {
+    		configPane.configureObj(SelectionHandler.getActiveModel());
+    	}
     }
 
     public void toggleConfigPane() {
-    	AuxillarySplitPane pane=configPane.toJComponent();
+    	AuxillarySplitPane pane = configPane.toJComponent();
     	pane.setAuxVisible(!pane.isAuxVisible());
-    	if (pane.isAuxVisible()) {
-    		configPane.configureObj( getSelectedModel() );
-    	}
+    	updateConfigurationPane();
     }
 
     class ConfigurationPane {
@@ -1079,7 +1041,7 @@ class RunNetworkAction extends StandardAction {
 
     @Override
     protected void action() throws ActionException {
-        WorldObject selectedNode = NengoGraphics.getInstance().getSelectedObj();
+        WorldObject selectedNode = SelectionHandler.getActiveObject();
 
         UINetwork selectedNetwork = UINetwork.getClosestNetwork(selectedNode);
         if (selectedNetwork != null) {
@@ -1109,7 +1071,7 @@ class SaveNetworkAction extends StandardAction {
 
     @Override
     protected void action() throws ActionException {
-        WorldObject selectedNode = NengoGraphics.getInstance().getSelectedObj();
+        WorldObject selectedNode = SelectionHandler.getActiveObject();
 
         UINetwork selectedNetwork = UINetwork.getClosestNetwork(selectedNode);
         if (selectedNetwork != null) {
@@ -1138,7 +1100,7 @@ class GenerateScriptAction extends StandardAction {
 
     @Override
     protected void action() throws ActionException {
-        WorldObject selectedNode = NengoGraphics.getInstance().getSelectedObj();
+        WorldObject selectedNode = SelectionHandler.getActiveObject();
 
         UINetwork selectedNetwork = UINetwork.getClosestNetwork(selectedNode);
         if (selectedNetwork != null) {

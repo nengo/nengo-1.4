@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import ca.nengo.ui.lib.actions.DragAction;
+import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.elastic.ElasticGround;
 import ca.nengo.ui.lib.world.piccolo.WorldGroundImpl;
@@ -130,13 +131,39 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		}
 	}
 	
-	public static Collection<WorldObject> getActiveSelection() {
+	/**
+	 * @return the selected objects in the active selection handler
+	 */
+	public static ArrayList<WorldObject> getActiveSelection() {
 		if( getActiveSelectionHandler() == null )
 			return new ArrayList<WorldObject>();
 		else
 			return getActiveSelectionHandler().getSelection();
 	}
-
+	
+    /**
+     * @return the last element in the list of active selected objects (or 
+     * null if no object selected)
+     */
+    public static WorldObject getActiveObject() {
+    	ArrayList<WorldObject> s = getActiveSelection();
+    	if (!s.isEmpty())
+    		return s.get(s.size() - 1); // return last item
+    	else
+    		return null;
+    }
+    
+    public static Object getActiveModel() {
+    	WorldObject obj = getActiveObject();
+	    while (obj != null)
+	    	if (obj instanceof ModelObject)
+	    		return ((ModelObject) obj).getModel();
+	    	else
+	    		obj = obj.getParent();
+	    
+	    return null;
+    }
+	
 	///////////////////////////////////////////////////////////////////////////
 	/// Private members
 
@@ -235,6 +262,16 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 				if (wo != null && wo.isSelectable()) {
 					moveStackToFront(wo);
 					pressNode = wo;
+					
+					if (wo instanceof Window) {
+						// select the parent (Network, ensemble, etc.) of the clicked window
+						WorldObjectImpl parent = (WorldObjectImpl)wo.getParent();
+						if (parent != null) {
+							parent.getWorld().getSelectionHandler().unselectAll();
+							parent.getWorld().getSelectionHandler().select(parent);
+						}
+					}
+					
 					return;
 				}
 			}
@@ -260,7 +297,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 		UINetwork net = null;
 		
 		WorldObject pwo = wo.getParent();
-		if (pwo != null && pwo instanceof ElasticGround) {
+		if (pwo instanceof ElasticGround) {
 			pwo = pwo.getWorld();
 			if (pwo != null && pwo instanceof NetworkViewer) {
 				net = ((NetworkViewer)pwo).getViewerParent();
@@ -330,7 +367,7 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	/**
 	 * Returns a copy of the currently selected nodes.
 	 */
-	public Collection<WorldObject> getSelection() {
+	public ArrayList<WorldObject> getSelection() {
 		ArrayList<WorldObject> sel = new ArrayList<WorldObject>(selectedObjects);
 		
 		for (int i = sel.size() - 1; i >= 0; i--) {

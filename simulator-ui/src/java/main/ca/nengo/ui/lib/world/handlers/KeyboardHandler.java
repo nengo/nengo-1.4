@@ -22,7 +22,7 @@ public class KeyboardHandler extends PBasicInputEventHandler implements Destroya
 
 	@Override
 	public void keyPressed(PInputEvent event) {
-		if (NengoGraphics.getInstance().getScriptConsolePane().isAuxVisible() && 
+		if (NengoGraphics.getInstance().isScriptConsoleVisible() && 
 				   event.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
 			// letter key press, package as KeyEvent and pass to ScriptConsole
 			KeyEvent e = new KeyEvent(NengoGraphics.getInstance(), 0, System.currentTimeMillis(), 
