@@ -12,6 +12,10 @@ params=[
     ('pstc','Gating PSTC [s]', float, 'Post-synaptic time constant of the gating ensemble'),
     ]
 
+import nef
+import nef.array
+import ca.nengo
+
 def test_params(net, p):
     gatedIsSet = False
     nameIsTaken = False
@@ -23,9 +27,12 @@ def test_params(net, p):
             nameIsTaken = True
     if nameIsTaken: return 'That name is already taken'
     if not gatedIsSet: return 'Must provide the name of an existing ensemble to be gated'
+    target=net.network.getNode(p['gated'])
+    if not isinstance(target, nef.array.NetworkArray) and not isinstance(target, ca.nengo.model.nef.NEFEnsemble):
+        return 'The ensemble to be gated must be either an ensemble or a network array'
+    if p['neurons']<1: return 'The number of neurons must be greater than zero'
+    if p['pstc']<=0: return 'The post-synaptic time constant must be greater than zero'
     
-import nef
-import nef.array
 from java.util import ArrayList
 from java.util import HashMap
 def make(net,name='Gate', gated='visual', neurons=40 ,pstc=0.01):
