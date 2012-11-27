@@ -99,7 +99,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 		this.setName(name);
 		
 		myNodes = nodes.clone();
-		myNumNodes = myNumNodes;
+		myNumNodes = myNodes.length;
 		myNodeDimensions = new int[myNumNodes];
 		myDimension = 0;
 
@@ -405,8 +405,8 @@ public class NetworkArrayImpl extends NetworkImpl {
 	}
 	
 	
-	public int getNodeDimension() {
-		return myNodeDimension;
+	public int[] getNodeDimension() {
+		return myNodeDimensions;
 	}
 	
 	/**
