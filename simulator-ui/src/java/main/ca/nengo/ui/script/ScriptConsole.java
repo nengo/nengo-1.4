@@ -238,9 +238,11 @@ public class ScriptConsole extends JPanel {
 	 * Reset the script console back to initial conditions (remove all modules and variables
 	 * added within the interpreter).
 	 */
-	public void reset() {
-		//remove modules
-		myInterpreter.exec("sys.modules.clear()");
+	public void reset(boolean clearModules) {
+		if(clearModules) {
+			//remove modules
+			myInterpreter.exec("sys.modules.clear()");
+		}
 		
 		//remove variables
 		String[] vars = getVariables();
@@ -415,7 +417,7 @@ public class ScriptConsole extends JPanel {
         			} else if (initText.equals("clear")) {
         				myDisplayArea.setText("");
         			} else if (initText.equals("reset")) {
-        				reset();
+        				reset(true);
         			} else {
         				myInterpreter.exec(initText);
         			}

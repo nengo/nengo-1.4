@@ -73,7 +73,7 @@ public class ClearAllAction extends StandardAction {
         	}
             
             //clear script console
-            nengo.getScriptConsole().reset();
+            nengo.getScriptConsole().reset(false);
             
         } else {
             throw new UserCancelledException();
