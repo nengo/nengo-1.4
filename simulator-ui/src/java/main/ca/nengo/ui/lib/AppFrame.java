@@ -44,7 +44,6 @@ import org.simplericity.macify.eawt.ApplicationEvent;
 import org.simplericity.macify.eawt.ApplicationListener;
 
 import ca.nengo.plot.Plotter;
-import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.ExitAction;
 import ca.nengo.ui.lib.actions.ReversableActionManager;

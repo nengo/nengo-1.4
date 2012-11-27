@@ -19,6 +19,7 @@ import ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.nodes.UINetwork;
 import ca.nengo.ui.models.viewers.NetworkViewer;
+import ca.nengo.ui.models.viewers.NodeViewer;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -250,8 +251,10 @@ public class MouseHandler extends PBasicInputEventHandler {
 			if (obj instanceof NetworkViewer) {
 				UINetwork nViewer = ((NetworkViewer) obj).getViewerParent();
 				UINetwork v = nViewer.getNetworkParent();
-				if (v != null) obj = v.getViewer();
-				else obj = NengoGraphics.getInstance().getWorld();
+				if (v != null)
+					obj = v.getViewer();
+				else
+					obj = NengoGraphics.getInstance().getWorld();
 			} else {
 				obj = null;
 			}
@@ -263,7 +266,10 @@ public class MouseHandler extends PBasicInputEventHandler {
 		while (!objStack.empty()) {
 			obj = objStack.pop();
 			newPosition = obj.globalToLocal(newPosition);
-			newPosition = ((NodeContainer)obj).localToView(newPosition);
+			if (obj instanceof NodeViewer)
+				newPosition = ((NodeViewer)obj).localToView(newPosition);
+			else
+				newPosition = ((NodeContainer)obj).localToView(newPosition);
 		}
 		
 		return newPosition;

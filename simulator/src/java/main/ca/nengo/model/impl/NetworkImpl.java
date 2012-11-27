@@ -922,6 +922,11 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		public Origin clone() throws CloneNotSupportedException {
 			return (Origin) super.clone();
 		}
+		
+		@Override
+		public Origin clone(Ensemble ensemble) throws CloneNotSupportedException {
+			return this.clone();
+		}
 
 		public void setRequiredOnCPU(boolean val){
 		    myWrapped.setRequiredOnCPU(val);

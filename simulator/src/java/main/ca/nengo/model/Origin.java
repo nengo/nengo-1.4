@@ -83,8 +83,17 @@ public interface Origin extends Serializable, Cloneable {
 
 	/**
 	 * @return Valid clone
-	 * @throws CloneNotSupportedException if clone can't be made
+	 * @throws CloneNotSupportedException if clone cannot be made
 	 */
 	public Origin clone() throws CloneNotSupportedException;
+	
+	/**
+	 * Clone method that changes necessary parameters to point to a new parent,
+	 * for use in cloning ensembles, etc.
+	 * @param e New parent ensemble
+	 * @return A clone of the origin for the new parent ensemble
+	 * @throws CloneNotSupportedException if clone cannot be made
+	 */
+	public Origin clone(Ensemble e) throws CloneNotSupportedException;
 
 }
