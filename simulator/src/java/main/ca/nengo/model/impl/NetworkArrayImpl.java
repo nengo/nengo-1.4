@@ -65,8 +65,9 @@ public class NetworkArrayImpl extends NetworkImpl {
 	private static final long serialVersionUID = 1L;
 	// ?? private static Logger ourLogger = Logger.getLogger(NetworkImpl.class);
 	
-	private final int myDimension;
-	private final int myNodeDimension;
+	private final int myNumNodes;
+	private int myDimension;
+	private final int[] myNodeDimensions;
 	
 	private final NEFEnsembleImpl[] myNodes;
 	private Map<String, Origin> myOrigins;
@@ -97,10 +98,17 @@ public class NetworkArrayImpl extends NetworkImpl {
 		super();
 		
 		this.setName(name);
-		myNodeDimension = nodes[0].getDimension();
-		myDimension = nodes.length * myNodeDimension;
 		
 		myNodes = nodes.clone();
+		myNumNodes = myNodes.length;
+		myNodeDimensions = new int[myNumNodes];
+		myDimension = 0;
+
+		for (int i = 0; i < myNumNodes; i++) {
+			myNodeDimensions[i] = myNodes[i].getDimension();
+			myDimension += myNodeDimensions[i];
+		}
+		
 		myNeurons = 0;
 		
 		myOrigins = new HashMap<String, Origin>(10);
@@ -122,8 +130,8 @@ public class NetworkArrayImpl extends NetworkImpl {
      * @throws StructuralException
 	 */
 	public void createEnsembleOrigin(String name) throws StructuralException {
-		DecodedOrigin[] origins = new DecodedOrigin[myNodes.length];
-		for (int i = 0; i < myNodes.length; i++) {
+		DecodedOrigin[] origins = new DecodedOrigin[myNumNodes];
+		for (int i = 0; i < myNumNodes; i++) {
 			origins[i] = (DecodedOrigin) myNodes[i].getOrigin(name);
 		}
 		createEnsembleOrigin(name, origins);
@@ -153,8 +161,8 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * @throws StructuralException
 	 */
 	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin) throws StructuralException {
-		DecodedOrigin[] origins = new DecodedOrigin[myNodes.length];
-		for (int i = 0; i < myNodes.length; i++) {
+		DecodedOrigin[] origins = new DecodedOrigin[myNumNodes];
+		for (int i = 0; i < myNumNodes; i++) {
 			origins[i] = (DecodedOrigin) myNodes[i].addDecodedOrigin(name,  functions,  nodeOrigin);
 		}
 		this.createEnsembleOrigin(name, origins);
@@ -178,15 +186,16 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * @throws StructuralException
 	 */
 	public Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
-		assert weights.length == myNeurons && weights[0].length == myNodeDimension;
+		assert weights.length == myNeurons;
 		
-		Termination[] terminations = new Termination[myNodes.length];
+		Termination[] terminations = new Termination[myNumNodes];
 		
-		for (int i = 0; i < myNodes.length; i++) {
+		for (int i = 0; i < myNumNodes; i++) {
 			int nodeNeuronCount = myNodes[i].getNeurons();
 			
 			float[][] matrix = MU.copy(weights, i * nodeNeuronCount, 0, nodeNeuronCount, -1);
-			
+			assert matrix[0].length == myNodeDimensions[i];
+
 			terminations[i] = myNodes[i].addTermination(name, matrix, tauPSC, modulatory);
 		}
 		
@@ -194,18 +203,69 @@ public class NetworkArrayImpl extends NetworkImpl {
 		return getTermination(name);
 	}
 	
+	/**
+	 * Create a new termination.  A new termination is created on each
+     * of the ensembles, which are then grouped together.  This termination
+     * does not use NEF-style encoders; instead, the matrix is the actual connection
+     * weight matrix.  Often used for adding an inhibitory connection that can turn
+     * off the whole array (by setting *matrix* to be all -10, for example). 
+     *   
+	 * @param name The name of the newly created termination
+	 * @param weights Synaptic connection weight matrix (LxNxM where L is the number of nodes in the array, 
+	 * N is the number of neurons in each node, and M is the dimensionality of each node)
+	 * @param tauPSC Post-synaptic time constant
+	 * @param modulatory Boolean value that is False for normal connections, True for modulatory connections 
+	 * (which adjust neural properties rather than the input current)
+	 * @return Termination that encapsulates all of the internal node terminations
+	 * @throws StructuralException
+	 */
 	public Termination addTermination(String name, float[][][] weights, float tauPSC, boolean modulatory) throws StructuralException {
-		assert weights.length == myNodes.length && weights[0].length == myNeurons && weights[0][0].length == myNodeDimension;
+		assert weights.length == myNumNodes && weights[0].length == myNeurons;
 		
-		Termination[] terminations = new Termination[myNodes.length];
+		Termination[] terminations = new Termination[myNumNodes];
 		
-		for (int i = 0; i < myNodes.length; i++)
+		for (int i = 0; i < myNumNodes; i++) {
+			assert weights[i][0].length == myNodeDimensions[i];
 			terminations[i] = myNodes[i].addTermination(name, weights[i], tauPSC, modulatory);
+		}
 		
 		exposeTermination(new EnsembleTermination(this, name, terminations), name);
 		return getTermination(name);
 	}
+
 	
+	/**
+	 * Create a new decoded termination.  A new termination is created on each
+     * of the ensembles, which are then grouped together.  
+     *   
+	 * @param name The name of the newly created termination
+	 * @param matrix Transformation matrix which defines a linear map on incoming information,
+     *      onto the space of vectors that can be represented by this NetworkArray. The first dimension
+     *      is taken as matrix columns, and must have the same length as the Origin that will be connected
+     *      to this Termination. The second dimension is taken as matrix rows, and must have the same
+     *      length as the encoders of this NEFEnsemble.
+	 * @param tauPSC Post-synaptic time constant
+	 * @param modulatory Boolean value that is False for normal connections, True for modulatory connections 
+	 * (which adjust neural properties rather than the input current)
+	 * @return Termination that encapsulates all of the internal node terminations
+	 * @throws StructuralException
+	 */
+	public Termination addDecodedTermination(String name, float[][] matrix, float tauPSC, boolean modulatory) throws StructuralException {
+		assert matrix.length == myDimension;
+		
+		Termination[] terminations = new Termination[myNumNodes];
+		
+		int dimCount = 0;
+		
+		for (int i = 0; i < myNumNodes; i++) {
+			float[][] submatrix = MU.copy(matrix, dimCount, 0, dimCount + myNodeDimensions[i], -1);
+
+			terminations[i] = myNodes[i].addTermination(name, submatrix, tauPSC, modulatory);
+		}
+		
+		exposeTermination(new EnsembleTermination(this, name, terminations), name);
+		return getTermination(name);
+	}	
 	
 	/**
 	 * Create a new plastic termination.  A new termination is created on each
@@ -220,14 +280,15 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * @throws StructuralException
 	 */
 	public Termination addPESTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
-		assert weights.length == myNeurons && weights[0].length == myNodeDimension;
+		assert weights.length == myNeurons;
 		
-		Termination[] terminations = new Termination[myNodes.length];
+		Termination[] terminations = new Termination[myNumNodes];
 		
-		for (int i = 0; i < myNodes.length; i++) {
+		for (int i = 0; i < myNumNodes; i++) {
 			int nodeNeuronCount = myNodes[i].getNeurons();
 			
 			float[][] matrix = MU.copy(weights, i * nodeNeuronCount, 0, nodeNeuronCount, -1);
+			assert matrix[0].length == myNodeDimensions[i];
 			
 			terminations[i] = myNodes[i].addPESTermination(name, matrix, tauPSC, modulatory);
 		}
@@ -236,11 +297,16 @@ public class NetworkArrayImpl extends NetworkImpl {
 		return getTermination(name);
 	}
 	
-	
-	public int getNodeDimension() {
-		return myNodeDimension;
+	/**
+	 * Returns the dimensions for each node in the array
+	 */
+	public int[] getNodeDimensions() {
+		return myNodeDimensions.clone();
 	}
 	
+	/**
+	 * @see ca.nengo.model.nef.NEFEnsemble#getDimension()
+	 */
 	public int getDimension() {
 		return myDimension;
 	}
@@ -249,7 +315,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * Exposes the AXON terminations of each ensemble in the network.
 	 */
 	public void exposeAxons() throws StructuralException {
-		for(int i=0; i < myNodes.length; i++)
+		for(int i=0; i < myNumNodes; i++)
 			exposeOrigin(myNodes[i].getOrigin("AXON"), "AXON_"+i);
 	}
 
@@ -265,10 +331,10 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 */
 	public TimeSeries getHistory(String stateName) throws SimulationException{
 		float[] times = myNodes[0].getHistory(stateName).getTimes();
-		float[][] values = new float[1][myNodes.length];
-		Units[] units = new Units[myNodes.length];
+		float[][] values = new float[1][myNumNodes];
+		Units[] units = new Units[myNumNodes];
 		
-		for(int i=0; i < myNodes.length; i++) {
+		for(int i=0; i < myNumNodes; i++) {
 			TimeSeries data = myNodes[i].getHistory(stateName);
 			units[i] = data.getUnits()[0];
 			values[0][i] = data.getValues()[0][0];
@@ -296,7 +362,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * @param oja whether or not to use Oja smoothing
 	 */
 	public void learn(String learnTerm, String modTerm, float rate, boolean oja) {
-		for(int i=0; i < myNodes.length; i++) {
+		for(int i=0; i < myNumNodes; i++) {
 			PESTermination term;
 			try {
 				term = (PESTermination)myNodes[i].getTermination(learnTerm);
@@ -326,7 +392,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * @param learn true if the ensembles are learning, else false
 	 */
 	public void setLearning(boolean learn) {
-		for(int i=0; i < myNodes.length; i++)
+		for(int i=0; i < myNumNodes; i++)
 			((PlasticEnsembleImpl)myNodes[i]).setLearning(learn);
 	}
 	
@@ -334,7 +400,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * Releases memory of all ensembles in the network.
 	 */
 	public void releaseMemory() {
-		for(int i=0; i < myNodes.length; i++)
+		for(int i=0; i < myNumNodes; i++)
 			myNodes[i].releaseMemory();
 	}
 	
@@ -346,7 +412,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 */
 	public float[][] getEncoders() {
 		float[][] encoders = new float[myNeurons][myDimension];
-		for(int i=0; i < myNodes.length; i++)
+		for(int i=0; i < myNumNodes; i++)
 			MU.copyInto(myNodes[i].getEncoders(), encoders, i*myNeurons, i*myNodes[i].getDimension(), myNeurons);
 		return encoders;
 	}

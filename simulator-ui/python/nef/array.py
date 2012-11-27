@@ -189,13 +189,13 @@ class NetworkArray(NetworkImpl):
         weights = []
         d = 0
         dd = self.getNodeDimension()
-        for n in self.getNodes():
+        for i,n in enumerate(self.getNodes()):
             encoder = n.encoders
-            w = MU.prod(encoder,[MU.prod(matrix,MU.transpose(decoder))[d+i] for i in range(dd)])
+            w = MU.prod(encoder,[MU.prod(matrix,MU.transpose(decoder))[d+i] for i in range(dd[i])])
             if weight_func is not None:
                 w = weight_func(w)
             weights += w
-            d += dd
+            d += dd[i]
         return self.addPESTermination(name, weights, tauPSC, False)
         """
 
