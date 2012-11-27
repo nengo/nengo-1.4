@@ -220,8 +220,6 @@ class ToolBar(
 
         self.ng.setToolbar(self.toolbar)
 
-        java.lang.Thread(self).start()
-
     def selectionChanged(self, objs):
         self.update()
 
@@ -232,57 +230,21 @@ class ToolBar(
         self.update()
 
     def update(self):
-        net = self.get_current_network()
-        self.button_run.enabled = net is not None
+        net = self.get_selected_network()
         self.button_scriptgen.enabled = net is not None
-        # self.button_run.toolTipText = 'interactive plots'
+
+        topnet = self.get_selected_network(top_parent=True)
+        self.button_run.enabled = topnet is not None
 
         viewer = self.get_current_network_viewer()
         self.layoutcombo.set_viewer(viewer)
         self.layoutcombo.enabled = viewer is not None
         self.layoutsave.enabled = viewer is not None
 
-    def get_current_network(self, top_parent=True):
-        network = SelectionHandler.getActiveObject()
-        if network is not None:
-            while (hasattr(network, 'termination') 
-                   and network.termination is not None):
-                network = network.termination
-            while (hasattr(network, 'nodeParent')
-                   and network.nodeParent is not None):
-                network = network.nodeParent
-            while (top_parent and hasattr(network, 'networkParent')
-                   and network.networkParent is not None):
-                network = network.networkParent
-            if (not(top_parent) and hasattr(network, 'networkParent')
-                and network.networkParent is not None):
-                network = network.networkParent
-        else:
-            # see if the main world has only one network; if so, return it
-            found_candidate = False
-            for wo in self.ng.world.ground.children:
-                if isinstance(wo, ca.nengo.ui.models.nodes.UINetwork):
-                    if not found_candidate:
-                        network = wo
-                        found_candidate = True
-                    else:
-                        network = None
-                        break
-        return network
-
     def get_selected_network(self, top_parent=False):
-        network = SelectionHandler.getActiveObject()
+        network = SelectionHandler.getActiveNetwork(top_parent)
         if network is not None:
-            while (hasattr(network, 'termination')
-                   and network.termination is not None):
-                network = network.termination
-            while (hasattr(network, 'nodeParent')
-                   and network.nodeParent is not None):
-                network = network.nodeParent
-            if (not(top_parent)
-                and not(isinstance(network, 
-                                   ca.nengo.ui.models.nodes.UINetwork))):
-                network = network.networkParent
+            return network
         else:
             # see if the main world has only one network; if so, return it
             found_candidate = False
@@ -298,7 +260,7 @@ class ToolBar(
 
     def get_current_network_viewer(self):
         viewer = None
-        net = self.get_current_network(top_parent=False)
+        net = self.get_selected_network(top_parent=False)
         if net is not None and hasattr(net, 'getViewer'):
             viewer = net.getViewer()
             if viewer is None or viewer.isDestroyed():
@@ -340,13 +302,17 @@ class ToolBar(
         self.layoutcombo.setSelectedIndex(0)
 
     def do_zoom_to_fit(self, event):
-        self.ng.world.zoomToFit()
+        viewer = SelectionHandler.getActiveViewer()
+        if viewer is not None:
+            viewer.zoomToFit()
+        else:
+            self.ng.world.zoomToFit()
 
     def do_inspect(self, event):
         self.ng.toggleConfigPane()
 
     def do_run(self, event):
-        network = self.get_current_network()
+        network = self.get_selected_network(top_parent=True)
         if network is not None:
             ca.nengo.ui.actions.RunInteractivePlotsAction(network).doAction()
 

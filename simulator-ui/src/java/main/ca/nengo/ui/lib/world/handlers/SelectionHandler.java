@@ -42,6 +42,7 @@ import java.util.Iterator;
 
 import ca.nengo.ui.lib.actions.DragAction;
 import ca.nengo.ui.lib.objects.models.ModelObject;
+import ca.nengo.ui.lib.world.World;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.elastic.ElasticGround;
 import ca.nengo.ui.lib.world.piccolo.WorldGroundImpl;
@@ -52,7 +53,8 @@ import ca.nengo.ui.lib.world.piccolo.objects.SelectionBorder;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld;
 import ca.nengo.ui.models.nodes.UINetwork;
-import ca.nengo.ui.models.viewers.NetworkViewer;
+import ca.nengo.ui.models.nodes.UINodeViewable;
+import ca.nengo.ui.models.viewers.NodeViewer;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.event.PDragSequenceEventHandler;
@@ -163,6 +165,105 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	    
 	    return null;
     }
+    
+    public static NodeViewer getActiveViewer() {
+    	WorldObject wo = getActiveObject();
+    	NodeViewer viewer = null;
+    	if (wo instanceof UINodeViewable) {
+    		UINodeViewable node = (UINodeViewable)wo;
+    		if (node.isViewerWindowVisible())
+    			viewer = node.getViewer();
+    	}
+    	if (viewer == null)
+    		viewer = getParentViewer(wo);
+    	
+    	return viewer;
+    }
+    
+    public static UINetwork getActiveNetwork(boolean toplevel) {
+    	WorldObject wo = getActiveObject();
+    	UINetwork net = null;
+		if (wo instanceof UINetwork) {
+			net = (UINetwork)wo;
+		} else {
+			net = getParentNetwork(wo);
+		}
+		
+		if (toplevel && net != null) {
+			UINetwork netparent = net.getNetworkParent();
+			while (netparent != null) {
+				net = netparent;
+				netparent = net.getNetworkParent();
+			}
+		}
+
+		return net; 
+    }
+	
+    /**
+     * Find the NodeViewer parent of a WorldObject
+     * @param wo the world object to start the search from
+     * @return the NodeViewer parent of the world object, null if it does not exist
+     */
+	protected static NodeViewer getParentViewer(WorldObject wo) {
+		if (wo instanceof NodeViewer)
+			return (NodeViewer)wo;
+		
+		while (wo != null) {
+			if (wo instanceof ElasticGround) {
+				World world = wo.getWorld();
+				if (world instanceof NodeViewer) {
+					return (NodeViewer)world;
+				} else {
+					wo = wo.getParent();
+				}
+			} else {
+				wo = wo.getParent();
+			}
+		}
+		return null;
+	}
+    
+    /**
+     * Find the UINetwork parent of a WorldObject
+     * @param wo the world object to start the search from
+     * @return the UINetwork parent of the world object, null if it does not exist
+     */
+	protected static UINetwork getParentNetwork(WorldObject wo) {
+		if (wo instanceof UINetwork)
+			return ((UINetwork)wo).getNetworkParent();
+		
+		while (wo != null) {
+			if (wo instanceof UINetwork) {
+				return (UINetwork)wo;
+			} else if (wo instanceof ElasticGround) {
+				World world = wo.getWorld();
+				if (world instanceof NodeViewer) {
+					wo = ((NodeViewer)world).getViewerParent();
+				} else {
+					wo = wo.getParent();
+				}
+			} else {
+				wo = wo.getParent();
+			}
+		}
+		return null;
+	}
+	
+	
+	// moves a WorldObject, and all the Windows it lies in, to the front
+	protected static void moveStackToFront(WorldObject wo) {
+		wo.moveToFront();
+		
+		// move all parent network windows to the front
+		UINetwork pnet = getParentNetwork(wo);
+		while (pnet != null) {
+		    if (pnet.isViewerWindowVisible()) {
+		        pnet.moveViewerWindowToFront();
+		    }
+			pnet = getParentNetwork(pnet);
+		}
+	}
 	
 	///////////////////////////////////////////////////////////////////////////
 	/// Private members
@@ -183,13 +284,12 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	private Point2D presspt = null;
 	private Point2D canvasPressPt = null;
 
-	private WorldGroundImpl selectableParent = null; // List of nodes whose
+	private WorldImpl world; // associated world
+	private WorldGroundImpl selectableParent = null; // ground of associated world
 
 	private float strokeNum = 0;
 
 	private Stroke[] strokes = null;
-
-	private WorldImpl world;
 
 	private PanEventHandler panHandler;
 
@@ -236,15 +336,15 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	}
 	
 	private void activeSelectionChanged() {
-		setActiveSelectionHandler( this );
+		setActiveSelectionHandler(this);
 		PNotificationCenter.defaultCenter().postNotification(SELECTION_CHANGED_NOTIFICATION, this);
-		selectionChanged( getSelection() );
+		selectionChanged(getSelection());
 	}
 	
 	private void passiveSelectionChanged() {
 		PNotificationCenter.defaultCenter().postNotification(SELECTION_CHANGED_NOTIFICATION, this);
-		if( isActiveSelectionHandler() )
-			selectionChanged( getSelection() );
+		if(isActiveSelectionHandler())
+			selectionChanged(getSelection());
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -277,43 +377,13 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 			}
 		}
 	}
-	
-	// moves a WorldObject, and all the Windows it lies in, to the front
-	protected void moveStackToFront(WorldObject wo) {
-		wo.moveToFront();
-		
-		// move all parent network windows to the front
-		UINetwork pnet = getParentNetwork(wo);
-		while (pnet != null) {
-		    if (pnet.isViewerWindowVisible()) {
-		        pnet.moveViewerWindowToFront();
-		    }
-			pnet = getParentNetwork(pnet);
-		}
-	}
-	
-	/// Get the parent network of a given WorldObject, or null if in the top level
-	protected UINetwork getParentNetwork(WorldObject wo) {
-		UINetwork net = null;
-		
-		WorldObject pwo = wo.getParent();
-		if (pwo instanceof ElasticGround) {
-			pwo = pwo.getWorld();
-			if (pwo != null && pwo instanceof NetworkViewer) {
-				net = ((NetworkViewer)pwo).getViewerParent();
-			}
-		} else if (pwo instanceof UINetwork) {
-			net = (UINetwork)pwo;
-		}
-		return net;
-	}
 
 	/**
 	 * Determine if the specified node is selectable (i.e., if it is a child of
 	 * the one the list of selectable parents.
 	 */
-	protected boolean isSelectable(WorldObjectImpl node) {
-		return ( node != null && selectableParent.isAncestorOf(node) ); 
+	protected boolean isSelectable(WorldObject node) {
+		return (node != null && selectableParent.isAncestorOf(node)); 
 	}
 	
 	protected void startStandardOptionSelection(PInputEvent pie) {
@@ -370,13 +440,17 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 	public ArrayList<WorldObject> getSelection() {
 		ArrayList<WorldObject> sel = new ArrayList<WorldObject>(selectedObjects);
 		
+		boolean changes = false;
 		for (int i = sel.size() - 1; i >= 0; i--) {
 			if (sel.get(i).isDestroyed()) {
 //				internalUnselect(sel.get(i));
 				selectedObjects.remove(sel.get(i));
 				sel.remove(i);
+				changes = true;
 			}
 		}
+		if (changes)
+			passiveSelectionChanged();
 		
 		return sel;
 	}
@@ -537,15 +611,37 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 			marquee = null;
 		}
 		if (!shouldStartMarqueeMode()) {
+			// store the parent, in case pressNode is destroyed and we want to select it
+			WorldObject parent = null;
+			if (pressNode != null) 
+				parent = pressNode.getParent();
+			
+			// end the drag action
 			if (dragAction != null) {
 				dragAction.setFinalPositions();
 				dragAction.doAction();
 				dragAction = null;
 			}
+			
+			// if pressNode is destroyed, unselect it and try to find a valid parent to select
+			if (pressNode != null && pressNode.isDestroyed()) {
+				while (parent != null && (parent.isDestroyed() || !isSelectable(parent))) {
+					parent = parent.getParent();
+				}
+				if (parent instanceof WorldObjectImpl) {
+					internalUnselect(pressNode);
+					select((WorldObjectImpl)parent);
+				} else {
+					unselect(pressNode);
+				}
+			}
 
-			if (unselect && (pressNode == null || pressNode instanceof Window) && getSelection().size() > 0) {
+			// if a window was dragged, deselect it
+			if (unselect && (pressNode == null || pressNode instanceof Window)) {
 				unselectAll();
 			}
+			
+			// cleanup
 			endStandardSelection();
 		}
 	}
