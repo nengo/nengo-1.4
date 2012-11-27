@@ -267,7 +267,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 		return getTermination(name);
 	}	
 	
-	/**
+    /**
 	 * Create a new plastic termination.  A new termination is created on each
      * of the ensembles, which are then grouped together.
      * 
