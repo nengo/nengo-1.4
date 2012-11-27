@@ -311,7 +311,7 @@ public class FunctionInput implements Node, Probeable {
             high.append("]");
             power.append("]");
 
-            py.append(String.format("%s.make_fourier_input('%s', dimensions=%d, base=%s, high=%s, power=%s\n",
+            py.append(String.format("%s.make_fourier_input('%s', dimensions=%d, base=%s, high=%s, power=%s)\n",
                         scriptData.get("netName"),
                         myName,
                         myFunctions.length,

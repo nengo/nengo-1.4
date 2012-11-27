@@ -34,26 +34,4 @@ def make(net,name='Bind', outputName='C', N_per_D=300, invertA=False, invertB=Fa
     output=net.network.getNode(outputName) 
     nef.convolution.make_convolution(net, name, None, None, output, int(N_per_D/2+1), quick=True, invert_first=invertA, invert_second=invertB)
 
-    if net.network.getMetaData("binding") == None:
-        net.network.setMetaData("binding", HashMap())
-    bindings = net.network.getMetaData("binding")
-
-    binding=HashMap(5)
-    binding.put("name", name)
-    binding.put("outputName", outputName)
-    binding.put("N_per_D", N_per_D)
-    binding.put("invertA", invertA)
-    binding.put("invertB", invertB)
-
-    bindings.put(name, binding)
-
-    if net.network.getMetaData("templates") == None:
-        net.network.setMetaData("templates", ArrayList())
-    templates = net.network.getMetaData("templates")
-    templates.add(name)
-
-    if net.network.getMetaData("templateProjections") == None:
-        net.network.setMetaData("templateProjections", HashMap())
-    templateproj = net.network.getMetaData("templateProjections")
-    templateproj.put(name, outputName)
 

@@ -1402,7 +1402,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                     continue;
                 }
 
-                py.append(String.format("nef.templates.integrator.make(%s, name='%s', neurons=%d, dimensions=%d, tau_feedback=%f, tau_input=%f, scale=%f)\n",
+                py.append(String.format("nef.templates.integrator.make(%s, name='%s', neurons=%d, dimensions=%d, tau_feedback=%g, tau_input=%g, scale=%g)\n",
                 			pythonNetworkName,
                             integrator.get("name"),
                             (Integer)integrator.get("neurons"),
@@ -1427,7 +1427,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                     continue;
                 }
 
-                py.append(String.format("nef.templates.oscillator.make(%s, name='%s', neurons=%d, dimensions=%d, frequency=%f, tau_feedback=%f, tau_input=%f, scale=%f, controlled=%s)\n",
+                py.append(String.format("nef.templates.oscillator.make(%s, name='%s', neurons=%d, dimensions=%d, frequency=%g, tau_feedback=%g, tau_input=%g, scale=%g, controlled=%s)\n",
                 			pythonNetworkName,
                             oscillator.get("name"),
                             (Integer)oscillator.get("neurons"),
@@ -1473,7 +1473,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                 }
                 a.append("]");
 
-                py.append(String.format("nef.templates.linear_system.make(%s, name='%s', neurons=%d, A=%s, tau_feedback=%f)\n",
+                py.append(String.format("nef.templates.linear_system.make(%s, name='%s', neurons=%d, A=%s, tau_feedback=%g)\n",
                 			pythonNetworkName,
                             linear.get("name"),
                             (Integer)linear.get("neurons"),
@@ -1482,9 +1482,31 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             }
         } 
 
-        if (myMetaData.get("binding") != null)
+        if (myMetaData.get("learnedterm") != null)
         {
-            Iterator iter = ((HashMap)myMetaData.get("binding")).values().iterator();
+            Iterator iter = ((HashMap)myMetaData.get("learnedterm")).values().iterator();
+            while (iter.hasNext())
+            {
+                HashMap learnedterm = (HashMap)iter.next();
+
+                if (!myNodeMap.containsKey(learnedterm.get("errName")))
+                {
+                    continue;
+                }
+
+                py.append(String.format("nef.templates.learned_termination.make(%s, errName='%s', N_err=%d, preName='%s', postName='%s', rate=%g)\n",
+                			pythonNetworkName,
+                            learnedterm.get("errName"),
+                            (Integer)learnedterm.get("N_err"),
+                            (String)learnedterm.get("preName"),
+                            (String)learnedterm.get("postName"),
+                            (Double)learnedterm.get("rate")));
+            }
+        }   
+
+        if (myMetaData.get("convolution") != null)
+        {
+            Iterator iter = ((HashMap)myMetaData.get("convolution")).values().iterator();
             while (iter.hasNext())
             {
                 HashMap binding = (HashMap)iter.next();
@@ -1494,16 +1516,50 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                     continue;
                 }
                 
-                String invertA = (Boolean)binding.get("invertA") ? "True" : "False";
-                String invertB = (Boolean)binding.get("invertB") ? "True" : "False";
+                String invert_first = (Boolean)binding.get("invert_first") ? "True" : "False";
+                String invert_second = (Boolean)binding.get("invert_second") ? "True" : "False";
+                String quick = (Boolean)binding.get("quick") ? "True" : "False";
+                String A = (String)binding.get("A") == null ? "None" : "'" + (String)binding.get("A") + "'";
+                String B = (String)binding.get("B") == null ? "None" : "'" + (String)binding.get("B") + "'";
+
+                StringBuilder encoders = new StringBuilder("[");
+                double[][] arr = (double[][])binding.get("encoders");
+                for (int i = 0; i < arr.length; i++)
+                {
+                    encoders.append("[");
+                    for (int j = 0; j < arr[i].length; j++)
+                    {
+                        encoders.append(arr[i][j]);
+                        if ((j+1) < arr[i].length)
+                        {
+                            encoders.append(",");
+                        }
+                    }
+                    encoders.append("]");
+                    if ((i + 1) < arr.length)
+                    {
+                        encoders.append(",");
+                    }
+                }
+                encoders.append("]");
                 
-                py.append(String.format("nef.templates.binding.make(%s, name='%s', outputName='%s', N_per_D=%d, invertA=%s, invertB=%s)\n",
+                py.append(String.format("nef.convolution.make_convolution(%s, name='%s', A=%s, B=%s, C='%s', N_per_D=%d, quick=%s, encoders=%s, radius=%d, pstc_out=%g, pstc_in=%g, pstc_gate=%g, invert_first=%s, invert_second=%s, mode='%s', output_scale=%d)\n",
                 			pythonNetworkName,
                             binding.get("name"),
-                            (String)binding.get("outputName"),
+                            A,
+                            B,
+                            (String)binding.get("C"),
                             (Integer)binding.get("N_per_D"),
-                            invertA,
-                            invertB));
+                            quick,
+                            encoders.toString(),
+                            (Integer)binding.get("radius"),
+                            (Double)binding.get("pstc_out"),
+                            (Double)binding.get("pstc_in"),
+                            (Double)binding.get("pstc_gate"),
+                            invert_first,
+                            invert_second,
+                            (String)binding.get("mode"),
+                            (Integer)binding.get("output_scale")));
             }
         } 
 
@@ -1522,7 +1578,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                 String use_single_input = (Boolean)bgrule.get("use_single_input") ? "True" : "False";
                 
                 // going to assume the current network is the BG...BG_rules can only be added on BG networks.
-                py.append(String.format("nef.templates.basalganglia_rule.make(%s, %s.network.getNode('%s'), index=%d, dim=%d, pattern='%s', pstc=%f, use_single_input=%s)\n",
+                py.append(String.format("nef.templates.basalganglia_rule.make(%s, %s.network.getNode('%s'), index=%d, dim=%d, pattern='%s', pstc=%g, use_single_input=%s)\n",
                             pythonNetworkName,
                             pythonNetworkName,
                             (String)bgrule.get("name"),
@@ -1546,36 +1602,14 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                     continue;
                 }
 
-                py.append(String.format("nef.templates.gate.make(%s, name='%s', gated='%s', neurons=%d, pstc=%f)\n",
+                py.append(String.format("nef.templates.gate.make(%s, name='%s', gated='%s', neurons=%d, pstc=%g)\n",
                 			pythonNetworkName,
                             gate.get("name"),
                             (String)gate.get("gated"),
                             (Integer)gate.get("neurons"),
                             (Double)gate.get("pstc")));
             }
-        } 
-
-        if (myMetaData.get("learnedterm") != null)
-        {
-            Iterator iter = ((HashMap)myMetaData.get("learnedterm")).values().iterator();
-            while (iter.hasNext())
-            {
-                HashMap learnedterm = (HashMap)iter.next();
-
-                if (!myNodeMap.containsKey(learnedterm.get("errName")))
-                {
-                    continue;
-                }
-
-                py.append(String.format("nef.templates.learned_termination.make(%s, errName='%s', N_err=%d, preName='%s', postName='%s', rate=%f)\n",
-                			pythonNetworkName,
-                            learnedterm.get("errName"),
-                            (Integer)learnedterm.get("N_err"),
-                            (String)learnedterm.get("preName"),
-                            (String)learnedterm.get("postName"),
-                            (Double)learnedterm.get("rate")));
-            }
-        }      
+        }    
 
 		return py.toString();
 	}
