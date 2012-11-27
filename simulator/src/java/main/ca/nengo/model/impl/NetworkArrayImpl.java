@@ -39,7 +39,7 @@ import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
-import ca.nengo.model.nef.NEFEnsemble;
+import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.util.MU;
 
@@ -58,7 +58,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 	
 	private final int myDimension;
 	
-	private final NEFEnsemble[] myNodes;
+	private final NEFEnsembleImpl[] myNodes;
 	private Map<String, Origin> myOrigins;
 	private int myNeurons;
 
@@ -83,7 +83,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * @param nodes The ca.nengo.model.nef.NEFEnsemble nodes to combine together
 	 * @throws StructuralException
 	 */
-	public NetworkArrayImpl(String name, NEFEnsemble[] nodes) throws StructuralException {
+	public NetworkArrayImpl(String name, NEFEnsembleImpl[] nodes) throws StructuralException {
 		super();
 		
 		this.setName(name);
@@ -94,7 +94,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 		
 		myOrigins = new HashMap<String, Origin>(10);
 		
-		for(int i = 0; i < nodes.length; i++) {
+		for (int i = 0; i < nodes.length; i++) {
 			this.addNode(nodes[i]);
 			myNeurons += nodes[i].getNodeCount();
 		}
@@ -110,16 +110,23 @@ public class NetworkArrayImpl extends NetworkImpl {
      * with that name.
      * @throws StructuralException
 	 */
-	private void createEnsembleOrigin(String name) throws StructuralException {
-		// Create array origin too.
+	public void createEnsembleOrigin(String name) throws StructuralException {
+		DecodedOrigin[] origins = new DecodedOrigin[myNodes.length];
+		for (int i = 0; i < myNodes.length; i++) {
+			origins[i] = (DecodedOrigin) myNodes[i].getOrigin(name);
+		}
+		createEnsembleOrigin(name, origins);
+	}
+	
+	private void createEnsembleOrigin(String name, DecodedOrigin[] origins) throws StructuralException {
+		myOrigins.put(name, new ArrayOrigin(this, name, origins));
 		this.exposeOrigin(this.myOrigins.get(name), name);
 	}
 	
 	public int getNeurons() {
 		return myNeurons;
 	}
-	
-	
+		
 	
 	/**
 	 * Create a new Origin.  A new origin is created on each of the 
@@ -135,13 +142,14 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * @throws StructuralException
 	 */
 	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin) throws StructuralException {
-		Origin[] origins = new Origin[myNodes.length];
-		for(int i = 0; i < myNodes.length; i++) {
-			origins[i] = myNodes[i].addDecodedOrigin(name,  functions,  nodeOrigin);
+		DecodedOrigin[] origins = new DecodedOrigin[myNodes.length];
+		for (int i = 0; i < myNodes.length; i++) {
+			origins[i] = (DecodedOrigin) myNodes[i].addDecodedOrigin(name,  functions,  nodeOrigin);
 		}
-		this.createEnsembleOrigin(name);
+		this.createEnsembleOrigin(name, origins);
 		return this.getOrigin(name);
 	}
+	
 	
 	/**
 	 * Create a new termination.  A new termination is created on each
@@ -159,8 +167,34 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * @throws StructuralException
 	 */
 	public Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
+		assert weights.length == myNeurons && weights[0].length == myNodes[0].getDimension();
 		
+		Termination[] terminations = new Termination[myNodes.length];
+		
+		for (int i = 0; i < myNodes.length; i++) {
+			int nodeNeuronCount = myNodes[i].getNeurons();
+			
+			float[][] matrix = MU.copy(weights, i * nodeNeuronCount, 0, nodeNeuronCount, -1);
+			
+			terminations[i] = myNodes[i].addTermination(name, matrix, tauPSC, modulatory);
+		}
+		
+		exposeTermination(new EnsembleTermination(this, name, terminations), name);
+		return getTermination(name);
 	}
+	
+	public Termination addTermination(String name, float[][][] weights, float tauPSC, boolean modulatory) throws StructuralException {
+		assert weights.length == myNodes.length && weights[0].length == myNeurons && weights[0][0].length == myNodes[0].getDimension();
+		
+		Termination[] terminations = new Termination[myNodes.length];
+		
+		for (int i = 0; i < myNodes.length; i++)
+			terminations[i] = myNodes[i].addTermination(name, weights[i], tauPSC, modulatory);
+		
+		exposeTermination(new EnsembleTermination(this, name, terminations), name);
+		return getTermination(name);
+	}
+	
 	
 	public class ArrayOrigin extends BasicOrigin {
 
