@@ -34,6 +34,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 import Jama.Matrix;
 import ca.nengo.dynamics.LinearSystem;
 import ca.nengo.dynamics.impl.CanonicalModel;
@@ -77,6 +79,8 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 	private ApproximatorFactory myApproximatorFactory;
 	private Map<String, LinearApproximator> myApproximators;
 	private float myTime; //used to support Probeable
+	
+	private static Logger ourLogger = Logger.getLogger(DecodableEnsembleImpl.class);
 
 	/**
 	 * @param name Name of the Ensemble
@@ -491,6 +495,10 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 		DecodedTermination t = myDecodedTerminations.get(stateName);
 
 		if (origin != null) {
+			if (t != null)
+				ourLogger.warn("Warning, probe set on ensemble with matching origin/termination names (\"" + 
+						stateName + "\"), probing origin by default");
+			
 		    origin.setRequiredOnCPU(true);
 			float[] vals = ((RealOutput) origin.getValues()).getValues();
 			Units[] units = new Units[vals.length];
@@ -498,7 +506,9 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 				units[i] = origin.getValues().getUnits();
 			}
 			result = new TimeSeriesImpl(new float[]{myTime}, new float[][]{vals}, units);
-		} else if (t == null && stateName.endsWith(":STP")) {
+		} else if (t != null) {
+			result = t.getHistory(DecodedTermination.OUTPUT);
+    	} else if (t == null && stateName.endsWith(":STP")) {
                 String originName = stateName.substring(0,stateName.length()-4);
                 try {
                     DecodedOrigin o = (DecodedOrigin) getOrigin(originName);
