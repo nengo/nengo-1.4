@@ -611,12 +611,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
                 	PasteAction a;
                 	MouseHandler mh = MouseHandler.getActiveMouseHandler();
                 	if (mh != null) {
-                		a = new PasteAction("Paste", (NodeContainer)mh.getWorld());
+                		a = new PasteAction("Paste", (NodeContainer)mh.getWorld(), true);
                 		Point2D pos = mh.getMouseMovedRelativePosition();
                 		if (pos != null)
                 			a.setPosition(pos.getX(), pos.getY());
                 	} else {
-                		a = new PasteAction("Paste", NengoGraphics.getInstance());
+                		a = new PasteAction("Paste", NengoGraphics.getInstance(), true);
                 	}
             		a.doAction();
                 }
