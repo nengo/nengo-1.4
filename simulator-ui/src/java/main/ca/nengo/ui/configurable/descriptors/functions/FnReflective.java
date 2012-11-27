@@ -28,13 +28,10 @@ package ca.nengo.ui.configurable.descriptors.functions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
+import java.util.Map;
 
 import ca.nengo.math.Function;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchema;
-import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.Property;
 
 /**
@@ -58,25 +55,25 @@ public class FnReflective extends AbstractFn {
     }
 
     @Override
-    protected Function createFunction(ConfigResult props) throws ConfigException {
-        List<Property> metaProperties = getSchema().getProperties();
+    protected Function createFunction(Map<Property, Object> props) throws ConfigException {
+        Property[] metaProperties = getSchema();
 
         /*
          * Create function using Java reflection, function parameter are
          * configured via the IConfigurable interface
          */
-        Class<?> partypes[] = new Class[metaProperties.size()];
-        for (int i = 0; i < metaProperties.size(); i++) {
-            partypes[i] = metaProperties.get(i).getTypeClass();
-
+        Class<?> partypes[] = new Class[metaProperties.length];
+        for (int i = 0; i < metaProperties.length; i++) {
+            partypes[i] = metaProperties[i].getTypeClass();
         }
+        
         Constructor<?> ct = null;
         try {
             ct = getFunctionType().getConstructor(partypes);
 
-            Object arglist[] = new Object[metaProperties.size()];
-            for (int i = 0; i < metaProperties.size(); i++) {
-                arglist[i] = props.getValue(metaProperties.get(i).getName());
+            Object arglist[] = new Object[metaProperties.length];
+            for (int i = 0; i < metaProperties.length; i++) {
+                arglist[i] = props.get(metaProperties[i]);
             }
             Object retobj = null;
             try {
@@ -101,8 +98,8 @@ public class FnReflective extends AbstractFn {
         }
     }
 
-    public ConfigSchema getSchema() {
-        return new ConfigSchemaImpl(myProperties);
+    public Property[] getSchema() {
+        return myProperties;
     }
 
 }

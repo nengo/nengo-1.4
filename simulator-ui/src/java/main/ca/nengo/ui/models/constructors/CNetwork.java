@@ -24,11 +24,12 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.constructors;
 
+import java.util.Map;
+
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchemaImpl;
+import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.models.nodes.UINetwork;
 
 public class CNetwork extends ConstructableNode {
@@ -37,8 +38,8 @@ public class CNetwork extends ConstructableNode {
 	}
 
 	@Override
-	public ConfigSchemaImpl getNodeConfigSchema() {
-		return new ConfigSchemaImpl(); // nothing to configure
+	public Property[] getNodeSchema() {
+		return new Property[] {}; // nothing to configure
 	}
 
 	public String getTypeName() {
@@ -46,7 +47,7 @@ public class CNetwork extends ConstructableNode {
 	}
 
 	@Override
-	protected Object createNode(ConfigResult configuredProperties, String name)
+	protected Object createNode(Map<Property, Object> configuredProperties, String name)
 			throws ConfigException {
 		NetworkImpl network = new NetworkImpl();
 

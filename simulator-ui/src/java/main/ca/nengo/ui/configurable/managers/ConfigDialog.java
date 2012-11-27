@@ -33,8 +33,10 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -45,10 +47,8 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.swing.text.MutableAttributeSet;
 
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.PropertyInputPanel;
 import ca.nengo.ui.lib.actions.ActionException;
@@ -116,7 +116,7 @@ public class ConfigDialog extends JDialog {
             if (inputPanel.isValueSet()) {
                 if (setPropertyFields) {
 
-                    myConfigManager.setProperty(property.getName(), inputPanel.getValue());
+                    myConfigManager.setProperty(property, inputPanel.getValue());
                 }
             } else {
                 if (showMessage) {
@@ -178,11 +178,17 @@ public class ConfigDialog extends JDialog {
             }
         });
         buttonsPanel.add(advancedButton);
-
-        if (myConfigManager.getConfigurable().getSchema().getAdvancedProperties().size() == 0) {
-            advancedButton.setVisible(false);
+        
+        // Do we have advanced properties?
+        Boolean advanced = false;
+        for (Property prop : myConfigManager.getConfigurable().getSchema()) {
+        	if (prop.isAdvanced()) {
+        		advanced = true;
+        		break;
+        	}
         }
 
+        advancedButton.setVisible(advanced);
         panel.add(buttonsPanel);
     }
 
@@ -193,9 +199,12 @@ public class ConfigDialog extends JDialog {
     private void advancedAction() {
         if (!isAdvancedShown) {
             isAdvancedShown = true;
-            List<Property> advancedDescriptors = myConfigManager.getConfigurable().getSchema()
-                    .getAdvancedProperties();
-
+            List<Property> advancedDescriptors = new ArrayList<Property>(3);
+            for (Property prop : myConfigManager.getConfigurable().getSchema()) {
+            	if (prop.isAdvanced()) {
+            		advancedDescriptors.add(prop);
+            	}
+            }
             addDescriptors(advancedDescriptors);
         }
         // hide the button once it's been pressed
@@ -237,8 +246,15 @@ public class ConfigDialog extends JDialog {
 
         myPropertyPanel = new VerticalLayoutPanel();
         myPanel.add(myPropertyPanel);
+        
+        List<Property> descriptors = new ArrayList<Property>(10);
+        for (Property prop : myConfigManager.getConfigurable().getSchema()) {
+        	if (!prop.isAdvanced()) {
+        		descriptors.add(prop);
+        	}
+        }
 
-        addDescriptors(configManager.getConfigurable().getSchema().getProperties());
+        addDescriptors(descriptors);
 
         initPanelBottom(myPanel);
 
@@ -271,8 +287,8 @@ public class ConfigDialog extends JDialog {
         myConfigManager.getConfigurable().completeConfiguration(createConfigResult());
     }
 
-    private ConfigResult createConfigResult() {
-        return new ConfigResult(myConfigManager.getProperties());
+    private Map<Property, Object> createConfigResult() {
+        return myConfigManager.getProperties();
     }
 
     /**
@@ -344,7 +360,7 @@ public class ConfigDialog extends JDialog {
             propertyInputPanels = new Vector<PropertyInputPanel>(propDescriptors.size());
         }
 
-        MutableAttributeSet properties = myConfigManager.getProperties();
+        Map<Property, Object> properties = myConfigManager.getProperties();
 
         for (Property property : propDescriptors) {
 
@@ -355,7 +371,7 @@ public class ConfigDialog extends JDialog {
              * Try to get the configurer's current value and apply it to the
              * input panels
              */
-            Object currentValue = properties.getAttribute(inputPanel.getName());
+            Object currentValue = properties.get(inputPanel.getDescriptor());
             if (currentValue != null) {
                 inputPanel.setValue(currentValue);
             }

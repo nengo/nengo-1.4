@@ -24,11 +24,12 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.actions;
 
+import java.util.Map;
+
 import ca.nengo.math.Function;
 import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.plot.Plotter;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PFloat;
 import ca.nengo.ui.configurable.descriptors.PInt;
@@ -74,7 +75,7 @@ public class PlotFunctionNodeAction extends StandardAction {
         Property[] propDescripters = { pFunctionIndex, pStart,
                 pIncrement, pEnd };
         try {
-            ConfigResult properties = ConfigManager.configure(propDescripters,
+        	Map<Property, Object> properties = ConfigManager.configure(propDescripters,
                     "Function plotter", UIEnvironment.getInstance(),
                     ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
@@ -90,14 +91,14 @@ public class PlotFunctionNodeAction extends StandardAction {
      * @param properties TODO
      * @throws ConfigException TODO
      */
-    public void completeConfiguration(ConfigResult properties)
+    public void completeConfiguration(Map<Property, Object> properties)
             throws ConfigException {
         String title = plotName + " - Function Plot";
 
-        int functionIndex = (Integer) properties.getValue(pFunctionIndex);
-        float start = (Float) properties.getValue(pStart);
-        float end = (Float) properties.getValue(pEnd);
-        float increment = (Float) properties.getValue(pIncrement);
+        int functionIndex = (Integer) properties.get(pFunctionIndex);
+        float start = (Float) properties.get(pStart);
+        float end = (Float) properties.get(pEnd);
+        float increment = (Float) properties.get(pIncrement);
 
         if (increment == 0) {
             throw new ConfigException(

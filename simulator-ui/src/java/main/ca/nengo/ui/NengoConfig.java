@@ -10,17 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
-import java.util.prefs.Preferences;
-import java.util.prefs.PreferencesFactory;
-
-
-import java.io.File;
-import java.util.logging.Logger;
 import java.util.prefs.AbstractPreferences;
-import java.util.prefs.Preferences;
-import java.util.prefs.PreferencesFactory;
 import java.util.prefs.BackingStoreException;
-
+import java.util.prefs.Preferences;
 import javax.swing.JFrame;
 
 /**
@@ -39,8 +31,6 @@ import javax.swing.JFrame;
  *
  */
 public class NengoConfig {
-	private static Preferences prefs = FilePreferences.userRoot();
-	
 	public static final String B_GRID = "show_grid";
 	public static final boolean B_GRID_DEF = true;
 	
@@ -65,9 +55,14 @@ public class NengoConfig {
 	public static final String S_SIMULATOR_SRC_PATH = "simulator_source";
 	public static final String S_SIMULATOR_SRC_PATH_DEF = "../simulator/src/java/main";
 	
+	private static Preferences prefs = FilePreferences.userRoot();
+	
 	public static Preferences getPrefs() {
-		System.out.println(prefs.toString());
 		return prefs;
+	}
+	
+	public static String getPrefsDir() {
+		return NengoPreferencesFactory.getPreferencesFile().getParent();
 	}
 }
 
@@ -179,7 +174,9 @@ class FilePreferences extends AbstractPreferences {
  
 	private void getPath(StringBuilder sb) {
 		final FilePreferences parent = (FilePreferences) parent();
-		if (parent == null) return;
+		if (parent == null) {
+			return;
+		}
  
 		parent.getPath(sb);
 		sb.append(name()).append('.');

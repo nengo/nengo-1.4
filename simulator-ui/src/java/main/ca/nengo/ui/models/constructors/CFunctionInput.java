@@ -24,14 +24,14 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.constructors;
 
+import java.util.Map;
+
 import ca.nengo.math.Function;
 import ca.nengo.model.Node;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PFunctionArray;
 import ca.nengo.ui.models.nodes.UIFunctionInput;
@@ -46,9 +46,9 @@ public class CFunctionInput extends ConstructableNode {
 	private static Property pFunctions = new PFunctionArray("Function Generators", 1);
 
 	@Override
-	protected Node createNode(ConfigResult props, String name) throws ConfigException {
+	protected Node createNode(Map<Property, Object> props, String name) throws ConfigException {
 
-		Function[] functions = (Function[]) props.getValue(pFunctions);
+		Function[] functions = (Function[]) props.get(pFunctions);
 
 		try {
 			// setName((String) getProperty(pName));
@@ -57,12 +57,11 @@ public class CFunctionInput extends ConstructableNode {
 			throw new ConfigException(e.getMessage());
 
 		}
-
 	}
 
 	@Override
-	public ConfigSchemaImpl getNodeConfigSchema() {
-		return new ConfigSchemaImpl(pFunctions);
+	public Property[] getNodeSchema() {
+		return new Property[] {pFunctions};
 	}
 
 	public String getTypeName() {

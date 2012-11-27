@@ -28,6 +28,7 @@ package ca.nengo.ui.configurable.panels;
 
 import java.awt.Container;
 import java.awt.event.ActionEvent;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -38,9 +39,6 @@ import javax.swing.JTextField;
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchema;
-import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.IConfigurable;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.PropertyInputPanel;
@@ -308,21 +306,19 @@ class ConfigurableFunctionArray implements IConfigurable {
      * 
      * @see ca.nengo.ui.configurable.IConfigurable#completeConfiguration(ca.nengo.ui.configurable.ConfigParam)
      */
-    public void completeConfiguration(ConfigResult properties) {
+    public void completeConfiguration(Map<Property, Object> properties) {
+    	Property[] props = getSchema();
         myFunctions = new Function[outputDimension];
         for (int i = 0; i < outputDimension; i++) {
-            myFunctions[i] = ((Function) properties.getValue("Function " + i));
-
+            myFunctions[i] = ((Function) properties.get(props[i]));
         }
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see ca.nengo.ui.configurable.IConfigurable#getConfigSchema()
+    /**
+     * @see ca.nengo.ui.configurable.IConfigurable#getSchema()
      */
-    public ConfigSchema getSchema() {
+    public Property[] getSchema() {
         Property[] props = new Property[outputDimension];
 
         for (int i = 0; i < outputDimension; i++) {
@@ -339,7 +335,7 @@ class ConfigurableFunctionArray implements IConfigurable {
             props[i] = function;
         }
 
-        return new ConfigSchemaImpl(props);
+        return props;
     }
 
     /**
@@ -358,7 +354,7 @@ class ConfigurableFunctionArray implements IConfigurable {
         return outputDimension + "x Functions";
     }
 
-    public void preConfiguration(ConfigResult props) throws ConfigException {
+    public void preConfiguration(Map<Property, Object> props) throws ConfigException {
         // do nothing
     }
 

@@ -46,9 +46,6 @@ import ca.nengo.math.impl.DefaultFunctionInterpreter;
 import ca.nengo.math.impl.PostfixFunction;
 import ca.nengo.ui.actions.PlotFunctionAction;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchema;
-import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.IConfigurable;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.PropertyInputPanel;
@@ -89,9 +86,9 @@ public class FnCustom extends AbstractFn {
         this.isInputDimEditable = isInputDimEditable;
     }
 
-    private Function parseFunction(ConfigResult props) throws ConfigException {
-        String expression = (String) props.getValue(pExpression);
-        int dimensions = (Integer) props.getValue(DIMENSION_STR);
+    private Function parseFunction(Map<Property, Object> props) throws ConfigException {
+        String expression = (String) props.get(pExpression);
+        int dimensions = (Integer) props.get(DIMENSION_STR);
 
         Function function;
         try {
@@ -104,7 +101,7 @@ public class FnCustom extends AbstractFn {
     }
 
     @Override
-    protected Function createFunction(ConfigResult props) throws ConfigException {
+    protected Function createFunction(Map<Property, Object> props) throws ConfigException {
         return parseFunction(props);
     }
 
@@ -122,7 +119,7 @@ public class FnCustom extends AbstractFn {
         return null;
     }
 
-    public ConfigSchema getSchema() {
+    public Property[] getSchema() {
         String expression = null;
         int dim = myInputDimensions;
 
@@ -141,8 +138,7 @@ public class FnCustom extends AbstractFn {
 
         pDimensions.setEditable(isInputDimEditable);
 
-        Property[] props = new Property[] { pExpression, pDimensions };
-        return new ConfigSchemaImpl(props);
+        return new Property[] { pExpression, pDimensions };
     }
 
     @Override
@@ -151,7 +147,7 @@ public class FnCustom extends AbstractFn {
     }
 
     @Override
-    public void preConfiguration(ConfigResult props) throws ConfigException {
+    public void preConfiguration(Map<Property, Object> props) throws ConfigException {
         /*
          * Try to parse the expression and throw an exception if it dosen't
          * succeed
@@ -288,12 +284,12 @@ class InterpreterFunctionConfigurer extends UserConfigurer {
                     PString pFnName = new PString("Name");
                     PFunction pFunction = new PFunction("New Function", 1, true, null);
 
-                    ConfigResult props = ConfigManager.configure(new Property[] { pFnName,
+                    Map<Property, Object> props = ConfigManager.configure(new Property[] { pFnName,
                             pFunction }, "Register fuction", FunctionDialog.this,
                             ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
-                    String name = (String) props.getValue(pFnName);
-                    Function fn = (Function) props.getValue(pFunction);
+                    String name = (String) props.get(pFnName);
+                    Function fn = (Function) props.get(pFunction);
 
                     interpreter.registerFunction(name, fn);
                     registeredFunctionsList.addItem(name);

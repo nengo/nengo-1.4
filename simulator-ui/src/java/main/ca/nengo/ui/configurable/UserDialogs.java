@@ -26,6 +26,8 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.configurable;
 
+import java.util.Map;
+
 import ca.nengo.ui.configurable.descriptors.PBoolean;
 import ca.nengo.ui.configurable.descriptors.PFloat;
 import ca.nengo.ui.configurable.descriptors.PInt;
@@ -90,7 +92,7 @@ public class UserDialogs {
      * @throws ConfigException TODO
      */
     public static Object showDialog(String dialogName, Property descriptor) throws ConfigException {
-        return showDialog(dialogName, new Property[] { descriptor }).getValue(descriptor);
+        return showDialog(dialogName, new Property[] { descriptor }).get(descriptor);
     }
 
     /**
@@ -99,7 +101,7 @@ public class UserDialogs {
      * @return TODO
      * @throws ConfigException TODO
      */
-    public static ConfigResult showDialog(String dialogName, Property[] descriptors)
+    public static Map<Property, Object> showDialog(String dialogName, Property[] descriptors)
             throws ConfigException {
         UserMultiPropDialog dialog = new UserMultiPropDialog(dialogName, descriptors);
 
@@ -114,16 +116,16 @@ public class UserDialogs {
  * @author Shu Wu
  */
 class UserMultiPropDialog {
-    private Property[] propertiesSchema;
-    private ConfigResult configResults;
+    private Property[] schema;
+    private Map<Property, Object> configResults;
     private String dialogName;
 
-    public UserMultiPropDialog(String dialogName, Property[] configParameters) {
+    public UserMultiPropDialog(String dialogName, Property[] schema) {
         this.dialogName = dialogName;
-        this.propertiesSchema = configParameters;
+        this.schema = schema;
     }
 
-    public ConfigResult configureAndGetResult() throws ConfigException {
+    public Map<Property, Object> configureAndGetResult() throws ConfigException {
 
         Configr myConfigurable = new Configr();
         UserConfigurer userConfigurer = new UserConfigurer(myConfigurable);
@@ -134,19 +136,19 @@ class UserMultiPropDialog {
 
     private class Configr implements IConfigurable {
 
-        public void completeConfiguration(ConfigResult configParameters) throws ConfigException {
+        public void completeConfiguration(Map<Property, Object> configParameters) throws ConfigException {
             configResults = configParameters;
         }
 
-        public ConfigSchema getSchema() {
-            return new ConfigSchemaImpl(propertiesSchema);
+        public Property[] getSchema() {
+            return schema;
         }
 
         public String getTypeName() {
             return dialogName;
         }
 
-        public void preConfiguration(ConfigResult props) throws ConfigException {
+        public void preConfiguration(Map<Property, Object> props) throws ConfigException {
             // do nothing
         }
 

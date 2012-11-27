@@ -30,6 +30,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.security.InvalidParameterException;
 import java.text.DecimalFormat;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -51,8 +52,6 @@ import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.PropertyInputPanel;
 import ca.nengo.ui.configurable.descriptors.PFloat;
@@ -81,9 +80,8 @@ public class CNEFEnsemble extends ConstructableNode {
     /**
      * Config descriptors
      */
-    static final ConfigSchemaImpl zConfig = new ConfigSchemaImpl(new Property[] { pNumOfNodes,
-            pDim, pNodeFactory, pRadius }, new Property[] { pApproximator, pEncodingDistribution,
-            pEncodingSign, pNoise });
+    static final Property[] zSchema = new Property[] {pNumOfNodes, pDim, pNodeFactory, pRadius,
+    	pApproximator, pEncodingDistribution, pEncodingSign, pNoise};
 
     public CNEFEnsemble() {
         pDim.setDescription("Number of dimensions that are represented by the ensemble");
@@ -96,24 +94,29 @@ public class CNEFEnsemble extends ConstructableNode {
         pNumOfNodes.setDescription("Number of neurons in the ensemble");
         pRadius.setDescription("Largest magnitude that can be accurately represented by the ensemble");
         pNoise.setDescription("Expected ratio of the noise amplitude to the signal amplitude to use when solving for decoders");
+        
+        pApproximator.setAdvanced(true);
+        pEncodingDistribution.setAdvanced(true);
+        pEncodingSign.setAdvanced(true);
+        pNoise.setAdvanced(true);
     }
 
-    protected Node createNode(ConfigResult prop, String name) {
+    protected Node createNode(Map<Property, Object> prop, String name) {
         try {
 
             NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
-            Integer numOfNeurons = (Integer) prop.getValue(pNumOfNodes);
-            Integer dimensions = (Integer) prop.getValue(pDim);
+            Integer numOfNeurons = (Integer) prop.get(pNumOfNodes);
+            Integer dimensions = (Integer) prop.get(pDim);
 
             /*
              * Advanced properties, these may not necessarily be configued, so
              */
-            ApproximatorFactory approxFactory = (ApproximatorFactory) prop.getValue(pApproximator);
-            NodeFactory nodeFactory = (NodeFactory) prop.getValue(pNodeFactory);
-            Sign encodingSign = (Sign) prop.getValue(pEncodingSign);
-            Float encodingDistribution = (Float) prop.getValue(pEncodingDistribution);
-            Float radius = (Float) prop.getValue(pRadius);
-            Float noise = (Float) prop.getValue(pNoise);
+            ApproximatorFactory approxFactory = (ApproximatorFactory) prop.get(pApproximator);
+            NodeFactory nodeFactory = (NodeFactory) prop.get(pNodeFactory);
+            Sign encodingSign = (Sign) prop.get(pEncodingSign);
+            Float encodingDistribution = (Float) prop.get(pEncodingDistribution);
+            Float radius = (Float) prop.get(pRadius);
+            Float noise = (Float) prop.get(pNoise);
 
             if (nodeFactory != null) {
                 ef.setNodeFactory(nodeFactory);
@@ -160,8 +163,8 @@ public class CNEFEnsemble extends ConstructableNode {
     }
 
     @Override
-    public ConfigSchemaImpl getNodeConfigSchema() {
-        return zConfig;
+    public Property[] getNodeSchema() {
+        return zSchema;
     }
 
     public String getTypeName() {
@@ -260,12 +263,12 @@ class PApproximator extends Property {
             try {
                 Property pNoiseLevel = new PFloat("Noise level", "Ratio of the noise amplitude to the signal amplitude", noiseLevel);
                 Property pNSV = new PInt("Number of Singular Values", NSV);
-                ConfigResult result = UserConfigurer.configure(
+                Map<Property, Object> result = UserConfigurer.configure(
                         new Property[] { pNoiseLevel, pNSV }, TYPE_NAME, this.getDialogParent(),
                         ConfigMode.STANDARD);
 
-                noiseLevel = (Float) result.getValue(pNoiseLevel);
-                NSV = (Integer) result.getValue(pNSV);
+                noiseLevel = (Float) result.get(pNoiseLevel);
+                NSV = (Integer) result.get(pNSV);
                 updateApproximator();
 
             } catch (ConfigException e) {

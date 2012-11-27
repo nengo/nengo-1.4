@@ -26,10 +26,11 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.constructors;
 
+import java.util.Map;
+
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchema;
 import ca.nengo.ui.configurable.IConfigurable;
+import ca.nengo.ui.configurable.Property;
 
 /**
  * A UIModel which can be configured through the IConfigurable interface
@@ -49,10 +50,10 @@ public abstract class AbstractConstructable implements IConfigurable {
 	 * @param configuredProperties
 	 *            the configured properties
 	 */
-	protected abstract Object configureModel(ConfigResult configuredProperties)
+	protected abstract Object configureModel(Map<Property, Object> configuredProperties)
 			throws ConfigException;
 
-	public void completeConfiguration(final ConfigResult properties) throws ConfigException {
+	public void completeConfiguration(final Map<Property, Object> properties) throws ConfigException {
 		model = null;
 		model = configureModel(properties);
 	}
@@ -65,9 +66,9 @@ public abstract class AbstractConstructable implements IConfigurable {
 		return model;
 	}
 
-	public abstract ConfigSchema getSchema();
+	public abstract Property[] getSchema();
 
-	public void preConfiguration(ConfigResult props) throws ConfigException {
+	public void preConfiguration(Map<Property, Object> props) throws ConfigException {
 		// do nothing
 	}
 	

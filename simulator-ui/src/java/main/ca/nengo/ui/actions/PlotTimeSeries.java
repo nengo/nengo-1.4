@@ -26,9 +26,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.actions;
 
+import java.util.Map;
+
 import ca.nengo.plot.Plotter;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PFloat;
 import ca.nengo.ui.configurable.descriptors.PInt;
@@ -86,15 +87,15 @@ public class PlotTimeSeries extends StandardAction {
             PInt pSubSampling = new PInt("Subsampling [0 = off]", subSampling);
 
             if (showUserConfigDialog) {
-                ConfigResult result;
+            	Map<Property, Object> result;
                 try {
                     result = UserConfigurer.configure(new Property[] { pTauFilter, pSubSampling },
                             "Plot Options",
                             UIEnvironment.getInstance(),
                             ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
-                    tauFilter = (Float) result.getValue(pTauFilter);
-                    subSampling = (Integer) result.getValue(pSubSampling);
+                    tauFilter = (Float) result.get(pTauFilter);
+                    subSampling = (Integer) result.get(pSubSampling);
 
                     ProbePlotHelper.getInstance().setDefaultTauFilter(tauFilter);
                     ProbePlotHelper.getInstance().setDefaultSubSampling(subSampling);

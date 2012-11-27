@@ -26,6 +26,8 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.actions;
 
+import java.util.Map;
+
 import javax.swing.SwingUtilities;
 
 import ca.nengo.model.SimulationException;
@@ -34,8 +36,6 @@ import ca.nengo.sim.SimulatorEvent;
 import ca.nengo.sim.SimulatorListener;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PBoolean;
 import ca.nengo.ui.configurable.descriptors.PFloat;
@@ -63,8 +63,8 @@ public class RunSimulatorAction extends StandardAction {
     
     private static final long serialVersionUID = 1L;
 
-    private static final ConfigSchemaImpl zProperties = new ConfigSchemaImpl(new Property[] {
-            pStartTime, pStepSize, pEndTime, pShowDataViewer});
+    private static final Property[] zProperties = new Property[] {
+            pStartTime, pStepSize, pEndTime, pShowDataViewer};
 
     private UINetwork uiNetwork;
 
@@ -111,14 +111,14 @@ public class RunSimulatorAction extends StandardAction {
 
         try {
             if (!configured) {
-                ConfigResult properties = ConfigManager.configure(zProperties, uiNetwork
+            	Map<Property, Object> properties = ConfigManager.configure(zProperties, uiNetwork
                         .getTypeName(), "Run " + uiNetwork.getFullName(), UIEnvironment
                         .getInstance(), ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
-                startTime = (Float) properties.getValue(pStartTime);
-                endTime = (Float) properties.getValue(pEndTime);
-                stepTime = (Float) properties.getValue(pStepSize);
-                showDataViewer = (Boolean) properties.getValue(pShowDataViewer);
+                startTime = (Float) properties.get(pStartTime);
+                endTime = (Float) properties.get(pEndTime);
+                stepTime = (Float) properties.get(pStepSize);
+                showDataViewer = (Boolean) properties.get(pShowDataViewer);
             }
             
             RunSimulatorActivity simulatorActivity = new RunSimulatorActivity(startTime, endTime,

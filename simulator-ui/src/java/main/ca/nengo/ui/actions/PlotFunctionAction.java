@@ -26,11 +26,12 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.actions;
 
+import java.util.Map;
+
 import javax.swing.JDialog;
 
 import ca.nengo.math.Function;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PFloat;
 import ca.nengo.ui.configurable.managers.ConfigManager;
@@ -64,8 +65,7 @@ public class PlotFunctionAction extends StandardAction {
      * @param function TODO
      * @param dialogParent TODO
      */
-    public PlotFunctionAction(String plotName, Function function,
-            JDialog dialogParent) {
+    public PlotFunctionAction(String plotName, Function function, JDialog dialogParent) {
         super("Plot function");
         this.plotName = plotName;
         this.function = function;
@@ -79,14 +79,14 @@ public class PlotFunctionAction extends StandardAction {
     protected void action() throws ActionException {
 
         try {
-            ConfigResult properties = ConfigManager.configure(propD,
+        	Map<Property, Object> properties = ConfigManager.configure(propD,
                     "Function Node plotter", UIEnvironment.getInstance(),
                     ConfigMode.TEMPLATE_NOT_CHOOSABLE);
             String title = plotName + " - Function Plot";
 
-            float start = (Float) properties.getValue(pStart);
-            float end = (Float) properties.getValue(pEnd);
-            float increment = (Float) properties.getValue(pIncrement);
+            float start = (Float) properties.get(pStart);
+            float end = (Float) properties.get(pEnd);
+            float increment = (Float) properties.get(pIncrement);
 
             if (increment == 0) {
                 throw new ActionException("Please use a non-zero increment");

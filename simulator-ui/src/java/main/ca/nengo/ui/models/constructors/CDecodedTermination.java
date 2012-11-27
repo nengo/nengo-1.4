@@ -24,13 +24,12 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.constructors;
 
+import java.util.Map;
+
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchema;
-import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PBoolean;
 import ca.nengo.ui.configurable.descriptors.PFloat;
@@ -50,11 +49,11 @@ public class CDecodedTermination extends ProjectionConstructor {
 	}
 
 	@Override
-	public ConfigSchema getSchema() {
+	public Property[] getSchema() {
 		pTransformMatrix = new PTerminationWeights("Weights", nefEnsembleParent.getDimension());
 
 		Property[] zProperties = { pName, pTransformMatrix, pTauPSC, pIsModulatory };
-		return new ConfigSchemaImpl(zProperties);
+		return zProperties;
 
 	}
 
@@ -72,14 +71,12 @@ public class CDecodedTermination extends ProjectionConstructor {
 	}
 
 	@Override
-	protected Object createModel(ConfigResult configuredProperties, String uniqueName) throws ConfigException {
-				
-
+	protected Object createModel(Map<Property, Object> configuredProperties, String uniqueName) throws ConfigException {
 		Termination term = null;
 		try {
 			term = nefEnsembleParent.addDecodedTermination(uniqueName,
-					(float[][]) configuredProperties.getValue(pTransformMatrix), (Float) configuredProperties
-							.getValue(pTauPSC), (Boolean) configuredProperties.getValue(pIsModulatory));
+					(float[][]) configuredProperties.get(pTransformMatrix), (Float) configuredProperties
+							.get(pTauPSC), (Boolean) configuredProperties.get(pIsModulatory));
 
 		} catch (StructuralException e) {
 			e.printStackTrace();

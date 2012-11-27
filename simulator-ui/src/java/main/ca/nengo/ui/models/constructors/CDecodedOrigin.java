@@ -26,14 +26,13 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.constructors;
 
+import java.util.Map;
+
 import ca.nengo.math.Function;
 import ca.nengo.model.Origin;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchema;
-import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PFunctionArray;
 import ca.nengo.ui.configurable.descriptors.PString;
@@ -52,12 +51,12 @@ public class CDecodedOrigin extends ProjectionConstructor {
 	}
 
 	@Override
-	public ConfigSchema getSchema() {
+	public Property[] getSchema() {
 		pFunctions = new PFunctionArray("Functions", enfEnsembleParent.getDimension());
 		pFunctions.setDescription("The function to compute");
 
 		Property[] zProperties = {pName, pFunctions};
-		return new ConfigSchemaImpl(zProperties);
+		return zProperties;
 	}
 
 	public String getTypeName() {
@@ -74,13 +73,13 @@ public class CDecodedOrigin extends ProjectionConstructor {
 	}
 
 	@Override
-	protected Object createModel(ConfigResult configuredProperties, String uniqueName) throws ConfigException {
+	protected Object createModel(Map<Property, Object> configuredProperties, String uniqueName) throws ConfigException {
 		Origin origin = null;
 
 		try {
 			origin = enfEnsembleParent.addDecodedOrigin(
 					uniqueName, (Function[]) configuredProperties
-					.getValue(pFunctions), "AXON");
+					.get(pFunctions), "AXON");
 
 		} catch (StructuralException e) {
 			throw new ConfigException(e.getMessage());

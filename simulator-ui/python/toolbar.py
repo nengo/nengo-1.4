@@ -100,7 +100,7 @@ class ParisianTransform(IConfigurable):
     def preConfiguration(self,props):
         pass
     def getSchema(self):
-        return ConfigSchemaImpl(self.properties,[])
+        return self.properties
     def getTypeName(self):
         return 'ParisianTransform'
     def getDescription(self):
@@ -202,7 +202,7 @@ class ParallelizationConfiguration(IConfigurable):
   def preConfiguration(self,props):
       pass
   def getSchema(self):
-      return ConfigSchemaImpl(self.properties,[])
+      return self.properties
   def getTypeName(self):
       return 'ParallelizationConfiguration'
   def getDescription(self):

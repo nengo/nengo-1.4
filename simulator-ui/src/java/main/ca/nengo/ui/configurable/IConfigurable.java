@@ -26,6 +26,8 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.configurable;
 
+import java.util.Map;
+
 /**
  * Describes a object which can be configured by a IConfigurationManager
  * 
@@ -36,11 +38,11 @@ public interface IConfigurable {
     /**
      * Called when configuration parameters have been set
      * 
-     * @param props A set of properties
+     * @param properties A set of properties
      * @throws ConfigException Exception thrown if there is an error during
      *         configuration.
      */
-    public void completeConfiguration(ConfigResult props) throws ConfigException;
+    public void completeConfiguration(Map<Property, Object> properties) throws ConfigException;
 
     /**
      * Called before full configuration to initialize and find errors.
@@ -49,13 +51,13 @@ public interface IConfigurable {
      * @throws ConfigException Exception thrown if there is an error during
      *         pre-configuration.
      */
-    public void preConfiguration(ConfigResult props) throws ConfigException;
+    public void preConfiguration(Map<Property, Object> properties) throws ConfigException;
 
     /**
      * @return An array of objects which describe what needs to be configured in
      *         this object
      */
-    public ConfigSchema getSchema();
+    public Property[] getSchema();
 
     /**
      * @return Name given to this type of object

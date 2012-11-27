@@ -28,6 +28,7 @@ package ca.nengo.ui.configurable.panels;
 
 import java.awt.Container;
 import java.awt.event.ActionEvent;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -36,7 +37,6 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.PropertyInputPanel;
 import ca.nengo.ui.configurable.descriptors.PCouplingMatrix;
@@ -147,11 +147,11 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
             String configName = getFromSize() + " to " + getToSize() + " Coupling Matrix";
 
             try {
-                ConfigResult result = ConfigManager.configure(
+            	Map<Property, Object> result = ConfigManager.configure(
                         new Property[] { pCouplingMatrix }, configName, parent,
                         ConfigManager.ConfigMode.STANDARD);
 
-                setValue(result.getValue(pCouplingMatrix));
+                setValue(result.get(pCouplingMatrix));
             } catch (ConfigException e) {
                 e.defaultHandleBehavior();
             }

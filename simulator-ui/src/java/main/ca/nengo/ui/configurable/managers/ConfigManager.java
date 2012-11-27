@@ -37,15 +37,11 @@ import java.io.InvalidClassException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-
-import ca.nengo.ui.NengoGraphics;
+import ca.nengo.ui.NengoConfig;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchema;
-import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.IConfigurable;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.lib.util.UserMessages;
@@ -60,9 +56,7 @@ public abstract class ConfigManager {
     /**
      * Name of directory where to store saved configuration
      */
-    static final String SAVED_CONFIG_DIR = "UIFiles/Config";
-    
-    static final String DEV_DIST_DIR = "dist-files/UIFiles/Config";
+    private static final String SAVED_CONFIG_DIR = "configurables";
 
     /**
      * Creates a saved objects folder if it isn't already there
@@ -70,63 +64,32 @@ public abstract class ConfigManager {
      * @return The Saved Objects folder
      */
     private static File getSavedObjectsFolder() {
-        File file = new File(SAVED_CONFIG_DIR);
+        File file = new File(NengoConfig.getPrefsDir(), SAVED_CONFIG_DIR);
         if (!file.exists()) {
             file.mkdir();
-            
-            // If we are building from source, find the dev config file
-            // directory and copy it to the directory it's expecting to find config files
-            File devConfigDir = new File(DEV_DIST_DIR);
-            if (devConfigDir.exists()) {
-            	File[] devConfigFiles = devConfigDir.listFiles();
-            	for (File devConfigFile : devConfigFiles) {
-            		File newConfigFile = new File(SAVED_CONFIG_DIR + "/" + devConfigFile.getName());
-            		try {
-            			Util.copyFile(devConfigFile, newConfigFile);
-            		} catch (IOException e) {
-            			System.out.println(e.getMessage());
-            		}
-            	}
-            }
         }
         return file;
     }
 
-    /**
-     * TODO
-     * 
-     * @author TODO
-     */
     public enum ConfigMode {
-        /**
-         * TODO
-         */
         STANDARD,
-
-        /**
-         * TODO
-         */
         TEMPLATE_NOT_CHOOSABLE,
-
-        /**
-         * TODO
-         */
         TEMPLATE_CHOOSABLE
     }
 
     /**
-     * @param prop TODO
-     * @param typeName TODO
-     * @param parent TODO
-     * @return TODO
-     * @throws ConfigException TODO
+     * @param prop
+     * @param typeName
+     * @param parent
+     * @return
+     * @throws ConfigException
      */
     public static Object configure(Property prop, String typeName, Container parent)
             throws ConfigException {
 
-        ConfigResult properties = configure(new ConfigSchemaImpl(prop), typeName, null, parent,
+    	Map<Property, Object> properties = configure(new Property[]{prop}, typeName, null, parent,
                 ConfigMode.TEMPLATE_NOT_CHOOSABLE);
-        return properties.getValue(prop);
+        return properties.get(prop);
     }
 
     /**
@@ -139,9 +102,9 @@ public abstract class ConfigManager {
      * @return TODO
      * @throws ConfigException TODO
      */
-    public static ConfigResult configure(Property[] schema, String typeName, Container parent,
+    public static Map<Property, Object> configure(Property[] schema, String typeName, Container parent,
             ConfigMode configMode) throws ConfigException {
-        return configure(new ConfigSchemaImpl(schema), typeName, null, parent, configMode);
+        return configure(schema, typeName, null, parent, configMode);
     }
 
     /**
@@ -153,7 +116,7 @@ public abstract class ConfigManager {
      * @return TODO
      * @throws ConfigException TODO
      */
-    public static ConfigResult configure(ConfigSchema schema, String typeName, String description,
+    public static Map<Property, Object> configure(Property[] schema, String typeName, String description,
             Container parent, ConfigMode configMode) throws ConfigException {
         if (description == null) {
             description = typeName;
@@ -194,16 +157,15 @@ public abstract class ConfigManager {
     /**
      * Set of attributes that will be set during configuration
      */
-    private MutableAttributeSet properties;
+    private Map<Property, Object> properties;
 
     /**
      * @param configurable
      *            Object to be configured
      */
     public ConfigManager(IConfigurable configurable) {
-        properties = new SimpleAttributeSet();
+        properties = new HashMap<Property, Object>();
         this.configurable = configurable;
-
     }
 
     /**
@@ -225,7 +187,6 @@ public abstract class ConfigManager {
             if (val == false) {
                 UserMessages.showError("Could not delete file");
             }
-
         }
     }
 
@@ -239,7 +200,7 @@ public abstract class ConfigManager {
     /**
      * @return Set of properties to be set during the configuration process
      */
-    protected MutableAttributeSet getProperties() {
+    protected Map<Property, Object> getProperties() {
         return properties;
     }
 
@@ -248,8 +209,8 @@ public abstract class ConfigManager {
      *            Name of property
      * @return Value of property
      */
-    protected Object getProperty(String name) {
-        return getProperties().getAttribute(name);
+    protected Object getProperty(Property prop) {
+        return getProperties().get(prop);
     }
 
     /**
@@ -283,8 +244,8 @@ public abstract class ConfigManager {
         FileInputStream f_in;
 
         try {
-            f_in = new FileInputStream(SAVED_CONFIG_DIR + "/" + getFileNamePrefix(configurable)
-                    + name);
+            f_in = new FileInputStream(getSavedObjectsFolder().getAbsolutePath() +
+            		"/" + getFileNamePrefix(configurable) + name);
 
             ObjectInputStream obj_in = new ObjectInputStream(f_in);
 
@@ -295,8 +256,7 @@ public abstract class ConfigManager {
             if (obj == null) {
                 UserMessages.showError("Could not load file: " + name);
             } else {
-
-                this.properties = (MutableAttributeSet) obj;
+                this.properties = (Map<Property, Object>) obj;
             }
             obj_in.close();
 
@@ -346,10 +306,9 @@ public abstract class ConfigManager {
 
     }
 
-    protected void setProperty(String name, Object value) {
-        getProperties().addAttribute(name, value);
+    protected void setProperty(Property prop, Object value) {
+        getProperties().put(prop, value);
     }
-
 }
 
 /**
@@ -377,27 +336,27 @@ class ConfigFilesFilter implements FilenameFilter {
 
 class Configureable implements IConfigurable {
 
-    private ConfigResult properties;
+    private Map<Property, Object> properties;
 
-    private ConfigSchema schema;
+    private Property[] schema;
     private String typeName;
     private String description;
 
-    public Configureable(ConfigSchema configSchema, String typeName, String description) {
-        this.schema = configSchema;
+    public Configureable(Property[] schema, String typeName, String description) {
+        this.schema = schema;
         this.typeName = typeName;
         this.description = description;
     }
 
-    public void completeConfiguration(ConfigResult props) throws ConfigException {
+    public void completeConfiguration(Map<Property, Object> props) throws ConfigException {
         properties = props;
     }
 
-    public ConfigSchema getSchema() {
+    public Property[] getSchema() {
         return schema;
     }
 
-    public ConfigResult getProperties() {
+    public Map<Property, Object> getProperties() {
         return properties;
     }
 
@@ -405,7 +364,7 @@ class Configureable implements IConfigurable {
         return typeName;
     }
 
-    public void preConfiguration(ConfigResult props) throws ConfigException {
+    public void preConfiguration(Map<Property, Object> props) throws ConfigException {
         // do nothing
     }
 

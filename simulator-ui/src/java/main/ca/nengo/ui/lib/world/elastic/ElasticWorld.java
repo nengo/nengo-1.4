@@ -3,11 +3,11 @@ package ca.nengo.ui.lib.world.elastic;
 import java.awt.Dimension;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PInt;
 import ca.nengo.ui.configurable.managers.ConfigManager;
@@ -258,9 +258,9 @@ class SetLayoutBoundsAction extends StandardAction {
         this.parent = parent;
     }
 
-    private void completeConfiguration(ConfigResult properties) {
-        parent.setLayoutBounds(new Dimension((Integer) properties.getValue(pWidth),
-                (Integer) properties.getValue(pHeight)));
+    private void completeConfiguration(Map<Property, Object> properties) {
+        parent.setLayoutBounds(new Dimension((Integer) properties.get(pWidth),
+                (Integer) properties.get(pHeight)));
 
     }
 
@@ -268,7 +268,7 @@ class SetLayoutBoundsAction extends StandardAction {
     protected void action() throws ActionException {
 
         try {
-            ConfigResult properties = ConfigManager.configure(zProperties, "Layout bounds",
+        	Map<Property, Object> properties = ConfigManager.configure(zProperties, "Layout bounds",
                     UIEnvironment.getInstance(), ConfigMode.TEMPLATE_NOT_CHOOSABLE);
             completeConfiguration(properties);
 

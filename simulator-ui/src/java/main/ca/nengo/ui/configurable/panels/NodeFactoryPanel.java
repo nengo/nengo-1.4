@@ -30,6 +30,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.lang.reflect.Constructor;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -49,9 +50,6 @@ import ca.nengo.model.neuron.impl.SpikeGeneratorFactory;
 import ca.nengo.model.neuron.impl.SpikingNeuronFactory;
 import ca.nengo.model.neuron.impl.SynapticIntegratorFactory;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchema;
-import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.PropertyInputPanel;
 import ca.nengo.ui.configurable.descriptors.PBoolean;
@@ -192,7 +190,7 @@ abstract class ConstructableNodeFactory extends AbstractConstructable {
         this.type = type;
     }
 
-    protected final Object configureModel(ConfigResult configuredProperties) throws ConfigException {
+    protected final Object configureModel(Map<Property, Object> configuredProperties) throws ConfigException {
         NodeFactory nodeFactory = createNodeFactory(configuredProperties);
 
         if (!getType().isInstance(nodeFactory)) {
@@ -203,7 +201,7 @@ abstract class ConstructableNodeFactory extends AbstractConstructable {
         }
     }
 
-    abstract protected NodeFactory createNodeFactory(ConfigResult configuredProperties)
+    abstract protected NodeFactory createNodeFactory(Map<Property, Object> configuredProperties)
             throws ConfigException;
 
     public Class<? extends NodeFactory> getType() {
@@ -230,28 +228,28 @@ class CALIFNeuronFactory extends ConstructableNodeFactory {
     static final Property pTauRC = pTauRCDefault;
     static final Property pTauRef = pTauRefDefault;
 
-    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pTauRC,
-            pTauN, pTauRef, pMaxRate, pIntercept, pIncN });
+    static final Property[] zSchema = new Property[] {pTauRC,
+            pTauN, pTauRef, pMaxRate, pIntercept, pIncN};
 
     public CALIFNeuronFactory() {
         super("Adapting LIF Neuron", ALIFNeuronFactory.class);
     }
 
     @Override
-    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
-        Float tauRC = (Float) configuredProperties.getValue(pTauRC);
-        Float tauRef = (Float) configuredProperties.getValue(pTauRef);
-        Float tauN = (Float) configuredProperties.getValue(pTauN);
-        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
-        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
-        IndicatorPDF incN = (IndicatorPDF) configuredProperties.getValue(pIncN);
+    protected NodeFactory createNodeFactory(Map<Property, Object> configuredProperties) {
+        Float tauRC = (Float) configuredProperties.get(pTauRC);
+        Float tauRef = (Float) configuredProperties.get(pTauRef);
+        Float tauN = (Float) configuredProperties.get(pTauN);
+        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.get(pMaxRate);
+        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.get(pIntercept);
+        IndicatorPDF incN = (IndicatorPDF) configuredProperties.get(pIncN);
 
         return new ALIFNeuronFactory(maxRate, intercept, incN, tauRef, tauRC, tauN);
     }
 
     @Override
-    public ConfigSchema getSchema() {
-        return zConfig;
+    public Property[] getSchema() {
+        return zSchema;
     }
 
 }
@@ -263,26 +261,26 @@ class CLIFNeuronFactory extends ConstructableNodeFactory {
     static final Property pTauRC = pTauRCDefault;
     static final Property pTauRef = pTauRefDefault;
 
-    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pTauRC,
-            pTauRef, pMaxRate, pIntercept });
+    static final Property[] zSchema = new Property[] {pTauRC,
+            pTauRef, pMaxRate, pIntercept};
 
     public CLIFNeuronFactory() {
         super("LIF Neuron", LIFNeuronFactory.class);
     }
 
     @Override
-    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
-        Float tauRC = (Float) configuredProperties.getValue(pTauRC);
-        Float tauRef = (Float) configuredProperties.getValue(pTauRef);
-        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
-        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
+    protected NodeFactory createNodeFactory(Map<Property, Object> configuredProperties) {
+        Float tauRC = (Float) configuredProperties.get(pTauRC);
+        Float tauRef = (Float) configuredProperties.get(pTauRef);
+        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.get(pMaxRate);
+        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.get(pIntercept);
 
         return new LIFNeuronFactory(tauRC, tauRef, maxRate, intercept);
     }
 
     @Override
-    public ConfigSchema getSchema() {
-        return zConfig;
+    public Property[] getSchema() {
+        return zSchema;
     }
 
 }
@@ -298,18 +296,18 @@ class CLinearNeuronFactory extends ConstructableNodeFactory {
     static final Property pMaxRate = pMaxRateDefault;
     
     static final Property pRectified = new PBoolean("Rectified","Whether to constrain the neuron outputs to be positive");
-    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] {
-            pMaxRate, pIntercept, pRectified });
+    static final Property[] zSchema = new Property[] {
+            pMaxRate, pIntercept, pRectified};
 
     public CLinearNeuronFactory() {
         super("Linear Neuron", LinearNeuronFactory.class);
     }
 
     @Override
-    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
-        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
-        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.getValue(pIntercept);
-        Boolean rectified = (Boolean) configuredProperties.getValue(pRectified);
+    protected NodeFactory createNodeFactory(Map<Property, Object> configuredProperties) {
+        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.get(pMaxRate);
+        IndicatorPDF intercept = (IndicatorPDF) configuredProperties.get(pIntercept);
+        Boolean rectified = (Boolean) configuredProperties.get(pRectified);
 
         LinearNeuronFactory factory = new PoissonSpikeGenerator.LinearNeuronFactory(maxRate,
                 intercept, rectified);
@@ -318,8 +316,8 @@ class CLinearNeuronFactory extends ConstructableNodeFactory {
     }
 
     @Override
-    public ConfigSchema getSchema() {
-        return zConfig;
+    public Property[] getSchema() {
+        return zSchema;
     }
 
 }
@@ -330,25 +328,25 @@ class CSigmoidNeuronFactory extends ConstructableNodeFactory {
 
     static final Property pMaxRate = pMaxRateDefault;
     static final Property pSlope = new PIndicatorPDF("Slope","Range of slopes for the sigmoid");
-    static final ConfigSchema zConfig = new ConfigSchemaImpl(new Property[] { pSlope,
-            pInflection, pMaxRate });
+    static final Property[] zSchema = new Property[] {pSlope,
+            pInflection, pMaxRate};
 
     public CSigmoidNeuronFactory() {
         super("Sigmoid Neuron", SigmoidNeuronFactory.class);
     }
 
     @Override
-    protected NodeFactory createNodeFactory(ConfigResult configuredProperties) {
-        IndicatorPDF slope = (IndicatorPDF) configuredProperties.getValue(pSlope);
-        IndicatorPDF inflection = (IndicatorPDF) configuredProperties.getValue(pInflection);
-        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.getValue(pMaxRate);
+    protected NodeFactory createNodeFactory(Map<Property, Object> configuredProperties) {
+        IndicatorPDF slope = (IndicatorPDF) configuredProperties.get(pSlope);
+        IndicatorPDF inflection = (IndicatorPDF) configuredProperties.get(pInflection);
+        IndicatorPDF maxRate = (IndicatorPDF) configuredProperties.get(pMaxRate);
 
         return new PoissonSpikeGenerator.SigmoidNeuronFactory(slope, inflection, maxRate);
     }
 
     @Override
-    public ConfigSchema getSchema() {
-        return zConfig;
+    public Property[] getSchema() {
+        return zSchema;
     }
 
 }
@@ -373,7 +371,6 @@ class CSpikingNeuronFactory extends ConstructableNodeFactory {
     }
 
     private Property pSpikeGenerator;
-
     private Property pSynapticIntegrator;
 
     public CSpikingNeuronFactory() {
@@ -399,15 +396,15 @@ class CSpikingNeuronFactory extends ConstructableNodeFactory {
     }
 
     @Override
-    protected NodeFactory createNodeFactory(ConfigResult configuredProperties)
+    protected NodeFactory createNodeFactory(Map<Property, Object> configuredProperties)
             throws ConfigException {
         Class<?> synapticIntegratorClass = ((ClassWrapper) configuredProperties
-                .getValue(pSynapticIntegrator)).getWrapped();
+                .get(pSynapticIntegrator)).getWrapped();
         Class<?> spikeGeneratorClass = ((ClassWrapper) configuredProperties
-                .getValue(pSpikeGenerator)).getWrapped();
+                .get(pSpikeGenerator)).getWrapped();
 
-        IndicatorPDF scale = (IndicatorPDF) configuredProperties.getValue(pScale);
-        IndicatorPDF bias = (IndicatorPDF) configuredProperties.getValue(pBias);
+        IndicatorPDF scale = (IndicatorPDF) configuredProperties.get(pScale);
+        IndicatorPDF bias = (IndicatorPDF) configuredProperties.get(pBias);
 
         /*
          * Construct Objects from Classes
@@ -420,7 +417,7 @@ class CSpikingNeuronFactory extends ConstructableNodeFactory {
     }
 
     @Override
-    public ConfigSchema getSchema() {
+    public Property[] getSchema() {
         /*
          * Generate these descriptors Just-In-Time, to show all possible
          * implementations in ClassRegistry
@@ -430,8 +427,7 @@ class CSpikingNeuronFactory extends ConstructableNodeFactory {
         pSpikeGenerator = getClassSelector("Spike Generator", ClassRegistry.getInstance()
                 .getImplementations(SpikeGeneratorFactory.class).toArray(new Class<?>[] {}));
 
-        return new ConfigSchemaImpl(new Property[] { pSynapticIntegrator,
-                pSpikeGenerator, pScale, pBias });
+        return new Property[] {pSynapticIntegrator, pSpikeGenerator, pScale, pBias};
     }
 
     /**

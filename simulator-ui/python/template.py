@@ -71,7 +71,7 @@ class TemplateConstructor(IConfigurable):
         if error is not None:
             raise ca.nengo.ui.configurable.ConfigException(error)
     def getSchema(self):
-        return ConfigSchemaImpl(self.properties._list,[])
+        return self.properties._list
     def getTypeName(self):
         return self.template.__name__
     def getDescription(self):

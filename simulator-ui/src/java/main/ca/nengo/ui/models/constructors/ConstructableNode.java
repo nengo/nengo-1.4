@@ -24,10 +24,9 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.constructors;
 
+import java.util.Map;
+
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchema;
-import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PString;
 
@@ -35,8 +34,8 @@ public abstract class ConstructableNode extends AbstractConstructable {
 	protected static final Property pName = new PString("Name", "Name of the item to create", "");
 
 	@Override
-	protected final Object configureModel(ConfigResult configuredProperties) throws ConfigException {
-		String name = (String) configuredProperties.getValue(pName);
+	protected final Object configureModel(Map<Property, Object> configuredProperties) throws ConfigException {
+		String name = (String) configuredProperties.get(pName);
 
 		// if (nodeContainer.getNodeModel(name) != null) {
 		// throw new ConfigException("A node with the same name already
@@ -46,20 +45,16 @@ public abstract class ConstructableNode extends AbstractConstructable {
 		return createNode(configuredProperties, name);
 	}
 
-	protected abstract Object createNode(ConfigResult configuredProperties, String name)
+	protected abstract Object createNode(Map<Property, Object> configuredProperties, String name)
 			throws ConfigException;
 
-	public final ConfigSchema getSchema() {
-		ConfigSchema nodeConfigSchema = getNodeConfigSchema();
-
-		ConfigSchemaImpl newConfigSchema = new ConfigSchemaImpl(nodeConfigSchema.getProperties()
-				.toArray(new Property[] {}), nodeConfigSchema.getAdvancedProperties().toArray(
-				new Property[] {}));
-
-		newConfigSchema.addProperty(pName, 0);
-
-		return newConfigSchema;
+	public final Property[] getSchema() {
+		Property[] nodeSchema = getNodeSchema();
+		Property[] newSchema = new Property[nodeSchema.length + 1];
+		newSchema[0] = pName;
+		System.arraycopy(nodeSchema, 0, newSchema, 1, nodeSchema.length);
+		return newSchema;
 	}
 
-	public abstract ConfigSchema getNodeConfigSchema();
+	public abstract Property[] getNodeSchema();
 }

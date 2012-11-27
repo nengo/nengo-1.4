@@ -212,7 +212,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
                 while (it.hasNext()) {
                     PropertyInputPanel panel = it.next();
 
-                    Object currentValue = getConfigurer().getProperty(panel.getName());
+                    Object currentValue = getConfigurer().getProperty(panel.getDescriptor());
                     if (currentValue != null && panel.isEnabled()) {
                         panel.setValue(currentValue);
                     }

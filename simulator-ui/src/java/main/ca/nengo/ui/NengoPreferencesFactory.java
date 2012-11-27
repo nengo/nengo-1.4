@@ -17,7 +17,7 @@ public class NengoPreferencesFactory implements PreferencesFactory {
  
 	Preferences rootPreferences;
 	private static final String SAVEDIRNAME = ".nengo";
-	private static final String SAVEFILENAME = "nengo-ui.properties";
+	private static final String SAVEFILENAME = "nengo.properties";
   
 	public Preferences systemRoot() {
 		return userRoot();

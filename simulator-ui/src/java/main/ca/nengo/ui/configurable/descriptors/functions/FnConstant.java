@@ -24,12 +24,11 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.configurable.descriptors.functions;
 
+import java.util.Map;
+
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.ConfigResult;
-import ca.nengo.ui.configurable.ConfigSchema;
-import ca.nengo.ui.configurable.ConfigSchemaImpl;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.descriptors.PFloat;
 import ca.nengo.ui.configurable.descriptors.PInt;
@@ -55,12 +54,12 @@ public class FnConstant extends AbstractFn {
     }
 
     @Override
-    protected Function createFunction(ConfigResult props) throws ConfigException {
-        return new ConstantFunction((Integer) props.getValue(pDimension), (Float) props
-                .getValue(pValue));
+    protected Function createFunction(Map<Property, Object> props) throws ConfigException {
+        return new ConstantFunction((Integer) props.get(pDimension), (Float) props
+                .get(pValue));
     }
 
-    public ConfigSchema getSchema() {
+    public Property[] getSchema() {
         if (getFunction() != null) {
             if (pDimension.isEditable()) {
                 pDimension.setDefaultValue(getFunction().getDimension());
@@ -69,7 +68,7 @@ public class FnConstant extends AbstractFn {
             pValue.setDefaultValue(getFunction().getValue());
         }
 
-        return new ConfigSchemaImpl(new Property[] { pDimension, pValue });
+        return new Property[] { pDimension, pValue };
     }
 
     @Override

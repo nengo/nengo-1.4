@@ -42,6 +42,7 @@ public abstract class Property implements Serializable {
     private String description;
 
     private boolean isEditable = true;
+    private boolean isAdvanced = false;
     private String name;
 
     /**
@@ -86,6 +87,13 @@ public abstract class Property implements Serializable {
     protected abstract PropertyInputPanel createInputPanel();
 
     /**
+     * @return Name of this property
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
      * @return Default value of this property
      */
     public Object getDefaultValue() {
@@ -118,13 +126,6 @@ public abstract class Property implements Serializable {
     }
 
     /**
-     * @return Name of this property
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
      * @return String to be displayed in a tooltip
      */
     public String getTooltip() {
@@ -153,6 +154,10 @@ public abstract class Property implements Serializable {
     public boolean isEditable() {
         return isEditable;
     }
+    
+    public boolean isAdvanced() {
+    	return isAdvanced;
+    }
 
     /**
      * @param defaultValue
@@ -174,10 +179,13 @@ public abstract class Property implements Serializable {
     public void setEditable(boolean bool) {
         isEditable = bool;
     }
+    
+    public void setAdvanced(boolean bool) {
+    	isAdvanced = bool;
+    }
 
     @Override
     public String toString() {
         return getTypeName();
     }
-
 }
