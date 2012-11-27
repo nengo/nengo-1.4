@@ -27,55 +27,21 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.impl;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-
-import org.apache.log4j.Logger;
 
 import ca.nengo.math.Function;
-import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
-import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
-import ca.nengo.model.Probeable;
-import ca.nengo.model.Projection;
 import ca.nengo.model.RealOutput;
 import ca.nengo.model.SimulationException;
-import ca.nengo.model.SimulationMode;
-import ca.nengo.model.SpikeOutput;
-import ca.nengo.model.StepListener;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.model.nef.NEFEnsemble;
-import ca.nengo.model.nef.impl.DecodableEnsembleImpl;
 import ca.nengo.model.nef.impl.DecodedOrigin;
-import ca.nengo.model.nef.impl.NEFEnsembleImpl;
-import ca.nengo.model.neuron.Neuron;
-import ca.nengo.sim.Simulator;
-import ca.nengo.sim.impl.LocalSimulator;
 import ca.nengo.util.MU;
-import ca.nengo.util.Probe;
-import ca.nengo.util.ScriptGenException;
-import ca.nengo.util.TaskSpawner;
-import ca.nengo.util.ThreadTask;
-import ca.nengo.util.TimeSeries;
-import ca.nengo.util.VisiblyMutable;
-import ca.nengo.util.VisiblyMutableUtils;
-import ca.nengo.util.impl.ProbeTask;
-import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * Default implementation of Network.
@@ -151,6 +117,49 @@ public class NetworkArrayImpl extends NetworkImpl {
 	
 	public int getNeurons() {
 		return myNeurons;
+	}
+	
+	
+	
+	/**
+	 * Create a new Origin.  A new origin is created on each of the 
+     * ensembles, and these are grouped together to create an output.
+     *  
+     * This method uses the same signature as ca.nengo.model.nef.NEFEnsemble.addDecodedOrigin()
+     * 
+	 * @param name The name of the newly created origin
+	 * @param functions A list of ca.nengo.math.Function objects to approximate at this origin
+	 * @param nodeOrigin Name of the base Origin to use to build this function approximation
+       (this will always be 'AXON' for spike-based synapses)
+	 * @return Origin that encapsulates all of the internal node origins
+	 * @throws StructuralException
+	 */
+	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin) throws StructuralException {
+		Origin[] origins = new Origin[myNodes.length];
+		for(int i = 0; i < myNodes.length; i++) {
+			origins[i] = myNodes[i].addDecodedOrigin(name,  functions,  nodeOrigin);
+		}
+		this.createEnsembleOrigin(name);
+		return this.getOrigin(name);
+	}
+	
+	/**
+	 * Create a new termination.  A new termination is created on each
+     * of the ensembles, which are then grouped together.  This termination
+     * does not use NEF-style encoders; instead, the matrix is the actual connection
+     * weight matrix.  Often used for adding an inhibitory connection that can turn
+     * off the whole array (by setting *matrix* to be all -10, for example). 
+     *   
+	 * @param name The name of the newly created origin
+	 * @param weights Synaptic connection weight matrix (NxM where M is the total number of neurons in the NetworkArray)
+	 * @param tauPSC Post-synaptic time constant
+	 * @param modulatory Boolean value that is False for normal connections, True for modulatory connections 
+	 * (which adjust neural properties rather than the input current)
+	 * @return Termination that encapsulates all of the internal node terminations
+	 * @throws StructuralException
+	 */
+	public Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
+		
 	}
 	
 	public class ArrayOrigin extends BasicOrigin {
@@ -268,46 +277,5 @@ public class NetworkArrayImpl extends NetworkImpl {
 			return decoders;
 		}
 
-	}
-	
-	/**
-	 * Create a new Origin.  A new origin is created on each of the 
-     * ensembles, and these are grouped together to create an output.
-     *  
-     * This method uses the same signature as ca.nengo.model.nef.NEFEnsemble.addDecodedOrigin()
-     * 
-	 * @param name The name of the newly created origin
-	 * @param functions A list of ca.nengo.math.Function objects to approximate at this origin
-	 * @param nodeOrigin Name of the base Origin to use to build this function approximation
-       (this will always be 'AXON' for spike-based synapses)
-	 * @return Origin that encapsulates all of the internal node origins
-	 * @throws StructuralException
-	 */
-	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin) throws StructuralException {
-		Origin[] origins = new Origin[myNodes.length];
-		for(int i = 0; i < myNodes.length; i++) {
-			origins[i] = myNodes[i].addDecodedOrigin(name,  functions,  nodeOrigin);
-		}
-		this.createEnsembleOrigin(name);
-		return this.getOrigin(name);
-	}
-	
-	/**
-	 * Create a new termination.  A new termination is created on each
-     * of the ensembles, which are then grouped together.  This termination
-     * does not use NEF-style encoders; instead, the matrix is the actual connection
-     * weight matrix.  Often used for adding an inhibitory connection that can turn
-     * off the whole array (by setting *matrix* to be all -10, for example). 
-     *   
-	 * @param name The name of the newly created origin
-	 * @param weights Synaptic connection weight matrix (NxM where M is the total number of neurons in the NetworkArray)
-	 * @param tauPSC Post-synaptic time constant
-	 * @param modulatory Boolean value that is False for normal connections, True for modulatory connections 
-	 * (which adjust neural properties rather than the input current)
-	 * @return Termination that encapsulates all of the internal node terminations
-	 * @throws StructuralException
-	 */
-	public Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
-		
 	}
 }
