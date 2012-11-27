@@ -27,6 +27,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -40,6 +41,7 @@ import ca.nengo.model.SimulationException;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
+import ca.nengo.model.nef.impl.DecodedTermination;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
@@ -266,8 +268,102 @@ public class NetworkArrayImpl extends NetworkImpl {
 		exposeTermination(new EnsembleTermination(this, name, terminations), name);
 		return getTermination(name);
 	}	
+
+	public Termination addIndexTermination(String name, float[][] matrix, float tauPSC) throws StructuralException {
+		return addIndexTermination(name, matrix, tauPSC, false, null);
+	}
 	
-    /**
+
+	public Termination addIndexTermination(String name, float[][] matrix, float tauPSC, boolean isModulatory) throws StructuralException {
+		return addIndexTermination(name, matrix, tauPSC, isModulatory, null);
+	}
+		
+	public Termination addIndexTermination(String name, float[][] matrix, float tauPSC, int[] index) throws StructuralException {
+		return addIndexTermination(name, matrix, tauPSC, false, index);
+	}
+	
+	/**
+	 * Create a new termination.  A new termination is created on the specified ensembles, 
+	 * which are then grouped together.  This termination does not use NEF-style encoders; 
+	 * instead, the matrix is the actual connection weight matrix.  Often used for adding an inhibitory 
+	 * connection that can turn off selected ensembles within the array (by setting *matrix* to be 
+	 * all -10, for example).  
+	 * 
+	 * @param string name: the name of the newly created origin
+	 * @param matrix: synaptic connection weight matrix (NxM where M is the total number of neurons in the ensembles to be connected)
+	 * @param float tauPSC: post-synaptic time constant
+	 * @param boolean isModulatory: False for normal connections, True for modulatory connections (which adjust neural
+	 *                                  properties rather than the input current)
+	 * @param index: The indexes of the ensembles to connect to. If set to None, this function behaves exactly like addTermination().
+	 * 
+	 * @return the new termination
+	 */
+	public Termination addIndexTermination(String name, float[][] matrix, float tauPSC, boolean isModulatory, int[] index) throws StructuralException {
+		if(index == null){
+			index = new int[myNodes.length];
+			for(int i=0; i < index.length; i++)
+				index[i] = i;
+		}
+		
+		ArrayList<Termination> terminations = new ArrayList<Termination>();
+
+		int count=0;
+		for(int i=0; i < myNodes.length; i++) {
+			for(int j=0; j < index.length; j++) {
+				if(index[j] == i) {
+					Termination t = myNodes[i].addTermination(name, MU.copy(matrix,count*myNodes[i].getNeurons(),0,myNodes[i].getNeurons(),-1),
+							tauPSC, isModulatory);
+					count++;
+					terminations.add(t);
+					break;
+				}
+			}
+		}
+		
+		EnsembleTermination term = new EnsembleTermination(this,name,(Termination[])terminations.toArray());
+		exposeTermination(term,name);
+		return getTermination(name);
+	}
+	
+	/**
+	 * Gets the nodes in the proper order from the network array. The NetworkImpl version of this function relies on 
+     * the nodeMap object which is sometimes out of order.
+     * 
+     * @return the nodes in this network array
+	 */
+	public Node[] getNodes() {
+		return myNodes;
+	}
+	
+	/**
+	 * @see ca.nengo.model.Network#getTerminations()
+	 */
+	public Termination[] getTerminations() {
+		Termination[] terminations = super.getTerminations();
+		ArrayList<Termination> decodedTerminations = new ArrayList<Termination>();
+		ArrayList<Termination> nonDecodedTerminations = new ArrayList<Termination>();
+		EnsembleTermination baseTermination;
+		for(int i=0; i < terminations.length; i++) {
+			if(terminations[i] instanceof NetworkImpl.TerminationWrapper)
+				baseTermination = (EnsembleTermination)((NetworkImpl.TerminationWrapper)terminations[i]).getBaseTermination();
+			else
+				baseTermination = (EnsembleTermination)terminations[i];
+			
+			Termination[] nodeTerminations = baseTermination.getNodeTerminations();
+			if(nodeTerminations != null) {
+				if(nodeTerminations[0] instanceof DecodedTermination)
+					decodedTerminations.add(terminations[i]);
+				else if(nodeTerminations[0] instanceof EnsembleTermination)
+					nonDecodedTerminations.add(terminations[i]);
+			}
+		}
+		nonDecodedTerminations.addAll(decodedTerminations);
+		
+		return (Termination[])nonDecodedTerminations.toArray();
+		
+	}
+	
+	/**
 	 * Create a new plastic termination.  A new termination is created on each
      * of the ensembles, which are then grouped together.
      * 
