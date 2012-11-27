@@ -73,7 +73,7 @@ class ArrayOrigin(BasicOrigin):
         return decoders            
 """    
 
-class NetworkArray(NetworkArrayImpl):
+class NetworkArray():
     """Collects a set of NEFEnsembles into a single network."""
     serialVersionUID=1
     def __init__(self,name,nodes):
@@ -97,7 +97,7 @@ class NetworkArray(NetworkArrayImpl):
         :param nodes: the nodes to combine together
         :type nodes: list of NEFEnsembles
         """        
-        NetworkArrayImpl.__init__(self, name, nodes)
+        return NetworkArrayImpl.__init__(self, name, nodes)
 
 #    def createEnsembleOrigin(self,name):
 #        """Create an Origin that concatenates the values of internal Origins.
@@ -151,43 +151,43 @@ class NetworkArray(NetworkArrayImpl):
 #        self.exposeTermination(termination,name)
 #        return self.getTermination(name)
 
-    def addPlasticTermination(self,name,matrix,tauPSC,decoder,weight_func=None):
-        """Create a new termination.  A new termination is created on each
-        of the ensembles, which are then grouped together.
-        
-        If decoders are not known at the time the termination is created,
-        then pass in an array of zeros of the appropriate size (i.e. however
-        many neurons will be in the population projecting to the termination,
-        by number of dimensions)."""
-        """
-        terminations = []
-        d = 0
-        dd=self._nodes[0].dimension
-        for n in self._nodes:
-            encoder = n.encoders
-            w = MU.prod(encoder,[MU.prod(matrix,MU.transpose(decoder))[d+i] for i in range(dd)])
-            if weight_func is not None:
-                w = weight_func(w)
-            t = n.addPESTermination(name,w,tauPSC,False)
-            terminations.append(t)
-            d += dd
-        termination = EnsembleTermination(self,name,terminations)
-        self.exposeTermination(termination,name)
-        return self.getTermination(name)
-        """
-        
-        # New wrapper code
-        weights = []
-        d = 0
-        dd = self.getNodeDimension()
-        for i,n in enumerate(self.getNodes()):
-            encoder = n.encoders
-            w = MU.prod(encoder,[MU.prod(matrix,MU.transpose(decoder))[d+i] for i in range(dd[i])])
-            if weight_func is not None:
-                w = weight_func(w)
-            weights += w
-            d += dd[i]
-        return self.addPESTermination(name, weights, tauPSC, False)
+#    def addPlasticTermination(self,name,matrix,tauPSC,decoder,weight_func=None):
+#        """Create a new termination.  A new termination is created on each
+#        of the ensembles, which are then grouped together.
+#        
+#        If decoders are not known at the time the termination is created,
+#        then pass in an array of zeros of the appropriate size (i.e. however
+#        many neurons will be in the population projecting to the termination,
+#        by number of dimensions)."""
+#        """
+#        terminations = []
+#        d = 0
+#        dd=self._nodes[0].dimension
+#        for n in self._nodes:
+#            encoder = n.encoders
+#            w = MU.prod(encoder,[MU.prod(matrix,MU.transpose(decoder))[d+i] for i in range(dd)])
+#            if weight_func is not None:
+#                w = weight_func(w)
+#            t = n.addPESTermination(name,w,tauPSC,False)
+#            terminations.append(t)
+#            d += dd
+#        termination = EnsembleTermination(self,name,terminations)
+#        self.exposeTermination(termination,name)
+#        return self.getTermination(name)
+#        """
+#        
+#        # New wrapper code
+#        weights = []
+#        d = 0
+#        dd = self.getNodeDimension()
+#        for i,n in enumerate(self.getNodes()):
+#            encoder = n.encoders
+#            w = MU.prod(encoder,[MU.prod(matrix,MU.transpose(decoder))[d+i] for i in range(dd[i])])
+#            if weight_func is not None:
+#                w = weight_func(w)
+#            weights += w
+#            d += dd[i]
+#        return self.addPESTermination(name, weights, tauPSC, False)
         
 
 #    def addDecodedTermination(self,name,matrix,tauPSC,isModulatory):
