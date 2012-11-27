@@ -315,10 +315,12 @@ public class ProjectionImpl implements Projection {
 	    // Now handle origin function if there is one
 	    
 	    String functionName = "";
-	    if(!(tempOrigin.getNode() instanceof FunctionInput))
+	    if(tempOrigin instanceof BasicOrigin && tempOrigin.getNode() instanceof FunctionInput)
 	    {
-	    	String cname = tempOrigin.getClass().getCanonicalName();
-	    	String cnodename = tempOrigin.getNode().getClass().getCanonicalName();
+	    	originNodeFullName.append(tempOrigin.getNode().getName());
+	    }
+	    else
+	    {
 		    DecodedOrigin dOrigin; 
 		    if(tempOrigin instanceof DecodedOrigin)
 		    {
@@ -344,7 +346,6 @@ public class ProjectionImpl implements Projection {
 		    
 		    functionName = addFunctionScript(py, dOrigin);
 	    }
-	    
 	    
 	    py.append("\'" + originNodeFullName + "\'");
 	    py.append(", \'" + terminationNodeFullName + "\'");
