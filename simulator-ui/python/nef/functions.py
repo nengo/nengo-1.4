@@ -20,8 +20,8 @@ class PythonFunction(AbstractFunction):
           self.setName(func.func_name)
 
     def checkIfSimple(self, code):
-        S = StringIO.StringIO(code)
-        T = tokenize.tokenize(S.readline)
+        #S = StringIO.StringIO(code)
+        #T = tokenize.tokenize(S.readline)
         #now we have a bunch of tokens, now what to do with them?
         
         return True

@@ -280,7 +280,7 @@ public class ProjectionImpl implements Projection {
 	    	terminationNodeFullName.append(tempTermination.getNode().getName());
 	    }
 	    else if(tempTermination instanceof EnsembleTermination && 
-	    		tempTermination.getNode().getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6")
+	    		tempTermination.getNode().getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$5")
 	    {
 	    	terminationNodeFullName.deleteCharAt(terminationNodeFullName.length()-1);
 	    	
@@ -317,14 +317,16 @@ public class ProjectionImpl implements Projection {
 	    String functionName = "";
 	    if(!(tempOrigin.getNode() instanceof FunctionInput))
 	    {
+	    	String cname = tempOrigin.getClass().getCanonicalName();
+	    	String cnodename = tempOrigin.getNode().getClass().getCanonicalName();
 		    DecodedOrigin dOrigin; 
 		    if(tempOrigin instanceof DecodedOrigin)
 		    {
 		    	dOrigin = (DecodedOrigin) tempOrigin;
 		    	originNodeFullName.append(tempOrigin.getNode().getName());
 		    }
-		    else if(tempOrigin.getClass().getCanonicalName() == "org.python.proxies.nef.array$ArrayOrigin$5" && 
-		    		tempOrigin.getNode().getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6")
+		    else if(tempOrigin.getClass().getCanonicalName() == "org.python.proxies.nef.array$ArrayOrigin$4" && 
+		    		tempOrigin.getNode().getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$5")
 		    {
 		    	originNodeFullName.deleteCharAt(originNodeFullName.length()-1);
 		    	Node node = tempOrigin.getNode().getChildren()[0];
@@ -407,7 +409,8 @@ public class ProjectionImpl implements Projection {
 	    	return "";
 	    }
 
-    	if(fns.length > 0 && fns[0].getClass().getCanonicalName() == "org.python.proxies.nef.functions$PythonFunction$4")
+	    String n = fns[0].getClass().getCanonicalName();
+    	if(fns.length > 0 && fns[0].getClass().getCanonicalName() == "org.python.proxies.nef.functions$PythonFunction$3")
     	{
     		AbstractFunction absFun = (AbstractFunction) fns[0];
     		String code = absFun.getCode();
