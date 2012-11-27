@@ -57,6 +57,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 	// ?? private static Logger ourLogger = Logger.getLogger(NetworkImpl.class);
 	
 	private final int myDimension;
+	private final int myNodeDimension;
 	
 	private final NEFEnsembleImpl[] myNodes;
 	private Map<String, Origin> myOrigins;
@@ -87,7 +88,8 @@ public class NetworkArrayImpl extends NetworkImpl {
 		super();
 		
 		this.setName(name);
-		myDimension = nodes.length * nodes[0].getDimension();
+		myNodeDimension = nodes[0].getDimension();
+		myDimension = nodes.length * myNodeDimension;
 		
 		myNodes = nodes.clone();
 		myNeurons = 0;
@@ -158,8 +160,8 @@ public class NetworkArrayImpl extends NetworkImpl {
      * weight matrix.  Often used for adding an inhibitory connection that can turn
      * off the whole array (by setting *matrix* to be all -10, for example). 
      *   
-	 * @param name The name of the newly created origin
-	 * @param weights Synaptic connection weight matrix (NxM where M is the total number of neurons in the NetworkArray)
+	 * @param name The name of the newly created termination
+	 * @param weights Synaptic connection weight matrix (NxM where N is the total number of neurons in the NetworkArray)
 	 * @param tauPSC Post-synaptic time constant
 	 * @param modulatory Boolean value that is False for normal connections, True for modulatory connections 
 	 * (which adjust neural properties rather than the input current)
@@ -167,7 +169,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * @throws StructuralException
 	 */
 	public Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
-		assert weights.length == myNeurons && weights[0].length == myNodes[0].getDimension();
+		assert weights.length == myNeurons && weights[0].length == myNodeDimension;
 		
 		Termination[] terminations = new Termination[myNodes.length];
 		
@@ -184,7 +186,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 	}
 	
 	public Termination addTermination(String name, float[][][] weights, float tauPSC, boolean modulatory) throws StructuralException {
-		assert weights.length == myNodes.length && weights[0].length == myNeurons && weights[0][0].length == myNodes[0].getDimension();
+		assert weights.length == myNodes.length && weights[0].length == myNeurons && weights[0][0].length == myNodeDimension;
 		
 		Termination[] terminations = new Termination[myNodes.length];
 		
@@ -195,6 +197,44 @@ public class NetworkArrayImpl extends NetworkImpl {
 		return getTermination(name);
 	}
 	
+	
+	/**
+	 * Create a new plastic termination.  A new termination is created on each
+     * of the ensembles, which are then grouped together.
+     * 
+	 * @param name The name of the newly created PES termination
+	 * @param weights Synaptic connection weight matrix (NxM where N is the total number of neurons in the NetworkArray)
+	 * @param tauPSC Post-synaptic time constant
+	 * @param modulatory Boolean value that is False for normal connections, True for modulatory connections 
+	 * (which adjust neural properties rather than the input current)
+	 * @return Termination that encapsulates all of the internal node terminations
+	 * @throws StructuralException
+	 */
+	public Termination addPESTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
+		assert weights.length == myNeurons && weights[0].length == myNodeDimension;
+		
+		Termination[] terminations = new Termination[myNodes.length];
+		
+		for (int i = 0; i < myNodes.length; i++) {
+			int nodeNeuronCount = myNodes[i].getNeurons();
+			
+			float[][] matrix = MU.copy(weights, i * nodeNeuronCount, 0, nodeNeuronCount, -1);
+			
+			terminations[i] = myNodes[i].addPESTermination(name, matrix, tauPSC, modulatory);
+		}
+		
+		exposeTermination(new EnsembleTermination(this, name, terminations), name);
+		return getTermination(name);
+	}
+	
+	
+	public int getNodeDimension() {
+		return myNodeDimension;
+	}
+	
+	public int getDimension() {
+		return myDimension;
+	}
 	
 	public class ArrayOrigin extends BasicOrigin {
 

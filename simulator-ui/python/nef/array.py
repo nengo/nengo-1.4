@@ -184,6 +184,21 @@ class NetworkArray(NetworkImpl):
         self.exposeTermination(termination,name)
         return self.getTermination(name)
 
+        """
+        # New wrapper code
+        weights = []
+        d = 0
+        dd = self.getNodeDimension()
+        for n in self.getNodes():
+            encoder = n.encoders
+            w = MU.prod(encoder,[MU.prod(matrix,MU.transpose(decoder))[d+i] for i in range(dd)])
+            if weight_func is not None:
+                w = weight_func(w)
+            weights += w
+            d += dd
+        return self.addPESTermination(name, weights, tauPSC, False)
+        """
+
     def addDecodedTermination(self,name,matrix,tauPSC,isModulatory):
         """Create a new termination.  A new termination is created on each
         of the ensembles, which are then grouped together."""
