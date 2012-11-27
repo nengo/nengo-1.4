@@ -416,7 +416,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
                     final String modelName = modelObject.getName();
 
                     try {
-                        scriptConsole.addVariable(modelName, model);
+                        //scriptConsole.addVariable(modelName, model);
 
                         modelObject.addPropertyChangeListener(Property.REMOVED_FROM_WORLD,
                                 new WorldObject.Listener() {
