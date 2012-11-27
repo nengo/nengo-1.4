@@ -1,4 +1,7 @@
 from ca.nengo.math.impl import AbstractFunction, PiecewiseConstantFunction
+import inspect
+import tokenize
+import StringIO
 
 class PythonFunction(AbstractFunction):
     serialVersionUID=1
@@ -8,6 +11,21 @@ class PythonFunction(AbstractFunction):
         self.time=time
         self.index=index
         self.use_cache=use_cache
+
+        code = inspect.getsource(func)
+        self.simple=self.checkIfSimple(code)
+        
+        if self.simple:
+          self.setCode(code)
+          self.setName(func.func_name)
+
+    def checkIfSimple(self, code):
+        S = StringIO.StringIO(code)
+        T = tokenize.tokenize(S.readline)
+        #now we have a bunch of tokens, now what to do with them?
+        
+        return True
+
     def map(self,x):
         func=PythonFunctionCache.transientFunctions.get(self,None)
         if func is not None:

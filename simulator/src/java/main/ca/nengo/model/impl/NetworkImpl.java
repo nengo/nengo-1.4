@@ -1294,8 +1294,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                     continue;
                 }
 
-            	String useQuick = (Boolean)array.get("useQuick") ? "True" : "False";
-
+            	/*
                 py.append(String.format("nef.templates.networkarray.make(%s, name='%s', neurons=%d, length=%d, radius=%.1f, rLow=%f, rHigh=%f, iLow=%f, iHigh=%f, encSign=%d, useQuick=%s)\n",
                             pythonNetworkName,
                             array.get("name"),
@@ -1308,6 +1307,32 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                             (Double)array.get("iHigh"),
                             (Integer)array.get("encSign"),
                             useQuick));
+                            */
+            	
+            	 py.append(String.format("%s.make_array(name='%s', neurons=%d, length=%d, dimensions=%d",
+            			 	pythonNetworkName,
+            			 	array.get("name"),
+            			 	(Integer)array.get("neurons"),
+                            (Integer)array.get("length"),
+                            (Integer)array.get("dimensions")
+                            ));
+            	 
+            	 if(array.containsKey("radius")){ py.append(", radius=" + Integer.toString((Integer)array.get("radius"))); }
+            	 
+            	 if(array.containsKey("rLow") && array.containsKey("rHigh"))
+            	 { py.append(", max_rate=(" + Integer.toString((Integer)array.get("rLow")) + ", " + Integer.toString((Integer)array.get("rHigh")) + ")"); }
+            	 
+            	 if(array.containsKey("iLow") && array.containsKey("iHigh"))
+            	 { py.append(", intercept=(" + Integer.toString((Integer)array.get("iLow")) + ", " + Integer.toString((Integer)array.get("iHigh")) + ")"); }
+            	 
+            	 if(array.containsKey("useQuick"))
+            	 {  
+            		String useQuick = (Boolean)array.get("useQuick") ? "True" : "False";
+            	 	py.append(", useQuick=" + useQuick);
+            	 }
+            	 
+            	 if(array.containsKey("encoders")){ py.append(", encoders=" + array.get("encoders")); }
+            	 py.append(")\n");
             }
         } 
 		
