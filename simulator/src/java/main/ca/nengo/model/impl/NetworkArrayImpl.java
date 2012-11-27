@@ -29,6 +29,7 @@ package ca.nengo.model.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import ca.nengo.math.Function;
 import ca.nengo.model.InstantaneousOutput;
@@ -41,12 +42,20 @@ import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.nef.impl.DecodedOrigin;
+import ca.nengo.model.neuron.impl.SpikingNeuron;
+import ca.nengo.model.plasticity.impl.ModulatedPlasticEnsembleTermination;
+import ca.nengo.model.plasticity.impl.PESTermination;
+import ca.nengo.model.plasticity.impl.PlasticEnsembleImpl;
+import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
+import ca.nengo.model.plasticity.impl.STDPTermination;
 import ca.nengo.util.MU;
+import ca.nengo.util.TimeSeries;
+import ca.nengo.util.impl.TimeSeriesImpl;
 
 /**
- * Default implementation of Network.
+ * Default implementation of Network Array.
  *
- * @author Bryan Tripp
+ * @author Xuan Choo, Daniel Rasmussen
  */
 public class NetworkArrayImpl extends NetworkImpl {
 
@@ -236,6 +245,117 @@ public class NetworkArrayImpl extends NetworkImpl {
 		return myDimension;
 	}
 	
+	/**
+	 * Exposes the AXON terminations of each ensemble in the network.
+	 */
+	public void exposeAxons() throws StructuralException {
+		for(int i=0; i < myNodes.length; i++)
+			exposeOrigin(myNodes[i].getOrigin("AXON"), "AXON_"+i);
+	}
+
+	/**
+	 * @see ca.nengo.model.Probeable#listStates()
+	 */
+	public Properties listStates() {
+		return myNodes[0].listStates();
+	}
+
+	/**
+	 * @see ca.nengo.model.Probeable#getHistory(java.lang.String)
+	 */
+	public TimeSeries getHistory(String stateName) throws SimulationException{
+		float[] times = myNodes[0].getHistory(stateName).getTimes();
+		float[][] values = new float[1][myNodes.length];
+		Units[] units = new Units[myNodes.length];
+		
+		for(int i=0; i < myNodes.length; i++) {
+			TimeSeries data = myNodes[i].getHistory(stateName);
+			units[i] = data.getUnits()[0];
+			values[0][i] = data.getValues()[0][0];
+		}
+		return new TimeSeriesImpl(times, values, units);
+	}
+	
+	/**
+	 * Sets learning parameters on learned terminations in the array.
+	 * 
+	 * @param learnTerm name of the learned termination
+	 * @param modTerm name of the modulatory termination
+	 * @param rate learning rate
+	 */
+	public void learn(String learnTerm, String modTerm, float rate) {
+		learn(learnTerm, modTerm, rate, true);
+	}
+	
+	/**
+	 * Sets learning parameters on learned terminations in the array.
+	 * 
+	 * @param learnTerm name of the learned termination
+	 * @param modTerm name of the modulatory termination
+	 * @param rate learning rate
+	 * @param oja whether or not to use Oja smoothing
+	 */
+	public void learn(String learnTerm, String modTerm, float rate, boolean oja) {
+		for(int i=0; i < myNodes.length; i++) {
+			PESTermination term;
+			try {
+				term = (PESTermination)myNodes[i].getTermination(learnTerm);
+			}
+			catch(StructuralException se) {
+				//term does not exist on this node
+				term=null;
+			}
+			catch(ClassCastException se) {
+				//term is not a PESTermination
+				term=null;
+			}
+			
+			if(term != null) {
+				term.setLearningRate(rate);
+				term.setOja(oja);
+				term.setOriginName("X");
+				term.setModTermName(modTerm);
+			}
+		}
+		
+	}
+	
+	/**
+	 * Sets learning on/off for all ensembles in the network.
+	 * 
+	 * @param learn true if the ensembles are learning, else false
+	 */
+	public void setLearning(boolean learn) {
+		for(int i=0; i < myNodes.length; i++)
+			((PlasticEnsembleImpl)myNodes[i]).setLearning(learn);
+	}
+	
+	/**
+	 * Releases memory of all ensembles in the network.
+	 */
+	public void releaseMemory() {
+		for(int i=0; i < myNodes.length; i++)
+			myNodes[i].releaseMemory();
+	}
+	
+	/**
+	 * Returns the encoders for the whole network array (the encoders of each 
+	 * population within the array concatenated together).
+	 * 
+	 * @return encoders of each neuron in the network array
+	 */
+	public float[][] getEncoders() {
+		float[][] encoders = new float[myNeurons][myDimension];
+		for(int i=0; i < myNodes.length; i++)
+			MU.copyInto(myNodes[i].getEncoders(), encoders, i*myNeurons, i*myNodes[i].getDimension(), myNeurons);
+		return encoders;
+	}
+
+	
+	/**
+	 * Origin representing the concatenation of origins on each of the
+	 * ensembles within the network array.
+	 */
 	public class ArrayOrigin extends BasicOrigin {
 
 		private static final long serialVersionUID = 1L;
