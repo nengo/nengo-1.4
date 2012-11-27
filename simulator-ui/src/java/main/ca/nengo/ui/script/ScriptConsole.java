@@ -245,12 +245,13 @@ public class ScriptConsole extends JPanel {
 		//remove variables
 		String[] vars = getVariables();
 		for(String v : vars) {
-			if(!myAddedVariables.contains(v)) //keep any variables that were added manually
+			if(!myAddedVariables.contains(v) && !v.startsWith("__")) //keep any variables that were added manually or special vars
 				removeVariable(v);
 		}
 		
 		//re-add init variables
-		myInterpreter.execfile("python/startup_common.py");
+		myInterpreter.execfile("python/startup_ui.py");
+
 	}
 
 	private static String makePythonName(String name) {

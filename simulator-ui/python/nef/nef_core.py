@@ -5,6 +5,7 @@ from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model.neuron.impl import LIFNeuronFactory
 from ca.nengo.model.plasticity.impl import PESTermination, PreLearnTermination, STDPTermination, PlasticEnsembleImpl
 from ca.nengo.util import MU
+from ca.nengo.util.impl import FixedVectorGenerator
 from ca.nengo.math.impl import IndicatorPDF,ConstantFunction,PiecewiseConstantFunction,GradientDescentApproximator,FourierFunction
 from ca.nengo.math import Function,PDFTools
 from ca.nengo.model import StructuralException
@@ -185,7 +186,7 @@ class Network:
             if len(encoders[0]) != dimensions:
                 raise Exception('Encoder dimensions (%d) must match specified ensemble dimensions (%d)' % (len(encoders[0]), dimensions))
             try:
-                ef.encoderFactory=generators.FixedVectorGenerator(encoders)
+                ef.encoderFactory = FixedVectorGenerator(encoders)
             except:
                 raise Exception('encoders must be a matrix where each row is a non-zero preferred direction vector')
         if decoder_sign is not None:
