@@ -26,7 +26,6 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.configurable.descriptors;
 
-import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.PropertyInputPanel;
 import ca.nengo.ui.configurable.panels.FloatPanel;
 
@@ -37,49 +36,25 @@ import ca.nengo.ui.configurable.panels.FloatPanel;
  * @author Shu Wu
  *
  */
-public class PFloat extends Property {
+public class PFloat extends PNumber {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @param name TODO
-     */
-    public PFloat(String name) {
-        super(name);
-    }
-    
-    public PFloat(String name, String description) {
-        super(name, description);
-    }
-
-    /**
-     * @param name TODO
-     * @param defaultValue TODO
-     */
-    public PFloat(String name, float defaultValue) {
-        super(name, defaultValue);
-    }
-    
     public PFloat(String name, String description, float defaultValue) {
         super(name, description, defaultValue);
     }
+    
+    public PFloat(String name, String description, float defaultValue,
+    		float min, float max) {
+        super(name, description, defaultValue);
+        setRange(min, max);
+    }
 
-    @Override
-    protected PropertyInputPanel createInputPanel() {
+    @Override protected PropertyInputPanel createInputPanel() {
         return new FloatPanel(this);
     }
 
-    @Override
-    public Class<Float> getTypeClass() {
-        /*
-         * Return the primitive type
-         */
+    @Override public Class<Float> getTypeClass() {
         return float.class;
     }
-
-    @Override
-    public String getTypeName() {
-        return "Float";
-    }
-
 }

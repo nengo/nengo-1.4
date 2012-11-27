@@ -32,18 +32,13 @@ package ca.nengo.ui.configurable.matrixEditor;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.EventObject;
 
 import javax.swing.DefaultCellEditor;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
@@ -59,11 +54,11 @@ public class MatrixEditor extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private class MyCellEditor extends DefaultCellEditor {
+    private class MECellEditor extends DefaultCellEditor {
         private static final long serialVersionUID = 7289808186710531L;
         private JTextField myTextField;
 
-        public MyCellEditor() {
+        public MECellEditor() {
             super(new JTextField());
             myTextField = (JTextField) this.getComponent();
         }
@@ -84,115 +79,10 @@ public class MatrixEditor extends JPanel {
             myTextField.selectAll();
             return component;
         }
-
-        @Override
-        public boolean isCellEditable(EventObject anEvent) {
-            // TODO Auto-generated method stub
-            return super.isCellEditable(anEvent);
-        }
-    }
-
-    /**
-     * For testing
-     * 
-     * @param args TODO
-     */
-    public static void main(String args[]) {
-        try {
-            //Tell the UIManager to use the platform look and feel
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch(Exception e) { /*Do nothing*/ }
-
-        CouplingMatrix matrix = new CouplingMatrixImpl(5, 3);
-        MatrixEditor editor = new MatrixEditor(matrix);
-
-        try {
-            JFrame frame = new JFrame("test");
-            frame.getContentPane().add(editor);
-
-            frame.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    System.exit(0);
-                }
-            });
-
-            frame.pack();
-            frame.setVisible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private final TableModel myTableModel;
-    JTable myTable;
-
-    /**
-     * Creates an editor for the given coupling matrix.
-     * @param theMatrix TODO
-     */
-    public MatrixEditor(CouplingMatrix theMatrix) {
-        super(new BorderLayout());
-        myTableModel = new MatrixTableModel(theMatrix);
-        myTable = new JTable(myTableModel);
-        if (NengoStyle.GTK) {
-            myTable.setRowHeight(24);
-        }
-
-        // manually resize massive tables to preserve minimum column width
-        int columnCount = myTable.getColumnCount();
-        int minColWidth = 30;
-        Dimension tableSize = myTable.getPreferredScrollableViewportSize();
-        if (tableSize.width < columnCount*minColWidth)
-        {
-            for (int i=0; i<columnCount; i++)
-            {
-                TableColumn column = null;
-                column = myTable.getColumnModel().getColumn(i);
-                column.setMinWidth(minColWidth);
-                column.setPreferredWidth(minColWidth);
-            }
-            myTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        }
-
-        myTable.setDefaultEditor(Object.class, new MyCellEditor());
-        JScrollPane scroll = new JScrollPane(myTable);
-        this.add(scroll, BorderLayout.CENTER);
-    }
-
-    /**
-     * TODO
-     */
-    public void finishEditing() {
-        if (myTable.getCellEditor() != null) {
-            myTable.getCellEditor().stopCellEditing();
-        }
-    }
-
-    /**
-     * @param arg0 TODO
-     * @param arg1 TODO
-     * @return TODO
-     */
-    public Object getValueAt(int arg0, int arg1) {
-        return myTableModel.getValueAt(arg0, arg1);
-    }
-
-    /**
-     * @param arg0 TODO
-     * @param arg1 TODO
-     * @param arg2 TODO
-     */
-    public void setValueAt(Object arg0, int arg1, int arg2) {
-        myTableModel.setValueAt(arg0, arg1, arg2);
     }
 
     private class MatrixTableModel extends AbstractTableModel {
-
-        /**
-         * 
-         */
+    	
         private static final long serialVersionUID = 1L;
         private final CouplingMatrix myMatrix;
 
@@ -213,20 +103,20 @@ public class MatrixEditor extends JPanel {
             return myMatrix.getToSize();
         }
 
-        public Object getValueAt(int theRow, int theColumn) {
-            return new Float(myMatrix.getElement(theRow + 1, theColumn + 1));
+        public Object getValueAt(int row, int col) {
+            return new Float(myMatrix.getElement(row + 1, col + 1));
         }
 
         @Override
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
+        public boolean isCellEditable(int row, int col) {
             return true;
         }
 
         @Override
-        public void setValueAt(Object theValue, int theRow, int theColumn) {
+        public void setValueAt(Object value, int row, int col) {
             try {
-                float val = Float.parseFloat(theValue.toString());
-                myMatrix.setElement(val, theRow + 1, theColumn + 1);
+                float val = Float.parseFloat(value.toString());
+                myMatrix.setElement(val, row + 1, col + 1);
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null,
                         "Please enter a number",
@@ -234,7 +124,66 @@ public class MatrixEditor extends JPanel {
                         JOptionPane.ERROR_MESSAGE);
             }
         }
+        
+    }
 
+    private final TableModel myTableModel;
+    private final JTable myTable;
+    
+    private static final int minColWidth = 30;
+
+    /**
+     * Creates an editor for the given coupling matrix.
+     * @param matrix The coupling matrix
+     */
+    public MatrixEditor(CouplingMatrix matrix) {
+        super(new BorderLayout());
+        myTableModel = new MatrixTableModel(matrix);
+        myTable = new JTable(myTableModel);
+        if (NengoStyle.GTK) {
+            myTable.setRowHeight(24);
+        }
+
+        // resize massive tables to preserve minimum column width
+        int columnCount = myTable.getColumnCount();
+        Dimension tableSize = myTable.getPreferredScrollableViewportSize();
+        if (tableSize.width < columnCount * minColWidth) {
+            for (int i = 0; i < columnCount; i++) {
+                TableColumn column = null;
+                column = myTable.getColumnModel().getColumn(i);
+                column.setMinWidth(minColWidth);
+                column.setPreferredWidth(minColWidth);
+            }
+            myTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        }
+
+        myTable.setDefaultEditor(Object.class, new MECellEditor());
+        JScrollPane scroll = new JScrollPane(myTable);
+        this.add(scroll, BorderLayout.CENTER);
+    }
+
+    public void finishEditing() {
+        if (myTable.getCellEditor() != null) {
+            myTable.getCellEditor().stopCellEditing();
+        }
+    }
+
+    /**
+     * @param row Row index
+     * @param col Column index
+     * @return Object at passed row, col
+     */
+    public Object getValueAt(int row, int col) {
+        return myTableModel.getValueAt(row, col);
+    }
+
+    /**
+     * @param value Object to set
+     * @param row Row index
+     * @param col Column index
+     */
+    public void setValueAt(Object value, int row, int col) {
+        myTableModel.setValueAt(value, row, col);
     }
 
 }

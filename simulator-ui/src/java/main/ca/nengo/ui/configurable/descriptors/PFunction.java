@@ -49,58 +49,39 @@ public class PFunction extends Property {
 
     private static final long serialVersionUID = 1L;
 
-    private int myInputDimension;
-
-    private boolean isInputDimensionEditable;
+    private int myOutputDimension;
 
     /**
-     * @param name TODO
-     * @param inputDimension TODO
+     * @param name Name of the function
+     * @param inputDimension Input dimensions
+     * @param isInputDimensionEditable Can dimensionality be changed?
+     * @param defaultValue Default function
      */
-    public PFunction(String name, int inputDimension) {
-        this(name, inputDimension, false, null);
+    public PFunction(String name, String description, Function defaultValue, int inputDimension) {
+        super(name, description, defaultValue);
+        this.myOutputDimension = inputDimension;
     }
 
-    /**
-     * @param name TODO
-     * @param inputDimension TODO
-     * @param isInputDimensionEditable TODO
-     * @param defaultValue TODO
-     */
-    public PFunction(String name, int inputDimension, boolean isInputDimensionEditable,
-            Function defaultValue) {
-        super(name, defaultValue);
-        this.myInputDimension = inputDimension;
-        this.isInputDimensionEditable = isInputDimensionEditable;
-    }
-
-    @SuppressWarnings("unchecked")
     private ConfigurableFunction[] createConfigurableFunctions() {
         Vector<ConfigurableFunction> functions = new Vector<ConfigurableFunction>();
 
-        functions.add(new FnConstant(myInputDimension, isInputDimensionEditable));
+        functions.add(new FnConstant(myOutputDimension));
+        functions.add(new FnCustom(myOutputDimension, false));
 
-        FnCustom interpreterFunction = new FnCustom(myInputDimension, false);
-
-        functions.add(interpreterFunction);
-
-        /*
-         * These functions can only have a input dimension of 1
-         */
-        if (myInputDimension == 1) {
-            FnReflective fourierFunction = new FnReflective(FourierFunction.class, "Fourier Function",
-            		new Property[] { new PFloat("Fundamental [Hz]","The smallest frequency represented, in Hertz"),
-                					 new PFloat("Cutoff [Hz]","The largest frequency represented, in Hertz"), 
-                					 new PFloat("RMS","Root-mean-square amplitude of the signal"), 
-                					 new PLong("Seed","Seed for the random number generator") });
-
-            FnReflective gaussianPDF = new FnReflective(GaussianPDF.class, "Gaussian PDF",
-                    new Property[] { new PFloat("Mean","Mean of the Gaussian distribution"), 
-            						 new PFloat("Variance","Variance of the Gaussian disribution"),
-            						 new PFloat("Peak","Maximum value of the Gaussian distribution (at the mode)") });
-
-            functions.add(fourierFunction);
-            functions.add(gaussianPDF);
+        if (myOutputDimension == 1) {
+            functions.add(new FnReflective(FourierFunction.class, "Fourier Function",
+            		new Property[] {
+            			new PFloat("Fundamental [Hz]","The smallest frequency represented, in Hertz"),
+				 		new PFloat("Cutoff [Hz]","The largest frequency represented, in Hertz"), 
+				 		new PFloat("RMS","Root-mean-square amplitude of the signal"), 
+				 		new PLong("Seed","Seed for the random number generator")
+            		}));
+            functions.add(new FnReflective(GaussianPDF.class, "Gaussian PDF",
+                    new Property[] {
+            			new PFloat("Mean","Mean of the Gaussian distribution"),
+            			new PFloat("Variance","Variance of the Gaussian disribution"),
+            			new PFloat("Peak","Maximum value of the Gaussian distribution (at the mode)")
+            		}));
         }
 
         for (Class<?> type : ClassRegistry.getInstance().getImplementations(Function.class)) {
@@ -112,27 +93,17 @@ public class PFunction extends Property {
         return functions.toArray(new ConfigurableFunction[0]);
     }
 
-    @Override
-    protected FunctionPanel createInputPanel() {
+    @Override protected FunctionPanel createInputPanel() {
         ConfigurableFunction[] functions = createConfigurableFunctions();
         return new FunctionPanel(this, functions);
     }
 
-    @Override
-    public Class<Function> getTypeClass() {
+    @Override public Class<Function> getTypeClass() {
         return Function.class;
     }
 
-    @Override
-    public String getTypeName() {
-        return "Function";
-    }
-
-    /**
-     * @return TODO
-     */
     public int getInputDimension() {
-        return myInputDimension;
+        return myOutputDimension;
     }
 
 }

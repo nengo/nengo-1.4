@@ -69,7 +69,7 @@ public abstract class PropertyInputPanel {
 
         outerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
-        JPanel labelPanel=new JPanel();
+        JPanel labelPanel = new JPanel();
         labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
         labelPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
 
@@ -78,7 +78,7 @@ public abstract class PropertyInputPanel {
         label.setFont(NengoStyle.FONT_BOLD);
         labelPanel.add(label);
 
-        JButton help=new JButton("<html><u>?</u></html>");
+        JButton help = new JButton("<html><u>?</u></html>");
         help.setFocusable(false);
         help.setForeground(new java.awt.Color(120,120,180));
         help.setBorderPainted(false);
@@ -86,13 +86,18 @@ public abstract class PropertyInputPanel {
         help.setFocusPainted(false);
         help.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null,propDescriptor.getTooltip(),propDescriptor.getName(),JOptionPane.INFORMATION_MESSAGE,null);
+                JOptionPane.showMessageDialog(
+                		null,
+                		propDescriptor.getTooltip(),
+                		propDescriptor.getName(),
+                		JOptionPane.INFORMATION_MESSAGE,
+                		null);
             }
         });
         labelPanel.add(help);
 
-        //labelPanel.add(Box.createHorizontalGlue());               // use this to right-justify question marks
-        labelPanel.setMaximumSize(labelPanel.getMinimumSize());     // use this to keep question marks on left
+        //labelPanel.add(Box.createHorizontalGlue());           // use this to right-justify question marks
+        labelPanel.setMaximumSize(labelPanel.getMinimumSize()); // use this to keep question marks on left
 
         outerPanel.add(labelPanel);
 
@@ -105,25 +110,19 @@ public abstract class PropertyInputPanel {
         statusMessage.setForeground(NengoStyle.COLOR_HIGH_SALIENCE);
 
         outerPanel.add(statusMessage);
-
     }
 
     /**
-     * @param comp
-     *            Component to be added to the input panel
+     * @param comp Component to be added to the input panel
      */
     protected void add(Component comp) {
         innerPanel.add(comp);
-
     }
 
     /**
-     * @return
+     * @return Dialog parent
      */
     protected JDialog getDialogParent() {
-        /*
-         * get the JDialog parent
-         */
         Container parent = outerPanel.getParent();
         while (parent != null) {
             if (parent instanceof JDialog) {
@@ -133,19 +132,17 @@ public abstract class PropertyInputPanel {
         }
 
         throw new RuntimeException("Input panel does not have a dialog parent");
-
     }
 
     /**
-     * @param comp
-     *            Component to be removed from the input panel
+     * @param comp Component to be removed from the input panel
      */
     protected void removeFromPanel(Component comp) {
         innerPanel.remove(comp);
     }
 
     /**
-     * @param msg
+     * @param msg Status message (usually about a failure)
      */
     protected void setStatusMsg(String msg) {
         statusMessage.setText(msg);
@@ -159,47 +156,45 @@ public abstract class PropertyInputPanel {
     }
 
     /**
-     * @return TODO
+     * @return The outer panel
      */
     public JPanel getJPanel() {
         return outerPanel;
     }
 
     /**
-     * @return TODO
+     * @return Name of the outer panel
      */
     public String getName() {
         return outerPanel.getName();
     }
 
     /**
-     * @return Value of the parameter
-     */
-    public abstract Object getValue();
-
-    /**
-     * @return TODO
+     * @return Is the inner panel enabled?
      */
     public boolean isEnabled() {
         return innerPanel.isEnabled();
     }
 
     /**
-     * @return True if configuration parameter is set
-     */
-    public abstract boolean isValueSet();
-
-    /**
-     * @param enabled TODO
+     * @param enabled Should inner panel be enabled
      */
     public void setEnabled(boolean enabled) {
         innerPanel.setEnabled(enabled);
     }
 
     /**
-     * @param value
-     *            Sets the configuration parameter
+     * @return Value of the parameter
+     */
+    public abstract Object getValue();    
+
+    /**
+     * @param value Sets the configuration parameter
      */
     public abstract void setValue(Object value);
 
+    /**
+     * @return True if configuration parameter is set
+     */
+    public abstract boolean isValueSet();
 }

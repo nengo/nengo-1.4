@@ -130,7 +130,7 @@ public class PostfixFunction implements Function {
 	 * @return A human-readable string representation of the function
 	 */
 	public String getExpression() {
-		if (myExpression != null && myExpression.compareTo("") != 0) {
+		if (myExpression != null && !myExpression.equals("")) {
 			return myExpression;
 		} else {
 			return "Postfix: " + myExpressionList.toString();

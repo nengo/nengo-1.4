@@ -29,34 +29,31 @@ import java.awt.Dialog;
 import ca.nengo.math.Function;
 
 /**
- * TODO
+ * Describes a function that be defined through a configure dialog.
  * 
- * @author TODO
+ * @author Shu Wu
  */
 public interface ConfigurableFunction {
+	
     /**
      * @return Type of function to be created
      */
     public Class<? extends Function> getFunctionType();
 
     /**
-     * This method is optional
-     * 
-     * @param function
-     *            Function to be configured.
+     * @param function Function to be configured.
      */
     public void setFunction(Function function);
 
     /**
-     * @return TODO
+     * @return Function to be configured
      */
     public Function getFunction();
 
     /**
      * Configures the function
      * 
-     * @param parent
-     *            Component to attach the configuration dialog to
+     * @param parent Component to attach the configuration dialog to
      * @return Configured function
      */
     public Function configureFunction(Dialog parent);

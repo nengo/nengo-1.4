@@ -43,25 +43,17 @@ public class FnReflective extends AbstractFn {
     private Property[] myProperties;
 
     /**
-     * @param functionClass TODO
-     * @param typeName TODO
-     * @param propStruct TODO
+     * @param functionClass Type of function to configure
+     * @param propStruct Set of properties to configure
      */
-    public FnReflective(Class<? extends Function> functionClass, String typeName,
-            Property[] propStruct) {
-        super(typeName, functionClass);
-
+    public FnReflective(Class<? extends Function> functionClass, Property[] propStruct) {
+        super(functionClass);
         this.myProperties = propStruct;
     }
 
-    @Override
-    protected Function createFunction(Map<Property, Object> props) throws ConfigException {
+    @Override protected Function createFunction(Map<Property, Object> props) throws ConfigException {
         Property[] metaProperties = getSchema();
 
-        /*
-         * Create function using Java reflection, function parameter are
-         * configured via the IConfigurable interface
-         */
         Class<?> partypes[] = new Class[metaProperties.length];
         for (int i = 0; i < metaProperties.length; i++) {
             partypes[i] = metaProperties[i].getTypeClass();

@@ -260,22 +260,17 @@ public class ConfigDialog extends JDialog {
 
         createButtons(myPanel);
         
-        //add(myPanel);
-        
+        // Trying to add the panel results in exceptions often for some reason.
+        // We get around it by continually trying to add the panel.
         while (true) {
             try {
                 add(myPanel);
                 break;
-            } catch (RuntimeException e) {
-                //e.printStackTrace();
-                // Ubuntu 11.04 throws a sun.awt.X11.XException ~80% of the time here
-            }
+            } catch (RuntimeException e) {}
         }
-        
 
         setMinimumSize(new Dimension(200, this.getHeight()));
         updateBounds();
-
     }
 
     private void updateBounds() {

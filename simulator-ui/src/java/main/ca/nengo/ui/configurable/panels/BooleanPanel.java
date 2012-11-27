@@ -43,7 +43,7 @@ public class BooleanPanel extends PropertyInputPanel {
     public JLabel label;
 
     /**
-     * @param property TODO
+     * @param property Configuration information associated with this panel
      */
     public BooleanPanel(Property property) {
         super(property);

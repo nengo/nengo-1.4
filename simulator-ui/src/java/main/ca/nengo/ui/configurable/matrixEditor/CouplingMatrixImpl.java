@@ -41,56 +41,45 @@ public class CouplingMatrixImpl implements CouplingMatrix {
     private int myToSize;
 
     /**
-     *  TODO
-     */
-    public CouplingMatrixImpl() {
-
-    }
-
-    /**
      * Creates a new instance.
      * 
-     * @param theFromSize
+     * @param fromSize
      *            the number of rows/columns in the matrix
-     * @param theToSize TODO
+     * @param toSize TODO
      */
-    public CouplingMatrixImpl(int theFromSize, int theToSize) {
-        myFromSize = theFromSize;
-        myToSize = theToSize;
-        myData = new float[theToSize][theFromSize];
-        if (theFromSize==theToSize) {
-            for (int i=0; i<theToSize; i++)
-            {
-                myData[i][i]=1;
+    public CouplingMatrixImpl(int fromSize, int toSize) {
+        myFromSize = fromSize;
+        myToSize = toSize;
+        myData = new float[toSize][fromSize];
+        if (fromSize == toSize) {
+            for (int i = 0; i < toSize; i++) {
+                myData[i][i] = 1;
             }
         }
     }
 
     // convenience method for producing an error message
-    private void checkIndex(int theIndex, boolean isRow) {
+    private void checkIndex(int index, boolean isRow) {
         String rowOrCol = (isRow) ? "row" : "col";
         int size = (isRow) ? getToSize() : getFromSize();
-        if (theIndex < 1 || theIndex > size) {
-            throw new IllegalArgumentException("There is no " + rowOrCol + "#"
-                    + theIndex);
+        if (index < 1 || index > size) {
+            throw new IllegalArgumentException(
+            		"There is no " + rowOrCol + " " + index);
         }
     }
 
     /**
-     * @return TODO
+     * @return The coupling matrix
      */
     public float[][] getData() {
         return myData;
     }
 
     /**
-     * @see ca.nengo.ui.configurable.matrixEditor.CouplingMatrix#getElement(int,
-     *      int)
+     * @param data New coupling matrix to set
      */
-    public float getElement(int theRow, int theCol) {
-        checkIndex(theRow, true);
-        checkIndex(theCol, false);
-        return myData[theRow - 1][theCol - 1];
+    public void setData(float[][] data) {
+        myData = data;
     }
 
     public int getFromSize() {
@@ -102,12 +91,17 @@ public class CouplingMatrixImpl implements CouplingMatrix {
     }
 
     /**
-     * @param theData TODO
+     * @see ca.nengo.ui.configurable.matrixEditor.CouplingMatrix#getElement(int,int)
      */
-    public void setData(float[][] theData) {
-        myData = theData;
+    public float getElement(int theRow, int theCol) {
+        checkIndex(theRow, true);
+        checkIndex(theCol, false);
+        return myData[theRow - 1][theCol - 1];
     }
 
+    /**
+     * @see ca.nengo.ui.configurable.matrixEditor.CouplingMatrix#setElement(float,int,int)
+     */
     public void setElement(float theValue, int row, int col) {
         myData[row - 1][col - 1] = theValue;
     }

@@ -26,21 +26,63 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.configurable.panels;
 
-import ca.nengo.ui.configurable.descriptors.PLong;
+import javax.swing.JTextField;
+
+import ca.nengo.ui.configurable.PropertyInputPanel;
+import ca.nengo.ui.configurable.descriptors.PNumber;
 
 /**
  * Input panel for entering Longs
  * 
  * @author Shu Wu
  */
-public class LongPanel extends NumberPanel {
+public abstract class NumberPanel extends PropertyInputPanel {
 
-    public LongPanel(PLong property) {
-		super(property);
-	}
+    private JTextField tf;
 
-	@Override public Long getValue() {
-        return Long.parseLong(getValueString());
+    /**
+     * @param property Property associated with this NumberPanel
+     */
+    public NumberPanel(PNumber property) {
+        super(property);
+        tf = new JTextField(10);
+        add(tf);
+    }
+
+    protected String getValueString() {
+    	return tf.getText();
+    }
+    
+    @Override public PNumber getDescriptor() {
+        return (PNumber) super.getDescriptor();
+    }
+
+    @Override public boolean isValueSet() {
+        String textValue = tf.getText();
+
+        if (textValue == null || textValue.equals("")) {
+//        	setStatusMsg("cannot be empty");
+            return false;
+        }
+
+        try {
+            Object value = getValue();
+            PNumber pnumber = getDescriptor();
+
+            if (pnumber.isCheckingRange() && !pnumber.isInRange(value)) {
+            	setStatusMsg("number outside of range " + pnumber.getRange());
+            	return false;
+            }
+        } catch (NumberFormatException e) {
+        	setStatusMsg("invalid number format");
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override public void setValue(Object value) {
+        tf.setText(value.toString());
     }
 
 }

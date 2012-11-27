@@ -42,58 +42,50 @@ public class CouplingMatrixPanel extends PropertyInputPanel {
     private CouplingMatrixImpl couplingMatrix;
 
     /**
-     * Editor responsible for creating the spreadsheet-like matrix editing
-     * Interface
+     * Editor responsible for creating the spreadsheet-like
+     * matrix editing interface
      */
     private MatrixEditor editor;
 
     /**
-     * @param property TODO
-     * @param fromSize TODO
-     * @param toSize TODO
+     * @param property Description associated with the coupling matrix
+     * @param fromSize From size (number of column)
+     * @param toSize To size (number of rows)
      */
-    public CouplingMatrixPanel(Property property, int fromSize,
-            int toSize) {
+    public CouplingMatrixPanel(Property property, int fromSize, int toSize) {
         super(property);
-
         couplingMatrix = new CouplingMatrixImpl(fromSize, toSize);
         editor = new MatrixEditor(couplingMatrix);
-
         add(editor);
     }
 
-    @Override
-    public float[][] getValue() {
+    @Override public float[][] getValue() {
         editor.finishEditing();
 
         return couplingMatrix.getData();
     }
 
-    @Override
-    public boolean isValueSet() {
+    @Override public boolean isValueSet() {
         return true;
     }
 
-    @Override
-    public void setValue(Object value) {
-        /*
-         * Transfers the new matrix values to the editor
-         */
+    /**
+     * Transfers the new matrix values to the editor
+     */
+    @Override public void setValue(Object value) {
         if (value instanceof float[][]) {
             float[][] matrix = (float[][]) value;
 
             if (matrix[0].length == couplingMatrix.getFromSize()
                     && matrix.length == couplingMatrix.getToSize()) {
-
                 for (int i = 0; i < matrix.length; i++) {
-
                     for (int j = 0; j < matrix[i].length; j++) {
                         editor.setValueAt(matrix[i][j], i, j);
                     }
                 }
             } else {
-                Util
-                .debugMsg("Termination weights not applied because they don't match dimensions");
+                Util.debugMsg("Termination weights not applied " +
+                		"because they don't match dimensions");
             }
         }
     }

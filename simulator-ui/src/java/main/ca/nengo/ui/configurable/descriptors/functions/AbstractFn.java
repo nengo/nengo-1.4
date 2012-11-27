@@ -42,36 +42,24 @@ import ca.nengo.ui.lib.util.UserMessages;
 public abstract class AbstractFn implements IConfigurable, ConfigurableFunction {
 
     private UserConfigurer configurer;
-
-    /**
-     * Function to be created
-     */
     private Function function;
-
     private Class<? extends Function> functionType;
-
-    /**
-     * What the type of function to be created is called
-     */
-    private String typeName;
 
     /**
      * @param typeName
      * @param functionType
      */
-    public AbstractFn(String typeName, Class<? extends Function> functionType) {
-        this.typeName = typeName;
+    public AbstractFn(Class<? extends Function> functionType) {
         this.functionType = functionType;
     }
 
     protected abstract Function createFunction(Map<Property, Object> props) throws ConfigException;
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
+     * Creates the function through reflection of its constructor and
+     * passing the user parameters to it
+     *      
      * @see ca.nengo.ui.configurable.IConfigurable#completeConfiguration(ca.nengo.ui.configurable.ConfigParam)
-     *      Creates the function through reflection of its constructor and
-     *      passing the user parameters to it
      */
     public void completeConfiguration(Map<Property, Object> props) throws ConfigException {
         try {
@@ -84,7 +72,6 @@ public abstract class AbstractFn implements IConfigurable, ConfigurableFunction 
 
     public Function configureFunction(Dialog parent) {
         if (parent != null) {
-
             if (configurer == null) {
                 configurer = new UserConfigurer(this, parent);
             }
@@ -115,13 +102,11 @@ public abstract class AbstractFn implements IConfigurable, ConfigurableFunction 
         return functionType;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see ca.nengo.ui.configurable.IConfigurable#getTypeName()
      */
     public String getTypeName() {
-        return typeName;
+        return functionType.getSimpleName();
     }
 
     public void preConfiguration(Map<Property, Object> props) throws ConfigException {
@@ -129,29 +114,22 @@ public abstract class AbstractFn implements IConfigurable, ConfigurableFunction 
     }
 
     /**
-     * @param function
-     *            function wrapper
+     * @param function Function wrapper
      */
     public final void setFunction(Function function) {
-        if (function != null) {
-            if (!getFunctionType().isInstance(function)) {
-                throw new IllegalArgumentException("Unexpected function type");
-            } else {
-                this.function = function;
-            }
-        } else {
-            this.function = null;
+        if (function != null && !getFunctionType().isInstance(function)) {
+        	throw new IllegalArgumentException("Unexpected function type");
         }
+        
+        this.function = function;
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return getTypeName();
     }
 
-	public String getExtendedDescription() {
+    public String getExtendedDescription() {
 		return null;
 	}
-
 
 }

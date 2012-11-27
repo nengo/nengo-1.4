@@ -34,29 +34,29 @@ import ca.nengo.ui.configurable.descriptors.PFloat;
 import ca.nengo.ui.configurable.descriptors.PInt;
 
 /**
- * TODO
+ * A constant function
  * 
- * @author TODO
+ * @author Shu Wu
  */
 public class FnConstant extends AbstractFn {
 
-    private PInt pDimension;
-    private PFloat pValue = new PFloat("Value","Constant value for the function");
+    private final PInt pDimension;
+    private final PFloat pValue = new PFloat(
+    		"Value", "Constant value for the function", 0);
 
     /**
-     * @param dimension TODO
-     * @param isEditable TODO
+     * @param dimension Dimensionality of the constant function
      */
-    public FnConstant(int dimension, boolean isEditable) {
-        super("Constant Function", ConstantFunction.class);
-        pDimension = new PInt("Input Dimension", dimension);
-        pDimension.setEditable(isEditable);
+    public FnConstant(int dimension) {
+        super(ConstantFunction.class);
+        pDimension = new PInt("Dimensionality",
+        		"Number of dimensions that will be output", dimension);
+        pDimension.setEditable(false);
     }
 
-    @Override
-    protected Function createFunction(Map<Property, Object> props) throws ConfigException {
-        return new ConstantFunction((Integer) props.get(pDimension), (Float) props
-                .get(pValue));
+    @Override protected Function createFunction(Map<Property, Object> props) throws ConfigException {
+        return new ConstantFunction((Integer) props.get(pDimension),
+        		(Float) props.get(pValue));
     }
 
     public Property[] getSchema() {
@@ -64,15 +64,13 @@ public class FnConstant extends AbstractFn {
             if (pDimension.isEditable()) {
                 pDimension.setDefaultValue(getFunction().getDimension());
             }
-
             pValue.setDefaultValue(getFunction().getValue());
         }
 
         return new Property[] { pDimension, pValue };
     }
 
-    @Override
-    public ConstantFunction getFunction() {
+    @Override public ConstantFunction getFunction() {
         return (ConstantFunction) super.getFunction();
     }
 

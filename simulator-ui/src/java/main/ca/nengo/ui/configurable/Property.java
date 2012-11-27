@@ -47,29 +47,6 @@ public abstract class Property implements Serializable {
 
     /**
      * @param name
-     */
-    public Property(String name) {
-        this(name, null, null);
-    }
-
-    /**
-     * @param name
-     * @param defaultValue
-     */
-    public Property(String name, Object defaultValue) {
-        this(name, null, defaultValue);
-    }
-
-    /**
-     * @param name
-     * @param description
-     */
-    public Property(String name, String description) {
-        this(name, description, null);
-    }
-
-    /**
-     * @param name
      * @param description
      * @param defaultValue
      */
@@ -77,14 +54,7 @@ public abstract class Property implements Serializable {
         this.description = description;
         this.defaultValue = defaultValue;
         this.name = name;
-
     }
-
-    /**
-     * @return UI Input panel which can be used for User Configuration of this
-     *         property, null if none exists
-     */
-    protected abstract PropertyInputPanel createInputPanel();
 
     /**
      * @return Name of this property
@@ -139,14 +109,11 @@ public abstract class Property implements Serializable {
     }
 
     /**
-     * @return Class type that this parameter's value must be
-     */
-    public abstract Class<?> getTypeClass();
-
-    /**
      * @return A name given to the Class type of this parameter's value
      */
-    public abstract String getTypeName();
+    public String getTypeName() {
+    	return getTypeClass().getCanonicalName();
+    }
 
     /**
      * @return Whether this property can be changed from its default value
@@ -188,4 +155,15 @@ public abstract class Property implements Serializable {
     public String toString() {
         return getTypeName();
     }
+
+    /**
+     * @return UI Input panel which can be used for User Configuration of this
+     *         property, null if none exists
+     */
+    protected abstract PropertyInputPanel createInputPanel();
+
+    /**
+     * @return Class type that this parameter's value must be
+     */
+    public abstract Class<?> getTypeClass();
 }

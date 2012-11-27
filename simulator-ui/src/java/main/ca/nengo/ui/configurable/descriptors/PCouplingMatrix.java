@@ -38,43 +38,34 @@ import ca.nengo.ui.configurable.panels.CouplingMatrixPanel;
 public class PCouplingMatrix extends Property {
 
     private static final long serialVersionUID = 1L;
-    private int fromSize, toSize;
+    private final int fromSize;
+    private final int toSize;
 
     /**
-     * @param matrixValues TODO
+     * @param matrixValues Default matrix values
      */
     public PCouplingMatrix(float[][] matrixValues) {
-        super("Editor", matrixValues);
-        init(matrixValues[0].length, matrixValues.length);
+        super("Coupling matrix editor", null, matrixValues);
+        this.fromSize = matrixValues[0].length;
+        this.toSize = matrixValues.length;
     }
 
     /**
-     * @param fromSize TODO
-     * @param toSize TODO
+     * @param fromSize From size (number of columns)
+     * @param toSize To size (number of rows)
      */
     public PCouplingMatrix(int fromSize, int toSize) {
-        super("Editor");
-        init(fromSize, toSize);
-    }
-
-    private void init(int fromSize, int toSize) {
+        super("Coupling matrix editor", null, null);
         this.fromSize = fromSize;
         this.toSize = toSize;
     }
 
-    @Override
-    protected PropertyInputPanel createInputPanel() {
+    @Override protected PropertyInputPanel createInputPanel() {
         return new CouplingMatrixPanel(this, fromSize, toSize);
     }
 
-    @Override
-    public Class<float[][]> getTypeClass() {
+    @Override public Class<float[][]> getTypeClass() {
         return float[][].class;
-    }
-
-    @Override
-    public String getTypeName() {
-        return "Coupling Matrix";
     }
 
 }

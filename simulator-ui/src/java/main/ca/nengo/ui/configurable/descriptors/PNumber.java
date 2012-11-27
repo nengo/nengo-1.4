@@ -26,6 +26,8 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.configurable.descriptors;
 
+import java.math.BigDecimal;
+
 import ca.nengo.ui.configurable.Property;
 
 /**
@@ -33,71 +35,46 @@ import ca.nengo.ui.configurable.Property;
  * 
  * @author Shu Wu
  */
-public abstract class RangedConfigParam extends Property {
+public abstract class PNumber extends Property {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Whether to check the range of the Integer value
+     * Whether to check the range of the value
      */
     private boolean checkRange = false;
+    private BigDecimal min;
+    private BigDecimal max;
+    
+    public PNumber(String name, String description, Object defaultValue) {
+        super(name, description, defaultValue);
+    }
 
-    private int min, max;
-
-    /**
-     * @param name TODO
-     * @param defaultValue TODO
-     */
-    public RangedConfigParam(String name, Object defaultValue) {
-        super(name, defaultValue);
+    protected void setRange(Object min, Object max) {
+    	if (min == null && max == null) {
+    		this.checkRange = false;
+    	} else {
+    		String min_str = (min != null) ? min.toString() : "-Infinity";
+    		String max_str = (max != null) ? max.toString() : "Infinity";
+    		this.min = new BigDecimal(min_str);
+    		this.max = new BigDecimal(max_str);
+    		this.checkRange = true;
+    	}
     }
     
-    public RangedConfigParam(String name, String description) {
-        super(name, description);
+    public String getRange() {
+    	return "[" + min.toPlainString() + " to " + max.toPlainString() + "]";
     }
-
-    /**
-     * @param name TODO
-     */
-    public RangedConfigParam(String name) {
-        super(name);
+    
+    public boolean isInRange(Object value) {
+    	BigDecimal val = new BigDecimal(value.toString());
+    	return val.compareTo(min) >= 0 && val.compareTo(max) <= 0;
     }
-
-    /**
-     * @param name
-     *            Name of the Config Descriptor
-     * @param defaultValue
-     *            default value
-     * @param min
-     *            Min value
-     * @param max
-     *            Max value
-     */
-    public RangedConfigParam(String name, int defaultValue, int min, int max) {
-        super(name + " (" + min + " to " + max + ")", defaultValue);
-        this.min = min;
-        this.max = max;
-        checkRange = true;
-    }
-
-    /**
-     * @return Max value
-     */
-    public int getMax() {
-        return max;
-    }
-
-    /**
-     * @return Min value
-     */
-    public int getMin() {
-        return min;
-    }
-
+    
     /**
      * @return Whether range checking is enabled
      */
-    public boolean isCheckRange() {
+    public boolean isCheckingRange() {
         return checkRange;
     }
 }

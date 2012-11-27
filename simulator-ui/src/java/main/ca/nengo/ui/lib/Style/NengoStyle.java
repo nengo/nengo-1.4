@@ -9,7 +9,7 @@ import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 /**
- * Style constants used by NEO Graphics
+ * Style constants used by Nengo
  * 
  * @author Shu Wu
  */
@@ -18,9 +18,8 @@ public class NengoStyle {
 		equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 	
 	public static final int ANIMATION_DROP_IN_WORLD_MS = 200;
-	/*
-	 * Colors
-	 */
+	
+	// Colors
 	public static final Color COLOR_BACKGROUND = Color.black;
 	public static final Color COLOR_FOREGROUND = Color.white;
 	public static final Color COLOR_BACKGROUND2 = Color.darkGray;
@@ -30,57 +29,40 @@ public class NengoStyle {
 	
 	public static final Color COLOR_CONFIGURE_BACKGROUND = Color.white;
 
-	/*
-	 * Button Colors
-	 */
+	// Button Colors
 	public static final Color COLOR_BUTTON_BACKGROUND = Color.darkGray;
 	public static final Color COLOR_BUTTON_BORDER = Color.darkGray;
-
 	public static final Color COLOR_BUTTON_HIGHLIGHT = Color.black;
-
 	public static final Color COLOR_BUTTON_SELECTED = Color.gray;
 	public static final Color COLOR_DARKBORDER = Color.darkGray;
 
-	/*
-	 * Other colors
-	 */
+	// Other colors
 	public static final Color COLOR_DISABLED = Color.gray;
 	public static final Color COLOR_ANCHOR = Color.lightGray;
 	public static final Color COLOR_HIGH_SALIENCE = new Color(150, 0, 0);
 
-	/*
-	 * Search colors
-	 */
+	// Search colors
 	public static final Color COLOR_SEARCH_BOX_BORDER = Color.green;
 	public static final Color COLOR_SEARCH_BAD_CHAR = Color.red;
 
-	/*
-	 * Named colors
-	 */
+	// Named colors
 	public static final Color COLOR_LIGHT_PURPLE = new Color(225, 180, 255);
 	public static final Color COLOR_LIGHT_BLUE = new Color(176, 220, 246);
 	public static final Color COLOR_LIGHT_GREEN = new Color(176, 246, 182);
 
-	/*
-	 * Line Colors
-	 */
+	// Line Colors
 	public static final Color COLOR_LINE = COLOR_LIGHT_GREEN;
-
 	public static final Color COLOR_LINE_HIGHLIGHT = Color.red;
-
 	public static final Color COLOR_LINEEND = COLOR_LIGHT_GREEN;
-
 	public static final Color COLOR_LINEENDWELL = COLOR_LIGHT_BLUE;
 	public static final Color COLOR_LINEIN = new Color(0, 128, 0);
-
+	
 	public static final Color COLOR_MENU_BACKGROUND = Color.black;
 	public static final Color COLOR_NOTIFICATION = Color.orange;
 
 	public static final Color COLOR_TOOLTIP_BORDER = new Color(100, 149, 237);
 
-	/*
-	 * Fonts
-	 */
+	// Fonts
 	public static final String FONT_FAMILY =
 		UIManager.getDefaults().getFont("TabbedPane.font").getFamily();
 
@@ -99,9 +81,7 @@ public class NengoStyle {
 	public static final Font FONT_MENU_TITLE = new Font(FONT_FAMILY, Font.BOLD, 13);
 	public static final Font FONT_MENU = new Font(FONT_FAMILY, Font.BOLD, 12);
 
-	/*
-	 * Search fonts
-	 */
+	// Search fonts
 	public static final Font FONT_SEARCH_TEXT = new Font(FONT_FAMILY, Font.BOLD, 30);
 	public static final Font FONT_SEARCH_RESULT_COUNT = new Font(FONT_FAMILY, Font.BOLD, 22);
 

@@ -34,37 +34,26 @@ import ca.nengo.ui.configurable.panels.LongPanel;
  * @author Shu Wu
  *
  */
-public class PLong extends RangedConfigParam {
+public class PLong extends PNumber {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @param name TODO
-     */
-    public PLong(String name) {
-        super(name);
+    public PLong(String name, String description, long defaultvalue) {
+        super(name, description, defaultvalue);
     }
     
-    public PLong(String name, String description) {
-        super(name, description);
+    public PLong(String name, String description, long defaultvalue,
+    		long min, long max) {
+        super(name, description, defaultvalue);
+        setRange(min, max);
     }
 
-    @Override
-    protected LongPanel createInputPanel() {
+    @Override protected LongPanel createInputPanel() {
         return new LongPanel(this);
     }
 
-    @Override
-    public Class<Long> getTypeClass() {
-        /*
-         * Return the primitive type
-         */
+    @Override public Class<Long> getTypeClass() {
         return long.class;
-    }
-
-    @Override
-    public String getTypeName() {
-        return "Long";
     }
 
 }

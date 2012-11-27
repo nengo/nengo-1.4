@@ -60,9 +60,9 @@ import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.util.UserMessages;
 
 /**
- * TODO
+ * Lets the user type in a function to create
  * 
- * @author TODO
+ * @author Shu Wu
  */
 public class FnCustom extends AbstractFn {
 
@@ -81,7 +81,7 @@ public class FnCustom extends AbstractFn {
      * @param isInputDimEditable TODO
      */
     public FnCustom(int inputDimensions, boolean isInputDimEditable) {
-        super("User-defined Function", PostfixFunction.class);
+        super(PostfixFunction.class);
         this.myInputDimensions = inputDimensions;
         this.isInputDimEditable = isInputDimEditable;
     }

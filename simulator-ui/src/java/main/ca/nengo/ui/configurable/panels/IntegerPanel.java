@@ -26,85 +26,21 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.configurable.panels;
 
-import javax.swing.JTextField;
-
-import ca.nengo.ui.configurable.PropertyInputPanel;
 import ca.nengo.ui.configurable.descriptors.PInt;
 
 /**
- * Input Panel for entering Integers
+ * Input panel for entering floating point numbers
  * 
  * @author Shu Wu
  */
-public class IntegerPanel extends PropertyInputPanel {
+public class IntegerPanel extends NumberPanel {
 
-    public JTextField tf;
-
-    /**
-     * @param property TODO
-     */
     public IntegerPanel(PInt property) {
-        super(property);
-        initPanel();
-    }
+		super(property);
+	}
 
-    @Override
-    public PInt getDescriptor() {
-        return (PInt) super.getDescriptor();
-    }
-
-    @Override
-    public Integer getValue() {
-
-        Integer integerValue = new Integer(tf.getText());
-        return integerValue.intValue();
-
-    }
-
-    public void initPanel() {
-        tf = new JTextField(10);
-
-        add(tf);
-
-    }
-
-
-
-    @Override
-    public boolean isValueSet() {
-        String textValue = tf.getText();
-
-        if (textValue == null || textValue.compareTo("") == 0) {
-            return false;
-        }
-
-        try {
-            Integer value = getValue();
-
-            if (getDescriptor().isCheckRange()) {
-                if (value > getDescriptor().getMax()
-                        || value < getDescriptor().getMin()) {
-                    return false;
-                }
-            }
-
-        } catch (NumberFormatException e) {
-        	setStatusMsg("invalid number format");
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public void setValue(Object value) {
-        tf.setText(value.toString());
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        tf.setEnabled(enabled);
+	@Override public Integer getValue() {
+        return Integer.parseInt(getValueString());
     }
 
 }

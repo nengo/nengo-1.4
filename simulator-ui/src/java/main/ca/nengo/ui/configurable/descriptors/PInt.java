@@ -34,56 +34,26 @@ import ca.nengo.ui.configurable.panels.IntegerPanel;
  * @author Shu Wu
  *
  */
-public class PInt extends RangedConfigParam {
+public class PInt extends PNumber {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @param name TODO
-     */
-    public PInt(String name) {
-        super(name);
+    public PInt(String name, String description, int defaultvalue) {
+        super(name, description, defaultvalue);
     }
     
-    public PInt(String name, String description) {
-        super(name, description);
+    public PInt(String name, String description, int defaultvalue,
+    		int min, int max) {
+        super(name, description, defaultvalue);
+        setRange(min, max);
     }
 
-    /**
-     * @param name TODO
-     * @param defaultValue TODO
-     */
-    public PInt(String name, int defaultValue) {
-        super(name, defaultValue);
-    }
-
-    /**
-     * @param name TODO
-     * @param defaultvalue TODO
-     * @param min TODO
-     * @param max TODO
-     */
-    public PInt(String name, int defaultvalue, int min, int max) {
-        super(name, defaultvalue, min, max);
-    }
-
-    @Override
-    protected IntegerPanel createInputPanel() {
+    @Override protected IntegerPanel createInputPanel() {
         return new IntegerPanel(this);
     }
 
-    @Override
-    public Class<Integer> getTypeClass() {
-        /*
-         * Return the primitive type... Integer values can always be cast as the
-         * primitive
-         */
+    @Override public Class<Integer> getTypeClass() {
         return int.class;
-    }
-
-    @Override
-    public String getTypeName() {
-        return "Integer";
     }
 
 }

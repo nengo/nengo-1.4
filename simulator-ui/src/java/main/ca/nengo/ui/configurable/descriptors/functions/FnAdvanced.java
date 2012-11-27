@@ -31,16 +31,16 @@ import ca.nengo.config.ui.NewConfigurableDialog;
 import ca.nengo.math.Function;
 
 /**
- * TODO
+ * Creates arbitrary functions using NewConfigurableDialog
  * 
- * @author TODO
+ * @author Shu Wu
  */
 public class FnAdvanced implements ConfigurableFunction {
     private Class<? extends Function> type;
     private Function myFunction;
 
     /**
-     * @param type TODO
+     * @param type Function type to create
      */
     public FnAdvanced(Class<? extends Function> type) {
         this.type = type;
@@ -60,18 +60,11 @@ public class FnAdvanced implements ConfigurableFunction {
     }
 
     public void setFunction(Function function) {
-        if (function != null) {
-            if (type.isInstance(function)) {
-                myFunction = function;
-            }
+        if (function != null && type.isInstance(function)) {
+        	myFunction = function;
         } else {
             myFunction = null;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "~" + type.getSimpleName();
     }
 
     public Function getFunction() {

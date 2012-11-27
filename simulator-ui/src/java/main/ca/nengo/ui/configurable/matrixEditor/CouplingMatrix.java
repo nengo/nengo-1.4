@@ -35,32 +35,30 @@ package ca.nengo.ui.configurable.matrixEditor;
  * @author Bryan Tripp
  */
 public interface CouplingMatrix {
-
+	
     /**
-     * Returns the element at the given matrix location.
-     * 
-     * @param row
-     *            the row number
-     * @param col
-     *            the column number
-     * @return TODO
-     */
-    public float getElement(int row, int col);
-
-    /**
-     * @return TODO
+     * @return From size (number of rows)
      */
     public int getFromSize();
 
     /**
-     * @return TODO
+     * @return To size (number of columns)
      */
     public int getToSize();
 
     /**
-     * @param theValue TODO
-     * @param row TODO
-     * @param col TODO
+     * Returns the element at the given matrix location.
+     * 
+     * @param row The row number
+     * @param col The column number
+     * @return float element at that row, col
+     */
+    public float getElement(int row, int col);
+    
+    /**
+     * @param theValue float element at that row, col
+     * @param row The row number
+     * @param col The column number
      */
     public void setElement(float theValue, int row, int col);
 

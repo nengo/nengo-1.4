@@ -119,14 +119,9 @@ public class UserConfigurer extends ConfigManager {
         }
 
         ConfigDialog dialog = createConfigDialog();
-        //dialog.setModal(false);   // fixes object creation in OpenJDK
         dialog.setVisible(true);
 
-        /*
-         * Block until configuration has completed
-         */
-        
-        
+        // Block until configuration has completed
         if (configLock != null) {
             synchronized (configLock) {
                 try {

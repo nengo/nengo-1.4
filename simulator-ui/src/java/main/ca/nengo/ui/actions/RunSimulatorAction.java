@@ -55,10 +55,10 @@ import ca.nengo.ui.models.nodes.UINetwork;
  * @author Shu Wu
  */
 public class RunSimulatorAction extends StandardAction {
+    private static final Property pStartTime = new PFloat("Start time");
     private static final Property pEndTime = new PFloat("End time");
     private static final Property pShowDataViewer = new PBoolean(
-            "Open data viewer after simulation");
-    private static final Property pStartTime = new PFloat("Start time");
+            "Open data viewer after simulation", null, true);
     private static final Property pStepSize = new PFloat("Step size");
     
     private static final long serialVersionUID = 1L;

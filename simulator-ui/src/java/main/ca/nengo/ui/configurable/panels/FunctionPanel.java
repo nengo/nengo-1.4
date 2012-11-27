@@ -52,24 +52,15 @@ import ca.nengo.ui.lib.util.Util;
  */
 public class FunctionPanel extends PropertyInputPanel {
 
-    /**
-     * Combo box for selecting a function type, types of function are stored in
-     * PTFunction.functions
-     */
     private JComboBox comboBox;
-
     private ConfigurableFunction[] configurableFunctionsList;
 
-    /**
-     * Function
-     */
     private Function function = new ca.nengo.math.impl.ConstantFunction(1,0f);
-    ;
 
     private JButton newBtn;
-
     private JButton previewBtn;
     private JButton configureBtn;
+
     /**
      * Currently selected item in the comboBox
      */
@@ -145,9 +136,6 @@ public class FunctionPanel extends PropertyInputPanel {
      */
     protected void setParameters(boolean resetValue) {
 
-        /*
-         * get the JDialog parent
-         */
         JDialog parent = getDialogParent();
 
         if (parent != null) {

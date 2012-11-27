@@ -39,41 +39,15 @@ public class PBoolean extends Property {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @param name TODO
-     */
-    public PBoolean(String name) {
-        super(name);
-    }
-    
-    public PBoolean(String name, String description) {
-        super(name, description);
+    public PBoolean(String name, String description, boolean defaultValue) {
+        super(name, description, defaultValue);
     }
 
-    /**
-     * @param name TODO
-     * @param defaultValue TODO
-     */
-    public PBoolean(String name, boolean defaultValue) {
-        super(name, defaultValue);
-    }
-
-    @Override
-    protected PropertyInputPanel createInputPanel() {
+    @Override protected PropertyInputPanel createInputPanel() {
         return new BooleanPanel(this);
     }
 
-    @Override
-    public Class<Boolean> getTypeClass() {
+    @Override public Class<Boolean> getTypeClass() {
         return Boolean.class;
-    }
-
-    @Override
-    public String getTypeName() {
-        return "Boolean";
-    }
-    
-    public void setDefaultValue(Boolean val){
-    	super.setDefaultValue(val);
     }
 }
