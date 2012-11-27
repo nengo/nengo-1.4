@@ -1153,7 +1153,10 @@ def load_layout_file(name, try_backup = True):
     # Save a backup of the layout file (but only if we are going to use it)
     if(not read_fail and try_backup):
         fp = java.io.File(fn).getCanonicalPath()
-        copyfile(fp, fp + '.bak')
+        try:
+            copyfile(fp, fp + '.bak')
+        except IOError:
+            pass    
 
     return data
 
