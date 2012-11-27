@@ -102,7 +102,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 		this.setName(name);
 		
 		myNodes = nodes.clone();
-		myNumNodes = myNodes.length;
+		myNumNodes = myNumNodes;
 		myNodeDimensions = new int[myNumNodes];
 		myDimension = 0;
 
@@ -300,7 +300,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 */
 	public Termination addIndexTermination(String name, float[][] matrix, float tauPSC, boolean isModulatory, int[] index) throws StructuralException {
 		if(index == null){
-			index = new int[myNodes.length];
+			index = new int[myNumNodes];
 			for(int i=0; i < index.length; i++)
 				index[i] = i;
 		}
@@ -308,7 +308,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 		ArrayList<Termination> terminations = new ArrayList<Termination>();
 
 		int count=0;
-		for(int i=0; i < myNodes.length; i++) {
+		for(int i=0; i < myNumNodes; i++) {
 			for(int j=0; j < index.length; j++) {
 				if(index[j] == i) {
 					Termination t = myNodes[i].addTermination(name, MU.copy(matrix,count*myNodes[i].getNeurons(),0,myNodes[i].getNeurons(),-1),
