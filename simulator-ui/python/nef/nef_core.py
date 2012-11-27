@@ -267,6 +267,13 @@ class Network:
         If the *encoders* parameter is used, you can provide either the standard
         array of encoders (e.g. ``[[1],[-1]]``) or a list of sets of encoders for
         each ensemble (e.g. ``[[[1]],[[-1]]]``).
+        
+        If the *dimensions* parameter is used, each ensemble represents the specified number of 
+        dimensions (default value is 1 dimension per ensemble). For example, if length=5 and 
+        dimensions=2, then a total of 10 dimensions are represented by the network array. 
+        The index number of the first ensemble's first dimension is 0, the index of the first 
+        ensemble's second dimension is 1, the index of the second ensemble's first dimension is 
+        2, and so on.
 
         :param string name:           name of the ensemble array (must be unique)
         :param integer neurons:       number of neurons in each ensemble
