@@ -159,6 +159,7 @@ class NetworkArray(NetworkArrayImpl):
         then pass in an array of zeros of the appropriate size (i.e. however
         many neurons will be in the population projecting to the termination,
         by number of dimensions)."""
+        """
         terminations = []
         d = 0
         dd=self._nodes[0].dimension
@@ -173,8 +174,8 @@ class NetworkArray(NetworkArrayImpl):
         termination = EnsembleTermination(self,name,terminations)
         self.exposeTermination(termination,name)
         return self.getTermination(name)
-
         """
+        
         # New wrapper code
         weights = []
         d = 0
@@ -187,7 +188,7 @@ class NetworkArray(NetworkArrayImpl):
             weights += w
             d += dd[i]
         return self.addPESTermination(name, weights, tauPSC, False)
-        """
+        
 
 #    def addDecodedTermination(self,name,matrix,tauPSC,isModulatory):
 #        """Create a new termination.  A new termination is created on each
