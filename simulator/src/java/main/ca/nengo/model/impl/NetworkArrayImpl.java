@@ -23,7 +23,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 */
 
 /*
- * Created on 23-May-2006
+ * Created on 27-Nov-2012
  */
 package ca.nengo.model.impl;
 
@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 
 import ca.nengo.math.Function;
 import ca.nengo.model.InstantaneousOutput;
@@ -44,12 +45,8 @@ import ca.nengo.model.Units;
 import ca.nengo.model.nef.impl.DecodedTermination;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.nef.impl.DecodedOrigin;
-import ca.nengo.model.neuron.impl.SpikingNeuron;
-import ca.nengo.model.plasticity.impl.ModulatedPlasticEnsembleTermination;
 import ca.nengo.model.plasticity.impl.PESTermination;
 import ca.nengo.model.plasticity.impl.PlasticEnsembleImpl;
-import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
-import ca.nengo.model.plasticity.impl.STDPTermination;
 import ca.nengo.util.MU;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.impl.TimeSeriesImpl;
@@ -363,6 +360,10 @@ public class NetworkArrayImpl extends NetworkImpl {
 		
 	}
 	
+	public Termination addPlasticTermination(String name, float[][] weights, float tauPSC, float[][] decoders) throws StructuralException {
+		return addPlasticTermination(name, weights, tauPSC, decoders, null);
+	}
+	
 	/**
 	 * Create a new plastic termination.  A new termination is created on each
      * of the ensembles, which are then grouped together.
@@ -370,34 +371,42 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * @param name The name of the newly created PES termination
 	 * @param weights Synaptic connection weight matrix (NxM where N is the total number of neurons in the NetworkArray)
 	 * @param tauPSC Post-synaptic time constant
-	 * @param modulatory Boolean value that is False for normal connections, True for modulatory connections 
 	 * (which adjust neural properties rather than the input current)
+	 * @param weightFunc object wrapping a function that consumes a weight matrix and returns a modified weight matrix
 	 * @return Termination that encapsulates all of the internal node terminations
 	 * @throws StructuralException
 	 */
-	public Termination addPESTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
+	public Termination addPlasticTermination(String name, float[][] weights, float tauPSC, float[][] decoders, WeightFunc weightFunc) throws StructuralException {
 		assert weights.length == myNeurons;
 		
 		Termination[] terminations = new Termination[myNumNodes];
+		int d=0;
 		
-		for (int i = 0; i < myNumNodes; i++) {
-			int nodeNeuronCount = myNodes[i].getNeurons();
+		int nodeDs = myNodes[0].getDimension();
+		
+		float[][] decoderWeights = MU.prod(weights,MU.transpose(decoders));
+		
+		for (int i = 0; i < myNodes.length; i++) {
+			float[][] encoders = myNodes[i].getEncoders();
+			float[][] w = MU.prod(encoders,MU.copy(decoderWeights,d,0,nodeDs,-1));
+			if(weightFunc != null)
+				w = weightFunc.call(w);
 			
-			float[][] matrix = MU.copy(weights, i * nodeNeuronCount, 0, nodeNeuronCount, -1);
-			assert matrix[0].length == myNodeDimensions[i];
-			
-			terminations[i] = myNodes[i].addPESTermination(name, matrix, tauPSC, modulatory);
+			terminations[i] = myNodes[i].addPESTermination(name, w, tauPSC, false);
+			d += myNodes[i].getDimension();
 		}
 		
 		exposeTermination(new EnsembleTermination(this, name, terminations), name);
 		return getTermination(name);
 	}
 	
-	/**
-	 * Returns the dimensions for each node in the array
-	 */
-	public int[] getNodeDimensions() {
-		return myNodeDimensions.clone();
+	public interface WeightFunc {
+		public float[][] call(float[][] weights);
+	}
+	
+	
+	public int getNodeDimension() {
+		return myNodeDimension;
 	}
 	
 	/**
