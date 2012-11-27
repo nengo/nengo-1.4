@@ -1457,9 +1457,9 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             }
         } 
 
-        if (myMetaData.get("binding") != null)
+        if (myMetaData.get("convolution") != null)
         {
-            Iterator iter = ((HashMap)myMetaData.get("binding")).values().iterator();
+            Iterator iter = ((HashMap)myMetaData.get("convolution")).values().iterator();
             while (iter.hasNext())
             {
                 HashMap binding = (HashMap)iter.next();
@@ -1469,16 +1469,50 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                     continue;
                 }
                 
-                String invertA = (Boolean)binding.get("invertA") ? "True" : "False";
-                String invertB = (Boolean)binding.get("invertB") ? "True" : "False";
+                String invert_first = (Boolean)binding.get("invert_first") ? "True" : "False";
+                String invert_second = (Boolean)binding.get("invert_second") ? "True" : "False";
+                String quick = (Boolean)binding.get("quick") ? "True" : "False";
+                String A = (String)binding.get("A") == null ? "None" : "'" + (String)binding.get("A") + "'";
+                String B = (String)binding.get("B") == null ? "None" : "'" + (String)binding.get("B") + "'";
+
+                StringBuilder encoders = new StringBuilder("[");
+                double[][] arr = (double[][])binding.get("encoders");
+                for (int i = 0; i < arr.length; i++)
+                {
+                    encoders.append("[");
+                    for (int j = 0; j < arr[i].length; j++)
+                    {
+                        encoders.append(arr[i][j]);
+                        if ((j+1) < arr[i].length)
+                        {
+                            encoders.append(",");
+                        }
+                    }
+                    encoders.append("]");
+                    if ((i + 1) < arr.length)
+                    {
+                        encoders.append(",");
+                    }
+                }
+                encoders.append("]");
                 
-                py.append(String.format("nef.templates.binding.make(%s, name='%s', outputName='%s', N_per_D=%d, invertA=%s, invertB=%s)\n",
+                py.append(String.format("nef.convolution.make_convolution(%s, name='%s', A=%s, B=%s, C='%s', N_per_D=%d, quick=%s, encoders=%s, radius=%d, pstc_out=%f, pstc_in=%f, pstc_gate=%f, invert_first=%s, invert_second=%s, mode='%s', output_scale=%d)\n",
                 			pythonNetworkName,
                             binding.get("name"),
-                            (String)binding.get("outputName"),
+                            A,
+                            B,
+                            (String)binding.get("C"),
                             (Integer)binding.get("N_per_D"),
-                            invertA,
-                            invertB));
+                            quick,
+                            encoders.toString(),
+                            (Integer)binding.get("radius"),
+                            (Double)binding.get("pstc_out"),
+                            (Double)binding.get("pstc_in"),
+                            (Double)binding.get("pstc_gate"),
+                            invert_first,
+                            invert_second,
+                            (String)binding.get("mode"),
+                            (Integer)binding.get("output_scale")));
             }
         } 
 
