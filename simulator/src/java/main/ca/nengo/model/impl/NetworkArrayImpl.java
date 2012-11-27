@@ -43,6 +43,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import ca.nengo.math.Function;
 import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Network;
@@ -58,6 +59,7 @@ import ca.nengo.model.StepListener;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
+import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.impl.DecodableEnsembleImpl;
 import ca.nengo.model.nef.impl.DecodedOrigin;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
@@ -90,14 +92,32 @@ public class NetworkArrayImpl extends NetworkImpl {
 	
 	private final int myDimension;
 	
-	private final NEFEnsembleImpl[] myNodes;
+	private final NEFEnsemble[] myNodes;
 	private Map<String, Origin> myOrigins;
 	private int myNeurons;
 
 	/**
-	 * Sets up a network's data structures
+	 * Create a network holding an array of nodes.  An 'X' Origin
+	 * is automatically created which concatenates the values of each
+	 * internal element's 'X' Origin.
+	 *  
+	 * This object is meant to be created using :func:`nef.Network.make_array()`, allowing for the
+	 * efficient creation of neural groups that can represent large vectors.  For example, the
+	 * following code creates a NetworkArray consisting of 50 ensembles of 1000 neurons, each of 
+	 * which represents 10 dimensions, resulting in a total of 500 dimensions represented::
+	 *  
+	 *   net=nef.Network('Example Array')
+	 *   A=net.make_array('A',neurons=1000,length=50,dimensions=10,quick=True)
+	 *    
+	 * The resulting NetworkArray object can be treated like a normal ensemble, except for the
+	 * fact that when computing nonlinear functions, you cannot use values from different
+	 * ensembles in the computation, as per NEF theory.
+	 *  
+	 * @param name The name of the NetworkArray to create
+	 * @param nodes The ca.nengo.model.nef.NEFEnsemble nodes to combine together
+	 * @throws StructuralException
 	 */
-	public NetworkArrayImpl(String name, NEFEnsembleImpl[] nodes) throws StructuralException {
+	public NetworkArrayImpl(String name, NEFEnsemble[] nodes) throws StructuralException {
 		super();
 		
 		this.setName(name);
@@ -110,13 +130,21 @@ public class NetworkArrayImpl extends NetworkImpl {
 		
 		for(int i = 0; i < nodes.length; i++) {
 			this.addNode(nodes[i]);
-			myNeurons += nodes[i].getNeurons();
+			myNeurons += nodes[i].getNodeCount();
 		}
 		
 		this.setUseGPU(true);
 	}
 
-	private void createEnsembleOrigin(String name) {
+	
+	/** 
+	 * Create an Origin that concatenates the values of internal Origins.
+     *
+     * @param name The name of the Origin to create.  Each internal node must already have an Origin 
+     * with that name.
+     * @throws StructuralException
+	 */
+	private void createEnsembleOrigin(String name) throws StructuralException {
 		// Create array origin too.
 		this.exposeOrigin(this.myOrigins.get(name), name);
 	}
@@ -242,4 +270,44 @@ public class NetworkArrayImpl extends NetworkImpl {
 
 	}
 	
+	/**
+	 * Create a new Origin.  A new origin is created on each of the 
+     * ensembles, and these are grouped together to create an output.
+     *  
+     * This method uses the same signature as ca.nengo.model.nef.NEFEnsemble.addDecodedOrigin()
+     * 
+	 * @param name The name of the newly created origin
+	 * @param functions A list of ca.nengo.math.Function objects to approximate at this origin
+	 * @param nodeOrigin Name of the base Origin to use to build this function approximation
+       (this will always be 'AXON' for spike-based synapses)
+	 * @return Origin that encapsulates all of the internal node origins
+	 * @throws StructuralException
+	 */
+	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin) throws StructuralException {
+		Origin[] origins = new Origin[myNodes.length];
+		for(int i = 0; i < myNodes.length; i++) {
+			origins[i] = myNodes[i].addDecodedOrigin(name,  functions,  nodeOrigin);
+		}
+		this.createEnsembleOrigin(name);
+		return this.getOrigin(name);
+	}
+	
+	/**
+	 * Create a new termination.  A new termination is created on each
+     * of the ensembles, which are then grouped together.  This termination
+     * does not use NEF-style encoders; instead, the matrix is the actual connection
+     * weight matrix.  Often used for adding an inhibitory connection that can turn
+     * off the whole array (by setting *matrix* to be all -10, for example). 
+     *   
+	 * @param name The name of the newly created origin
+	 * @param weights Synaptic connection weight matrix (NxM where M is the total number of neurons in the NetworkArray)
+	 * @param tauPSC Post-synaptic time constant
+	 * @param modulatory Boolean value that is False for normal connections, True for modulatory connections 
+	 * (which adjust neural properties rather than the input current)
+	 * @return Termination that encapsulates all of the internal node terminations
+	 * @throws StructuralException
+	 */
+	public Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
+		
+	}
 }
