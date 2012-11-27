@@ -712,7 +712,16 @@ class Network:
 
         # check for the special case of being given a pre-existing termination
         if isinstance(post,Termination):
-            self.network.addProjection(origin,post)
+            if transform is not None: raise Exception('transform cannot be specified when connecting to an existing termination')
+            if index_pre is not None: raise Exception('index_pre cannot be specified when connecting to an existing termination')
+            if index_post is not None: raise Exception('index_post cannot be specified when connecting to an existing termination')
+            if weight_func is not None: raise Exception('weight_func cannot be specified when connecting to an existing termination')
+            if weight!=1: raise Exception('weight cannot be specified when connecting to an existing termination')
+            if expose_weights: raise Exception('expose_weights cannot be specified when connecting to an existing termination')
+            if modulatory: raise Exception('modulatory cannot be specified when connecting to an existing termination')
+            
+            if create_projection:
+                self.network.addProjection(origin,post)
             return
 
         if isinstance(post, int):
