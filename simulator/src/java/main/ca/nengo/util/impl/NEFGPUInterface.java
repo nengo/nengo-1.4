@@ -14,6 +14,7 @@ import ca.nengo.model.SimulationMode;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.EnsembleTermination;
+import ca.nengo.model.impl.NetworkArrayImpl;
 import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.impl.NetworkImpl.OriginWrapper;
 import ca.nengo.model.impl.NetworkImpl.TerminationWrapper;
@@ -168,7 +169,7 @@ public class NEFGPUInterface {
 		
 		for(Node currentNode : myGPUNetworkArrays){
 			// all the nodes in myGPUNetworkArrays are going to run on the GPU. 
-			if(currentNode.getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6"){
+			if(currentNode instanceof NetworkArrayImpl){
 				List<Node> nodeList = Arrays.asList(((NetworkImpl) currentNode).getNodes());
 				GPUNodeList.addAll(nodeList);
 			}
@@ -625,7 +626,7 @@ public class NEFGPUInterface {
 				workingNode instanceof NEFEnsembleImpl && ((NEFEnsembleImpl) workingNode).getUseGPU();
 			
 			boolean NetworkArrayUseGPU = 
-				workingNode.getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6" &&
+				workingNode instanceof NetworkArrayImpl &&
 				((NetworkImpl) workingNode).getUseGPU();
 		
 			if(NEFEnsembleUseGPU || NetworkArrayUseGPU){

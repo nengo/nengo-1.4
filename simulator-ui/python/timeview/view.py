@@ -5,7 +5,7 @@ import data
 import simulator
 import hrr
 from timeview.components import hrrgraph, neuronmap
-from nef.array import NetworkArray
+#from nef.array import NetworkArray
 import nef
 
 import java

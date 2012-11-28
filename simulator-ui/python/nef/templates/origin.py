@@ -2,11 +2,12 @@ title='Decoded Origin'
 label='Origin'
 icon='origin.png'
  
-from nef.array import NetworkArray
+#from nef.array import NetworkArray
 from ca.nengo.ui.configurable.descriptors import PFunctionArray
+from ca.nengo.model.impl import NetworkArrayImpl
 
 def params(net,node):
-    if(isinstance(node, NetworkArray)):
+    if(isinstance(node, NetworkArrayImpl)):
       dimension = node.getNodes()[0].getDimension();
       function_title = 'Function Array (per sub-ensemble)'
       help_string = """Functions to be computed by each sub-ensemble. The input dimension of each function can 

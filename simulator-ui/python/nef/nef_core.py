@@ -271,7 +271,7 @@ class Network:
         :param integer neurons:       number of neurons in each ensemble
         :param integer length:        number of ensembles in the array
         :param integer dimensions:    number of dimensions each ensemble represents       
-        :returns: the newly created :class:`nef.array.NetworkArray`
+        :returns: the newly created :class:`ca.nengo.model.impl.NetworkArrayImpl`
         """
         nodes=[]
         storage_code=args.get('storage_code','')
@@ -903,7 +903,7 @@ class Network:
             print 'Unknown type of learning termination:',learn_term    
 
     def learn_array(self,array,learn_term,mod_term,rate=5e-7,**kwargs):
-        """Apply a learning rule to a termination of a :class:`nef.array.NetworkArray` (an array of
+        """Apply a learning rule to a termination of a :class:`ca.nengo.model.impl.NetworkArrayImpl` (an array of
         ensembles, created using :func:`nef.Network.make_array()`).
         
         See :func:`nef.Network.learn()` for parameters.
