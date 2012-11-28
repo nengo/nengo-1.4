@@ -315,21 +315,22 @@ public class NetworkArrayImpl extends NetworkImpl {
 				index[i] = i;
 		}
 		
-		Termination[] terminations = new Termination[index.length];
+		ArrayList<Termination> terminations = new ArrayList<Termination>();
 
 		int count=0;
 		for(int i=0; i < myNumNodes; i++) {
 			for(int j=0; j < index.length; j++) {
 				if(index[j] == i) {
-					terminations[count] = myNodes[i].addTermination(name, MU.copy(matrix,count*myNodes[i].getNeurons(),0,myNodes[i].getNeurons(),-1),
+					Termination t = myNodes[i].addTermination(name, MU.copy(matrix,count*myNodes[i].getNeurons(),0,myNodes[i].getNeurons(),-1),
 							tauPSC, isModulatory);
 					count++;
+					terminations.add(t);
 					break;
 				}
 			}
 		}
 		
-		EnsembleTermination term = new EnsembleTermination(this, name, terminations);
+		EnsembleTermination term = new EnsembleTermination(this, name, terminations.toArray(new Termination[0]));
 		exposeTermination(term,name);
 		return getTermination(name);
 	}
