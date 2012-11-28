@@ -35,13 +35,15 @@ def test_params(net, p):
     
 from java.util import ArrayList
 from java.util import HashMap
+
+from ca.nengo.model.impl import NetworkArrayImpl
 def make(net,name='Gate', gated='visual', neurons=40 ,pstc=0.01):
     gate=net.make(name, neurons, 1, intercept=(-0.7, 0), encoders=[[-1]])
     def addOne(x):
         return [x[0]+1]            
     net.connect(gate, None, func=addOne, origin_name='xBiased', create_projection=False)
     output=net.network.getNode(gated)
-    if isinstance(output,nef.array.NetworkArray):
+    if isinstance(output,NetworkArrayImpl):
         weights=[[-10]]*(output.nodes[0].neurons*len(output.nodes))
     else:
         weights=[[-10]]*output.neurons

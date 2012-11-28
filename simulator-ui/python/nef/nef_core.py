@@ -1,4 +1,4 @@
-from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput
+from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput, NetworkArrayImpl
 from ca.nengo.model import SimulationMode, Origin, Units, Termination, Network
 from ca.nengo.model.nef.impl import NEFEnsembleFactoryImpl
 from ca.nengo.model.nef import NEFEnsemble
@@ -19,7 +19,6 @@ from java.util import HashMap
 import pdfs
 import generators
 import functions
-import array
 import random
 import inspect
 import log
@@ -282,7 +281,7 @@ class Network:
         :param integer neurons:       number of neurons in each ensemble
         :param integer length:        number of ensembles in the array
         :param integer dimensions:    number of dimensions each ensemble represents       
-        :returns: the newly created :class:`nef.array.NetworkArray`
+        :returns: the newly created :class:`ca.nengo.model.impl.NetworkArrayImpl`
         """
         nodes=[]
         storage_code=args.get('storage_code','')
@@ -295,7 +294,7 @@ class Network:
             nodes.append(n)
 
         parent,name=self._parse_name(name)    
-        ensemble=array.NetworkArray(name,nodes)
+        ensemble=NetworkArrayImpl(name,nodes)
         parent.addNode(ensemble)
         ensemble.mode=ensemble.nodes[0].mode
 
@@ -482,8 +481,8 @@ class Network:
                     except StructuralException:
                         origin=None
                     if origin is None:
-                        if isinstance(pre,array.NetworkArray):
-                            dim=pre._nodes[0].dimension
+                        if isinstance(pre,NetworkArrayImpl):
+                            dim=pre.nodes[0].dimension
                         else:
                             dim=pre.dimension
 
@@ -747,13 +746,18 @@ class Network:
         if plastic_array:
             suffix = ''
             attempts = 1
+            class MyWeightFunc(NetworkArrayImpl.WeightFunc):
+                def __init__(self, func):
+                    self.func = func
+                def call(self, weights):
+                    return self.func(weights)
             while attempts < 100:
                 try:
                     if hasattr(origin,'decoders'):
-                        term = post.addPlasticTermination(pre.name + suffix,transform,pstc,origin.decoders,weight_func)
+                        term = post.addPlasticTermination(pre.name + suffix,transform,pstc,origin.decoders,MyWeightFunc(weight_func))
                     else:
                         term = post.addPlasticTermination(pre.name + suffix,transform,pstc,
-                                                          [[0.0]*pre.dimension]*pre.neurons,weight_func)
+                                                          [[0.0]*pre.dimension]*pre.neurons,MyWeightFunc(weight_func))
                     break
                 except StructuralException,e:
                     exception = e
@@ -786,7 +790,7 @@ class Network:
 
             term=post.addTermination(pre.name,w,pstc,False)
             
-            if isinstance(pre,array.NetworkArray):
+            if isinstance(pre,NetworkArrayImpl):
                 try:
                    pre.getOrigin('AXON')
                 except:    
@@ -958,7 +962,7 @@ class Network:
             print 'Unknown type of learning termination:',learn_term    
 
     def learn_array(self,array,learn_term,mod_term,rate=5e-7,**kwargs):
-        """Apply a learning rule to a termination of a :class:`nef.array.NetworkArray` (an array of
+        """Apply a learning rule to a termination of a :class:`ca.nengo.model.impl.NetworkArrayImpl` (an array of
         ensembles, created using :func:`nef.Network.make_array()`).
         
         See :func:`nef.Network.learn()` for parameters.

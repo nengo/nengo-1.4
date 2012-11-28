@@ -10,6 +10,7 @@ import java.util.List;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Projection;
+import ca.nengo.model.impl.NetworkArrayImpl;
 import ca.nengo.util.TaskSpawner;
 import ca.nengo.util.ThreadTask;
 
@@ -378,7 +379,7 @@ public class NodeThreadPool {
             if((workingNode.getClass().getCanonicalName().contains("CCMModelNetwork"))){
             	isNetwork = false;
             }
-            else if(workingNode.getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6")
+            else if(workingNode instanceof NetworkArrayImpl)
             {
             	if(breakDownNetworkArrays){
             		isNetwork = true;
