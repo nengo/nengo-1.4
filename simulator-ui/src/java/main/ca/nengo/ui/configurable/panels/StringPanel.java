@@ -48,8 +48,7 @@ public class StringPanel extends PropertyInputPanel {
         initPanel();
     }
 
-    @Override
-    public Object getValue() {
+    @Override public String getValue() {
         return tf.getText();
 
     }
@@ -59,12 +58,11 @@ public class StringPanel extends PropertyInputPanel {
         add(tf);
     }
 
-    @Override
-    public boolean isValueSet() {
+    @Override public boolean isValueSet() {
 
-        String text = (String) getValue();
+        String text = getValue();
 
-        if (text != null && text.compareTo("") != 0) {
+        if (text != null && !text.equals("")) {
             return true;
         } else {
             return false;
@@ -72,10 +70,8 @@ public class StringPanel extends PropertyInputPanel {
 
     }
 
-    @Override
-    public void setValue(Object value) {
+    @Override public void setValue(Object value) {
         tf.setText((String) value);
-
     }
 
 }

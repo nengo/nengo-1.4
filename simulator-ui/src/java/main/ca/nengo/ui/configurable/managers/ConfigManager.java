@@ -239,7 +239,8 @@ public abstract class ConfigManager {
      * @param name
      *            Name of the properties set to be loaded
      */
-    protected void loadPropertiesFromFile(String name) {
+    @SuppressWarnings("unchecked")
+	protected void loadPropertiesFromFile(String name) {
 
         FileInputStream f_in;
 

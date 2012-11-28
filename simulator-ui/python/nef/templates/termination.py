@@ -2,7 +2,7 @@ title='Decoded Termination'
 label='Termination'
 icon='termination.png'
 
-from ca.nengo.ui.configurable.descriptors import PTerminationWeights
+from ca.nengo.ui.configurable.properties import PTerminationWeights
 
 def params(net,node):
     return [

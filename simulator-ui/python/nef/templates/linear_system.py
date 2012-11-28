@@ -4,7 +4,7 @@ icon='linearsystem.png'
 
 from ca.nengo.ui.configurable import *
 from ca.nengo.ui.configurable.managers import ConfigManager
-from ca.nengo.ui.configurable.descriptors import PCouplingMatrix
+from ca.nengo.ui.configurable.properties import PCouplingMatrix
 from ca.nengo.util import MU
 from ca.nengo.ui.lib.util import UserMessages
 

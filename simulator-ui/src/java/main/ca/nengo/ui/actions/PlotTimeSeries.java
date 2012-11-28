@@ -31,10 +31,10 @@ import java.util.Map;
 import ca.nengo.plot.Plotter;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.Property;
-import ca.nengo.ui.configurable.descriptors.PFloat;
-import ca.nengo.ui.configurable.descriptors.PInt;
 import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
 import ca.nengo.ui.configurable.managers.UserConfigurer;
+import ca.nengo.ui.configurable.properties.PFloat;
+import ca.nengo.ui.configurable.properties.PInt;
 import ca.nengo.ui.dataList.ProbePlotHelper;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
@@ -57,14 +57,6 @@ public class PlotTimeSeries extends StandardAction {
     private float tauFilter;
     private int subSampling;
 
-    /**
-     * @param actionName TODO
-     * @param timeSeries TODO
-     * @param plotName TODO
-     * @param showUserConfigDialog TODO
-     * @param defaultTau TODO
-     * @param defaultSubSampling TODO
-     */
     public PlotTimeSeries(
             String actionName,
             TimeSeries timeSeries,
@@ -83,8 +75,17 @@ public class PlotTimeSeries extends StandardAction {
     @Override
     protected void action() throws ActionException {
         try {
-            PFloat pTauFilter = new PFloat("Time constant of display filter [0 = off]", tauFilter);
-            PInt pSubSampling = new PInt("Subsampling [0 = off]", subSampling);
+            PFloat pTauFilter = new PFloat(
+            		"Display filter time constant [0 = off]",
+            		"Plots are filtered with a decaying exponential" +
+            		"with this time constant",
+            		tauFilter,
+            		0f,
+            		Float.MAX_VALUE);
+            PInt pSubSampling = new PInt(
+            		"Subsampling [0 = off]",
+            		"Subsampling [0 = off]",
+            		subSampling);
 
             if (showUserConfigDialog) {
             	Map<Property, Object> result;

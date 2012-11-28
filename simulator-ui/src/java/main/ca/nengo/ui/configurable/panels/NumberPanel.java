@@ -29,7 +29,7 @@ package ca.nengo.ui.configurable.panels;
 import javax.swing.JTextField;
 
 import ca.nengo.ui.configurable.PropertyInputPanel;
-import ca.nengo.ui.configurable.descriptors.PNumber;
+import ca.nengo.ui.configurable.properties.PNumber;
 
 /**
  * Input panel for entering Longs

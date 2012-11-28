@@ -26,7 +26,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.configurable.panels;
 
-import ca.nengo.ui.configurable.descriptors.PFloat;
+import ca.nengo.ui.configurable.properties.PFloat;
 
 /**
  * Input panel for entering floating point numbers

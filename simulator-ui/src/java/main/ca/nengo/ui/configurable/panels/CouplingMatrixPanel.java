@@ -28,9 +28,9 @@ package ca.nengo.ui.configurable.panels;
 
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.PropertyInputPanel;
-import ca.nengo.ui.configurable.matrixEditor.CouplingMatrixImpl;
-import ca.nengo.ui.configurable.matrixEditor.MatrixEditor;
 import ca.nengo.ui.lib.util.Util;
+import ca.nengo.ui.widgets.matrixEditor.CouplingMatrixImpl;
+import ca.nengo.ui.widgets.matrixEditor.MatrixEditor;
 
 /**
  * Input panel for a matrix

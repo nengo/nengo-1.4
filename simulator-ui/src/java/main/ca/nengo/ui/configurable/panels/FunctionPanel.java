@@ -38,10 +38,10 @@ import javax.swing.JDialog;
 import ca.nengo.math.Function;
 import ca.nengo.ui.actions.PlotFunctionAction;
 import ca.nengo.ui.configurable.PropertyInputPanel;
-import ca.nengo.ui.configurable.descriptors.PFunction;
-import ca.nengo.ui.configurable.descriptors.functions.AbstractFn;
-import ca.nengo.ui.configurable.descriptors.functions.ConfigurableFunction;
-import ca.nengo.ui.configurable.descriptors.functions.FnAdvanced;
+import ca.nengo.ui.configurable.functions.AbstractFn;
+import ca.nengo.ui.configurable.functions.ConfigurableFunction;
+import ca.nengo.ui.configurable.functions.FnAdvanced;
+import ca.nengo.ui.configurable.properties.PFunction;
 import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.Util;
 

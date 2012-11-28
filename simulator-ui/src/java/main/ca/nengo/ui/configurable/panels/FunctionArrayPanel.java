@@ -28,7 +28,6 @@ package ca.nengo.ui.configurable.panels;
 
 import java.awt.Container;
 import java.awt.event.ActionEvent;
-import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -39,12 +38,10 @@ import javax.swing.JTextField;
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.ui.configurable.ConfigException;
-import ca.nengo.ui.configurable.IConfigurable;
-import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.PropertyInputPanel;
-import ca.nengo.ui.configurable.descriptors.PFunction;
-import ca.nengo.ui.configurable.descriptors.PFunctionArray;
+import ca.nengo.ui.configurable.functions.ConfigurableFunctionArray;
 import ca.nengo.ui.configurable.managers.UserConfigurer;
+import ca.nengo.ui.configurable.properties.PFunctionArray;
 import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.Util;
 
@@ -55,25 +52,29 @@ import ca.nengo.ui.lib.util.Util;
  */
 public class FunctionArrayPanel extends PropertyInputPanel {
 
-    /**
-     * Function array
-     */
-    private Function[] myFunctionsWr;
+    private Function[] myFunctions;
 
     /**
      * Text field component for entering the dimensions of the function array
      */
     private JTextField tf;
-    private int inputDimension;
+    private int numFunctions;
 
     /**
      * @param property TODO
-     * @param inputDimension TODO
+     * @param numFunctions TODO
      */
-    public FunctionArrayPanel(PFunctionArray property, int inputDimension) {
+    public FunctionArrayPanel(PFunctionArray property, int numFunctions) {
         super(property);
-        initPanel();
-        this.inputDimension = inputDimension;
+        this.numFunctions = numFunctions;
+        
+        JLabel dimensions = new JLabel("Output Dimensions: ");
+        tf = new JTextField(10);
+        add(dimensions);
+        add(tf);
+
+        JButton configureFunction = new JButton(new EditFunctions());
+        add(configureFunction);
     }
 
     /**
@@ -85,9 +86,6 @@ public class FunctionArrayPanel extends PropertyInputPanel {
             return;
         }
 
-        /*
-         * get the JDialog parent
-         */
         Container parent = getJPanel().getParent();
         while (parent != null) {
             if (parent instanceof JDialog) {
@@ -114,34 +112,16 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 
     }
 
-    @Override
-    public PFunctionArray getDescriptor() {
+    @Override public PFunctionArray getDescriptor() {
         return (PFunctionArray) super.getDescriptor();
     }
 
-    /**
-     * @return TODO
-     */
     public int getOutputDimension() {
-        Integer integerValue = new Integer(tf.getText());
-        return integerValue.intValue();
+        return Integer.parseInt(tf.getText());
     }
 
-    @Override
-    public Function[] getValue() {
-        return myFunctionsWr;
-    }
-
-    private void initPanel() {
-        JLabel dimensions = new JLabel("Output Dimensions: ");
-        tf = new JTextField(10);
-        add(dimensions);
-        add(tf);
-
-        JButton configureFunction = new JButton(new EditFunctions());
-        add(tf);
-        add(configureFunction);
-
+    @Override public Function[] getValue() {
+        return myFunctions;
     }
 
     /**
@@ -155,9 +135,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
         }
 
         try {
-            @SuppressWarnings("unused")
-            Integer value = getOutputDimension();
-
+            getOutputDimension();
         } catch (NumberFormatException e) {
             return false;
         }
@@ -165,23 +143,22 @@ public class FunctionArrayPanel extends PropertyInputPanel {
         return true;
     }
 
-    @Override
-    public boolean isValueSet() {
+    @Override public boolean isValueSet() {
     	if (!isOutputDimensionsSet()) {
     		return false;
     	}
     	
-        if (myFunctionsWr != null && (myFunctionsWr.length == getOutputDimension())) {
+        if (myFunctions != null && (myFunctions.length == getOutputDimension())) {
             return true;
         } else {
             setStatusMsg("Functions not set");
         }
         
-        if (isOutputDimensionsSet() && (myFunctionsWr == null ||
-        		myFunctionsWr.length != getOutputDimension())) {
-            myFunctionsWr = new Function[getOutputDimension()];
+        if (isOutputDimensionsSet() && (myFunctions == null ||
+        		myFunctions.length != getOutputDimension())) {
+            myFunctions = new Function[getOutputDimension()];
             for (int i=0; i<getOutputDimension(); i++) {
-                myFunctionsWr[i] = new ConstantFunction(inputDimension, 0.0f);
+                myFunctions[i] = new ConstantFunction(numFunctions, 0.0f);
             }
             return true;
         }
@@ -198,14 +175,9 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 
     }
 
-    @Override
-    public void setValue(Object value) {
+    @Override public void setValue(Object value) {
         Function[] functions = (Function[]) value;
 
-        /*
-         * Check that the functions are of the correct dimension before
-         * committing
-         */
         for (Function function : functions) {
             if (function.getDimension() != getInputDimension()) {
                 Util.debugMsg("Saved functions are of a different dimension, they can't be used");
@@ -214,8 +186,8 @@ public class FunctionArrayPanel extends PropertyInputPanel {
         }
 
         if (value != null) {
-            myFunctionsWr = functions;
-            setDimensions(myFunctionsWr.length);
+            myFunctions = functions;
+            setDimensions(myFunctions.length);
             setStatusMsg("");
         } else {
 
@@ -242,128 +214,7 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 
     }
 
-    /**
-     * @return TODO
-     */
     public int getInputDimension() {
-        return inputDimension;
+        return numFunctions;
     }
-}
-
-/**
- * Configurable object which creates an array of functions
- * 
- * @author Shu Wu
- */
-/**
- * @author Shu
- */
-class ConfigurableFunctionArray implements IConfigurable {
-
-    /**
-     * Number of functions to be created
-     */
-    private int outputDimension;
-
-    /**
-     * Dimensions of the functions to be created
-     */
-    private int inputDimension;
-
-    /**
-     * Array of functions to be created
-     */
-    private Function[] myFunctions;
-
-    private Function[] defaultValues;
-
-    /**
-     * @param inputDimension TODO
-     * @param outputDimension
-     *            Number of functions to create
-     * @param defaultValues TODO
-     */
-    public ConfigurableFunctionArray(int inputDimension, int outputDimension,
-            Function[] defaultValues) {
-        this.defaultValues = defaultValues;
-        init(inputDimension, outputDimension);
-
-    }
-
-    /**
-     * Initializes this instance
-     * 
-     * @param outputDimension
-     *            number of functions to create
-     */
-    private void init(int inputDimension, int outputDimension) {
-        this.inputDimension = inputDimension;
-        this.outputDimension = outputDimension;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see ca.nengo.ui.configurable.IConfigurable#completeConfiguration(ca.nengo.ui.configurable.ConfigParam)
-     */
-    public void completeConfiguration(Map<Property, Object> properties) {
-    	Property[] props = getSchema();
-        myFunctions = new Function[outputDimension];
-        for (int i = 0; i < outputDimension; i++) {
-            myFunctions[i] = ((Function) properties.get(props[i]));
-        }
-
-    }
-
-    /**
-     * @see ca.nengo.ui.configurable.IConfigurable#getSchema()
-     */
-    public Property[] getSchema() {
-        Property[] props = new Property[outputDimension];
-
-        for (int i = 0; i < outputDimension; i++) {
-
-            Function defaultValue = null;
-
-            if (defaultValues != null && i < defaultValues.length && defaultValues[i] != null) {
-                defaultValue = defaultValues[i];
-
-            }
-            PFunction function = new PFunction("Function " + i, inputDimension, false, defaultValue);
-            function.setDescription("The function to use for dimension "+i);
-
-            props[i] = function;
-        }
-
-        return props;
-    }
-
-    /**
-     * @return Functions created
-     */
-    public Function[] getFunctions() {
-        return myFunctions;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see ca.nengo.ui.configurable.IConfigurable#getTypeName()
-     */
-    public String getTypeName() {
-        return outputDimension + "x Functions";
-    }
-
-    public void preConfiguration(Map<Property, Object> props) throws ConfigException {
-        // do nothing
-    }
-
-    public String getDescription() {
-        return getTypeName();
-    }
-	public String getExtendedDescription() {
-		return null;
-	}
-    
-
 }

@@ -31,10 +31,10 @@ import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.plot.Plotter;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.Property;
-import ca.nengo.ui.configurable.descriptors.PFloat;
-import ca.nengo.ui.configurable.descriptors.PInt;
 import ca.nengo.ui.configurable.managers.ConfigManager;
 import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
+import ca.nengo.ui.configurable.properties.PFloat;
+import ca.nengo.ui.configurable.properties.PInt;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.util.UIEnvironment;
@@ -47,19 +47,17 @@ import ca.nengo.ui.lib.util.UIEnvironment;
 public class PlotFunctionNodeAction extends StandardAction {
     private static final long serialVersionUID = 1L;
 
-    static final Property pEnd = new PFloat("End");
-    static final Property pIncrement = new PFloat("Increment");
-    static final Property pStart = new PFloat("Start");
-    // static final PropDescriptor pTitle = new PTString("Title");
+    static final Property pEnd = new PFloat("End",
+    		"End of the graph range", 1);
+    static final Property pIncrement = new PFloat("Increment",
+    		"Step size (dt, in seconds) of the graph (usually 0.001)", 0.001f);
+    static final Property pStart = new PFloat("Start",
+    		"Start of the graph range (usually 0)", 0);
+
     private FunctionInput functionInput;
     private Property pFunctionIndex;
     private String plotName;
 
-    /**
-     * @param plotName TODO
-     * @param actionName TODO
-     * @param functionInput TODO
-     */
     public PlotFunctionNodeAction(String plotName, String actionName,
             FunctionInput functionInput) {
         super("Plot function input", actionName);
@@ -68,14 +66,16 @@ public class PlotFunctionNodeAction extends StandardAction {
 
     }
 
-    @Override
-    protected void action() throws ActionException {
-        pFunctionIndex = new PInt("Function index", 0, 0, functionInput
-                .getFunctions().length - 1);
-        Property[] propDescripters = { pFunctionIndex, pStart,
-                pIncrement, pEnd };
+    @Override protected void action() throws ActionException {
+        pFunctionIndex = new PInt(
+        		"Function index",
+        		"Which function to plot",
+        		0,
+        		0,
+        		functionInput.getFunctions().length - 1);
+        Property[] propDescriptors = {pFunctionIndex, pStart, pIncrement, pEnd};
         try {
-        	Map<Property, Object> properties = ConfigManager.configure(propDescripters,
+        	Map<Property, Object> properties = ConfigManager.configure(propDescriptors,
                     "Function plotter", UIEnvironment.getInstance(),
                     ConfigMode.TEMPLATE_NOT_CHOOSABLE);
 
@@ -87,10 +87,6 @@ public class PlotFunctionNodeAction extends StandardAction {
 
     }
 
-    /**
-     * @param properties TODO
-     * @throws ConfigException TODO
-     */
     public void completeConfiguration(Map<Property, Object> properties)
             throws ConfigException {
         String title = plotName + " - Function Plot";
@@ -114,6 +110,5 @@ public class PlotFunctionNodeAction extends StandardAction {
         Function function = functionInput.getFunctions()[functionIndex];
         Plotter.plot(function, start, increment, end, title + " ("
                 + function.getClass().getSimpleName() + ")");
-
     }
 }

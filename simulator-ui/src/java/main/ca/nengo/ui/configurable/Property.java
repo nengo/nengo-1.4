@@ -37,10 +37,8 @@ public abstract class Property implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    protected Object defaultValue = null;
-
+    private Object defaultValue = null;
     private String description;
-
     private boolean isEditable = true;
     private boolean isAdvanced = false;
     private String name;

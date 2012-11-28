@@ -33,8 +33,8 @@ import ca.nengo.model.StructuralException;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.model.impl.NetworkImpl;
+import ca.nengo.ui.ExampleRunner;
 import ca.nengo.ui.actions.RunSimulatorAction;
-import ca.nengo.ui.dev.ExampleRunner;
 import ca.nengo.ui.models.nodes.UINetwork;
 
 /**

@@ -28,11 +28,11 @@ package ca.nengo.ui.configurable;
 
 import java.util.Map;
 
-import ca.nengo.ui.configurable.descriptors.PBoolean;
-import ca.nengo.ui.configurable.descriptors.PFloat;
-import ca.nengo.ui.configurable.descriptors.PInt;
-import ca.nengo.ui.configurable.descriptors.PString;
 import ca.nengo.ui.configurable.managers.UserConfigurer;
+import ca.nengo.ui.configurable.properties.PBoolean;
+import ca.nengo.ui.configurable.properties.PFloat;
+import ca.nengo.ui.configurable.properties.PInt;
+import ca.nengo.ui.configurable.properties.PString;
 
 /**
  * Creates various dialogs and returns user results
@@ -41,66 +41,30 @@ import ca.nengo.ui.configurable.managers.UserConfigurer;
  */
 public class UserDialogs {
 
-    /**
-     * @param dialogName TODO
-     * @param defaultValue TODO
-     * @return TODO
-     * @throws ConfigException TODO
-     */
-    public static Float showDialogFloat(String dialogName, Float defaultValue)
+    public static Float showDialogFloat(String dialogName, String description, Float defaultValue)
             throws ConfigException {
-        return (Float) showDialog("Config", new PFloat(dialogName, defaultValue));
+        return (Float) showDialog("Config", new PFloat(dialogName, description, defaultValue));
     }
 
-    /**
-     * @param dialogName TODO
-     * @param defaultValue TODO
-     * @return TODO
-     * @throws ConfigException TODO
-     */
-    public static Boolean showDialogBoolean(String dialogName, Boolean defaultValue)
+    public static Boolean showDialogBoolean(String dialogName, String description, Boolean defaultValue)
             throws ConfigException {
-        return (Boolean) showDialog("Config", new PBoolean(dialogName, defaultValue));
+        return (Boolean) showDialog("Config", new PBoolean(dialogName, description, defaultValue));
     }
 
-    /**
-     * @param dialogName TODO
-     * @param defaultValue TODO
-     * @return TODO
-     * @throws ConfigException TODO
-     */
-    public static Integer showDialogInteger(String dialogName, int defaultValue)
+    public static Integer showDialogInteger(String dialogName, String description, int defaultValue)
             throws ConfigException {
-        return (Integer) showDialog("Config", new PInt(dialogName, defaultValue));
+        return (Integer) showDialog("Config", new PInt(dialogName, description, defaultValue));
     }
 
-    /**
-     * @param dialogName TODO
-     * @param defaultValue TODO
-     * @return TODO
-     * @throws ConfigException TODO
-     */
     public static String showDialogString(String dialogName, String defaultValue)
             throws ConfigException {
         return (String) showDialog("Config", new PString(dialogName, null, defaultValue));
     }
 
-    /**
-     * @param dialogName TODO
-     * @param descriptor TODO
-     * @return TODO
-     * @throws ConfigException TODO
-     */
     public static Object showDialog(String dialogName, Property descriptor) throws ConfigException {
         return showDialog(dialogName, new Property[] { descriptor }).get(descriptor);
     }
 
-    /**
-     * @param dialogName TODO
-     * @param descriptors TODO
-     * @return TODO
-     * @throws ConfigException TODO
-     */
     public static Map<Property, Object> showDialog(String dialogName, Property[] descriptors)
             throws ConfigException {
         UserMultiPropDialog dialog = new UserMultiPropDialog(dialogName, descriptors);

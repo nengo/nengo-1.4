@@ -71,14 +71,14 @@ class LayoutComboBox(JComboBox):
         elif layout=='sort by name':
             self.viewer.doSortByNameLayout()
 
-from ca.nengo.ui.configurable.descriptors import *
+from ca.nengo.ui.configurable.properties import *
 from ca.nengo.ui.configurable import *
 
 class ParisianTransform(IConfigurable):
-    p_num_interneurons=PInt('Number of interneurons')
-    p_tau_interneurons=PFloat('Post-synaptic time constant of interneurons')
-    p_excitatory=PBoolean('Excitatory')
-    p_optimize=PBoolean('Optimize bias function')
+    p_num_interneurons=PInt('Number of interneurons', None, 100)
+    p_tau_interneurons=PFloat('Post-synaptic time constant of interneurons', None, 0.01)
+    p_excitatory=PBoolean('Excitatory', None, True)
+    p_optimize=PBoolean('Optimize bias function', None, True)
     properties=[p_num_interneurons,p_tau_interneurons,p_excitatory,p_optimize]
 
     def __init__(self):
@@ -150,14 +150,14 @@ class PGpuCount(PInt):
         default = NEFGPUInterface.getRequestedNumDevices()
         maximum = NEFGPUInterface.getNumAvailableDevices()
 
-        PInt.__init__(self, name, default, 0, maximum)
+        PInt.__init__(self, name, '', default, 0, maximum)
 
     def createInputPanel(self):
         return GpuCountPanel(self)
 
 class PGpuUse(PBoolean):
     def __init__(self,name):
-        PBoolean.__init__(self, name, WeightedCostApproximator.getUseGPU())
+        PBoolean.__init__(self, name, '', WeightedCostApproximator.getUseGPU())
 
     def createInputPanel(self):
         return GpuUsePanel(self)
@@ -168,7 +168,7 @@ class ParallelizationConfiguration(IConfigurable):
   num_sim_GPU=NEFGPUInterface.getRequestedNumDevices()
   use_GPU_for_creation=WeightedCostApproximator.getUseGPU()
 
-  p_num_java_threads=PInt('Number of Java Threads', num_java_threads, 1, NodeThreadPool.getMaxNumJavaThreads())
+  p_num_java_threads=PInt('Number of Java Threads', '', num_java_threads, 1, NodeThreadPool.getMaxNumJavaThreads())
   p_num_sim_GPU=PGpuCount('Number of GPU\'s for Simulation')
   p_use_GPU_for_creation=PGpuUse('Use GPU for Ensemble Creation')
 

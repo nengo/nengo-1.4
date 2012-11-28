@@ -6,9 +6,9 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
-import ca.nengo.ui.configurable.matrixEditor.CouplingMatrix;
-import ca.nengo.ui.configurable.matrixEditor.CouplingMatrixImpl;
-import ca.nengo.ui.configurable.matrixEditor.MatrixEditor;
+import ca.nengo.ui.widgets.matrixEditor.CouplingMatrix;
+import ca.nengo.ui.widgets.matrixEditor.CouplingMatrixImpl;
+import ca.nengo.ui.widgets.matrixEditor.MatrixEditor;
 
 public class WidgetTest {
     public static void main(String args[]) {

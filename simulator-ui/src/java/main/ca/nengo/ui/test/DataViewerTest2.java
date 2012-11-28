@@ -27,10 +27,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.ui.test;
 
 import ca.nengo.model.StructuralException;
+import ca.nengo.ui.ExampleRunner;
+import ca.nengo.ui.FuzzyLogicExample;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.actions.RunSimulatorAction;
-import ca.nengo.ui.dev.ExampleRunner;
-import ca.nengo.ui.dev.FuzzyLogicExample;
 import ca.nengo.ui.models.nodes.UINetwork;
 
 /**

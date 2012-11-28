@@ -129,7 +129,7 @@ public class FourierFunction implements Function {
 	 * @param fundamental The fundamental frequency (Hz), i.e., frequency step size.
 	 * @param cutoff The high-frequency limit (Hz)
 	 * @param rms The root-mean-squared function amplitude
-	 * 	@param seed Random seed
+	 * @param seed Random seed
 	 */
 	public FourierFunction(float fundamental, float cutoff, float rms, long seed) {
 		this(fundamental, cutoff, rms, seed, 1);

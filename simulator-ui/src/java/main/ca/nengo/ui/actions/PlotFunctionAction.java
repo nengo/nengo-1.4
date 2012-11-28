@@ -33,9 +33,9 @@ import javax.swing.JDialog;
 import ca.nengo.math.Function;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.Property;
-import ca.nengo.ui.configurable.descriptors.PFloat;
 import ca.nengo.ui.configurable.managers.ConfigManager;
 import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
+import ca.nengo.ui.configurable.properties.PFloat;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.util.UIEnvironment;
@@ -49,11 +49,14 @@ import ca.nengo.ui.util.DialogPlotter;
 public class PlotFunctionAction extends StandardAction {
     private static final long serialVersionUID = 1L;
 
-    static final Property pEnd = new PFloat("End");
-    static final Property pIncrement = new PFloat("Increment");
-    static final Property pStart = new PFloat("Start");
+    static final Property pEnd = new PFloat("End",
+    		"End of the graph range", 1);
+    static final Property pIncrement = new PFloat("Increment",
+    		"Step size (dt, in seconds) of the graph (usually 0.001)", 0.001f);
+    static final Property pStart = new PFloat("Start",
+    		"Start of the graph range (usually 0)", 0);
 
-    static final Property[] propD = { pStart, pIncrement, pEnd };
+    static final Property[] propD = {pStart, pIncrement, pEnd};
     private Function function;
 
     private String plotName;
@@ -70,13 +73,9 @@ public class PlotFunctionAction extends StandardAction {
         this.plotName = plotName;
         this.function = function;
         this.dialogParent = dialogParent;
-        pStart.setDescription("Time (in seconds) to start the graph (usually 0)");
-        pIncrement.setDescription("Resolution (in seconds) of the graph (usually 0.001)");
-        pEnd.setDescription("Time (in seconds) of the end of the graph");
     }
 
-    @Override
-    protected void action() throws ActionException {
+    @Override protected void action() throws ActionException {
 
         try {
         	Map<Property, Object> properties = ConfigManager.configure(propD,

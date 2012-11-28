@@ -2,7 +2,7 @@ from javax.swing import *
 from java.awt import *
 import java
 
-from ca.nengo.ui.configurable.descriptors import *
+from ca.nengo.ui.configurable.properties import *
 from ca.nengo.ui.configurable import *
 import ca.nengo
 import inspect
@@ -110,10 +110,10 @@ class TemplateBar(TransferHandler):
         self.ng.universe.transferHandler = dh
         self.ng.universe.getDropTarget().addDropTargetListener(dh)
         
-        self.add_template('Network','ca.nengo.ui.models.constructors.CNetwork','images/nengoIcons/network.gif')
-        self.add_template('Ensemble','ca.nengo.ui.models.constructors.CNEFEnsemble','images/nengoIcons/ensemble.gif')
-        self.add_template('Input','ca.nengo.ui.models.constructors.CFunctionInput','images/nengoIcons/input.png')
-        self.add_template('Origin','ca.nengo.ui.models.constructors.CDecodedOrigin','images/nengoIcons/origin.png')
+        self.add_template('Network','ca.nengo.ui.configurable.models.CNetwork','images/nengoIcons/network.gif')
+        self.add_template('Ensemble','ca.nengo.ui.configurable.models.CNEFEnsemble','images/nengoIcons/ensemble.gif')
+        self.add_template('Input','ca.nengo.ui.configurable.models.CFunctionInput','images/nengoIcons/input.png')
+        self.add_template('Origin','ca.nengo.ui.configurable.models.CDecodedOrigin','images/nengoIcons/origin.png')
         self.add_template('Termination','nef.templates.termination','images/nengoIcons/termination.png')
         
         self.panel.add(JSeparator(JSeparator.HORIZONTAL,maximumSize = (200,1),foreground = Color(0.3,0.3,0.3),background = Color(0.1,0.1,0.1)))
@@ -241,11 +241,11 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
         
         constructor = eval(constructor)
         
-        if constructor is ca.nengo.ui.models.constructors.CNetwork: return True
+        if constructor is ca.nengo.ui.configurable.models.CNetwork: return True
 
         drop_on_ensemble = False
-        if constructor is ca.nengo.ui.models.constructors.CDecodedOrigin: drop_on_ensemble = True
-        if constructor is ca.nengo.ui.models.constructors.CDecodedTermination: drop_on_ensemble = True
+        if constructor is ca.nengo.ui.configurable.models.CDecodedOrigin: drop_on_ensemble = True
+        if constructor is ca.nengo.ui.configurable.models.CDecodedTermination: drop_on_ensemble = True
 
         net,pos = self.find_target(support.dropLocation.dropPoint)
 
@@ -278,8 +278,8 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
         try:
             constructor = eval(constructor)
             drop_on_ensemble = False
-            if constructor is ca.nengo.ui.models.constructors.CDecodedOrigin: drop_on_ensemble = True
-            if constructor is ca.nengo.ui.models.constructors.CDecodedTermination: drop_on_ensemble = True
+            if constructor is ca.nengo.ui.configurable.models.CDecodedOrigin: drop_on_ensemble = True
+            if constructor is ca.nengo.ui.configurable.models.CDecodedTermination: drop_on_ensemble = True
 
             node = None
             for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
@@ -300,16 +300,16 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
 
     def create(self,constructor,nodeContainer,position,node = None):
         try:
-            if isinstance(constructor,ca.nengo.ui.models.constructors.ConstructableNode):
+            if isinstance(constructor,ca.nengo.ui.configurable.models.CNode):
                 action = ca.nengo.ui.actions.CreateModelAction(nodeContainer,constructor)
                 action.setPosition(position.x,position.y)
                 action.doAction()
-            elif isinstance(constructor,ca.nengo.ui.models.constructors.CDecodedOrigin):
+            elif isinstance(constructor,ca.nengo.ui.configurable.models.CDecodedOrigin):
                 uc = ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
                 uc.configureAndWait()
                 if constructor.model is not None:
                     node.showOrigin(constructor.model.name)
-            elif isinstance(constructor,ca.nengo.ui.models.constructors.CDecodedTermination):
+            elif isinstance(constructor,ca.nengo.ui.configurable.models.CDecodedTermination):
                 uc = ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
                 uc.configureAndWait()
                 if constructor.model is not None:

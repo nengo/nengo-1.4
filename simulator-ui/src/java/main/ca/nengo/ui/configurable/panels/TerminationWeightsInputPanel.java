@@ -39,9 +39,9 @@ import javax.swing.JTextField;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.Property;
 import ca.nengo.ui.configurable.PropertyInputPanel;
-import ca.nengo.ui.configurable.descriptors.PCouplingMatrix;
-import ca.nengo.ui.configurable.descriptors.PTerminationWeights;
 import ca.nengo.ui.configurable.managers.ConfigManager;
+import ca.nengo.ui.configurable.properties.PCouplingMatrix;
+import ca.nengo.ui.configurable.properties.PTerminationWeights;
 import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.Util;
 
@@ -67,17 +67,21 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
      */
     public TerminationWeightsInputPanel(PTerminationWeights property) {
         super(property);
-        initPanel();
+        
+        JLabel dimensions = new JLabel("Input Dim: ");
+        tf = new JTextField(10);
+        add(dimensions);
+        add(tf);
+
+        JButton configureFunction = new JButton(new EditMatrixAction());
+        add(configureFunction);
     }
 
     /**
      * @return The dimensions of this termination
      */
     private int getDimensions() {
-
-        Integer integerValue = new Integer(tf.getText());
-        return integerValue.intValue();
-
+        return Integer.parseInt(tf.getText());
     }
 
     /**
@@ -86,14 +90,12 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
     private boolean isDimensionsSet() {
         String textValue = tf.getText();
 
-        if (textValue == null || textValue.compareTo("") == 0) {
+        if (textValue == null || textValue.equals("")) {
             return false;
         }
 
         try {
-            @SuppressWarnings("unused")
-            Integer value = getDimensions();
-
+            getDimensions();
         } catch (NumberFormatException e) {
             return false;
         }
@@ -102,11 +104,10 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
     }
 
     /**
-     * @param dimensions
-     *            New dimensions
+     * @param dimensions New dimensions
      */
     private void setDimensions(int dimensions) {
-        tf.setText(dimensions + "");
+        tf.setText(Integer.toString(dimensions));
     }
 
     /**
@@ -118,9 +119,6 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
             return;
         }
 
-        /*
-         * get the JDialog parent
-         */
         Container parent = getJPanel().getParent();
         while (parent != null) {
             if (parent instanceof JDialog) {
@@ -132,15 +130,9 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
         if (parent != null && parent instanceof JDialog) {
             Property pCouplingMatrix;
             if (isValueSet()) {
-                /*
-                 * Create a property descriptor with a set matrix
-                 */
                 pCouplingMatrix = new PCouplingMatrix(getValue());
             }
             else {
-                /*
-                 * Create a property descriptor with no default value
-                 */
                 pCouplingMatrix = new PCouplingMatrix(getFromSize(), getToSize());
             }
 
@@ -150,7 +142,6 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
             	Map<Property, Object> result = ConfigManager.configure(
                         new Property[] { pCouplingMatrix }, configName, parent,
                         ConfigManager.ConfigMode.STANDARD);
-
                 setValue(result.get(pCouplingMatrix));
             } catch (ConfigException e) {
                 e.defaultHandleBehavior();
@@ -176,33 +167,19 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
         return getDescriptor().getEnsembleDimensions();
     }
 
-    private void initPanel() {
-        JLabel dimensions = new JLabel("Input Dim: ");
-        tf = new JTextField(10);
-        add(dimensions);
-        add(tf);
-
-        JButton configureFunction = new JButton(new EditMatrixAction());
-
-        add(tf);
-        add(configureFunction);
-    }
-
-    @Override
-    public PTerminationWeights getDescriptor() {
+    @Override public PTerminationWeights getDescriptor() {
         return (PTerminationWeights) super.getDescriptor();
     }
 
-    @Override
-    public float[][] getValue() {
+    @Override public float[][] getValue() {
         return matrix;
     }
 
-    @Override
-    public boolean isValueSet() {
+    @Override public boolean isValueSet() {
         if (matrix != null && matrix[0].length == getDimensions()) {
             return true;
-        } else if (isDimensionsSet() && getFromSize()==getToSize()){
+        } else if (isDimensionsSet() && getFromSize() == getToSize()){
+        	// default to identity matrix
             matrix = new float[getFromSize()][getToSize()];
             for (int i=0; i<getFromSize(); i++) {
                 for (int j=0; j<getFromSize(); j++) {
@@ -213,19 +190,19 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
                     }
                 }
             }
-            return true; // default to identity matrix when applicable, if not already set
+            return true;
         }
         setStatusMsg("matrix not set");
         return false;
     }
 
-    @Override
-    public void setValue(Object value) {
+    @Override public void setValue(Object value) {
         if ((value != null) && (value instanceof float[][])
                 && (getToSize() == ((float[][]) value).length)) {
             matrix = (float[][]) value;
             setDimensions(matrix[0].length);
 
+            // Does this fix a bug or something?
             if (isValueSet()) {
                 setStatusMsg("");
             }
@@ -244,7 +221,7 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
         private static final long serialVersionUID = 1L;
 
         public EditMatrixAction() {
-            super("Set Weights");
+            super("Set weights");
         }
 
         public void actionPerformed(ActionEvent e) {

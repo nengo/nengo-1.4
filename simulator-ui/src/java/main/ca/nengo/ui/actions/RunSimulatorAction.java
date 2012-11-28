@@ -37,10 +37,10 @@ import ca.nengo.sim.SimulatorListener;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.Property;
-import ca.nengo.ui.configurable.descriptors.PBoolean;
-import ca.nengo.ui.configurable.descriptors.PFloat;
 import ca.nengo.ui.configurable.managers.ConfigManager;
 import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
+import ca.nengo.ui.configurable.properties.PBoolean;
+import ca.nengo.ui.configurable.properties.PFloat;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.objects.activities.TrackedAction;
@@ -55,12 +55,15 @@ import ca.nengo.ui.models.nodes.UINetwork;
  * @author Shu Wu
  */
 public class RunSimulatorAction extends StandardAction {
-    private static final Property pStartTime = new PFloat("Start time");
-    private static final Property pEndTime = new PFloat("End time");
+    private static final Property pStartTime = new PFloat("Start time",
+    		"Time (in seconds) to start the simulation (usually 0)", 0);
+    private static final Property pEndTime = new PFloat("End time",
+    		"Time (in seconds) to end the simulation", 1);
+    private static final Property pStepSize = new PFloat("Step size",
+    		"Increment (dt, in seconds) of the simulation (usually 0.001)", 0.001f);
     private static final Property pShowDataViewer = new PBoolean(
             "Open data viewer after simulation", null, true);
-    private static final Property pStepSize = new PFloat("Step size");
-    
+
     private static final long serialVersionUID = 1L;
 
     private static final Property[] zProperties = new Property[] {
@@ -191,9 +194,7 @@ public class RunSimulatorAction extends StandardAction {
 
         }
 
-        /*
-         * (non-Javadoc)
-         * 
+        /**
          * @see ca.nengo.sim.SimulatorListener#processEvent(ca.nengo.sim.SimulatorEvent)
          */
         public void processEvent(SimulatorEvent event) {

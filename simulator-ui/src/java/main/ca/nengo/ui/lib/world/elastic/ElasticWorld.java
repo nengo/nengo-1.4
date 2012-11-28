@@ -9,9 +9,9 @@ import javax.swing.SwingUtilities;
 
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.Property;
-import ca.nengo.ui.configurable.descriptors.PInt;
 import ca.nengo.ui.configurable.managers.ConfigManager;
 import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
+import ca.nengo.ui.configurable.properties.PInt;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.LayoutAction;
 import ca.nengo.ui.lib.actions.StandardAction;
@@ -246,8 +246,10 @@ public class ElasticWorld extends WorldImpl {
  */
 class SetLayoutBoundsAction extends StandardAction {
 
-    private static final Property pHeight = new PInt("Height");
-    private static final Property pWidth = new PInt("Width");
+    private static final Property pHeight = new PInt("Height",
+    		"Height of current layout", 600);
+    private static final Property pWidth = new PInt("Width",
+    		"Width of current layout", 400);
     private static final long serialVersionUID = 1L;
     private static final Property[] zProperties = { pWidth, pHeight };
 
