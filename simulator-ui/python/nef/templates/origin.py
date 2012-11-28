@@ -2,7 +2,6 @@ title='Decoded Origin'
 label='Origin'
 icon='origin.png'
  
-#from nef.array import NetworkArray
 from ca.nengo.ui.configurable.descriptors import PFunctionArray
 from ca.nengo.model.impl import NetworkArrayImpl
 

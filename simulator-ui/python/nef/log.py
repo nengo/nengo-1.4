@@ -3,7 +3,6 @@ import time
 import numeric
 from simplenode import SimpleNode
 from nef_core import Network
-#from array import NetworkArray
 import hrr
 from ca.nengo.model import Origin, StepListener
 import stats.reader

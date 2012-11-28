@@ -5,7 +5,6 @@ import data
 import simulator
 import hrr
 from timeview.components import hrrgraph, neuronmap
-#from nef.array import NetworkArray
 import nef
 
 import java
@@ -254,7 +253,7 @@ class ArrayWatch:
 
     def spike_array(self, obj):
         r = []
-        for n in obj._nodes:
+        for n in obj.nodes:
             r.extend(n.getOrigin('AXON').getValues().values)
         return r
 
