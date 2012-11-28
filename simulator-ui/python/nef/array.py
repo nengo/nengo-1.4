@@ -73,32 +73,32 @@ class ArrayOrigin(BasicOrigin):
         return decoders            
 """    
 
-class NetworkArray():
-    """Collects a set of NEFEnsembles into a single network."""
-    serialVersionUID=1
-    def __init__(self,name,nodes):
-        """Create a network holding an array of nodes.  An 'X' Origin
-        is automatically created which concatenates the values of each
-        internal element's 'X' Origin.
-        
-        This object is meant to be created using :func:`nef.Network.make_array()`, allowing for the
-        efficient creation of neural groups that can represent large vectors.  For example, the
-        following code creates a NetworkArray consisting of 50 ensembles of 1000 neurons, each of 
-        which represents 10 dimensions, resulting in a total of 500 dimensions represented::
-        
-          net=nef.Network('Example Array')
-          A=net.make_array('A',neurons=1000,length=50,dimensions=10,quick=True)
-          
-        The resulting NetworkArray object can be treated like a normal ensemble, except for the
-        fact that when computing nonlinear functions, you cannot use values from different
-        ensembles in the computation, as per NEF theory.
-        
-        :param string name: the name of the NetworkArray to create
-        :param nodes: the nodes to combine together
-        :type nodes: list of NEFEnsembles
-        """        
-        return NetworkArrayImpl.__init__(self, name, nodes)
-
+#class NetworkArray():
+#    """Collects a set of NEFEnsembles into a single network."""
+#    serialVersionUID=1
+#    def __init__(self,name,nodes):
+#        """Create a network holding an array of nodes.  An 'X' Origin
+#        is automatically created which concatenates the values of each
+#        internal element's 'X' Origin.
+#        
+#        This object is meant to be created using :func:`nef.Network.make_array()`, allowing for the
+#        efficient creation of neural groups that can represent large vectors.  For example, the
+#        following code creates a NetworkArray consisting of 50 ensembles of 1000 neurons, each of 
+#        which represents 10 dimensions, resulting in a total of 500 dimensions represented::
+#        
+#          net=nef.Network('Example Array')
+#          A=net.make_array('A',neurons=1000,length=50,dimensions=10,quick=True)
+#          
+#        The resulting NetworkArray object can be treated like a normal ensemble, except for the
+#        fact that when computing nonlinear functions, you cannot use values from different
+#        ensembles in the computation, as per NEF theory.
+#        
+#        :param string name: the name of the NetworkArray to create
+#        :param nodes: the nodes to combine together
+#        :type nodes: list of NEFEnsembles
+#        """        
+#        return NetworkArrayImpl.__init__(self, name, nodes)
+#
 #    def createEnsembleOrigin(self,name):
 #        """Create an Origin that concatenates the values of internal Origins.
 #        

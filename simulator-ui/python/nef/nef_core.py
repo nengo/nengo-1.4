@@ -1,4 +1,4 @@
-from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput
+from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput, NetworkArrayImpl
 from ca.nengo.model import SimulationMode, Origin, Units, Termination, Network
 from ca.nengo.model.nef.impl import NEFEnsembleFactoryImpl
 from ca.nengo.model.nef import NEFEnsemble
@@ -284,7 +284,7 @@ class Network:
             nodes.append(n)
 
         parent,name=self._parse_name(name)    
-        ensemble=array.NetworkArray(name,nodes)
+        ensemble=NetworkArrayImpl(name,nodes)
         parent.addNode(ensemble)
         ensemble.mode=ensemble.nodes[0].mode
         return ensemble
@@ -432,8 +432,8 @@ class Network:
                     except StructuralException:
                         origin=None
                     if origin is None:
-                        if isinstance(pre,array.NetworkArray):
-                            dim=pre._nodes[0].dimension
+                        if isinstance(pre,NetworkArrayImpl):
+                            dim=pre.nodes[0].dimension
                         else:
                             dim=pre.dimension
 
@@ -687,13 +687,18 @@ class Network:
         if plastic_array:
             suffix = ''
             attempts = 1
+            class MyWeightFunc(NetworkArrayImpl.WeightFunc):
+                def __init__(self, func):
+                    self.func = func
+                def call(self, weights):
+                    return self.func(weights)
             while attempts < 100:
                 try:
                     if hasattr(origin,'decoders'):
-                        term = post.addPlasticTermination(pre.name + suffix,transform,pstc,origin.decoders,weight_func)
+                        term = post.addPlasticTermination(pre.name + suffix,transform,pstc,origin.decoders,MyWeightFunc(weight_func))
                     else:
                         term = post.addPlasticTermination(pre.name + suffix,transform,pstc,
-                                                          [[0.0]*pre.dimension]*pre.neurons,weight_func)
+                                                          [[0.0]*pre.dimension]*pre.neurons,MyWeightFunc(weight_func))
                     break
                 except StructuralException,e:
                     exception = e
@@ -726,7 +731,7 @@ class Network:
 
             term=post.addTermination(pre.name,w,pstc,False)
             
-            if isinstance(pre,array.NetworkArray):
+            if isinstance(pre,NetworkArrayImpl):
                 try:
                    pre.getOrigin('AXON')
                 except:    

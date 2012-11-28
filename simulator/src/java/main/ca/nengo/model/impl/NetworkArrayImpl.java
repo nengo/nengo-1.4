@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 
 import ca.nengo.math.Function;
 import ca.nengo.model.InstantaneousOutput;
@@ -98,11 +97,11 @@ public class NetworkArrayImpl extends NetworkImpl {
 		
 		this.setName(name);
 		
-		myNodes = nodes.clone();
+		myNodes = nodes;
 		myNumNodes = myNodes.length;
+		
 		myNodeDimensions = new int[myNumNodes];
 		myDimension = 0;
-
 		for (int i = 0; i < myNumNodes; i++) {
 			myNodeDimensions[i] = myNodes[i].getDimension();
 			myDimension += myNodeDimensions[i];
@@ -116,10 +115,9 @@ public class NetworkArrayImpl extends NetworkImpl {
 			this.addNode(nodes[i]);
 			myNeurons += nodes[i].getNodeCount();
 		}
-		
+		createEnsembleOrigin("X");
 		this.setUseGPU(true);
 	}
-
 	
 	/** 
 	 * Create an Origin that concatenates the values of internal Origins.
@@ -257,9 +255,10 @@ public class NetworkArrayImpl extends NetworkImpl {
 		int dimCount = 0;
 		
 		for (int i = 0; i < myNumNodes; i++) {
-			float[][] submatrix = MU.copy(matrix, dimCount, 0, dimCount + myNodeDimensions[i], -1);
+			float[][] submatrix = MU.copy(matrix, dimCount, 0, myNodeDimensions[i], -1);
 
-			terminations[i] = myNodes[i].addTermination(name, submatrix, tauPSC, modulatory);
+			terminations[i] = myNodes[i].addDecodedTermination(name, submatrix, tauPSC, modulatory);
+			dimCount += myNodeDimensions[i];
 		}
 		
 		exposeTermination(new EnsembleTermination(this, name, terminations), name);
@@ -356,7 +355,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 		}
 		nonDecodedTerminations.addAll(decodedTerminations);
 		
-		return (Termination[])nonDecodedTerminations.toArray();
+		return nonDecodedTerminations.toArray(new Termination[0]);
 		
 	}
 	

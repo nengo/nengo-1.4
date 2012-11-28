@@ -3,7 +3,7 @@ import time
 import numeric
 from simplenode import SimpleNode
 from nef_core import Network
-from array import NetworkArray
+#from array import NetworkArray
 import hrr
 from ca.nengo.model import Origin, StepListener
 import stats.reader
@@ -168,7 +168,7 @@ class Log(StepListener):
         node=self.network.get(source)
         if isinstance(node,Origin):
             origin=node
-        elif isinstance(node,NetworkArray):
+        elif isinstance(node,NetworkArrayImpl):
             origin=[n.getOrigin('AXON') for n in node.nodes]
         else:    
             origin=node.getOrigin('AXON')
