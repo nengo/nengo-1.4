@@ -182,6 +182,10 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * @return Termination that encapsulates all of the internal node terminations
 	 * @throws StructuralException
 	 */
+	public Termination addTermination(String name, float[][] matrix, float tauPSC) throws StructuralException {
+		return addTermination(name, matrix, tauPSC, false);
+	}
+	
 	public Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
 		assert weights.length == myNeurons;
 		
@@ -216,6 +220,10 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * @return Termination that encapsulates all of the internal node terminations
 	 * @throws StructuralException
 	 */
+	public Termination addTermination(String name, float[][][] matrix, float tauPSC) throws StructuralException {
+		return addTermination(name, matrix, tauPSC, false);
+	}
+	
 	public Termination addTermination(String name, float[][][] weights, float tauPSC, boolean modulatory) throws StructuralException {
 		assert weights.length == myNumNodes && weights[0].length == myNeurons;
 		
@@ -247,6 +255,10 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * @return Termination that encapsulates all of the internal node terminations
 	 * @throws StructuralException
 	 */
+	public Termination addDecodedTermination(String name, float[][] matrix, float tauPSC) throws StructuralException {
+		return addDecodedTermination(name, matrix, tauPSC, false);
+	}
+	
 	public Termination addDecodedTermination(String name, float[][] matrix, float tauPSC, boolean modulatory) throws StructuralException {
 		assert matrix.length == myDimension;
 		
@@ -264,20 +276,9 @@ public class NetworkArrayImpl extends NetworkImpl {
 		exposeTermination(new EnsembleTermination(this, name, terminations), name);
 		return getTermination(name);
 	}	
-
-	public Termination addIndexTermination(String name, float[][] matrix, float tauPSC) throws StructuralException {
-		return addIndexTermination(name, matrix, tauPSC, false, null);
-	}
+	
 	
 
-	public Termination addIndexTermination(String name, float[][] matrix, float tauPSC, boolean isModulatory) throws StructuralException {
-		return addIndexTermination(name, matrix, tauPSC, isModulatory, null);
-	}
-		
-	public Termination addIndexTermination(String name, float[][] matrix, float tauPSC, int[] index) throws StructuralException {
-		return addIndexTermination(name, matrix, tauPSC, false, index);
-	}
-	
 	/**
 	 * Create a new termination.  A new termination is created on the specified ensembles, 
 	 * which are then grouped together.  This termination does not use NEF-style encoders; 
@@ -294,6 +295,19 @@ public class NetworkArrayImpl extends NetworkImpl {
 	 * 
 	 * @return the new termination
 	 */
+	public Termination addIndexTermination(String name, float[][] matrix, float tauPSC) throws StructuralException {
+		return addIndexTermination(name, matrix, tauPSC, false, null);
+	}
+	
+
+	public Termination addIndexTermination(String name, float[][] matrix, float tauPSC, boolean isModulatory) throws StructuralException {
+		return addIndexTermination(name, matrix, tauPSC, isModulatory, null);
+	}
+		
+	public Termination addIndexTermination(String name, float[][] matrix, float tauPSC, int[] index) throws StructuralException {
+		return addIndexTermination(name, matrix, tauPSC, false, index);
+	}
+	
 	public Termination addIndexTermination(String name, float[][] matrix, float tauPSC, boolean isModulatory, int[] index) throws StructuralException {
 		if(index == null){
 			index = new int[myNumNodes];
@@ -301,22 +315,21 @@ public class NetworkArrayImpl extends NetworkImpl {
 				index[i] = i;
 		}
 		
-		ArrayList<Termination> terminations = new ArrayList<Termination>();
+		Termination[] terminations = new Termination[index.length];
 
 		int count=0;
 		for(int i=0; i < myNumNodes; i++) {
 			for(int j=0; j < index.length; j++) {
 				if(index[j] == i) {
-					Termination t = myNodes[i].addTermination(name, MU.copy(matrix,count*myNodes[i].getNeurons(),0,myNodes[i].getNeurons(),-1),
+					terminations[count] = myNodes[i].addTermination(name, MU.copy(matrix,count*myNodes[i].getNeurons(),0,myNodes[i].getNeurons(),-1),
 							tauPSC, isModulatory);
 					count++;
-					terminations.add(t);
 					break;
 				}
 			}
 		}
 		
-		EnsembleTermination term = new EnsembleTermination(this,name,(Termination[])terminations.toArray());
+		EnsembleTermination term = new EnsembleTermination(this, name, terminations);
 		exposeTermination(term,name);
 		return getTermination(name);
 	}
@@ -627,11 +640,15 @@ public class NetworkArrayImpl extends NetworkImpl {
 				myOrigins[i].setRequiredOnCPU(req);
 		}
 		
-		public Origin clone() {
+		public ArrayOrigin clone() throws CloneNotSupportedException {
 			//this is how it was implemented in networkarray, but I don't think it will work (myOrigins needs to be updated to the cloned origins)
 			return new ArrayOrigin(myParent, myName, myOrigins);
 		}
-
+		
+		public ArrayOrigin clone(Node n) throws CloneNotSupportedException {
+			return null;
+		}
+		
 		public float[][] getDecoders() {
 			int neurons = myParent.getNeurons();
 			float[][] decoders = new float[neurons*myOrigins.length][myDimensions];
