@@ -719,6 +719,7 @@ class Network:
             if weight!=1: raise Exception('weight cannot be specified when connecting to an existing termination')
             if expose_weights: raise Exception('expose_weights cannot be specified when connecting to an existing termination')
             if modulatory: raise Exception('modulatory cannot be specified when connecting to an existing termination')
+            if pstc!=0.01: raise Exception('pstc cannot be specified when connecting to an existing termination')
             
             if create_projection:
                 self.network.addProjection(origin,post)
