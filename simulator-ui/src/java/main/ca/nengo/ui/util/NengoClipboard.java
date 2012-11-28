@@ -30,11 +30,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import ca.nengo.model.Node;
+import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 
 public class NengoClipboard {
 
 	private ArrayList<Node> selectedObjs = null;
 	private ArrayList<Point2D> objectOffsets = null;
+	private WorldImpl sourceWorld = null;
 	
 	///////////////////////////////////////////////////////////////////////////
 	/// Listeners
@@ -105,10 +107,18 @@ public class NengoClipboard {
 		return objectOffsets;
 	}
 
-	public void setContents(ArrayList<Node> nodes, ArrayList<Point2D> objOffsets) {
-		selectedObjs = nodes;
-		objectOffsets = objOffsets;
-		fireChanged();
+	public WorldImpl getSourceWorld() {
+		return sourceWorld;
 	}
 	
+	public void setContents(ArrayList<Node> nodes, ArrayList<Point2D> objOffsets) {
+		setContents(nodes, objOffsets, null);
+	}
+	
+	public void setContents(ArrayList<Node> nodes, ArrayList<Point2D> objOffsets, WorldImpl srcWorld) {
+		selectedObjs = nodes;
+		objectOffsets = objOffsets;
+		sourceWorld = srcWorld;
+		fireChanged();
+	}
 }

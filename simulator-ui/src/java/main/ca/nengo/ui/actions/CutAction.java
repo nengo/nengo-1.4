@@ -32,6 +32,7 @@ import ca.nengo.model.Node;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.models.UINeoNode;
 
 /**
@@ -65,7 +66,11 @@ public class CutAction extends StandardAction {
     	}
     	averagePoint.setLocation(averagePoint.getX() / nodeUIs.size(), averagePoint.getY() / nodeUIs.size());
     	
+    	WorldImpl world = null;
     	for (UINeoNode nodeUI : nodeUIs) {
+    		if (world == null && nodeUI.getWorld() != null) {
+    			world = nodeUI.getWorld();
+    		}
     		try {
     			nodes.add(nodeUI.getModel().clone());
     			offsets.add(new Point2D.Double(nodeUI.getOffset().getX() - averagePoint.getX(), nodeUI.getOffset().getY() - averagePoint.getY()));
@@ -81,7 +86,7 @@ public class CutAction extends StandardAction {
     		nodeUI.destroyModel();
     	}
 
-        NengoGraphics.getInstance().getClipboard().setContents(nodes, offsets);
+        NengoGraphics.getInstance().getClipboard().setContents(nodes, offsets, world);
     }
 
 }

@@ -1,5 +1,5 @@
 title='General Linear System'
-label='Linear System'
+label='Linear\nSystem'
 icon='linearsystem.png'
 
 from ca.nengo.ui.configurable import *

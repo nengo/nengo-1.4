@@ -35,6 +35,7 @@ import ca.nengo.config.Configuration;
 import ca.nengo.config.Property;
 import ca.nengo.config.impl.ConfigurationImpl;
 import ca.nengo.config.impl.SingleValuedPropertyImpl;
+import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Noise;
@@ -230,13 +231,18 @@ public class BasicOrigin implements Origin, Noise.Noisy, Resettable, Configurabl
 //	}
 
 	@Override
-	public Origin clone() throws CloneNotSupportedException {
+	public BasicOrigin clone() throws CloneNotSupportedException {
 		BasicOrigin result = (BasicOrigin) super.clone();
 		if (myNoise != null) {
             result.setNoise(myNoise.clone());
         }
 		result.setValues(myValues.clone());
 		return result;
+	}
+	
+	@Override
+	public BasicOrigin clone(Ensemble e) throws CloneNotSupportedException {
+		return this.clone();
 	}
 
 	/**

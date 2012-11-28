@@ -31,6 +31,7 @@ import ca.nengo.model.Node;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.NodeContainer.ContainerException;
 import ca.nengo.ui.util.NengoClipboard;
@@ -48,14 +49,16 @@ public class PasteAction extends StandardAction {
     
     private Double posX = null;
     private Double posY = null;
+    
+    private boolean isFromTopMenu = false;
 
     /**
      * @param description TODO
      * @param nodeContainer TODO
      */
-    public PasteAction(String description, NodeContainer nodeContainer) {
+    public PasteAction(String description, NodeContainer nodeContainer, boolean fromTopMenu) {
         super(description);
-
+        isFromTopMenu = fromTopMenu;
         this.nodeContainer = nodeContainer;
     }
 
@@ -65,6 +68,7 @@ public class PasteAction extends StandardAction {
         if (clipboard.hasContents()) {
 			ArrayList<Node> nodes = clipboard.getContents();
 			ArrayList<Point2D> offsets = clipboard.getOffsets();
+			WorldImpl clipboardSrcWorld = clipboard.getSourceWorld();
         	
         	for (int i = 0; i < nodes.size(); i++) {
         		Node node = nodes.get(i);
@@ -76,7 +80,18 @@ public class PasteAction extends StandardAction {
         				nodeContainer.addNodeModel(node, posX + offsets.get(i).getX(), posY + offsets.get(i).getY());
         			}
         		} catch (ContainerException e) {
-        			throw new ActionException(e);
+        			// Did the attempt to paste to the mouse location fail?
+        			// If so, try to paste into the network that the clipboard contents came from
+        			if (isFromTopMenu) {
+        				try {
+        					CreateModelAction.ensureNonConflictingName(node, ((NodeContainer)clipboardSrcWorld));
+        					((NodeContainer)clipboardSrcWorld).addNodeModel(node);
+        				} catch (ContainerException ex) {
+        					throw new ActionException(ex);
+        				}
+        			} else {
+        				throw new ActionException(e);
+        			}
         		}
         	}
         } else {

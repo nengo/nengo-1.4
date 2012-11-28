@@ -28,6 +28,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.model.impl;
 
+import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -161,7 +162,12 @@ public class ProbeableOrigin implements Origin {
     }
 
 	@Override
-	public Origin clone() throws CloneNotSupportedException {
-		return (Origin) super.clone();
+	public ProbeableOrigin clone() throws CloneNotSupportedException {
+		return (ProbeableOrigin)super.clone();
+	}
+	
+	@Override
+	public ProbeableOrigin clone(Ensemble ensemble) throws CloneNotSupportedException {
+		return this.clone();
 	}
 }

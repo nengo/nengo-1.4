@@ -253,7 +253,7 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 			} else {
 				selectionName = "selection";
 			}
-			PasteAction pasteAction = new PasteAction("Paste '" + selectionName + "' here", (NodeContainer)this);
+			PasteAction pasteAction = new PasteAction("Paste '" + selectionName + "' here", (NodeContainer)this, false);
 			pasteAction.setPosition(posX, posY);
 			menu.addAction(pasteAction);
 		}
@@ -357,6 +357,10 @@ public class WorldImpl extends WorldObjectImpl implements World, Interactable {
 	 */
 	public Collection<WorldObject> getSelection() {
 		return selectionEventHandler.getSelection();
+	}
+	
+	public SelectionHandler getSelectionHandler() {
+		return selectionEventHandler;
 	}
 
 	/**

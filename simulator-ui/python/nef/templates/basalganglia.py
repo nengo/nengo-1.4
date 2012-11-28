@@ -24,13 +24,13 @@ import numeric
 from ca.nengo.model.impl import NetworkImpl
 from java.util import ArrayList
 from java.util import HashMap
-def make(net,name='Basal Ganglia', dimensions=1, neurons=100, pstc=0.01, netbg=None, same_neurons=True):
+def make(net,name='Basal Ganglia', dimensions=1, neurons=100, pstc=0.01, netbg=None, same_neurons=True, tau_ampa=0.002, tau_gaba=0.008, radius=1.5):
 
     if netbg is None:
         netbg=nef.Network(name)
     input=netbg.make('input',1,dimensions,quick=True,mode='direct')
     output=netbg.make('output',1,dimensions,quick=True,mode='direct')
-    nps.basalganglia.make_basal_ganglia(netbg,input,output, dimensions=dimensions, neurons=neurons, same_neurons=same_neurons)
+    nps.basalganglia.make_basal_ganglia(netbg,input,output, dimensions=dimensions, neurons=neurons, same_neurons=same_neurons, tau_ampa=0.002, tau_gaba=0.008, radius=radius)
 
     input.addDecodedTermination('input',numeric.eye(dimensions),pstc,False)
     netbg.network.exposeTermination(input.getTermination('input'),'input')

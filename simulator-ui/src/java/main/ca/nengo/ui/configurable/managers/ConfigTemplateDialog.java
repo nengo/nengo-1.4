@@ -149,11 +149,7 @@ public class ConfigTemplateDialog extends ConfigDialog {
                 }
             });
             labelPanel.add(help);
-    		
-    		
-    		
-    		
-    		
+            
     		panel.add(labelPanel);
     	}
 

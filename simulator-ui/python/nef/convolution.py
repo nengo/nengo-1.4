@@ -116,7 +116,10 @@ def input_transform(dimensions,first,invert=False):
     
     
         
-               
+
+from java.util import ArrayList
+from java.util import HashMap     
+from ca.nengo.util import MU          
 def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],[-1,1],[-1,-1]],radius=3,pstc_out=0.01,pstc_in=0.01,pstc_gate=0.01,invert_first=False,invert_second=False,mode='default',output_scale=1):
     if isinstance(A,str):
         A=self.network.getNode(A)
@@ -158,6 +161,49 @@ def make_convolution(self,name,A,B,C,N_per_D,quick=False,encoders=[[1,1],[1,-1],
         ifftm2=output_transform(dimensions)
         
         self.connect(D,C,func=product,transform=ifftm2*output_scale,pstc=pstc_out)
+
+    if self.network.getMetaData("convolution") == None:
+        self.network.setMetaData("convolution", HashMap())
+    bindings = self.network.getMetaData("convolution")
+
+    binding=HashMap(15)
+    binding.put("name", name)
+    if A is not None:
+        binding.put("A", A.getName())
+    else:
+        binding.put("A", None)
+    if B is not None:
+        binding.put("B", B.getName())
+    else:
+        binding.put("B", None)
+    binding.put("C", C.getName())
+    binding.put("N_per_D", N_per_D)
+    binding.put("quick", quick)
+    binding.put("encoders", MU.clone(encoders))
+    binding.put("radius", radius)
+    binding.put("pstc_out", pstc_out)
+    binding.put("pstc_in", pstc_in)
+    binding.put("pstc_gate", pstc_gate)
+    binding.put("invert_first", invert_first)
+    binding.put("invert_second", invert_second)
+    binding.put("mode", mode)
+    binding.put("output_scale", output_scale)
+
+    bindings.put(name, binding)
+
+    if self.network.getMetaData("templates") == None:
+        self.network.setMetaData("templates", ArrayList())
+    templates = self.network.getMetaData("templates")
+    templates.add(name)
+
+    if self.network.getMetaData("templateProjections") == None:
+        self.network.setMetaData("templateProjections", HashMap())
+    templateproj = self.network.getMetaData("templateProjections")
+    if A is not None:
+        templateproj.put(name, A.getName())
+    if B is not None:
+        templateproj.put(name, B.getName())
+    templateproj.put(name, C.getName())
         
     return D
 

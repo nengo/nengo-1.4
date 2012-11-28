@@ -5,12 +5,16 @@ from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model.neuron.impl import LIFNeuronFactory
 from ca.nengo.model.plasticity.impl import PESTermination, PreLearnTermination, STDPTermination, PlasticEnsembleImpl
 from ca.nengo.util import MU
+from ca.nengo.util.impl import FixedVectorGenerator
 from ca.nengo.math.impl import IndicatorPDF,ConstantFunction,PiecewiseConstantFunction,GradientDescentApproximator,FourierFunction
 from ca.nengo.math import Function,PDFTools
 from ca.nengo.model import StructuralException
 from ca.nengo.io import FileManager
 import java
 import warnings
+
+from java.util import ArrayList
+from java.util import HashMap
 
 import pdfs
 import generators
@@ -184,7 +188,7 @@ class Network:
             if len(encoders[0]) != dimensions:
                 raise Exception('Encoder dimensions (%d) must match specified ensemble dimensions (%d)' % (len(encoders[0]), dimensions))
             try:
-                ef.encoderFactory=generators.FixedVectorGenerator(encoders)
+                ef.encoderFactory = FixedVectorGenerator(encoders)
             except:
                 raise Exception('encoders must be a matrix where each row is a non-zero preferred direction vector')
         if decoder_sign is not None:
@@ -265,6 +269,13 @@ class Network:
         If the *encoders* parameter is used, you can provide either the standard
         array of encoders (e.g. ``[[1],[-1]]``) or a list of sets of encoders for
         each ensemble (e.g. ``[[[1]],[[-1]]]``).
+        
+        If the *dimensions* parameter is used, each ensemble represents the specified number of 
+        dimensions (default value is 1 dimension per ensemble). For example, if length=5 and 
+        dimensions=2, then a total of 10 dimensions are represented by the network array. 
+        The index number of the first ensemble's first dimension is 0, the index of the first 
+        ensemble's second dimension is 1, the index of the second ensemble's first dimension is 
+        2, and so on.
 
         :param string name:           name of the ensemble array (must be unique)
         :param integer neurons:       number of neurons in each ensemble
@@ -286,6 +297,49 @@ class Network:
         ensemble=NetworkArrayImpl(name,nodes)
         parent.addNode(ensemble)
         ensemble.mode=ensemble.nodes[0].mode
+
+        #for script gen            
+        if self.network.getMetaData("NetworkArray") == None:
+            self.network.setMetaData("NetworkArray", HashMap())
+        arrays = self.network.getMetaData("NetworkArray")
+
+        radius=args.get('radius',None)
+        max_rate=args.get('max_rate',None)
+        intercept=args.get('intercept',None)
+        quick=args.get('quick',None)
+
+        narr=HashMap(10)
+        narr.put("name", name)
+        narr.put("neurons", neurons)
+        narr.put("length", length)
+        narr.put("dimensions", dimensions)
+
+        if radius:
+          narr.put("radius", radius)
+
+        if max_rate:
+          narr.put("rLow", max_rate[0])
+          narr.put("rHigh", max_rate[1])
+        
+        if intercept:
+          narr.put("iLow", intercept[0])
+          narr.put("iHigh", intercept[1])
+        
+        if quick:
+          narr.put("useQuick", quick)
+        
+        if encoders:
+          narr.put("encoders", str(encoders))
+
+        arrays.put(name, narr)
+
+        if self.network.getMetaData("templates") == None:
+            self.network.setMetaData("templates", ArrayList())
+        templates = self.network.getMetaData("templates")
+        templates.add(name)
+
+
+
         return ensemble
 
     def make_input(self,name,values,zero_after_time=None):
@@ -401,10 +455,6 @@ class Network:
         network.name=name
         parent.addNode(network)
         return Network(network)
-                    
-            
-            
-
 
     def _parse_pre(self,pre,func,origin_name):
         if isinstance(pre,Origin):
@@ -661,7 +711,16 @@ class Network:
 
         # check for the special case of being given a pre-existing termination
         if isinstance(post,Termination):
-            self.network.addProjection(origin,post)
+            if transform is not None: raise Exception('transform cannot be specified when connecting to an existing termination')
+            if index_pre is not None: raise Exception('index_pre cannot be specified when connecting to an existing termination')
+            if index_post is not None: raise Exception('index_post cannot be specified when connecting to an existing termination')
+            if weight_func is not None: raise Exception('weight_func cannot be specified when connecting to an existing termination')
+            if weight!=1: raise Exception('weight cannot be specified when connecting to an existing termination')
+            if expose_weights: raise Exception('expose_weights cannot be specified when connecting to an existing termination')
+            if modulatory: raise Exception('modulatory cannot be specified when connecting to an existing termination')
+            
+            if create_projection:
+                self.network.addProjection(origin,post)
             return
 
         if isinstance(post, int):

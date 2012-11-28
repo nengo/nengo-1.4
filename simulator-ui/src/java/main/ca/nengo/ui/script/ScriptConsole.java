@@ -238,19 +238,22 @@ public class ScriptConsole extends JPanel {
 	 * Reset the script console back to initial conditions (remove all modules and variables
 	 * added within the interpreter).
 	 */
-	public void reset() {
-		//remove modules
-		myInterpreter.exec("sys.modules.clear()");
+	public void reset(boolean clearModules) {
+		if(clearModules) {
+			//remove modules
+			myInterpreter.exec("sys.modules.clear()");
+		}
 		
 		//remove variables
 		String[] vars = getVariables();
 		for(String v : vars) {
-			if(!myAddedVariables.contains(v)) //keep any variables that were added manually
+			if(!myAddedVariables.contains(v) && !v.startsWith("__")) //keep any variables that were added manually or special vars
 				removeVariable(v);
 		}
 		
 		//re-add init variables
-		myInterpreter.execfile("python/startup_common.py");
+		myInterpreter.execfile("python/startup_ui.py");
+
 	}
 
 	private static String makePythonName(String name) {
@@ -414,7 +417,7 @@ public class ScriptConsole extends JPanel {
         			} else if (initText.equals("clear")) {
         				myDisplayArea.setText("");
         			} else if (initText.equals("reset")) {
-        				reset();
+        				reset(true);
         			} else {
         				myInterpreter.exec(initText);
         			}

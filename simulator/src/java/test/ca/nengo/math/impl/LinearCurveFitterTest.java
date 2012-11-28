@@ -8,7 +8,7 @@ import ca.nengo.math.CurveFitter;
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.LinearCurveFitter;
 import ca.nengo.math.impl.Polynomial;
-import ca.nengo.math.impl.LinearCurveFitter.InterpolatedFunction;
+import ca.nengo.math.impl.InterpolatedFunction;
 //import ca.nengo.plot.Plotter;
 //import ca.nengo.util.MU;
 import junit.framework.TestCase;

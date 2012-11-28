@@ -26,9 +26,6 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.configurable.panels;
 
-import javax.swing.JTextField;
-
-import ca.nengo.ui.configurable.PropertyInputPanel;
 import ca.nengo.ui.configurable.descriptors.PInt;
 
 /**
@@ -36,16 +33,12 @@ import ca.nengo.ui.configurable.descriptors.PInt;
  * 
  * @author Shu Wu
  */
-public class IntegerPanel extends PropertyInputPanel {
+public class IntegerPanel extends PropertyTextPanel {
+	
+	private static int COLUMNS = 10;
 
-    public JTextField tf;
-
-    /**
-     * @param property TODO
-     */
     public IntegerPanel(PInt property) {
-        super(property);
-        initPanel();
+        super(property, COLUMNS);
     }
 
     @Override
@@ -55,27 +48,14 @@ public class IntegerPanel extends PropertyInputPanel {
 
     @Override
     public Integer getValue() {
-
-        Integer integerValue = new Integer(tf.getText());
+        Integer integerValue = new Integer(getText());
         return integerValue.intValue();
-
     }
-
-    public void initPanel() {
-        tf = new JTextField(10);
-
-        add(tf);
-
-    }
-
-
 
     @Override
-    public boolean isValueSet() {
-        String textValue = tf.getText();
-
+    protected TextError checkValue(String textValue) {
         if (textValue == null || textValue.compareTo("") == 0) {
-            return false;
+            return TextError.ValueNotSet;
         }
 
         try {
@@ -84,28 +64,15 @@ public class IntegerPanel extends PropertyInputPanel {
             if (getDescriptor().isCheckRange()) {
                 if (value > getDescriptor().getMax()
                         || value < getDescriptor().getMin()) {
-                    return false;
+                    return TextError.InvalidFormat;
                 }
             }
 
         } catch (NumberFormatException e) {
-        	setStatusMsg("Invalid number format");
-            return false;
+        	return TextError.InvalidFormat;
         }
 
-        setStatusMsg("");
-        return true;
-    }
-
-    @Override
-    public void setValue(Object value) {
-        tf.setText(value.toString());
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        tf.setEnabled(enabled);
+        return TextError.NoError;
     }
 
 }
