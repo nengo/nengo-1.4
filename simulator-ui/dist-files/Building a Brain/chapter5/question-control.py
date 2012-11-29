@@ -10,10 +10,10 @@ import nef.templates.gate as gating
 import nef.templates.basalganglia as bgtemplate
 import nef.templates.basalganglia_rule as bg_rule
 
-net = nef.Network('Question Answering with Control (pre-built)',seed=1)
+net = nef.Network('Question Answering with Control (pre-built)',seed=15)
 
 # Define the vocabulary of vectors
-vocab = hrr.Vocabulary(D,max_similarity=0.05)
+vocab = hrr.Vocabulary(D)
 vocab.parse('CIRCLE+BLUE+RED+SQUARE+QUESTION+STATEMENT')
 
 # Input, output, and intermediate ensembles
@@ -22,11 +22,11 @@ channel = net.make_array('Channel', N, D)
 net.make_array('Motor', N, D)
 
 # Create the memory
-integrator.make(net,name='Memory',neurons=N*D,dimensions=D,tau_feedback=0.4,tau_input=0.1,scale=1)
+integrator.make(net,name='Memory',neurons=N*D,dimensions=D,tau_feedback=0.4,tau_input=0.05,scale=1)
 memory = net.network.getNode('Memory')
 
 # Add projections to and from the channel ensemble
-net.connect('Visual', 'Channel')
+net.connect('Visual', 'Channel', pstc=0.02)
 net.network.addProjection(channel.getOrigin('X'), memory.getTermination('input'))
 
 # Create ensemble calculating the unbinding transformation
@@ -56,35 +56,46 @@ gating.make(net,name='Gate2', gated='Motor', neurons=100 ,pstc=0.01)
 net.connect(thalamus, 'Gate1', index_pre=0, func=xBiased)
 net.connect(thalamus, 'Gate2', index_pre=1, func=xBiased)
 
-# Automatic inputs
-class Input(nef.SimpleNode):
-    def __init__(self,name):
-        self.zero=[0]*D
-        nef.SimpleNode.__init__(self,name)
-        self.v1=vocab.parse('STATEMENT+RED*CIRCLE').v
-        self.v2=vocab.parse('STATEMENT+BLUE*SQUARE').v
-        self.v3=vocab.parse('QUESTION+RED').v
-        self.v4=vocab.parse('QUESTION+SQUARE').v
-    def origin_x(self):
-        t=self.t_start
-        if t<0.5:
-          if 0.1<self.t_start<0.3:
-            return self.v1
-          elif 0.35<self.t_start<0.5:
-            return self.v2
-          else:
-            return self.zero
-        else:
-          t=(t-0.5)%0.6
-          if 0.2<t<0.4:
-            return self.v3
-          elif 0.4<t<0.6:
-            return self.v4            
-          else:
-            return self.zero
-        
-input=Input('Input')
-net.add(input)
-net.connect(input.getOrigin('x'), 'Visual')
+
+inputs={}
+ZERO=[0]*D
+inputs[0.0]=ZERO
+inputs[0.1]=vocab.parse('STATEMENT+RED*CIRCLE').v
+inputs[0.5]=ZERO
+inputs[0.6]=vocab.parse('STATEMENT+BLUE*SQUARE').v
+inputs[1.0]=ZERO
+inputs[1.2]=vocab.parse('QUESTION+RED').v
+inputs[1.4]=vocab.parse('QUESTION+SQUARE').v
+inputs[1.6]=ZERO
+inputs[1.8]=vocab.parse('QUESTION+RED').v
+inputs[2.0]=vocab.parse('QUESTION+SQUARE').v
+inputs[2.2]=ZERO
+inputs[2.4]=vocab.parse('QUESTION+RED').v
+inputs[2.6]=vocab.parse('QUESTION+SQUARE').v
+inputs[2.8]=ZERO
+inputs[3.0]=vocab.parse('QUESTION+RED').v
+inputs[3.2]=vocab.parse('QUESTION+SQUARE').v
+inputs[3.4]=ZERO
+inputs[3.6]=vocab.parse('QUESTION+RED').v
+inputs[3.8]=vocab.parse('QUESTION+SQUARE').v
+inputs[4.0]=ZERO
+inputs[4.2]=vocab.parse('QUESTION+RED').v
+inputs[4.4]=vocab.parse('QUESTION+SQUARE').v
+inputs[4.6]=ZERO
+inputs[4.8]=vocab.parse('QUESTION+RED').v
+inputs[5.0]=vocab.parse('QUESTION+SQUARE').v
+inputs[5.2]=ZERO
+inputs[5.4]=vocab.parse('QUESTION+RED').v
+inputs[5.6]=vocab.parse('QUESTION+SQUARE').v
+inputs[5.8]=ZERO
+inputs[6.0]=vocab.parse('QUESTION+RED').v
+inputs[6.2]=vocab.parse('QUESTION+SQUARE').v
+inputs[6.4]=ZERO
+inputs[6.6]=vocab.parse('QUESTION+RED').v
+inputs[6.8]=vocab.parse('QUESTION+SQUARE').v
+inputs[7.0]=ZERO
+
+net.make_input('Input',inputs)        
+net.connect('Input','Visual')
 
 net.add_to_nengo()

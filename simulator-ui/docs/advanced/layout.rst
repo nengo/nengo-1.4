@@ -30,9 +30,9 @@ For example, here we define a simple network and directly specify the layout to 
     import nef
 
     net=nef.Network('My Test Model')
-    input=net.make_input('input',[0,0])
-    neuron=net.make('neurons',100,2,quick=True)
-    net.connect(input,neuron)
+    net.make_input('input',[0,0])
+    net.make('neurons',100,2,quick=True)
+    net.connect('input','neurons')
     net.add_to_nengo()
 
     net.set_layout({'height': 473, 'x': -983, 'width': 798, 'state': 0, 'y': 85},

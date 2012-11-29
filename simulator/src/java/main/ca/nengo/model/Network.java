@@ -27,17 +27,15 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model;
 
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 import ca.nengo.sim.Simulator;
 import ca.nengo.util.ScriptGenException;
-import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * <p>A neural circuit, consisting of Nodes such as Ensembles and ExternalInputs. A Network is the
  * usual object of a simulation. If you are new to this code, what you probably want to
- * do is create some Neurons, group them into Ensembles, connect the Ensemles in a Network,
+ * do is create some Neurons, group them into Ensembles, connect the Ensembles in a Network,
  * and run the Network in a Simulator.</p>
  *
  * <p>Note: Multiple steps are needed to add a Projection between Ensembles. First, an Origin

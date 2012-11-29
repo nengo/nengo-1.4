@@ -48,6 +48,7 @@ import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.SimulationException;
+import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.FunctionInput;
@@ -59,6 +60,9 @@ import ca.nengo.ui.actions.AddProbeAction;
 import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
+import ca.nengo.ui.actions.DefaultModeAction;
+import ca.nengo.ui.actions.DirectModeAction;
+import ca.nengo.ui.actions.RateModeAction;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.UserDialogs;
 import ca.nengo.ui.lib.actions.ActionException;
@@ -110,13 +114,9 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		UINeoNode nodeUI = null;
 		if (node instanceof Network) {
 			nodeUI = new UINetwork((Network) node);
-			nodeUI.showAllTerminations();
-			nodeUI.showAllOrigins();
 		} else if (node instanceof Ensemble) {
 			if (node instanceof NEFEnsemble) {
 				nodeUI = new UINEFEnsemble((NEFEnsemble) node);
-				nodeUI.showAllTerminations();
-				nodeUI.showAllDecodedOrigins();
 			} else {
 				nodeUI = new UIEnsemble((Ensemble) node);
 			}
@@ -238,6 +238,26 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		
 		menu.addAction(new CopyAction("Copy", arrayOfMe));
 		menu.addAction(new CutAction("Cut", arrayOfMe));
+
+		SimulationMode mode = ((UINeoNode) arrayOfMe.toArray()[0]).getModel().getMode();
+
+		int selected = -1;
+		if (mode == SimulationMode.DEFAULT) {
+			selected = 0;
+		} else if (mode == SimulationMode.RATE) {
+			selected = 1;
+		} else if (mode == SimulationMode.DIRECT) {
+			selected = 2;
+		}
+		
+		if (selected >= 0) {
+			AbstractMenuBuilder modeMenu = menu.addSubMenu("Mode");
+			modeMenu.addActionsRadio(new StandardAction[]{
+					new DefaultModeAction("Spiking", arrayOfMe),
+					new RateModeAction("Rate", arrayOfMe),
+					new DirectModeAction("Direct", arrayOfMe)
+				}, selected);
+		}
 
 //		menu.addSection("File");
 //		menu.addAction(new SaveNodeAction(this));
@@ -699,6 +719,13 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 		fm.save(this.getModel(), file);
 		new TransientStatusMessage(this.getFullName() + " was saved to " + file.toString(), 2500);
+	}
+	
+	public void generateScript(File file) throws IOException {
+		FileManager fm = new FileManager();
+
+		fm.generate(this.getModel(), file.toString());
+		new TransientStatusMessage(this.getFullName() + " generated script " + file.toString(), 2500);
 	}
 
 	@Override

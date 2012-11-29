@@ -29,7 +29,6 @@ package ca.nengo.model.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -112,7 +111,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	protected int myNumJavaThreads = 1;
 	protected boolean myUseGPU = true;
 
-    private transient final Collection<StepListener> myStepListeners;
+    private transient Collection<StepListener> myStepListeners;
 
 
 	/**
@@ -296,7 +295,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			 * 
 			 * Also only do the swap if the node being changed is already in myNodeMap.
 			 */
-			if ((Node)ne.getObject() == getNode(ne.getOldName()) && !ne.getOldName().equals(ne.getNewName())) {
+			if (!ne.getOldName().equals(ne.getNewName()) && ((Node)ne.getObject() == getNode(ne.getOldName()))) {
 				myNodeMap.put(ne.getNewName(), (Node)ne.getObject());
 				myNodeMap.remove(ne.getOldName());
 			}
@@ -428,12 +427,12 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			myNodeMap.remove(name);
 			node.removeChangeListener(this);
 //			VisiblyMutableUtils.nodeRemoved(this, node, myListeners);
+			
+			getSimulator().initialize(this);
+			fireVisibleChangeEvent();
 		} else {
 			throw new StructuralException("No Node named " + name + " in this Network");
 		}
-
-		getSimulator().initialize(this);
-		fireVisibleChangeEvent();
 	}
 
 	/**
@@ -442,19 +441,17 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	public Projection addProjection(Origin origin, Termination termination) throws StructuralException {
 		if (myProjectionMap.containsKey(termination)) {
 			throw new StructuralException("There is already an Origin connected to the specified Termination");
-		}
-
-		if (origin.getDimensions() != termination.getDimensions()) {
+		} else if (origin.getDimensions() != termination.getDimensions()) {
 			throw new StructuralException("Can't connect Origin of dimension " + origin.getDimensions()
 					+ " to Termination of dimension " + termination.getDimensions());
+		} else {
+			Projection result = new ProjectionImpl(origin, termination, this);
+			myProjectionMap.put(termination, result);
+			getSimulator().initialize(this);
+			fireVisibleChangeEvent();
+	
+			return result;
 		}
-
-		Projection result = new ProjectionImpl(origin, termination, this);
-		myProjectionMap.put(termination, result);
-		getSimulator().initialize(this);
-		fireVisibleChangeEvent();
-
-		return result;
 	}
 
 	/**
@@ -497,8 +494,10 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * 		will be a part)
 	 */
 	public void setName(String name) throws StructuralException {
-		VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
-		myName = name;
+		if (!myName.equals(name)) {
+			myName = name;
+			VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
+		}
 	}
 
 
@@ -647,7 +646,9 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 *      java.lang.String)
 	 */
 	public void exposeOrigin(Origin origin, String name) {
-		OriginWrapper temp = new OriginWrapper(this, origin, name);
+		Origin temp;
+
+		temp = new OriginWrapper(this, origin, name);
 
 		myExposedOrigins.put(name, temp );
 		myExposedOriginNames.put(origin, name);
@@ -720,11 +721,14 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Network#exposeTermination(ca.nengo.model.Termination, java.lang.String)
 	 */
 	public void exposeTermination(Termination termination, String name) {
-		TerminationWrapper term = new TerminationWrapper(this, termination, name);
-
-		myExposedTerminations.put(name, term);
-		myExposedTerminationNames.put(termination, name);
-		OrderedExposedTerminations.add(term);
+		Termination term;
+		
+			term = new TerminationWrapper(this, termination, name);
+			
+			myExposedTerminations.put(name, term);
+			myExposedTerminationNames.put(termination, name);
+			OrderedExposedTerminations.add(term);
+		
 		fireVisibleChangeEvent();
 	}
 
@@ -732,7 +736,11 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Network#hideTermination(java.lang.String)
 	 */
 	public void hideTermination(String name) {
-		OrderedExposedTerminations.remove(myExposedTerminations.get(name));
+		Termination term = myExposedTerminations.get(name);
+		
+		if(term == null) return;
+		
+		OrderedExposedTerminations.remove(term);
 		TerminationWrapper termination = (TerminationWrapper)myExposedTerminations.remove(name);
 		if (termination != null) {
 			myExposedTerminationNames.remove(termination.myWrapped);
@@ -914,6 +922,11 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		public Origin clone() throws CloneNotSupportedException {
 			return (Origin) super.clone();
 		}
+		
+		@Override
+		public Origin clone(Ensemble ensemble) throws CloneNotSupportedException {
+			return this.clone();
+		}
 
 		public void setRequiredOnCPU(boolean val){
 		    myWrapped.setRequiredOnCPU(val);
@@ -1094,7 +1107,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
     public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		StringBuilder py = new StringBuilder();
-        String pythonNetworkName = scriptData.get("prefix") + myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue());
+        String pythonNetworkName = scriptData.get("prefix") + myName.replaceAll("\\p{Blank}|\\p{Punct}", ((Character)scriptData.get("spaceDelim")).toString());
 
         py.append("\n\n# Network " + myName + " Start\n");
 
@@ -1243,33 +1256,39 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	}
 	
 	public void addStepListener(StepListener listener) {
+		if (myStepListeners == null) {
+			myStepListeners = new ArrayList<StepListener>(1);
+		}
         myStepListeners.add(listener);
 	}
 	public void removeStepListener(StepListener listener) {
+		if (myStepListeners == null) {
+			myStepListeners = new ArrayList<StepListener>(1);
+		}
         myStepListeners.remove(listener);
 	}
 	
 	public void fireStepListeners(float time) {
+		if (myStepListeners == null) {
+			myStepListeners = new ArrayList<StepListener>(1);
+		}
 		for (StepListener listener: myStepListeners) {
 			listener.stepStarted(time);
 		}
 	}
 
-	@Override
 	public Node[] getChildren() {
 		return getNodes();
 	}
 
-	@Override
 	public String toPostScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		StringBuilder py = new StringBuilder();
 
-		String pythonNetworkName = scriptData.get("prefix") + myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue());
+		String pythonNetworkName = scriptData.get("prefix") + myName.replaceAll("\\p{Blank}|\\p{Punct}", ((Character)scriptData.get("spaceDelim")).toString());
 
         py.append("\n# " + myName + " - Templates\n");
 		
-        if (myMetaData.get("NetworkArray") != null)
-        {
+        if (myMetaData.get("NetworkArray") != null) {
             Iterator iter = ((HashMap)myMetaData.get("NetworkArray")).values().iterator();
             while (iter.hasNext())
             {
@@ -1280,8 +1299,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                     continue;
                 }
 
-            	String useQuick = (Boolean)array.get("useQuick") ? "True" : "False";
-
+            	/*
                 py.append(String.format("nef.templates.networkarray.make(%s, name='%s', neurons=%d, length=%d, radius=%.1f, rLow=%f, rHigh=%f, iLow=%f, iHigh=%f, encSign=%d, useQuick=%s)\n",
                             pythonNetworkName,
                             array.get("name"),
@@ -1294,6 +1312,32 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                             (Double)array.get("iHigh"),
                             (Integer)array.get("encSign"),
                             useQuick));
+                            */
+            	
+            	 py.append(String.format("%s.make_array(name='%s', neurons=%d, length=%d, dimensions=%d",
+            			 	pythonNetworkName,
+            			 	array.get("name"),
+            			 	(Integer)array.get("neurons"),
+                            (Integer)array.get("length"),
+                            (Integer)array.get("dimensions")
+                            ));
+            	 
+            	 if(array.containsKey("radius")){ py.append(", radius=" + Integer.toString((Integer)array.get("radius"))); }
+            	 
+            	 if(array.containsKey("rLow") && array.containsKey("rHigh"))
+            	 { py.append(", max_rate=(" + Integer.toString((Integer)array.get("rLow")) + ", " + Integer.toString((Integer)array.get("rHigh")) + ")"); }
+            	 
+            	 if(array.containsKey("iLow") && array.containsKey("iHigh"))
+            	 { py.append(", intercept=(" + Integer.toString((Integer)array.get("iLow")) + ", " + Integer.toString((Integer)array.get("iHigh")) + ")"); }
+            	 
+            	 if(array.containsKey("useQuick"))
+            	 {  
+            		String useQuick = (Boolean)array.get("useQuick") ? "True" : "False";
+            	 	py.append(", useQuick=" + useQuick);
+            	 }
+            	 
+            	 if(array.containsKey("encoders")){ py.append(", encoders=" + array.get("encoders")); }
+            	 py.append(")\n");
             }
         } 
 		
@@ -1358,7 +1402,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                     continue;
                 }
 
-                py.append(String.format("nef.templates.integrator.make(%s, name='%s', neurons=%d, dimensions=%d, tau_feedback=%f, tau_input=%f, scale=%f)\n",
+                py.append(String.format("nef.templates.integrator.make(%s, name='%s', neurons=%d, dimensions=%d, tau_feedback=%g, tau_input=%g, scale=%g)\n",
                 			pythonNetworkName,
                             integrator.get("name"),
                             (Integer)integrator.get("neurons"),
@@ -1383,7 +1427,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                     continue;
                 }
 
-                py.append(String.format("nef.templates.oscillator.make(%s, name='%s', neurons=%d, dimensions=%d, frequency=%f, tau_feedback=%f, tau_input=%f, scale=%f, controlled=%s)\n",
+                py.append(String.format("nef.templates.oscillator.make(%s, name='%s', neurons=%d, dimensions=%d, frequency=%g, tau_feedback=%g, tau_input=%g, scale=%g, controlled=%s)\n",
                 			pythonNetworkName,
                             oscillator.get("name"),
                             (Integer)oscillator.get("neurons"),
@@ -1429,7 +1473,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                 }
                 a.append("]");
 
-                py.append(String.format("nef.templates.linear_system.make(%s, name='%s', neurons=%d, A=%s, tau_feedback=%f)\n",
+                py.append(String.format("nef.templates.linear_system.make(%s, name='%s', neurons=%d, A=%s, tau_feedback=%g)\n",
                 			pythonNetworkName,
                             linear.get("name"),
                             (Integer)linear.get("neurons"),
@@ -1438,9 +1482,31 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             }
         } 
 
-        if (myMetaData.get("binding") != null)
+        if (myMetaData.get("learnedterm") != null)
         {
-            Iterator iter = ((HashMap)myMetaData.get("binding")).values().iterator();
+            Iterator iter = ((HashMap)myMetaData.get("learnedterm")).values().iterator();
+            while (iter.hasNext())
+            {
+                HashMap learnedterm = (HashMap)iter.next();
+
+                if (!myNodeMap.containsKey(learnedterm.get("errName")))
+                {
+                    continue;
+                }
+
+                py.append(String.format("nef.templates.learned_termination.make(%s, errName='%s', N_err=%d, preName='%s', postName='%s', rate=%g)\n",
+                			pythonNetworkName,
+                            learnedterm.get("errName"),
+                            (Integer)learnedterm.get("N_err"),
+                            (String)learnedterm.get("preName"),
+                            (String)learnedterm.get("postName"),
+                            (Double)learnedterm.get("rate")));
+            }
+        }   
+
+        if (myMetaData.get("convolution") != null)
+        {
+            Iterator iter = ((HashMap)myMetaData.get("convolution")).values().iterator();
             while (iter.hasNext())
             {
                 HashMap binding = (HashMap)iter.next();
@@ -1450,16 +1516,50 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                     continue;
                 }
                 
-                String invertA = (Boolean)binding.get("invertA") ? "True" : "False";
-                String invertB = (Boolean)binding.get("invertB") ? "True" : "False";
+                String invert_first = (Boolean)binding.get("invert_first") ? "True" : "False";
+                String invert_second = (Boolean)binding.get("invert_second") ? "True" : "False";
+                String quick = (Boolean)binding.get("quick") ? "True" : "False";
+                String A = (String)binding.get("A") == null ? "None" : "'" + (String)binding.get("A") + "'";
+                String B = (String)binding.get("B") == null ? "None" : "'" + (String)binding.get("B") + "'";
+
+                StringBuilder encoders = new StringBuilder("[");
+                double[][] arr = (double[][])binding.get("encoders");
+                for (int i = 0; i < arr.length; i++)
+                {
+                    encoders.append("[");
+                    for (int j = 0; j < arr[i].length; j++)
+                    {
+                        encoders.append(arr[i][j]);
+                        if ((j+1) < arr[i].length)
+                        {
+                            encoders.append(",");
+                        }
+                    }
+                    encoders.append("]");
+                    if ((i + 1) < arr.length)
+                    {
+                        encoders.append(",");
+                    }
+                }
+                encoders.append("]");
                 
-                py.append(String.format("nef.templates.binding.make(%s, name='%s', outputName='%s', N_per_D=%d, invertA=%s, invertB=%s)\n",
+                py.append(String.format("nef.convolution.make_convolution(%s, name='%s', A=%s, B=%s, C='%s', N_per_D=%d, quick=%s, encoders=%s, radius=%d, pstc_out=%g, pstc_in=%g, pstc_gate=%g, invert_first=%s, invert_second=%s, mode='%s', output_scale=%d)\n",
                 			pythonNetworkName,
                             binding.get("name"),
-                            (String)binding.get("outputName"),
+                            A,
+                            B,
+                            (String)binding.get("C"),
                             (Integer)binding.get("N_per_D"),
-                            invertA,
-                            invertB));
+                            quick,
+                            encoders.toString(),
+                            (Integer)binding.get("radius"),
+                            (Double)binding.get("pstc_out"),
+                            (Double)binding.get("pstc_in"),
+                            (Double)binding.get("pstc_gate"),
+                            invert_first,
+                            invert_second,
+                            (String)binding.get("mode"),
+                            (Integer)binding.get("output_scale")));
             }
         } 
 
@@ -1478,7 +1578,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                 String use_single_input = (Boolean)bgrule.get("use_single_input") ? "True" : "False";
                 
                 // going to assume the current network is the BG...BG_rules can only be added on BG networks.
-                py.append(String.format("nef.templates.basalganglia_rule.make(%s, %s.network.getNode('%s'), index=%d, dim=%d, pattern='%s', pstc=%f, use_single_input=%s)\n",
+                py.append(String.format("nef.templates.basalganglia_rule.make(%s, %s.network.getNode('%s'), index=%d, dim=%d, pattern='%s', pstc=%g, use_single_input=%s)\n",
                             pythonNetworkName,
                             pythonNetworkName,
                             (String)bgrule.get("name"),
@@ -1502,36 +1602,14 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                     continue;
                 }
 
-                py.append(String.format("nef.templates.gate.make(%s, name='%s', gated='%s', neurons=%d, pstc=%f)\n",
+                py.append(String.format("nef.templates.gate.make(%s, name='%s', gated='%s', neurons=%d, pstc=%g)\n",
                 			pythonNetworkName,
                             gate.get("name"),
                             (String)gate.get("gated"),
                             (Integer)gate.get("neurons"),
                             (Double)gate.get("pstc")));
             }
-        } 
-
-        if (myMetaData.get("learnedterm") != null)
-        {
-            Iterator iter = ((HashMap)myMetaData.get("learnedterm")).values().iterator();
-            while (iter.hasNext())
-            {
-                HashMap learnedterm = (HashMap)iter.next();
-
-                if (!myNodeMap.containsKey(learnedterm.get("errName")))
-                {
-                    continue;
-                }
-
-                py.append(String.format("nef.templates.learned_termination.make(%s, errName='%s', N_err=%d, preName='%s', postName='%s', rate=%f)\n",
-                			pythonNetworkName,
-                            learnedterm.get("errName"),
-                            (Integer)learnedterm.get("N_err"),
-                            (String)learnedterm.get("preName"),
-                            (String)learnedterm.get("postName"),
-                            (Double)learnedterm.get("rate")));
-            }
-        }      
+        }    
 
 		return py.toString();
 	}

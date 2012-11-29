@@ -44,12 +44,16 @@ public abstract class AbstractFunction implements Function {
 	public static final String DIMENSION_PROPERTY = "dimension";
 
 	private int myDim;
+	private String myCode;
+	private String myName;
 
 	/**
 	 * @param dim Input dimension of the function
 	 */
 	public AbstractFunction(int dim) {
 		myDim = dim;
+		myCode = "";
+		myName = "";
 	}
 
 	/**
@@ -58,7 +62,22 @@ public abstract class AbstractFunction implements Function {
 	public int getDimension() {
 		return myDim;
 	}
-
+	
+	public String getCode(){
+		return myCode;
+	}
+	
+	public void setCode(String code){
+		myCode = code;
+	}
+	
+	public String getName(){
+		return myName;
+	}
+	
+	public void setName(String name){
+		myName = name;
+	}
 	/**
 	 * @see ca.nengo.math.Function#map(float[])
 	 */
@@ -83,5 +102,6 @@ public abstract class AbstractFunction implements Function {
 	public Function clone() throws CloneNotSupportedException {
 		return (Function) super.clone();
 	}
+	
 
 }

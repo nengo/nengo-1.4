@@ -31,13 +31,12 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import ca.nengo.math.Function;
+import ca.nengo.math.impl.AbstractFunction;
+import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.math.impl.IdentityFunction;
-import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.math.impl.PostfixFunction;
 import ca.nengo.model.Network;
 import ca.nengo.model.impl.NetworkImpl.OriginWrapper;
@@ -248,7 +247,7 @@ public class ProjectionImpl implements Projection {
 	    StringBuilder py = new StringBuilder();
 	    
 	    String pythonNetworkName = scriptData.get("prefix") 
-	    			+ getNetwork().getName().replace(' ', ((Character)scriptData.get("spaceDelim")).charValue());
+	    			+ getNetwork().getName().replaceAll("\\p{Blank}|\\p{Punct}", ((Character) scriptData.get("spaceDelim")).toString());
 	    
 	    py.append(String.format("%1s.connect(", pythonNetworkName));
 	    
@@ -261,12 +260,6 @@ public class ProjectionImpl implements Projection {
 	    	tempOrigin = ((OriginWrapper) tempOrigin).getWrappedOrigin();
 	    }
 	    
-	    originNodeFullName.append(tempOrigin.getNode().getName());
-	    
-	    py.append("\'" + originNodeFullName + "\'");
-	    
-	    
-	    
 	    StringBuilder terminationNodeFullName = new StringBuilder();
 	    Termination tempTermination = myTermination;
 
@@ -276,32 +269,109 @@ public class ProjectionImpl implements Projection {
 	    	tempTermination = ((TerminationWrapper) tempTermination).getWrappedTermination();
 	    }
 	    
-	    terminationNodeFullName.append(tempTermination.getNode().getName());
-	    
-	    py.append(", \'" + terminationNodeFullName + "\'");
-	    
-	    
-	    
-	    
 	    DecodedTermination dTermination; 
+	    StringBuilder transformString = new StringBuilder();
+	    
+	    transformString.append('[');
 	    if(tempTermination instanceof DecodedTermination)
 	    {
 	    	dTermination = (DecodedTermination) tempTermination;
+	    	transformString.append(getTransformScript(dTermination, "transform = ".length()));
+	    	terminationNodeFullName.append(tempTermination.getNode().getName());
+	    }
+	    else if(tempTermination instanceof EnsembleTermination && 
+	    		tempTermination.getNode().getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$5")
+	    {
+	    	terminationNodeFullName.deleteCharAt(terminationNodeFullName.length()-1);
+	    	
+	    	boolean first = true;
+	    	for(Node node : tempTermination.getNode().getChildren())
+	    	{
+	    		if(first)
+	    		{
+	    			first = false;
+	    		}else {
+	    			transformString.append(",\n" + new String(new char["transform = ".length() + 1]).replace("\0", " "));
+	    		}
+	    		
+	    		// this relies on the decoded terminations in the child nodes having the 
+	    		// same name as the ensemble termination that contains them
+	    		try{
+	    			dTermination = (DecodedTermination) node.getTermination(tempTermination.getName());
+	    		}catch(Exception e){
+	    			dTermination = null;
+	    		}
+	    		
+	    		transformString.append(getTransformScript(dTermination, "transform = ".length() + 1));
+	    	}
 	    }
 	    else
 	    {
 	    	throw new ScriptGenException("Trying to generate script of non decoded termination which is not supported.");
 	    }
 
-	    StringBuilder transformString = new StringBuilder();
-	    transformString.append('[');
+	    transformString.append("]\n");
+	   
+	    // Now handle origin function if there is one
 	    
-	    float[][] transform = dTermination.getTransform();
+	    String functionName = "";
+	    if(tempOrigin instanceof BasicOrigin && tempOrigin.getNode() instanceof FunctionInput)
+	    {
+	    	originNodeFullName.append(tempOrigin.getNode().getName());
+	    }
+	    else
+	    {
+		    DecodedOrigin dOrigin; 
+		    if(tempOrigin instanceof DecodedOrigin)
+		    {
+		    	dOrigin = (DecodedOrigin) tempOrigin;
+		    	originNodeFullName.append(tempOrigin.getNode().getName());
+		    }
+		    else if(tempOrigin.getClass().getCanonicalName() == "org.python.proxies.nef.array$ArrayOrigin$4" && 
+		    		tempOrigin.getNode().getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$5")
+		    {
+		    	originNodeFullName.deleteCharAt(originNodeFullName.length()-1);
+		    	Node node = tempOrigin.getNode().getChildren()[0];
+		    	
+		    	try{
+		    		dOrigin = (DecodedOrigin) node.getOrigin(tempOrigin.getName());
+		    	}catch(StructuralException e){
+		    		dOrigin = null;
+		    	}
+		    }
+		    else
+		    {
+		    	throw new ScriptGenException("Trying to generate script of non decoded origin which is not supported.");
+		    }
+		    
+		    functionName = addFunctionScript(py, dOrigin);
+	    }
+	    
+	    py.append("\'" + originNodeFullName + "\'");
+	    py.append(", \'" + terminationNodeFullName + "\'");
+	    
+	    py.insert(0, "transform = " + transformString);
+	    py.append(", transform=transform");
+	    
+	    if(functionName != ""){
+	    	py.append(", func="+functionName);
+	    }
+	    
+	    py.append(")\n\n");
+	    
+	    return py.toString();
+	}
+	
+	String getTransformScript(DecodedTermination dTermination, int offset) throws ScriptGenException
+	{
+		StringBuilder transformString = new StringBuilder();
+		float[][] transform = dTermination.getTransform();
 	    
 	    for(int i = 0; i < transform.length; i++)
 	    {
-	    	if(i != 0)
-	    		transformString.append(", ");
+	    	if(i != 0) {
+	    		transformString.append(",\n " + new String(new char[offset]).replace("\0", " "));
+	    	}
 	    	
 	    	transformString.append("[");
 	    	
@@ -316,101 +386,93 @@ public class ProjectionImpl implements Projection {
 	    	transformString.append("]");
 	    }
 	    
-	    transformString.append("]");
-	   
-	    py.append(", transform="+transformString.toString());
+	    return transformString.toString();
+	}
+	
+	String addFunctionScript(StringBuilder py, DecodedOrigin dOrigin) throws ScriptGenException
+	{
+		StringBuilder funcString = new StringBuilder();
+	    boolean first = true;
 	    
+	    Function[] fns = dOrigin.getFunctions();
 	    
-								
-	    // Now handle origin function if there is one
-	   
-	    if(!(tempOrigin.getNode() instanceof FunctionInput))
+	    boolean allIdentity = true;
+	    for(Function f: fns)
 	    {
-		    DecodedOrigin dOrigin; 
-		    if(tempOrigin instanceof DecodedOrigin)
-		    {
-		    	dOrigin = (DecodedOrigin) tempOrigin;
-		    }
-		    else
-		    {
-		    	throw new ScriptGenException("Trying to generate script of non decoded origin which is not supported.");
-		    }
-
-		    StringBuilder funcString = new StringBuilder();
-		    boolean first = true;
-		    
-		    boolean allIdentity = true;
-		    for(Function f: dOrigin.getFunctions())
-		    {
-		    	 if(!(f instanceof IdentityFunction))
-		    	 {
-		    		 allIdentity = false;
-		    		 break;
-		    	 }
-		    }
-		    
-		    if(!allIdentity)
-		    {
-			    
-			    for(Function f: dOrigin.getFunctions())
-			    {
-			    	if(f instanceof PostfixFunction)
-			    	{
-			    		PostfixFunction pf = (PostfixFunction) f;
-			    		String exp = pf.getExpression();
-			    		
-			    		exp=exp.replaceAll("^","**");
-			    		exp=exp.replaceAll("!"," not ");
-			    		exp=exp.replaceAll("&"," and ");
-			    		exp=exp.replaceAll("|"," or ");
-			    		exp=exp.replaceAll("ln","log");
-			    		
-			    		for(int j = 0; j < f.getDimension(); j++)
-			    		{
-			    			String find = "x"+ Integer.toString(j);
-			    			String replace = "x["+ Integer.toString(j) + "]";
-			    			exp=exp.replaceAll(find, replace);
-			    		}
-			    		
-			    		if (first)
-			    		{
-			    			funcString.append(exp);
-			    			first = false;
-			    		}
-			    		else
-			    		{
-			    			funcString.append(", " + exp);	
-			    		}
-			    	}
-			    	else if(f instanceof IdentityFunction)
-			    	{
-			    		String exp = "x[" + Integer.toString(((IdentityFunction) f).getIdentityDimension()) + "]";
-			    			
-			    		if (first)
-			    		{
-			    			funcString.append(exp);
-			    			first = false;
-			    		}
-			    		else
-			    		{
-			    			funcString.append(", " + exp);	
-			    		}
-			    	}
-			    	else
-			    	{
-			    		throw new ScriptGenException("Trying to generate script of non user-defined function on an origin which is not supported.");
-			    	}
-			    }
-			    
-			    py.insert(0, "    return [" + funcString.toString() + "]\n\n");
-			    py.insert(0, "def function(x):\n");
-			    
-			    py.append(", func=function");
-		    }
+	    	 if(!(f instanceof IdentityFunction))
+	    	 {
+	    		 allIdentity = false;
+	    		 break;
+	    	 }
 	    }
 	    
-	    py.append(")\n");
+	    if(allIdentity){
+	    	return "";
+	    }
+
+	    String n = fns[0].getClass().getCanonicalName();
+    	if(fns.length > 0 && fns[0].getClass().getCanonicalName() == "org.python.proxies.nef.functions$PythonFunction$3")
+    	{
+    		AbstractFunction absFun = (AbstractFunction) fns[0];
+    		String code = absFun.getCode();
+    		
+    		if(code != ""){
+    			py.insert(0, code);
+    		}else{
+    			throw new ScriptGenException("Trying to generate script of non user-defined function on an origin which is not supported.");
+    		}
+    		
+    		return absFun.getName();
+    	}
+    	
+	    for(Function f: fns)
+	    {
+	    	String exp;
+	    	if(f instanceof PostfixFunction)
+	    	{
+	    		PostfixFunction pf = (PostfixFunction) f;
+	    		exp = pf.getExpression();
+	    		
+	    		exp=exp.replaceAll("\\^","**");
+	    		exp=exp.replaceAll("!"," not ");
+	    		exp=exp.replaceAll("&"," and ");
+	    		exp=exp.replaceAll("\\|"," or ");
+	    		exp=exp.replaceAll("ln","log");
+	    		
+	    		for(int j = 0; j < f.getDimension(); j++)
+	    		{
+	    			String find = "x"+ Integer.toString(j);
+	    			String replace = "x["+ Integer.toString(j) + "]";
+	    			exp=exp.replaceAll(find, replace);
+	    		}
+	    	}
+	    	else if(f instanceof IdentityFunction)
+	    	{
+	    		exp = "x[" + Integer.toString(((IdentityFunction) f).getIdentityDimension()) + "]";
+	    	}
+	    	else if(f instanceof ConstantFunction)
+	    	{
+	    		exp = Float.toString(((ConstantFunction) f).getValue());
+	    	}
+	    	else
+	    	{
+	    		throw new ScriptGenException("Trying to generate script of non user-defined function on an origin which is not supported.");
+	    	}
+	    	
+	    	if (first)
+    		{
+    			funcString.append(exp);
+    			first = false;
+    		}
+    		else
+    		{
+    			funcString.append(", " + exp);	
+    		}
+	    }
 	    
-	    return py.toString();
+    	py.insert(0, "    return [" + funcString + "]\n\n");
+	    py.insert(0, "def function(x):\n");
+	    
+	    return "function";
 	}
 }

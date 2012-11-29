@@ -120,7 +120,7 @@ public class UIEnsemble extends UINodeViewable {
 	}
 
 	@Override
-	public void modelUpdated() {
+	protected void modelUpdated() {
 		super.modelUpdated();
 		if (getModel().isCollectingSpikes()) {
 			collectSpikes(true);

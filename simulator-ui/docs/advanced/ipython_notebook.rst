@@ -63,9 +63,9 @@ Running a Nengo model from IPython notebook
 
     import nef
     net=nef.Network('Test')
-    A=net.make('A',50,1)
-    input=net.make_input('input',{0: -1, 0.2: -0.5, 0.4:0, 0.6:0.5, 0.8:1.0})
-    net.connect(input,A)
+    net.make('A',50,1)
+    net.make_input('input',{0: -1, 0.2: -0.5, 0.4:0, 0.6:0.5, 0.8:1.0})
+    net.connect('input','A')
     log=net.log()
     log.add('input',tau=0)
     log.add('A')
@@ -97,9 +97,9 @@ Running a model with different parameter settings
 
     import nef
     net=nef.Network('Test')
-    A=net.make('A',N,1)
-    input=net.make_input('input',{0: -1, 0.2: -0.5, 0.4:0, 0.6:0.5, 0.8:1.0})
-    net.connect(input,A)
+    net.make('A',N,1)
+    net.make_input('input',{0: -1, 0.2: -0.5, 0.4:0, 0.6:0.5, 0.8:1.0})
+    net.connect('input','A')
     log=net.log()
     log.add('input',tau=0)
     log.add('A')

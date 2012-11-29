@@ -19,7 +19,7 @@ net.make('pre',N,D)
 net.make('post',N,D)
 
 # Create a random function input.
-input=FunctionInput('input',[FourierFunction(.1, 10,.5,12)],Units.UNK)
+input=FunctionInput('input',[FourierFunction(.1, 10,.5,1)],Units.UNK)
 net.add(input)
 net.connect(input,'pre')
 

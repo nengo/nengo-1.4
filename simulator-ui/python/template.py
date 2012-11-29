@@ -4,6 +4,8 @@ import java
 
 from ca.nengo.ui.configurable.properties import *
 from ca.nengo.ui.configurable import *
+from ca.nengo.ui.configurable.managers import ConfigDialogClosedException
+
 import ca.nengo
 import inspect
 import threading
@@ -120,27 +122,23 @@ class TemplateBar(TransferHandler):
         dh = DropHandler()
         self.ng.universe.transferHandler = dh
         self.ng.universe.getDropTarget().addDropTargetListener(dh)
-
-        self.add_template('Network', 'ca.nengo.ui.configurable.models.CNetwork', 'images/nengoIcons/network.gif')
-        self.add_template('Ensemble', 'ca.nengo.ui.configurable.models.CNEFEnsemble', 'images/nengoIcons/ensemble.gif')
-        self.add_template('Input', 'ca.nengo.ui.configurable.models.CFunctionInput', 'images/nengoIcons/input.png')
-        self.add_template('Origin', 'ca.nengo.ui.configurable.models.CDecodedOrigin', 'images/nengoIcons/origin.png')
-        self.add_template('Termination', 'nef.templates.termination', 'images/nengoIcons/termination.png')
-
-        self.panel.add(JSeparator(JSeparator.HORIZONTAL, maximumSize=(200, 1), foreground=Color(0.3, 0.3, 0.3), background=Color(0.1, 0.1, 0.1)))
+        
+        self.add_template('Network','ca.nengo.ui.configurable.models.CNetwork','images/nengoIcons/network.gif')
+        self.add_template('Ensemble','ca.nengo.ui.configurable.models.CNEFEnsemble','images/nengoIcons/ensemble.gif')
+        self.add_template('Input','ca.nengo.ui.configurable.models.CFunctionInput','images/nengoIcons/input.png')
+        #self.add_template('Origin','ca.nengo.ui.configurable.models.CDecodedOrigin','images/nengoIcons/origin.png')
+        self.add_template('Origin','nef.templates.origin','images/nengoIcons/origin.png')
+        self.add_template('Termination','nef.templates.termination','images/nengoIcons/termination.png')
+        
+        self.panel.add(JSeparator(JSeparator.HORIZONTAL,maximumSize = (200,1),foreground = Color(0.3,0.3,0.3),background = Color(0.1,0.1,0.1)))
 
         for template in nef.templates.templates:
             self.add_template(getattr(template, 'label'), template.__name__, 'images/nengoIcons/' + getattr(template, 'icon'))
 
-        self.scrollPane = JScrollPane(self.panel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER)
-        self.ng.getContentPane().add(self.scrollPane, BorderLayout.WEST)
-
-        self.scrollPane.verticalScrollBar.unitIncrement = 20
-        self.scrollPane.revalidate()
-        self.size_with_scrollbar = self.scrollPane.preferredSize
-        self.scrollPane.verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
-
-    def add_template(self, name, constructor, image):
+        # get NengoGraphics to add me
+        self.ng.setTemplatePanel(self.panel)
+        
+    def add_template(self,name,constructor,image):
         icon = ImageIcon(image)
         if icon.iconWidth > self.max_icon_width:
             icon = ImageIcon(icon.image.getScaledInstance(self.max_icon_width, icon.iconHeight * self.max_icon_width / icon.iconWidth, Image.SCALE_SMOOTH))
@@ -171,14 +169,6 @@ class TemplateBar(TransferHandler):
 
     def createTransferable(self, component):
         return TemplateTransferable(self.templates[component])
-
-    def toggle_visible(self):
-        self.visible(not self.scrollPane.visible)
-
-    def visible(self, visible):
-        self.scrollPane.visible = visible
-        ca.nengo.ui.NengoGraphics.getInstance().contentPane.revalidate()
-        self.scrollPane.preferredSize = self.size_with_scrollbar
 
     def toggle_labels(self):
         for l in self.labels:
@@ -280,8 +270,8 @@ class DropHandler(TransferHandler, java.awt.dnd.DropTargetListener):
 
         if hasattr(constructor, 'test_drop'):
             node = None
-            for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x, pos.y, 1, 1)):
-                if isinstance(n3, ca.nengo.ui.models.UINeoNode):
+            for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
+                if isinstance(n3,ca.nengo.ui.models.UINeoNode) or isinstance(n3, ca.nengo.ui.models.nodes.widgets.UITermination) or isinstance(n3, ca.nengo.ui.models.nodes.widgets.UIOrigin):
                     node = n3.model
             return constructor.test_drop(net.model, node)
 
@@ -304,8 +294,8 @@ class DropHandler(TransferHandler, java.awt.dnd.DropTargetListener):
                 drop_on_ensemble = True
 
             node = None
-            for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x, pos.y, 1, 1)):
-                if isinstance(n3, ca.nengo.ui.models.UINeoNode):
+            for n3 in net.ground.findIntersectingNodes(java.awt.Rectangle(pos.x,pos.y,1,1)):
+                if isinstance(n3,ca.nengo.ui.models.UINeoNode) or isinstance(n3, ca.nengo.ui.models.nodes.widgets.UITermination) or isinstance(n3, ca.nengo.ui.models.nodes.widgets.UIOrigin):
                     node = n3
 
             if drop_on_ensemble:
@@ -357,20 +347,26 @@ class DropHandler(TransferHandler, java.awt.dnd.DropTargetListener):
             pass
 
     def configureAndWait(self, node, user_configurer):
-        if node is not None:
-            origins = node.model.getOrigins()
-            terminations = node.model.getTerminations()
-        user_configurer.configureAndWait()
+        #if node is not None:
+        #    origins = node.model.getOrigins()
+        #    terminations = node.model.getTerminations()
 
-        if node is not None:
-            for o in node.model.getOrigins():
-                if o not in origins:
-                    node.showOrigin(o.name)
-            for t in node.model.getTerminations():
-                if t not in terminations:
-                    node.showTermination(t.name)
+        try:
+          user_configurer.configureAndWait()
+        except ConfigDialogClosedException:
+          pass
 
 
+        #this was causing terminations and origins added via templates to be displayed twice
+        #if node is not None:
+            #for o in node.model.getOrigins():
+            #    if o not in origins: node.showOrigin(o.name)
+
+            #for t in node.model.getTerminations():
+                #pass
+                #if t not in terminations: node.showTermination(t.name)
+                
+            
 ################################################################################
 class TemplateTransferable(java.awt.datatransfer.Transferable):
     flavor = java.awt.datatransfer.DataFlavor("application/nengo;class = java.lang.String")
@@ -390,4 +386,3 @@ class TemplateTransferable(java.awt.datatransfer.Transferable):
 ################################################################################
 ### Main
 template = TemplateBar()
-template.visible(True)

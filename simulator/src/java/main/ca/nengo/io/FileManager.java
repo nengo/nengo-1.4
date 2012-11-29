@@ -41,6 +41,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import ca.nengo.model.Node;
+import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.util.TimeSeries;
 
 /**
@@ -87,6 +88,11 @@ public class FileManager {
 		saveObject(node, destination);
 	}
 
+	public void generate(Node node, String destination) throws IOException {
+		NetworkImpl network = (NetworkImpl) node;
+		network.dumpToScript(destination);
+	}
+	
 	/**
 	 * @param timeSeries TimeSeries to serialize
 	 * @param destination File to save serialized TimeSeries in

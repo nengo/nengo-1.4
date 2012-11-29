@@ -111,8 +111,7 @@ public abstract class UINodeViewable extends UINeoNode {
      * @return Viewer Window
      */
     protected Window getViewerWindow() {
-
-        if (viewerWindowRef.get() == null || viewerWindowRef.get().isDestroyed()) {
+        if (!isViewerWindowVisible()) {
 
             NodeViewer nodeViewer = createViewerInstance();
             Window viewerWindow = new Window(this, nodeViewer);
@@ -133,6 +132,14 @@ public abstract class UINodeViewable extends UINeoNode {
 
         return viewerWindowRef.get();
 
+    }
+
+    public boolean isViewerWindowVisible() {
+        return (viewerWindowRef.get() != null && !viewerWindowRef.get().isDestroyed());
+    }
+
+    public void moveViewerWindowToFront() {
+        getViewerWindow().moveToFront();
     }
 
     @Override

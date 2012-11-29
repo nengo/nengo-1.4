@@ -3,6 +3,8 @@ package ca.nengo.ui.lib.world;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
+import ca.nengo.ui.lib.world.handlers.SelectionHandler;
+
 public interface World extends WorldObject {
 	public WorldLayer getGround();
 
@@ -11,6 +13,7 @@ public interface World extends WorldObject {
 	public Point2D skyToGround(Point2D position);
 
 	public Collection<WorldObject> getSelection();
+	public SelectionHandler getSelectionHandler();
 
 	/**
 	 * Animate the sky to view all object on the ground

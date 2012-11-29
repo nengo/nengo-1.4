@@ -62,7 +62,9 @@ public abstract class UITermination extends Widget implements ILineTermination {
 	 * @return UI Termination Wrapper
 	 */
 	public static UITermination createTerminationUI(UINeoNode uiNodeParent, Termination termination) {
-		if (termination instanceof DecodedTermination) {
+	    if (uiNodeParent instanceof UINetwork) {
+	        return new UINetworkTermination((UINetwork)uiNodeParent, termination);
+	    } else if (termination instanceof DecodedTermination) {
 			return new UIDecodedTermination(uiNodeParent, (DecodedTermination) termination);
 		} else {
 			return new UIGenericTermination(uiNodeParent, termination);

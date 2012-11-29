@@ -175,11 +175,15 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
         return matrix;
     }
 
-    @Override public boolean isValueSet() {
+    @Override
+    public boolean isValueSet() {
+        if (!isDimensionsSet()) {
+            return false;
+        }
+
         if (matrix != null && matrix[0].length == getDimensions()) {
             return true;
-        } else if (isDimensionsSet() && getFromSize() == getToSize()){
-        	// default to identity matrix
+        } else if (getFromSize() == getToSize()){
             matrix = new float[getFromSize()][getToSize()];
             for (int i=0; i<getFromSize(); i++) {
                 for (int j=0; j<getFromSize(); j++) {
@@ -192,7 +196,7 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
             }
             return true;
         }
-        setStatusMsg("matrix not set");
+        setStatusMsg("Matrix not set");
         return false;
     }
 

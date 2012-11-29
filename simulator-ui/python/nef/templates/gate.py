@@ -5,13 +5,16 @@ icon = 'gate.png'
 description = """<html>This template creates an ensemble that drives an inhibitory gate on an existing specified ensemble. </html>"""
 
 
-params = [
-    ('name', 'Name', str, 'Name of the new gating ensemble'),
-    ('gated', 'Name of gated ensemble', str, 'Name of the existing ensemble to gate'),
-    ('neurons', 'Number of neurons', int, 'Number of neurons in the new gating ensemble'),
-    ('pstc', 'Synaptic time constant [s]', float, 'Synaptic time constant of the gating ensemble'),
-]
+params=[
+    ('name','Name',str,'Name of the new gating ensemble'),
+    ('gated','Name of gated ensemble',str,'Name of the existing ensemble to gate'),
+    ('neurons','Number of neurons',int,'Number of neurons in the new gating ensemble'),
+    ('pstc','Gating PSTC [s]', float, 'Post-synaptic time constant of the gating ensemble'),
+    ]
 
+import nef
+import nef.array
+import ca.nengo
 
 def test_params(net, p):
     gatedIsSet = False
@@ -22,26 +25,26 @@ def test_params(net, p):
             gatedIsSet = True
         elif i.name == p['name']:
             nameIsTaken = True
-    if nameIsTaken:
-        return 'That name is already taken'
-    if not gatedIsSet:
-        return 'Must provide the name of an existing ensemble to be gated'
-
-import nef
-import nef.array
+    if nameIsTaken: return 'That name is already taken'
+    if not gatedIsSet: return 'Must provide the name of an existing ensemble to be gated'
+    target=net.network.getNode(p['gated'])
+    if not isinstance(target, nef.array.NetworkArray) and not isinstance(target, ca.nengo.model.nef.NEFEnsemble):
+        return 'The ensemble to be gated must be either an ensemble or a network array'
+    if p['neurons']<1: return 'The number of neurons must be greater than zero'
+    if p['pstc']<=0: return 'The post-synaptic time constant must be greater than zero'
+    
 from java.util import ArrayList
 from java.util import HashMap
 
-
-def make(net, name='Gate', gated='visual', neurons=40, pstc=0.01):
-    gate = net.make(name, neurons, 1, intercept=(-0.7, 0), encoders=[[-1]])
-
+from ca.nengo.model.impl import NetworkArrayImpl
+def make(net,name='Gate', gated='visual', neurons=40 ,pstc=0.01):
+    gate=net.make(name, neurons, 1, intercept=(-0.7, 0), encoders=[[-1]])
     def addOne(x):
         return [x[0] + 1]
     net.connect(gate, None, func=addOne, origin_name='xBiased', create_projection=False)
-    output = net.network.getNode(gated)
-    if isinstance(output, nef.array.NetworkArray):
-        weights = [[-10]] * (output.nodes[0].neurons * len(output.nodes))
+    output=net.network.getNode(gated)
+    if isinstance(output,NetworkArrayImpl):
+        weights=[[-10]]*(output.nodes[0].neurons*len(output.nodes))
     else:
         weights = [[-10]] * output.neurons
 

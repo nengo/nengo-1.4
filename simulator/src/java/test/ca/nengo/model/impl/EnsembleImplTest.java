@@ -17,7 +17,6 @@ import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.util.MU;
 import ca.nengo.util.ScriptGenException;
-import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * Unit tests for EnsembleImpl.
@@ -109,13 +108,11 @@ public class EnsembleImplTest extends TestCase {
 		@Override
 		public void reset(boolean randomize) {}
 
-		@Override
 		public Node[] getChildren() {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
-		@Override
 		public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 			// TODO Auto-generated method stub
 			return null;

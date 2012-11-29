@@ -54,7 +54,6 @@ import ca.nengo.util.TimeSeries;
 import ca.nengo.util.TimeSeries1D;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
-import ca.nengo.util.impl.ScriptGenerator;
 import ca.nengo.util.impl.TimeSeries1DImpl;
 
 /**
@@ -405,12 +404,10 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 		return myNoise;
 	}
 
-	@Override
 	public Node[] getChildren() {
 		return new Node[0];
 	}
 
-	@Override
 	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		return "";
 	}

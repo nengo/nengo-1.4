@@ -44,7 +44,6 @@ import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
 import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.math.impl.WeightedCostApproximator;
-import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.PlasticNodeTermination;
@@ -69,7 +68,6 @@ import ca.nengo.model.plasticity.impl.PreLearnTermination;
 import ca.nengo.util.MU;
 import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.TimeSeries;
-import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.impl.LearningTask;
 import ca.nengo.util.impl.TimeSeriesImpl;
 /**

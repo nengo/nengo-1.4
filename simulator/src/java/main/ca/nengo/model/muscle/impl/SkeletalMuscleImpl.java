@@ -54,7 +54,6 @@ import ca.nengo.util.MU;
 import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutableUtils;
-import ca.nengo.util.impl.ScriptGenerator;
 import ca.nengo.util.impl.TimeSeries1DImpl;
 import ca.nengo.util.impl.TimeSeriesImpl;
 
@@ -296,12 +295,10 @@ public class SkeletalMuscleImpl implements SkeletalMuscle {
 		}
 	}
 
-	@Override
 	public Node[] getChildren() {
 		return new Node[0];
 	}
 
-	@Override
 	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		return "";
 	}

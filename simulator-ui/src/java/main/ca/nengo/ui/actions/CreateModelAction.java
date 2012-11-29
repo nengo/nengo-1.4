@@ -135,7 +135,9 @@ public class CreateModelAction extends ReversableAction {
         try {
 
             Object model = ModelFactory.constructModel(constructable);
-            if (model instanceof Node) {
+            if (model == null) {
+            	throw new ActionException("No model was created");
+            } else if (model instanceof Node) {
                 final Node node = (Node) model;
 
                 SwingUtilities.invokeAndWait(new Runnable() {

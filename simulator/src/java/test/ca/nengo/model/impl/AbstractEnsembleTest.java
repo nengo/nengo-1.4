@@ -16,7 +16,6 @@ import ca.nengo.model.impl.AbstractEnsemble;
 import ca.nengo.model.impl.AbstractNode;
 import ca.nengo.model.impl.BasicOrigin;
 import ca.nengo.util.ScriptGenException;
-import ca.nengo.util.impl.ScriptGenerator;
 import junit.framework.TestCase;
 
 /**
@@ -54,12 +53,10 @@ public class AbstractEnsembleTest extends TestCase {
 			@Override
 			public void reset(boolean randomize) {}
 
-			@Override
 			public Node[] getChildren() {
 				return new Node[0];
 			}
 
-			@Override
 			public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 				return "";
 			}};		
@@ -73,12 +70,10 @@ public class AbstractEnsembleTest extends TestCase {
 			@Override
 			public void reset(boolean randomize) {}
 
-			@Override
 			public Node[] getChildren() {
 				return new Node[0];
 			}
 
-			@Override
 			public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 				return "";
 			}};		
@@ -92,12 +87,10 @@ public class AbstractEnsembleTest extends TestCase {
 			@Override
 			public void reset(boolean randomize) {}
 
-			@Override
 			public Node[] getChildren() {
 				return new Node[0];
 			}
 
-			@Override
 			public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 				return "";
 			}};

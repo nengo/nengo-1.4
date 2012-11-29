@@ -97,14 +97,29 @@ public abstract class Property implements Serializable {
      * @return String to be displayed in a tooltip
      */
     public String getTooltip() {
-        String nodeDescription = "Type: " + getTypeName();
-
+        int width = 250;
+        String css = "<style type = \"text/css\">" +
+                "body { width: " + width + "px }" +
+                "p { margin-top: 12px }" +
+                "</style>";
+        
+        String sType = "Type: " + getTypeName();
+        String sBody;
         if (description != null) {
-            return "<html><b>" + description + "</b><br>" + nodeDescription
-                    + "</html>";
+        	sBody = "<p><b>" + description + "</b></p>"
+        		+ "<p>" + sType + "</p>";
+        } else {
+        	sBody = sType;
         }
-        return nodeDescription;
+
+        String sHTML = "<html><head>" + css + "</head><body>" + sBody + "</body></html>";
+        return sHTML;
     }
+
+    /**
+     * @return Class type that this parameter's value must be
+     */
+    public abstract Class<?> getTypeClass();
 
     /**
      * @return A name given to the Class type of this parameter's value

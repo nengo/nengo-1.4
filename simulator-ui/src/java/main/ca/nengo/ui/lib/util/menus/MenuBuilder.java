@@ -2,9 +2,11 @@ package ca.nengo.ui.lib.util.menus;
 
 import java.awt.Font;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 
@@ -31,14 +33,14 @@ public class MenuBuilder extends AbstractMenuBuilder {
 		addAction(action, -1, null);
 	}
 
-	public void addAction(StandardAction action, KeyStroke accelorator) {
-		addAction(action, -1, accelorator);
+	public void addAction(StandardAction action, KeyStroke accelerator) {
+		addAction(action, -1, accelerator);
 	}
 
-	public void addAction(StandardAction action, int mnemonic, KeyStroke accelorator) {
+	public void addAction(StandardAction action, int mnemonic, KeyStroke accelerator) {
 		JMenuItem item = new JMenuItem(action.toSwingAction());
-		if (accelorator != null) {
-			item.setAccelerator(accelorator);
+		if (accelerator != null) {
+			item.setAccelerator(accelerator);
 		}
 		if (mnemonic != -1) {
 			item.setMnemonic(mnemonic);
@@ -46,7 +48,19 @@ public class MenuBuilder extends AbstractMenuBuilder {
 
 		style(item);
 		menu.add(item);
-
+	}
+	
+	public void addActionsRadio(StandardAction[] actions, int selected) {
+		ButtonGroup group = new ButtonGroup();
+		JRadioButtonMenuItem item;
+		
+		for (int i = 0; i < actions.length; i++) {
+			item = new JRadioButtonMenuItem(actions[i].toSwingAction());
+			item.setSelected(i == selected);
+			style(item);
+			group.add(item);
+			menu.add(item);
+		}
 	}
 
 	/**

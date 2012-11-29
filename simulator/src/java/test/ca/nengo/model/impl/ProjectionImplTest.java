@@ -6,6 +6,7 @@ package ca.nengo.model.impl;
 import junit.framework.TestCase;
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.IdentityFunction;
+import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
@@ -268,7 +269,11 @@ public class ProjectionImplTest extends TestCase {
 		public Origin clone() throws CloneNotSupportedException {
 			return (Origin) super.clone();
 		}
-
+		
+		@Override
+		public Origin clone(Ensemble ensemble) throws CloneNotSupportedException {
+			return this.clone();
+		}
 	}
 
 	public static class MockTermination implements Termination {

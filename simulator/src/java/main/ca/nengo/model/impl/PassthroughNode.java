@@ -53,7 +53,6 @@ import ca.nengo.util.MU;
 import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
-import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * <p>A Node that passes values through unaltered.</p>
@@ -415,12 +414,10 @@ public class PassthroughNode implements Node {
 
 	}
 
-	@Override
 	public Node[] getChildren() {
 		return new Node[0];
 	}
 
-	@Override
 	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		return "";
 	}

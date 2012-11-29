@@ -12,7 +12,6 @@ import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.util.ScriptGenException;
-import ca.nengo.util.impl.ScriptGenerator;
 
 /**
  * A Cloneable Node for testing copy&paste / drag&drop.
@@ -144,12 +143,10 @@ public class MockNode implements Node, Cloneable {
 		this.myName = myName;
 	}
 
-	@Override
 	public Node[] getChildren() {
 		return new Node[0];
 	}
 
-	@Override
 	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 
 		return "";

@@ -39,7 +39,7 @@ package ca.nengo.model.neuron.impl;
 
 import java.util.Properties;
 
-import ca.nengo.math.impl.LinearCurveFitter;
+import ca.nengo.math.impl.InterpolatedFunction;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.SimulationException;
@@ -370,7 +370,7 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 		boolean spiking = false;
 		for (int i = 0; i < steps; i++) {
 			myTime[i] = time[0] + i*dt;
-			double I = LinearCurveFitter.InterpolatedFunction.interpolate(time, current, myTime[i]+dt/2f);
+			double I = InterpolatedFunction.interpolate(time, current, myTime[i]+dt/2f);
 
 			if (myVoltage >= Vth) {
 				spiking = true;

@@ -170,14 +170,14 @@ public class FunctionPanel extends PropertyInputPanel {
         if (function != null) {
 
             if (function.getDimension() != getDescriptor().getInputDimension()) {
-                setStatusMsg("input dimension must be " + getDescriptor().getInputDimension()
+                setStatusMsg("Input dimension must be " + getDescriptor().getInputDimension()
                         + ", it is currently " + function.getDimension());
                 return false;
             }
             return true;
 
         } else {
-            setStatusMsg("function parameters not set");
+            setStatusMsg("Function parameters not set");
 
             return false;
         }

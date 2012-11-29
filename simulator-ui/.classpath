@@ -5,6 +5,7 @@
 	<classpathentry kind="lib" path="../simulator/lib/jfreechart-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/macify-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/jayatana-1.2.4.jar"/>
+	<classpathentry kind="lib" path="lib/jnumeric-0.1.jar"/>
 	<classpathentry kind="src" path="src/java/main"/>
 	<classpathentry kind="src" path="src/java/test"/>
 	<classpathentry kind="lib" path="lib/analysis/checkstyle-5.1/checkstyle-all-5.1.jar"/>

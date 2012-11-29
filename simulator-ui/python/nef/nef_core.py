@@ -1,10 +1,11 @@
-from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput
+from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput, NetworkArrayImpl
 from ca.nengo.model import SimulationMode, Origin, Units, Termination, Network
 from ca.nengo.model.nef.impl import NEFEnsembleFactoryImpl
 from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model.neuron.impl import LIFNeuronFactory
 from ca.nengo.model.plasticity.impl import PESTermination, PreLearnTermination, STDPTermination, PlasticEnsembleImpl
 from ca.nengo.util import MU
+from ca.nengo.util.impl import FixedVectorGenerator
 from ca.nengo.math.impl import IndicatorPDF,ConstantFunction,PiecewiseConstantFunction,GradientDescentApproximator,FourierFunction
 from ca.nengo.math import Function,PDFTools
 from ca.nengo.model import StructuralException
@@ -12,10 +13,12 @@ from ca.nengo.io import FileManager
 import java
 import warnings
 
+from java.util import ArrayList
+from java.util import HashMap
+
 import pdfs
 import generators
 import functions
-import array
 import random
 import inspect
 import log
@@ -69,6 +72,9 @@ class Network:
         if seed is not None:
             self.random=random.Random()
             self.random.seed(seed)
+            PDFTools.setSeed(seed)    
+            random.seed(seed)
+            
         
     def make(self,name,neurons,dimensions,
                   tau_rc=0.02,tau_ref=0.002,
@@ -93,7 +99,7 @@ class Network:
                                or a list of maximum rate values to use
         :type max_rate:          tuple or list                       
         :param intercept:     normalized range for uniform selection of tuning curve x-intercept (as 2-tuple)
-                               or a list of intercept values to use                          
+                               or a list of intercept values to use  (intercepts are defined with respect to encoders, so an encoder of -1 and intercept of .3 will result in a neuron only active below -.3)                        
         :type intercept:          tuple or list                       
         :param float radius:        representational range        
         :param list encoders:      list of encoder vectors to use (if None, uniform distribution around unit sphere).
@@ -177,9 +183,12 @@ class Network:
             else:
                 it=pdfs.ListPDF(intercept)
             ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc,tauRef=tau_ref,maxRate=mr,intercept=it)
+        # Check if encoder dimensions match ensemble dimensions
         if encoders is not None:
+            if len(encoders[0]) != dimensions:
+                raise Exception('Encoder dimensions (%d) must match specified ensemble dimensions (%d)' % (len(encoders[0]), dimensions))
             try:
-                ef.encoderFactory=generators.FixedVectorGenerator(encoders)
+                ef.encoderFactory = FixedVectorGenerator(encoders)
             except:
                 raise Exception('encoders must be a matrix where each row is a non-zero preferred direction vector')
         if decoder_sign is not None:
@@ -190,6 +199,9 @@ class Network:
         else:        
             ef.approximatorFactory.noise=decoder_noise
         if eval_points is not None:
+            if len(eval_points[0]) != dimensions:
+                raise Exception('Dimensions of evaluation points (%d) must match specified ensemble dimensions (%d)' %
+                                (len(eval_points[0]), dimensions))
             ef.evalPointFactory=generators.FixedEvalPointGenerator(eval_points)
         if isinstance(radius,list):
             r=radius
@@ -257,12 +269,19 @@ class Network:
         If the *encoders* parameter is used, you can provide either the standard
         array of encoders (e.g. ``[[1],[-1]]``) or a list of sets of encoders for
         each ensemble (e.g. ``[[[1]],[[-1]]]``).
+        
+        If the *dimensions* parameter is used, each ensemble represents the specified number of 
+        dimensions (default value is 1 dimension per ensemble). For example, if length=5 and 
+        dimensions=2, then a total of 10 dimensions are represented by the network array. 
+        The index number of the first ensemble's first dimension is 0, the index of the first 
+        ensemble's second dimension is 1, the index of the second ensemble's first dimension is 
+        2, and so on.
 
         :param string name:           name of the ensemble array (must be unique)
         :param integer neurons:       number of neurons in each ensemble
         :param integer length:        number of ensembles in the array
         :param integer dimensions:    number of dimensions each ensemble represents       
-        :returns: the newly created :class:`nef.array.NetworkArray`
+        :returns: the newly created :class:`ca.nengo.model.impl.NetworkArrayImpl`
         """
         nodes=[]
         storage_code=args.get('storage_code','')
@@ -275,9 +294,52 @@ class Network:
             nodes.append(n)
 
         parent,name=self._parse_name(name)    
-        ensemble=array.NetworkArray(name,nodes)
+        ensemble=NetworkArrayImpl(name,nodes)
         parent.addNode(ensemble)
         ensemble.mode=ensemble.nodes[0].mode
+
+        #for script gen            
+        if self.network.getMetaData("NetworkArray") == None:
+            self.network.setMetaData("NetworkArray", HashMap())
+        arrays = self.network.getMetaData("NetworkArray")
+
+        radius=args.get('radius',None)
+        max_rate=args.get('max_rate',None)
+        intercept=args.get('intercept',None)
+        quick=args.get('quick',None)
+
+        narr=HashMap(10)
+        narr.put("name", name)
+        narr.put("neurons", neurons)
+        narr.put("length", length)
+        narr.put("dimensions", dimensions)
+
+        if radius:
+          narr.put("radius", radius)
+
+        if max_rate:
+          narr.put("rLow", max_rate[0])
+          narr.put("rHigh", max_rate[1])
+        
+        if intercept:
+          narr.put("iLow", intercept[0])
+          narr.put("iHigh", intercept[1])
+        
+        if quick:
+          narr.put("useQuick", quick)
+        
+        if encoders:
+          narr.put("encoders", str(encoders))
+
+        arrays.put(name, narr)
+
+        if self.network.getMetaData("templates") == None:
+            self.network.setMetaData("templates", ArrayList())
+        templates = self.network.getMetaData("templates")
+        templates.add(name)
+
+
+
         return ensemble
 
     def make_input(self,name,values,zero_after_time=None):
@@ -306,8 +368,8 @@ class Network:
         
         if isinstance(values,basestring) or (hasattr(values,'items') and callable(values.items)):
             values=functions.Interpolator(values)
-        
-        if callable(values):
+            funcs=values.create_function_list()
+        elif callable(values):
             d=values(0)
             if isinstance(d,(tuple,list)):
                 for i in range(len(d)):
@@ -393,10 +455,6 @@ class Network:
         network.name=name
         parent.addNode(network)
         return Network(network)
-                    
-            
-            
-
 
     def _parse_pre(self,pre,func,origin_name):
         if isinstance(pre,Origin):
@@ -423,8 +481,8 @@ class Network:
                     except StructuralException:
                         origin=None
                     if origin is None:
-                        if isinstance(pre,array.NetworkArray):
-                            dim=pre._nodes[0].dimension
+                        if isinstance(pre,NetworkArrayImpl):
+                            dim=pre.nodes[0].dimension
                         else:
                             dim=pre.dimension
 
@@ -653,7 +711,17 @@ class Network:
 
         # check for the special case of being given a pre-existing termination
         if isinstance(post,Termination):
-            self.network.addProjection(origin,post)
+            if transform is not None: raise Exception('transform cannot be specified when connecting to an existing termination')
+            if index_pre is not None: raise Exception('index_pre cannot be specified when connecting to an existing termination')
+            if index_post is not None: raise Exception('index_post cannot be specified when connecting to an existing termination')
+            if weight_func is not None: raise Exception('weight_func cannot be specified when connecting to an existing termination')
+            if weight!=1: raise Exception('weight cannot be specified when connecting to an existing termination')
+            if expose_weights: raise Exception('expose_weights cannot be specified when connecting to an existing termination')
+            if modulatory: raise Exception('modulatory cannot be specified when connecting to an existing termination')
+            if pstc!=0.01: raise Exception('pstc cannot be specified when connecting to an existing termination')
+            
+            if create_projection:
+                self.network.addProjection(origin,post)
             return
 
         if isinstance(post, int):
@@ -678,13 +746,18 @@ class Network:
         if plastic_array:
             suffix = ''
             attempts = 1
+            class MyWeightFunc(NetworkArrayImpl.WeightFunc):
+                def __init__(self, func):
+                    self.func = func
+                def call(self, weights):
+                    return self.func(weights)
             while attempts < 100:
                 try:
                     if hasattr(origin,'decoders'):
-                        term = post.addPlasticTermination(pre.name + suffix,transform,pstc,origin.decoders,weight_func)
+                        term = post.addPlasticTermination(pre.name + suffix,transform,pstc,origin.decoders,MyWeightFunc(weight_func))
                     else:
                         term = post.addPlasticTermination(pre.name + suffix,transform,pstc,
-                                                          [[0.0]*pre.dimension]*pre.neurons,weight_func)
+                                                          [[0.0]*pre.dimension]*pre.neurons,MyWeightFunc(weight_func))
                     break
                 except StructuralException,e:
                     exception = e
@@ -717,7 +790,7 @@ class Network:
 
             term=post.addTermination(pre.name,w,pstc,False)
             
-            if isinstance(pre,array.NetworkArray):
+            if isinstance(pre,NetworkArrayImpl):
                 try:
                    pre.getOrigin('AXON')
                 except:    
@@ -889,7 +962,7 @@ class Network:
             print 'Unknown type of learning termination:',learn_term    
 
     def learn_array(self,array,learn_term,mod_term,rate=5e-7,**kwargs):
-        """Apply a learning rule to a termination of a :class:`nef.array.NetworkArray` (an array of
+        """Apply a learning rule to a termination of a :class:`ca.nengo.model.impl.NetworkArrayImpl` (an array of
         ensembles, created using :func:`nef.Network.make_array()`).
         
         See :func:`nef.Network.learn()` for parameters.

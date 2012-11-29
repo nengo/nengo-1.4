@@ -70,9 +70,12 @@
 		<exec executable="make" dir="${src.sphinx}">
 			<arg value="latex"/>
 		</exec>
-		<exec executable="make" dir="${dest.artifacts.sphinx}/latex">
-			<arg value="LATEXOPTS='--interaction=nonstopmode'"/>
-		</exec>
+        <exec executable="make" dir="${dest.artifacts.sphinx}/latex" spawn="true">
+            <arg value="LATEXOPTS='--interaction=batchmode'"/>
+        </exec>
+        <exec executable="make" dir="${dest.artifacts.sphinx}/latex">
+            <arg value="LATEXOPTS='--interaction=nonstopmode'"/>
+        </exec>
 	</target>
 	
 	<target description="Run the FindBugs code analysis tool."

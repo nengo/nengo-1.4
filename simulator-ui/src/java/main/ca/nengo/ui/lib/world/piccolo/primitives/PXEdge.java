@@ -130,12 +130,7 @@ public class PXEdge extends PXPath implements PropertyChangeListener, Destroyabl
 		double deltaY = endPos.getY() - startPos.getY();
 
 		double distance = Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
-
-		double arcRadius = minArcRadius;
-
-		if (arcRadius < (distance / 2d)) {
-			arcRadius = (distance / 2d);
-		}
+		float arcRadius = (float) Math.max(minArcRadius, distance / 2d);
 
 		double ang1 = Math.atan2(-deltaY, deltaX);
 

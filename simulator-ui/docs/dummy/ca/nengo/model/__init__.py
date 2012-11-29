@@ -6,3 +6,4 @@ class StructuralException: pass
 class SimulationMode: pass
 class Units: pass
 class Network: pass
+class StepListener: pass

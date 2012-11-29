@@ -1,6 +1,6 @@
-title = 'General Linear System'
-label = 'Linear System'
-icon = 'linearsystem.png'
+title='General Linear System'
+label='Linear\nSystem'
+icon='linearsystem.png'
 
 from ca.nengo.ui.configurable import *
 from ca.nengo.ui.configurable.managers import ConfigManager
@@ -82,12 +82,12 @@ class PSystemMatrix(Property):
 
 description = """<html>This is a generic template for constructing a recurrent network that implements the specified dynamic linear system: dx/dt = Ax + Bu. Input Bu must be supplied after construction by adding a termination with the B matrix.</html>"""
 
-params = [
-    ('name', 'Name', str, 'Name of the new linear system'),
-    ('neurons', 'Number of Neurons', int, 'Number of neurons in the new linear system'),
-    ('tau_feedback', 'Feedback time constant [s]', float, 'Synaptic time constant for the integrative feedback, in seconds'),
-    ('A', 'System dynamics matrix', PSystemMatrix, 'The system dynamics matrix, A, of the new linear system'),
-]
+params=[
+    ('name','Name',str,'Name of the new linear system'),
+    ('neurons','Number of Neurons',int,'Number of neurons in the new linear system'),
+    ('tau_feedback','Feedback PSTC [s]',float,'Post-synaptic time constant for the integrative feedback, in seconds'),
+    ('A','System dynamics matrix',PSystemMatrix,'The system dynamics matrix, A, of the new linear system'),
+    ]
 
 
 def test_params(net, p):

@@ -55,8 +55,6 @@ import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
-import ca.nengo.util.ScriptGenException;
-import ca.nengo.util.impl.ScriptGenerator;
 import ca.nengo.util.impl.TimeSeriesImpl;
 
 /**
@@ -273,7 +271,6 @@ public class FunctionInput implements Node, Probeable {
 		myListeners.remove(listener);
 	}
 
-	@Override
 	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		StringBuilder py = new StringBuilder();
         boolean isFourier = true;
@@ -314,7 +311,7 @@ public class FunctionInput implements Node, Probeable {
             high.append("]");
             power.append("]");
 
-            py.append(String.format("%s.make_fourier_input('%s', dimensions=%d, base=%s, high=%s, power=%s\n",
+            py.append(String.format("%s.make_fourier_input('%s', dimensions=%d, base=%s, high=%s, power=%s)\n",
                         scriptData.get("netName"),
                         myName,
                         myFunctions.length,
@@ -324,24 +321,26 @@ public class FunctionInput implements Node, Probeable {
         } else {
             StringBuilder funcs = new StringBuilder("[");
             for (int i = 0; i < myFunctions.length; i++) {
+            	
+            	String functionName = String.format("Function%c%s%c%d", 
+													(Character)scriptData.get("spaceDelim"), 
+													myName.replaceAll("\\p{Blank}|\\p{Punct}", ((Character)scriptData.get("spaceDelim")).toString()),
+													(Character)scriptData.get("spaceDelim"), 
+													i);
+
                 if (myFunctions[i] instanceof ConstantFunction) {
                     ConstantFunction func = (ConstantFunction)myFunctions[i];
-
-                    py.append(String.format("Function%c%s%c%d = ConstantFunction(%d, %.3f)\n",
-                    			(Character)scriptData.get("spaceDelim"),
-                                myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()),
-                                (Character)scriptData.get("spaceDelim"),
-                                i,
-                                func.getDimension(),
-                                func.getValue()));
+                    
+                    py.append(String.format("%s = ConstantFunction(%d, %.3f)\n",
+                                			functionName,
+                                			func.getDimension(),
+                                			func.getValue()));
+                    
                 } else if (myFunctions[i] instanceof FourierFunction) {
                     FourierFunction func = (FourierFunction)myFunctions[i];
 
-                    py.append(String.format("Function%c%s%c%d = FourierFunction(%f, %f, %f, %d)\n",
-                    			(Character)scriptData.get("spaceDelim"),
-                                myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()),
-                                (Character)scriptData.get("spaceDelim"),
-                                i,
+                    py.append(String.format("%s = FourierFunction(%f, %f, %f, %d)\n",
+                    			functionName,
                                 func.getFundamental(),
                                 func.getCutoff(),
                                 func.getRms(),
@@ -349,20 +348,14 @@ public class FunctionInput implements Node, Probeable {
                 } else if (myFunctions[i] instanceof PostfixFunction) {
                     PostfixFunction func = (PostfixFunction)myFunctions[i];
 
-                    py.append(String.format("Function%c%s%c%d = PostfixFunction('%s', %d)\n",
-                    			(Character)scriptData.get("spaceDelim"),
-                                myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()),
-                                (Character)scriptData.get("spaceDelim"),
-                                i,
+                    py.append(String.format("%s = PostfixFunction('%s', %d)\n",
+                    			functionName,
                                 func.getExpression(),
                                 func.getDimension()));
                 }
 
-                funcs.append(String.format("Function%c%s%c%d",
-                			(Character)scriptData.get("spaceDelim"),
-                            myName.replace(' ', ((Character)scriptData.get("spaceDelim")).charValue()),
-                            (Character)scriptData.get("spaceDelim"),
-                            i));
+                funcs.append(functionName);
+                
                 if ((i + 1) < myFunctions.length) {
                     funcs.append(", ");
                 }
@@ -403,7 +396,6 @@ public class FunctionInput implements Node, Probeable {
 		return result;
 	}
 
-	@Override
 	public Node[] getChildren() {
 		return new Node[0];
 	}

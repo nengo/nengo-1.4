@@ -22,13 +22,11 @@ import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
-//import ca.nengo.model.neuron.Neuron;
 import ca.nengo.util.Probe;
 import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
-import ca.nengo.util.impl.ScriptGenerator;
 import junit.framework.TestCase;
 
 public class NetworkImplTest extends TestCase {
@@ -581,13 +579,11 @@ public class NetworkImplTest extends TestCase {
 			return (Node) super.clone();
 		}
 
-		@Override
 		public Node[] getChildren() {
 			
 			return null;
 		}
 
-		@Override
 		public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 			// TODO Auto-generated method stub
 			return null;

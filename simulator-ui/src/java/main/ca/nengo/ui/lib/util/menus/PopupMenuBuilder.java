@@ -3,9 +3,11 @@ package ca.nengo.ui.lib.util.menus;
 import java.awt.Component;
 import java.awt.Font;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 
 import ca.nengo.ui.lib.Style.NengoStyle;
@@ -35,33 +37,43 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 
 	@Override
 	public void addAction(StandardAction standardAction) {
-		
 		addAction(standardAction, menu.getComponentCount());
 	}
 	
-	public void addAction(StandardAction standardAction, int index)
-	{
+	public void addAction(StandardAction standardAction, int index)	{
 		JMenuItem item;
 		item = new JMenuItem(standardAction.toSwingAction());
 		style(item);
 		menu.insert(item, index);
 	}
 	
-	public void addAction(String section, StandardAction action)
-	{
+	public void addAction(String section, StandardAction action) {
 		Component[] comps = menu.getComponents(); 
 		int index = -1;
-		for(int i = 0; i < comps.length; i++)
-		{
-			if(comps[i] instanceof JLabel)
-			{
-				if(((JLabel)comps[i]).getText().equals(section))
+		for(int i = 0; i < comps.length; i++) {
+			if(comps[i] instanceof JLabel) {
+				if(((JLabel)comps[i]).getText().equals(section)) {
 					index = i+1;
+				}
 			}
 		}
-		if(index == -1)
+		if(index == -1) {
 			index = comps.length;
+		}
 		addAction(action, index);
+	}
+
+	public void addActionsRadio(StandardAction[] actions, int selected) {
+		ButtonGroup group = new ButtonGroup();
+		JRadioButtonMenuItem item;
+		
+		for (int i = 0; i < actions.length; i++) {
+			item = new JRadioButtonMenuItem(actions[i].toSwingAction());
+			item.setSelected(i == selected);
+			style(item);
+			group.add(item);
+			menu.insert(item, menu.getComponentCount());
+		}
 	}
 
 	public void addSection(String name) {
@@ -71,10 +83,8 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 	/**
 	 * Creates a new section in the Popup menu
 	 * 
-	 * @param name
-	 *            the name of the new section
-	 * @param fontStyle
-	 *            style of font for the subsection label
+	 * @param name The name of the new section
+	 * @param fontStyle Style of font for the subsection label
 	 */
 	public void addSection(String name, Font fontStyle) {
 		if (isFirstSection) {
@@ -95,7 +105,6 @@ public class PopupMenuBuilder extends AbstractMenuBuilder {
 		MenuBuilder mb = new MenuBuilder(label, isCustomStyle());
 		toJPopupMenu().add(mb.getJMenu());
 		return mb;
-
 	}
 
 	/**

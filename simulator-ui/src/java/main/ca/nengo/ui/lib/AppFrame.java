@@ -7,7 +7,6 @@ import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyEventDispatcher;
-//import java.awt.KeyEventDispatcher;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
@@ -15,14 +14,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-//import java.io.ByteArrayOutputStream;
-//import java.io.File;
-//import java.io.FileInputStream;
-//import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-//import java.io.ObjectInputStream;
-//import java.io.ObjectOutputStream;
-//import java.io.Serializable;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,14 +31,16 @@ import java.util.LinkedList;
 //import java.util.LinkedList;
 import java.util.prefs.Preferences;
 
-//import javax.swing.FocusManager;
 import javax.swing.FocusManager;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 import org.simplericity.macify.eawt.ApplicationEvent;
 import org.simplericity.macify.eawt.ApplicationListener;
@@ -48,16 +49,17 @@ import ca.nengo.plot.Plotter;
 import ca.nengo.ui.NengoConfig;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.ExitAction;
+import ca.nengo.ui.lib.actions.OpenURLAction;
 import ca.nengo.ui.lib.actions.ReversableActionManager;
 import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.actions.ZoomToFitAction;
 import ca.nengo.ui.lib.misc.ShortcutKey;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.menus.MenuBuilder;
 import ca.nengo.ui.lib.world.World;
 import ca.nengo.ui.lib.world.WorldObject;
-import ca.nengo.ui.lib.world.Search.SearchInputHandler;
 import ca.nengo.ui.lib.world.elastic.ElasticWorld;
-//import ca.nengo.ui.lib.world.piccolo.WorldImpl;
+import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.PXGrid;
 import ca.nengo.ui.lib.world.piccolo.primitives.Universe;
@@ -73,34 +75,52 @@ import edu.umd.cs.piccolo.util.PUtil;
  * @author Shu Wu
  */
 public abstract class AppFrame extends JFrame implements ApplicationListener {
-    private static final long serialVersionUID = 6L;
+    private static final long serialVersionUID = 2769082313231407201L;
 
     public static int MENU_SHORTCUT_KEY_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
     /**
      * A String which briefly describes some commands used in this application
      */
-    public static final String WORLD_TIPS = "<H3>Mouse</H3>" + "Right Click >> Object menus<BR>"
-            + "Right Click + Drag >> Zoom<BR>" + "Scroll Wheel >> Zoom" + "<H3>Keyboard</H3>"
-            + "CTRL/CMD F >> Search the current window<BR>" + "Hold SHIFT >> Marquee select<BR>"
-            + "Hold CTRL/CMD >> Hover over objects for tooltips";
+    public static final String WORLD_TIPS =
+    	"<H3>Mouse</H3>"
+    	+ "Right Click >> Context menus<BR>"
+        + "Right Click + Drag >> Zoom<BR>"
+        + "Scroll Wheel >> Zoom"
+        + "<H3>Keyboard</H3>"
+        + "CTRL/CMD F >> Search the current window<BR>"
+        + "SHIFT >> Multiple select<BR>"
+        + "SHIFT + Drag >> Marquee select<BR>"
+        + "<H3>Additional Help</H3>" 
+        + "<a href=\"http://nengo.ca/docs/html/index.html\">Full documentation</a> (http://nengo.ca/docs/html/index.html)<BR>"
+        + "<a href=\"http://nengo.ca/faq\">Frequently Asked Questions</a> (http://nengo.ca/faq)";
 
     private ReversableActionManager actionManager;
+
     private EventListener escapeFullScreenModeListener;
+
     private GraphicsDevice graphicsDevice;
+
     private boolean isFullScreenMode;
 //    private UserPreferences preferences;
     private ShortcutKey[] shortcutKeys;
+
     private Window topWindow;
+
     private Universe universe;
+
     private MenuBuilder worldMenu;
+
     protected MenuBuilder editMenu;
+
     protected MenuBuilder runMenu;
-    private SearchInputHandler searchHandler;
-    
+
+    /**
+     * TODO
+     */
     public AppFrame() {
-        super(GraphicsEnvironment.getLocalGraphicsEnvironment()
-        		.getDefaultScreenDevice().getDefaultConfiguration());
+        super(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
+                .getDefaultConfiguration());
 
         if (!SwingUtilities.isEventDispatchThread()) {
             try {
@@ -146,7 +166,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
         menuBar.add(runMenu.getJMenu());
 
-        worldMenu = new MenuBuilder("Options");
+        worldMenu = new MenuBuilder("Misc");
         worldMenu.getJMenu().setMnemonic(KeyEvent.VK_O);
         menuBar.add(worldMenu.getJMenu());
 
@@ -160,7 +180,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
         helpMenu.addAction(new OpenURLAction("Documentation (opens in browser)",
                 "http://www.nengo.ca/documentation"), KeyEvent.VK_F1);
-        helpMenu.addAction(new WelcomeAction("Tips and Commands", false), KeyEvent.VK_T);
+        helpMenu.addAction(new TipsAction("Tips and Commands", false), KeyEvent.VK_T);
         boolean isMacOS = System.getProperty("mrj.version") != null;
         if (!isMacOS) {
             helpMenu.addAction(new AboutAction("About"), KeyEvent.VK_A);
@@ -227,7 +247,9 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
      * @param menuBar
      *            is attached to the frame
      */
-    protected void initFileMenu(MenuBuilder menu) { }
+    protected void initFileMenu(MenuBuilder menu) {
+
+    }
 
     protected void initialize() {
         /*
@@ -257,7 +279,8 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
         if (prefs.getBoolean(NengoConfig.B_WELCOME, NengoConfig.B_WELCOME_DEF)) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    (new WelcomeAction("", true)).doAction();
+
+                    (new TipsAction("", true)).doAction();
                 }
             });
         }
@@ -301,38 +324,12 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
         validate();
         setFullScreenMode(false);
-    }
-
-    /**
-     * @param enabled TODO
-     */
-    public void setSearchEnabled(boolean enabled) {
-        if (searchHandler != null) {
-            searchHandler.destroy();
-        }
 
     }
 
     protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
-        shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_0, new ZoomToFitAction(
-                "Zoom to fit")));
-    }
-
-    class ZoomToFitAction extends StandardAction {
-
-        private static final long serialVersionUID = 1L;
-
-        public ZoomToFitAction(String description) {
-            super(description);
-        }
-
-        @Override
-        protected void action() throws ActionException {
-            World world = getTopWorld();
-            if (world != null) {
-                world.zoomToFit();
-            }
-        }
+        shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_0, 
+        		new ZoomToFitAction("Zoom to fit", (WorldImpl)getTopWorld())));
     }
 
     private World getTopWorld() {
@@ -376,6 +373,8 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
         editMenu.addAction(new RedoAction(), KeyEvent.VK_Y, KeyStroke.getKeyStroke(KeyEvent.VK_Y,
                 MENU_SHORTCUT_KEY_MASK));
+        
+        editMenu.getJMenu().addSeparator();
 
     }
 
@@ -394,7 +393,18 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
     protected void updateWorldMenu() {
     	Preferences prefs = NengoConfig.getPrefs();
         worldMenu.reset();
+
+        if (!universe.isSelectionMode()) {
+            worldMenu.addAction(new SwitchToSelectionMode(), KeyEvent.VK_S);
+        } else {
+            worldMenu.addAction(new SwitchToNavigationMode(), KeyEvent.VK_S);
+        }        
+        
+        worldMenu.getJMenu().addSeparator();
+        
         worldMenu.addAction(new CloseAllPlots(), KeyEvent.VK_M);
+        
+        worldMenu.getJMenu().addSeparator();
 
         if (!isFullScreenMode) {
             // worldMenu.addAction(new TurnOnFullScreen(), KeyEvent.VK_F);
@@ -627,7 +637,6 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
         new AboutAction("About").doAction();
         event.setHandled(true);
     }
-    
     public void handleOpenApplication(ApplicationEvent event) {}
 
     public void handleOpenFile(ApplicationEvent event) {}
@@ -881,54 +890,7 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
     }
 
     protected String getHelp() {
-        return WORLD_TIPS + "<BR>" + getShortcutHelp();
-    }
-    
-    static final String[] browsers = {"google-chrome", "chromium", "firefox",
-    	"opera", "konqueror"};
-
-    class OpenURLAction extends StandardAction {
-        private static final long serialVersionUID = 1L;
-        private String url;
-
-        public OpenURLAction(String helpstring, String url) {
-            super("Open URL", helpstring);
-
-            this.url = url;
-        }
-
-        @Override
-        protected void action() throws ActionException {
-            try {
-                String os = System.getProperty("os.name").toLowerCase();
-                if (os.startsWith("win")) {
-                    Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + this.url);
-                } else if (os.startsWith("mac")){ 
-                    Runtime.getRuntime().exec("open " + this.url);
-                } else {
-                	Boolean ran = false;
-                	for (String browser : browsers) {
-                		try {
-	                		if (Runtime.getRuntime().exec(new String[]
-	                				{"which", browser }).waitFor() == 0) {
-	                			Runtime.getRuntime().exec(new String[] { browser, url });
-	                			ran = true;
-	                			break;
-	                		}
-                		} catch (InterruptedException e) { }
-                    }
-                	
-                	if (!ran) {
-                		JOptionPane.showMessageDialog(UIEnvironment.getInstance(),
-                				"Could not open browser automatically. " + 
-                				"Please navigate to" + this.url,
-                				"URL can't be opened", JOptionPane.INFORMATION_MESSAGE);
-                	}
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        return WORLD_TIPS + "<BR>";
     }
 
     /**
@@ -936,60 +898,43 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
      * 
      * @author Shu Wu
      */
-    class WelcomeAction extends StandardAction {
+    class TipsAction extends StandardAction {
 
         private static final long serialVersionUID = 1L;
 
         private boolean welcome;
 
-        public WelcomeAction(String actionName, boolean isWelcomeScreen) {
-            super("Show welcome dialog", actionName);
+        public TipsAction(String actionName, boolean isWelcomeScreen) {
+            super("Show UI tips", actionName);
 
             this.welcome = isWelcomeScreen;
         }
 
         @Override
         protected void action() throws ActionException {
-            JLabel editor;
+            JEditorPane editor;
 
             if (welcome) {
                 String appendum = "To show this message again, click <b>Help -> Tips and Commands</b>";
-                editor = new JLabel("<html><H2>Welcome to " + getAppName() + "</H2>" + getHelp()
+                editor = new JEditorPane("text/html", "<html><H2>Welcome to " + getAppName() + "</H2>" + getHelp()
                         + "<BR><BR>" + appendum + "</html>");
             } else {
-                editor = new JLabel("<html>" + getHelp() + "</html>");
+                editor = new JEditorPane("text/html", "<html>" + getHelp() + "</html>");
             }
+            
+            editor.setEditable(false);
+            editor.setOpaque(false);
+            editor.addHyperlinkListener(new HyperlinkListener() {
+            	public void hyperlinkUpdate(HyperlinkEvent hle) {
+            		if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+            			new OpenURLAction(hle.getDescription(),hle.getDescription()).doAction();
+            		}            		
+            	}
+            });
 
             JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, getAppName()
                     + " Tips", JOptionPane.PLAIN_MESSAGE);
         }
-    }
-
-    private String getShortcutHelp() {
-        StringBuilder shortcutKeysString = new StringBuilder(400);
-
-        shortcutKeysString.append("<h3>Additional Shortcuts</h3>");
-        if (getShortcutKeys().length == 0) {
-            shortcutKeysString.append("No shortcuts available");
-        } else {
-            for (ShortcutKey shortcutKey : getShortcutKeys()) {
-                if ((shortcutKey.getModifiers() & MENU_SHORTCUT_KEY_MASK) != 0) {
-                    shortcutKeysString.append("CTRL/CMD ");
-                }
-                if ((shortcutKey.getModifiers() & KeyEvent.ALT_MASK) != 0) {
-                    shortcutKeysString.append("ALT ");
-                }
-                if ((shortcutKey.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
-                    shortcutKeysString.append("SHIFT ");
-                }
-
-                shortcutKeysString.append((char) shortcutKey.getKeyCode());
-                shortcutKeysString.append(" >> ");
-                shortcutKeysString.append(shortcutKey.getAction().getDescription());
-                shortcutKeysString.append("<br>");
-            }
-        }
-        return shortcutKeysString.toString();
     }
 
     /**
