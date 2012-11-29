@@ -40,20 +40,78 @@ class PTemplateSign(Property):
     def getTypeClass(self):
         return PInt
 
-description = """<html>This template enables constructing subnetworks full D (# of dimensions) independent populations of neurons.  These are faster to construct but cannot compute all the same nonlinear functions as a single large population with D dimensions.</html>"""
+description = ("<html>This template enables constructing subnetworks full D "
+               "(# of dimensions) independent populations of neurons. "
+               "These are faster to construct but cannot compute all the "
+               "same nonlinear functions as a single large population with "
+               "D dimensions.</html>")
 
-params = [
-    ('name', 'Name', str, 'Name of the Network Array'),
-    ('neurons', 'Neurons per dimension', int, 'Number of neurons in each of the ensembles'),
-    ('length', 'Number of dimensions', int, 'Number of ensembles in the array'),
-    ('radius', 'Radius', float, 'Maximum magnitude of vector that can be represented in each ensemble'),
-    ('iLow', 'Intercept (low)', float, 'Smallest value for neurons to start firing at (between -1 and 1)'),
-    ('iHigh', 'Intercept (high)', float, 'Largest value for neurons to start firing at (between -1 and 1)'),
-    ('rLow', 'Max rate (low) [Hz]', float, 'Smallest maximum firing rate for neurons in the ensemble'),
-    ('rHigh', 'Max rate (high) [Hz]', float, 'Largest maximum firing rate for neurons in the ensemble'),
-    ('encSign', 'Encoding sign', PTemplateSign, 'Limits the sign of the encoders'),
-    ('useQuick', 'Quick mode', bool, 'Uses the exact same encoders and decoders for each ensemble in the array'),
-]
+params = {
+    'name': PString(
+        'Name',
+        'Name of the Network Array',
+        'Network Array',
+    ),
+    'neurons': PInt(
+        'Neurons per dimension',
+        'Number of neurons in each of the ensembles',
+        50,
+        1,
+        sys.maxint,
+    ),
+    'length': PInt(
+        'Number of dimensions',
+        'Number of ensembles in the array',
+        10,
+        1,
+        sys.maxint,
+    ),
+    'radius': PFloat(
+        'Radius',
+        'Maximum magnitude of vector that can be represented in each ensemble',
+        1.0,
+        0,
+        float("inf"),
+    ),
+    'iLow': PFloat(
+        'Intercept (low)',
+        'Smallest value for neurons to start firing at (between -1 and 1)',
+        -1,
+        -1,
+        1,
+    ),
+    'iHigh': PFloat(
+        'Intercept (high)',
+        'Largest value for neurons to start firing at (between -1 and 1)',
+        1,
+        -1,
+        1,
+    ),
+    'rLow': PFloat(
+        'Max rate (low) [Hz]',
+        'Smallest maximum firing rate for neurons in the ensemble',
+        200,
+        0,
+        sys.maxint,
+    ),
+    'rHigh': PFloat(
+        'Max rate (high) [Hz]',
+        'Largest maximum firing rate for neurons in the ensemble',
+        400,
+        0,
+        sys.maxint,
+    ),
+    'encSign': PTemplateSign(
+        'Encoding sign',
+        'Limits the sign of the encoders',
+        0,
+    ),
+    'useQuick': PBoolean(
+        'Quick mode',
+        'Uses the exact same encoders and decoders for each ensemble in the array',
+        True,
+    ),
+}
 
 
 def test_params(net, p):

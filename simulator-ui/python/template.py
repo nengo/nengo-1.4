@@ -10,8 +10,6 @@ import ca.nengo
 import inspect
 import threading
 
-################################################################################
-
 
 class Properties:
     pmap = {}
@@ -25,11 +23,9 @@ class Properties:
         self._list = []
         self._properties = {}
         for p in params:
-            if len(p) == 3:
-                key, text, type = p
-                help = ''
-            else:
-                key, text, type, help = p
+            key, type, text, help = p[:4]
+            args = p[4:]
+
             if isinstance(type, Property):
                 p = type
             # checking isinstance(type, Property.__class__) will not find Jython children of Property
@@ -41,8 +37,6 @@ class Properties:
             p.setDescription(help)
             self._list.append(p)
             self._properties[key] = p
-
-################################################################################
 
 
 class TemplateConstructor(IConfigurable):
@@ -102,7 +96,6 @@ class TemplateConstructor(IConfigurable):
             params = params(self.network, self.node)
         self.properties = Properties(params)
 
-################################################################################
 import nef.templates
 
 
@@ -138,7 +131,7 @@ class TemplateBar(TransferHandler):
         # get NengoGraphics to add me
         self.ng.setTemplatePanel(self.panel)
         
-    def add_template(self,name,constructor,image):
+    def add_template(self, name, constructor, image):
         icon = ImageIcon(image)
         if icon.iconWidth > self.max_icon_width:
             icon = ImageIcon(icon.image.getScaledInstance(self.max_icon_width, icon.iconHeight * self.max_icon_width / icon.iconWidth, Image.SCALE_SMOOTH))

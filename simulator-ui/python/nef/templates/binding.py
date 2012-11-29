@@ -2,16 +2,43 @@ title = 'Binding'
 label = 'Binding'
 icon = 'convolution.png'
 
-description = """<html>This template inserts a subnetwork that computes the circular convolution (the SPA binding operator) of two inputs. The dimensionality of the input is determined by the dimensionality of the specified output ensemble. Inverting an input causes it to be unbound from the other input. Inputs must be specified after construction.</html>"""
+description = ("<html>This template inserts a subnetwork that computes the "
+               "circular convolution (the SPA binding operator) of two inputs."
+               " The dimensionality of the input is determined by the "
+               "dimensionality of the specified output ensemble. Inverting "
+               "an input causes it to be unbound from the other input. "
+               "Inputs must be specified after construction.</html>")
 
-params = [
-    ('name', 'Name', str, 'Name of the binding (circular convolution) population'),
-    ('outputName', 'Name of output ensemble', str, 'Name of an existing ensemble specifying the output destination for the binding ensemble'),
-    ('N_per_D', 'Number of neurons per dimension', int, 'Number of neurons per dimension of the binding population'),
-    ('invertA', 'Invert input A', bool, 'Whether to invert the first input (A)'),
-    ('invertB', 'Invert input B', bool, 'Whether to invert the second input (B)'),
-]
-
+params = {
+    'name': PString(
+        'Name',
+        'Name of the binding (circular convolution) population',
+        'Bind',
+    ),
+    'outputName': PString(
+        'Name of output ensemble',
+        ('Name of an existing ensemble specifying the output destination '
+         'for the binding ensemble'),
+        'C',
+    ),
+    'N_per_D': PInt(
+        'Number of neurons per dimension',
+        'Number of neurons per dimension of the binding population',
+        300,
+        1,
+        sys.maxint,
+    ),
+    'invertA': PBoolean(
+        'Invert input A',
+        'Whether to invert the first input (A)',
+        False,
+    ),
+    'invertB': PBoolean(
+        'Invert input B',
+        'Whether to invert the second input (B)',
+        False,
+    ),
+}
 
 def test_params(net, p):
     outputIsSet = False

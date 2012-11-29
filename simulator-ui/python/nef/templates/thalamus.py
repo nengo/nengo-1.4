@@ -4,15 +4,37 @@ title = 'Thalamus'
 label = 'Thalamus'
 icon = 'thalamus.png'
 
-description = """<html>This template is designed to take output from a Basal Ganglia template model and send it to cortex for control of information flow or update of cortical states in SPA models.</html>"""
+description = ("<html>This template is designed to take output from a "
+               "Basal Ganglia template model and send it to cortex for "
+               "control of information flow or update of cortical states "
+               "in SPA models.</html>")
 
-params = [
-    ('name', 'Name', str, 'Name of the new thalamus sub-network'),
-    ('neurons', 'Neurons per dimension', int, 'Number of neurons for each dimension of the thalamus'),
-    ('dimensions', 'Dimensions', int, 'Number of dimensions for the thalamus'),
-    ('useQuick', 'Quick mode', bool, 'Whether to use quick mode'),
-]
-
+params = {
+    'name': PString(
+        'Name',
+        'Name of the new thalamus sub-network',
+        'Network Array',
+    ),
+    'neurons': PInt(
+        'Neurons per dimension',
+        'Number of neurons for each dimension of the thalamus',
+        50,
+        1,
+        sys.maxint,
+    ),
+    'dimensions': PInt(
+        'Dimensions',
+        'Number of dimensions for the thalamus',
+        2,
+        1,
+        sys.maxint,
+    ),
+    'useQuick': PBoolean(
+        'Quick mode',
+        'Whether to use quick mode',
+        True,
+    ),
+}
 
 def test_params(net, p):
     try:

@@ -2,15 +2,35 @@ title = 'Gate'
 label = 'Gate'
 icon = 'gate.png'
 
-description = """<html>This template creates an ensemble that drives an inhibitory gate on an existing specified ensemble. </html>"""
+description = ("<html>This template creates an ensemble that drives an "
+               "inhibitory gate on an existing specified ensemble. </html>")
 
-
-params=[
-    ('name','Name',str,'Name of the new gating ensemble'),
-    ('gated','Name of gated ensemble',str,'Name of the existing ensemble to gate'),
-    ('neurons','Number of neurons',int,'Number of neurons in the new gating ensemble'),
-    ('pstc','Gating PSTC [s]', float, 'Post-synaptic time constant of the gating ensemble'),
-    ]
+params = {
+    'name': PString(
+        'Name',
+        'Name of the new gating ensemble',
+        'Gate',
+    ),
+    'gated': PString(
+        'Name of gated ensemble',
+        'Name of the existing ensemble to gate',
+        'visual',
+    ),
+    'neurons': Pint(
+        'Number of neurons',
+        'Number of neurons in the new gating ensemble',
+        40,
+        1,
+        sys.maxint,
+    ),
+    'pstc': PFloat(
+        'Gating PSTC [s]',
+        'Post-synaptic time constant of the gating ensemble',
+        0.01,
+        1e-40,
+        float("inf"),
+    ),
+}
 
 import nef
 import nef.array
@@ -37,7 +57,7 @@ from java.util import ArrayList
 from java.util import HashMap
 
 from ca.nengo.model.impl import NetworkArrayImpl
-def make(net,name='Gate', gated='visual', neurons=40 ,pstc=0.01):
+def make(net, name='Gate', gated='visual', neurons=40 ,pstc=0.01):
     gate=net.make(name, neurons, 1, intercept=(-0.7, 0), encoders=[[-1]])
     def addOne(x):
         return [x[0] + 1]

@@ -4,15 +4,31 @@ icon = 'termination.png'
 
 from ca.nengo.ui.configurable.properties import PTerminationWeights
 
-
-def params(net, node):
-    return [
-    ('name','Name',str,'Name of termination'),
-    ('weights','Weights',PTerminationWeights('Weights',node.dimension),'Linear transformation matrix to apply'),
-    ('pstc','PSTC [s]',float,'Post-synaptic time constant, in seconds'),
-    ('modulatory','Is Modulatory',bool,'Only Enable this setting if this termination merely adjusts neuron properties (rather than adding input current)'),
-    ]
-
+params = {
+    'name': PString(
+        'Name',
+        'Name of termination',
+        'termination',
+    ),
+    'weights': PTerminationWeights(
+        'Weights',
+        'Linear transformation matrix to apply',
+        1,
+    ),
+    'pstc': PFloat(
+        'PSTC [s]',
+        'Post-synaptic time constant, in seconds',
+        0.01,
+        1e-40,
+        float("inf"),
+    ),
+    'modulatory': PBoolean(
+        'Is Modulatory',
+        ('Only enable this setting if this termination merely adjusts '
+         'neuron properties (rather than adding input current)'),
+        False,
+    ),
+}
 
 def test_params(net, node, p):
     try:

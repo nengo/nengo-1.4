@@ -2,17 +2,52 @@ title = 'Integrator'
 label = 'Integrator'
 icon = 'integrator.png'
 
-description = """<html>This constructs an integrator of the specified number of dimensions. It requires an input of that number of dimensions after construction.</html>"""
+description = ("<html>This constructs an integrator of the specified number "
+               "of dimensions. It requires an input of that number of "
+               "dimensions after construction.</html>")
 
-params=[
-    ('name','Name',str,'Name of the integrator'),
-    ('neurons','Number of neurons',int,'Number of neurons in the integrator'),
-    ('dimensions','Number of dimensions',int,'Number of dimensions for the integrator'),
-    ('tau_feedback','Feedback PSTC [s]',float,'Post-synaptic time constant of the integrative feedback, in seconds (longer -> slower change but better value retention)'),
-    ('tau_input','Input PSTC [s]',float,'Post-synaptic time constant of the integrator input, in seconds (longer -> more input filtering)'),
-    ('scale','Scaling factor',float,'A scaling value for the input (controls the rate of integration)'),
-    ]
-
+params = {
+    'name': PString(
+        'Name',
+        'Name of the integrator',
+        'My Integrator',
+    ),
+    'neurons': PInt(
+        'Number of neurons',
+        'Number of neurons in the integrator',
+        100,
+        1,
+        sys.maxint,
+    ),
+    'dimensions': PInt(
+        'Number of dimensions',
+        'Number of dimensions for the integrator',
+        1,
+        1,
+        sys.maxint,
+    ),
+    'tau_feedback': PFloat(
+        'Feedback PSTC [s]',
+        ('Post-synaptic time constant of the integrative feedback, in seconds '
+         '(longer -> slower change but better value retention)'),
+        0.1,
+        1e-40,
+        float("inf"),
+    ),
+    'tau_input': PFloat(
+        'Input PSTC [s]',
+        ('Post-synaptic time constant of the integrator input, in seconds '
+         '(longer -> more input filtering)'),
+        0.01,
+        1e-40,
+        float("inf"),
+    ),
+    'scale': PFloat(
+        'Scaling factor',
+        'A scaling value for the input (controls the rate of integration)',
+        1,
+    ),
+}
 
 def test_params(net, p):
     try:
@@ -20,10 +55,6 @@ def test_params(net, p):
         return 'That name is already taken'
     except:
         pass
-    if p['neurons'] < 1:
-        return 'Must have a positive number of neurons'
-    if p['dimensions'] < 1:
-        return 'Must have at least one dimension'
 
 import numeric
 from java.util import ArrayList

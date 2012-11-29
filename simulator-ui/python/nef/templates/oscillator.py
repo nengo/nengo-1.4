@@ -2,18 +2,59 @@ title = 'Oscillator'
 label = 'Oscillator'
 icon = 'oscillator.png'
 
-description = """<html>The oscillator needs an input (2D), which can be used to start it off from rest.  Once it has started, the input can be set to zero. The controlled oscillator also needs a 1D control input that changes the frequency (and direction) of the oscillation. <a href="http://nengo.ca/docs/html/demos/oscillator.html">Tips & tricks.</a></html>"""
+description = ("<html>The oscillator needs an input (2D), which can be used "
+               "to start it off from rest.  Once it has started, the input "
+               "can be set to zero. The controlled oscillator also needs a "
+               "1D control input that changes the frequency (and direction) "
+               "of the oscillation. <a href=\"http://nengo.ca/docs/html/demos"
+               "/oscillator.html\">Tips & tricks.</a></html>")
 
-params=[
-    ('name','Name',str,'Name of the oscillator'),
-    ('neurons','Number of neurons',int,'Number of neurons in the oscillator'),
-    ('frequency','Oscillator frequency (Hz)',float,'The speed at which the osillator oscillates'),
-    ('tau_feedback','Feedback time constant [s]',float,'Synaptic time constant of the oscillator feedback, in seconds (longer -> slower change but better value retention)'),
-    ('tau_input','Input PSTC [s]',float,'Post-synaptic time constant of the oscillator input, in seconds (longer -> more input filtering)'),
-    ('scale','Scaling factor',float,'A scaling value for the input'),
-    ('controlled', 'Frequency control', bool,'If checked will build a frequency controlled oscillator (a nonlinear system)'),
-    ]
-
+params = {
+    'name': PString(
+        'Name',
+        'Name of the oscillator',
+        'Oscillator',
+    ),
+    'neurons': PInt(
+        'Number of neurons',
+        'Number of neurons in the oscillator',
+        100,
+        1,
+        sys.maxint,
+    ),
+    'frequency': PFloat(
+        'Oscillator frequency (Hz)',
+        'The speed at which the osillator oscillates',
+        5,
+    ),
+    'tau_feedback': PFloat(
+        'Feedback time constant [s]',
+        ('Synaptic time constant of the oscillator feedback, in seconds '
+         '(longer -> slower change but better value retention)'),
+        0.1,
+        1e-40,
+        float("inf"),
+    ),
+    'tau_input': PFloat(
+        'Input PSTC [s]',
+        ('Post-synaptic time constant of the oscillator input, '
+         'in seconds (longer -> more input filtering)'),
+        0.01,
+        1e-40,
+        float("inf"),
+    ),
+    'scale': PFloat(
+        'Scaling factor',
+        'A scaling value for the input',
+        1
+    ),
+    'controlled': PBoolean(
+        'Frequency control',
+        ('If checked will build a frequency controlled oscillator'
+         '(a nonlinear system)'),
+        False,
+    ),
+}
 
 def test_params(net, p):
     try:

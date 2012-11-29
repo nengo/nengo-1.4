@@ -2,6 +2,7 @@ title='General Linear System'
 label='Linear\nSystem'
 icon='linearsystem.png'
 
+import sys
 from ca.nengo.ui.configurable import *
 from ca.nengo.ui.configurable.managers import ConfigManager
 from ca.nengo.ui.configurable.properties import PCouplingMatrix
@@ -80,15 +81,37 @@ class PSystemMatrix(Property):
     def getTypeClass(self):
         return PCouplingMatrix(1, 1).getTypeClass()
 
-description = """<html>This is a generic template for constructing a recurrent network that implements the specified dynamic linear system: dx/dt = Ax + Bu. Input Bu must be supplied after construction by adding a termination with the B matrix.</html>"""
+description = ("<html>This is a generic template for constructing a recurrent "
+               "network that implements the specified dynamic linear system: "
+               "dx/dt = Ax + Bu. Input Bu must be supplied after construction "
+               "by adding a termination with the B matrix.</html>")
 
-params=[
-    ('name','Name',str,'Name of the new linear system'),
-    ('neurons','Number of Neurons',int,'Number of neurons in the new linear system'),
-    ('tau_feedback','Feedback PSTC [s]',float,'Post-synaptic time constant for the integrative feedback, in seconds'),
-    ('A','System dynamics matrix',PSystemMatrix,'The system dynamics matrix, A, of the new linear system'),
-    ]
-
+params = {
+    'name': PString(
+        "Name",
+        "Name of the new linear system",
+        "My linear system",
+    ),
+    'neurons': PInt(
+        "Number of neurons",
+        'Number of neurons in the new linear system',
+        100,
+        1,
+        sys.maxint,
+    ),
+    'tau_feedback': PFloat(
+        'Feedback PSTC [s]',
+        'Post-synaptic time constant for the integrative feedback, in seconds',
+        0.1,
+        1e-40,
+        float('inf'),
+    ),
+    'A': PSystemMatrix(
+        'System dynamics matrix',
+        'The system dynamics matrix, A, of the new linear system',
+        [[0]],
+    ),
+}
 
 def test_params(net, p):
     try:
@@ -96,8 +119,6 @@ def test_params(net, p):
         return 'That name is already taken'
     except:
         pass
-    if p['neurons'] < 1:
-        return 'Must have a positive number of neurons'
 
 
 import numeric
