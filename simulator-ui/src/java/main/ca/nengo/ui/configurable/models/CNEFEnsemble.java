@@ -75,6 +75,7 @@ public class CNEFEnsemble extends CNode {
 
     public CNEFEnsemble() {
         pName.setDescription("Name of the ensemble");
+        pName.setDefaultValue("My Ensemble");
         pApproximator.setAdvanced(true);
         pEncodingDistribution.setAdvanced(true);
         pEncodingSign.setAdvanced(true);

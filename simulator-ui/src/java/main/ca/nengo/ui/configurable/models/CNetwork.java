@@ -35,6 +35,7 @@ import ca.nengo.ui.models.nodes.UINetwork;
 public class CNetwork extends CNode {
 	public CNetwork() {
 		pName.setDescription("Name of the network");
+		pName.setDefaultValue("My Network");
 	}
 
 	@Override
