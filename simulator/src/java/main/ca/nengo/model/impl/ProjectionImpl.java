@@ -46,6 +46,7 @@ import ca.nengo.model.Origin;
 import ca.nengo.model.Projection;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
+import ca.nengo.model.impl.NetworkArrayImpl;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.impl.BiasOrigin;
 import ca.nengo.model.nef.impl.BiasTermination;
@@ -280,7 +281,7 @@ public class ProjectionImpl implements Projection {
 	    	terminationNodeFullName.append(tempTermination.getNode().getName());
 	    }
 	    else if(tempTermination instanceof EnsembleTermination && 
-	    		tempTermination.getNode().getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$5")
+	    		tempTermination.getNode() instanceof NetworkArrayImpl)
 	    {
 	    	terminationNodeFullName.deleteCharAt(terminationNodeFullName.length()-1);
 	    	
@@ -327,8 +328,8 @@ public class ProjectionImpl implements Projection {
 		    	dOrigin = (DecodedOrigin) tempOrigin;
 		    	originNodeFullName.append(tempOrigin.getNode().getName());
 		    }
-		    else if(tempOrigin.getClass().getCanonicalName() == "org.python.proxies.nef.array$ArrayOrigin$4" && 
-		    		tempOrigin.getNode().getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$5")
+		    else if(tempOrigin instanceof NetworkArrayImpl.ArrayOrigin && 
+		    		tempOrigin.getNode() instanceof NetworkArrayImpl)
 		    {
 		    	originNodeFullName.deleteCharAt(originNodeFullName.length()-1);
 		    	Node node = tempOrigin.getNode().getChildren()[0];
