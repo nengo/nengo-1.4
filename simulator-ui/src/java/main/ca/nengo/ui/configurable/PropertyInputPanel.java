@@ -35,10 +35,14 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
+import ca.nengo.ui.lib.actions.OpenURLAction;
 import ca.nengo.ui.lib.Style.NengoStyle;
 
 /**
@@ -87,7 +91,18 @@ public abstract class PropertyInputPanel {
         help.setFocusPainted(false);
         help.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(help,propDescriptor.getTooltip(),propDescriptor.getName(),JOptionPane.INFORMATION_MESSAGE,null);
+            	JEditorPane editor = new JEditorPane("text/html", propDescriptor.getTooltip());
+                editor.setEditable(false);
+                editor.setOpaque(false);
+                editor.addHyperlinkListener(new HyperlinkListener() {
+                	public void hyperlinkUpdate(HyperlinkEvent hle) {
+                		if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+                			OpenURLAction a = new OpenURLAction(hle.getDescription(),hle.getDescription());
+                			a.doAction();
+                		}            		
+                	}
+                });
+                JOptionPane.showMessageDialog(help, editor, propDescriptor.getName(), JOptionPane.INFORMATION_MESSAGE, null);
             }
         });
         labelPanel.add(help);

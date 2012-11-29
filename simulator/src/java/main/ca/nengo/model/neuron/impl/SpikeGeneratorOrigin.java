@@ -150,7 +150,6 @@ public class SpikeGeneratorOrigin implements Origin {
         return result;
     }
     
-	@Override
 	public SpikeGeneratorOrigin clone(Ensemble e) throws CloneNotSupportedException {
 		return this.clone();
 	}	

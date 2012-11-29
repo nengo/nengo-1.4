@@ -1,7 +1,6 @@
 import generators
 import pdfs
 import functions
-import array
 import convolution
 import log
 from nef_core import Network

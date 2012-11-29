@@ -585,7 +585,6 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		}
 	}
 	
-	@Override
 	public DecodedOrigin clone(Ensemble e) throws CloneNotSupportedException {
 		return this.clone();
 	}

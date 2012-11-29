@@ -69,13 +69,19 @@ import ca.nengo.ui.lib.util.UserMessages;
  */
 public class FnCustom extends AbstractFn {
 
-    private static final String DIMENSION_STR = "Input Dimensions";
+	private static final String DIMENSION_STR = "Input Dimensions";
+	private static final String DIMENSION_DESC = "The number of input dimensions to the function";
 
     private static final String EXPRESSION_STR = "Expression";
+    private static final String EXPRESSION_DESC = "Expression to evaluate. " + 
+    	"Refer to ensemble values as \"x#\", where # is the dimension index " + 
+    	"(e.g., x0*x0 returns the square of the first dimension).<br>" +
+    	"(Full documentation: <a href=\"http://nengo.ca/docs/html/tutorial3.html\">http://nengo.ca/docs/html/tutorial3.html</a>)";
     private static DefaultFunctionInterpreter interpreter = new DefaultFunctionInterpreter();
 
     private int myInputDimensions;
     private Property pExpression;
+    private Property pDimensions;
     InterpreterFunctionConfigurer configurer;
     boolean isInputDimEditable;
 
@@ -91,7 +97,8 @@ public class FnCustom extends AbstractFn {
 
     private Function parseFunction(ConfigResult props) throws ConfigException {
         String expression = (String) props.getValue(pExpression);
-        int dimensions = (Integer) props.getValue(DIMENSION_STR);
+//        int dimensions = (Integer) props.getValue(DIMENSION_STR);
+        int dimensions = (Integer) props.getValue(pDimensions);
 
         Function function;
         try {
@@ -136,9 +143,8 @@ public class FnCustom extends AbstractFn {
             }
         }
 
-        pExpression = new PString(EXPRESSION_STR, null, expression);
-        Property pDimensions = new PInt(DIMENSION_STR, dim);
-
+        pExpression = new PString(EXPRESSION_STR, EXPRESSION_DESC, expression);
+        pDimensions = new PInt(DIMENSION_STR, DIMENSION_DESC, dim);
         pDimensions.setEditable(isInputDimEditable);
 
         Property[] props = new Property[] { pExpression, pDimensions };

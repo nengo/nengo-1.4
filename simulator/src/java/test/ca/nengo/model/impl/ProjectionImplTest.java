@@ -270,7 +270,6 @@ public class ProjectionImplTest extends TestCase {
 			return (Origin) super.clone();
 		}
 		
-		@Override
 		public Origin clone(Ensemble ensemble) throws CloneNotSupportedException {
 			return this.clone();
 		}

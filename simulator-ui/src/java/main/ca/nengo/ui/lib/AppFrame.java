@@ -46,6 +46,7 @@ import org.simplericity.macify.eawt.ApplicationListener;
 import ca.nengo.plot.Plotter;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.ExitAction;
+import ca.nengo.ui.lib.actions.OpenURLAction;
 import ca.nengo.ui.lib.actions.ReversableActionManager;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.actions.ZoomToFitAction;
@@ -86,12 +87,18 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
     /**
      * A String which briefly describes some commands used in this application
      */
-    public static final String WORLD_TIPS = "<H3>Mouse</H3>" + "Right Click >> Context menus<BR>"
-            + "Right Click + Drag >> Zoom<BR>" + "Scroll Wheel >> Zoom" + "<H3>Keyboard</H3>"
-            + "CTRL/CMD F >> Search the current window<BR>" + "SHIFT >> Multiple select<BR>"
-            + "SHIFT + Drag >> Marquee select<BR>" + "<H3>Additional Help</H3>" 
-            + "<a href=\"http://nengo.ca/docs/html/index.html\">Full documentation</a> (http://nengo.ca/docs/html/index.html)<BR>"
-            + "<a href=\"http://nengo.ca/faq\">Frequently Asked Questions</a> (http://nengo.ca/faq)";
+    public static final String WORLD_TIPS =
+    	"<H3>Mouse</H3>"
+    	+ "Right Click >> Context menus<BR>"
+        + "Right Click + Drag >> Zoom<BR>"
+        + "Scroll Wheel >> Zoom"
+        + "<H3>Keyboard</H3>"
+        + "CTRL/CMD F >> Search the current window<BR>"
+        + "SHIFT >> Multiple select<BR>"
+        + "SHIFT + Drag >> Marquee select<BR>"
+        + "<H3>Additional Help</H3>" 
+        + "<a href=\"http://nengo.ca/docs/html/index.html\">Full documentation</a> (http://nengo.ca/docs/html/index.html)<BR>"
+        + "<a href=\"http://nengo.ca/faq\">Frequently Asked Questions</a> (http://nengo.ca/faq)";
 
     private ReversableActionManager actionManager;
 
@@ -948,54 +955,6 @@ public abstract class AppFrame extends JFrame implements ApplicationListener {
 
     protected String getHelp() {
         return WORLD_TIPS + "<BR>";
-    }
-    
-    static final String[] browsers = {"google-chrome", "chromium", "firefox",
-    	"opera", "konqueror"};
-
-    class OpenURLAction extends StandardAction {
-        private static final long serialVersionUID = 1L;
-        private String url;
-
-        public OpenURLAction(String helpstring, String url) {
-            super("Open URL", helpstring);
-
-            this.url = url;
-        }
-
-        @Override
-        protected void action() throws ActionException {
-            try {
-                String os = System.getProperty("os.name").toLowerCase();
-                if (os.startsWith("win")) {
-                    Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + this.url);
-                } else if (os.startsWith("mac")){ 
-                    Runtime.getRuntime().exec("open " + this.url);
-                } else {
-                	Boolean ran = false;
-                	for (String browser : browsers) {
-                		try {
-	                		if (Runtime.getRuntime().exec(new String[]
-	                				{"which", browser }).waitFor() == 0) {
-	                			Runtime.getRuntime().exec(new String[] { browser, url });
-	                			ran = true;
-	                			break;
-	                		}
-                		} catch (InterruptedException e) {
-                			ran = false;
-                		}
-                	}
-                	if (!ran) {
-                		JOptionPane.showMessageDialog(UIEnvironment.getInstance(),
-                				"Could not open browser automatically. " + 
-                				"Please navigate to" + this.url,
-                				"URL can't be opened", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**

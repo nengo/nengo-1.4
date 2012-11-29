@@ -5,7 +5,6 @@ import data
 import simulator
 import hrr
 from timeview.components import hrrgraph, neuronmap
-from nef.array import NetworkArray
 import nef
 
 import java
@@ -234,7 +233,7 @@ class FunctionWatch:
 
 class HRRWatch:
     def check(self, obj):
-        if(isinstance(obj, NEFEnsemble) or isinstance(obj, NetworkArray)):
+        if(isinstance(obj, NEFEnsemble) or isinstance(obj, NetworkArrayImpl)):
             return (obj.dimension >= 8)
         elif(isinstance(obj, nef.SimpleNode) or isinstance(obj, NetworkImpl)):
             try:
@@ -250,11 +249,11 @@ class HRRWatch:
 
 class ArrayWatch:
     def check(self, obj):
-        return isinstance(obj, NetworkArray)
+        return isinstance(obj, NetworkArrayImpl)
 
     def spike_array(self, obj):
         r = []
-        for n in obj._nodes:
+        for n in obj.nodes:
             r.extend(n.getOrigin('AXON').getValues().values)
         return r
 

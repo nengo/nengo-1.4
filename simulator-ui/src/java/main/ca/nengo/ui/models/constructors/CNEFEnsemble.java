@@ -60,6 +60,7 @@ import ca.nengo.ui.configurable.descriptors.PInt;
 import ca.nengo.ui.configurable.descriptors.PNodeFactory;
 import ca.nengo.ui.configurable.managers.ConfigManager.ConfigMode;
 import ca.nengo.ui.configurable.managers.UserConfigurer;
+import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.models.nodes.UINEFEnsemble;
 import ca.nengo.util.VectorGenerator;
@@ -155,6 +156,13 @@ public class CNEFEnsemble extends ConstructableNode {
                 return ensemble;
             }
         } catch (StructuralException e) {
+        	Util.debugMsg("StructuralException: " + e.toString());
+
+			if (e.getMessage() != null) {
+				UserMessages.showWarning(e.getMessage());
+			} else {
+				Util.showException(e);
+			}
             e.printStackTrace();
         }
         return null;
