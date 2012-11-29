@@ -9,7 +9,7 @@ import gate
 import learned_termination
 import thalamus
 
-templates=[
+templates = [
     networkarray,
     integrator,
     oscillator,
@@ -20,4 +20,4 @@ templates=[
     thalamus,
     gate,
     learned_termination,
-    ]
+]
