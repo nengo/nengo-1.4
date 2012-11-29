@@ -35,7 +35,8 @@ public class GeneratePDFAction extends StandardAction {
         super(description);
     }
 
-    protected void action() {
+    @SuppressWarnings("deprecation")
+	protected void action() {
     	String name = new String("Nengo");
         
         JFileChooser fileChooser = new JFileChooser();

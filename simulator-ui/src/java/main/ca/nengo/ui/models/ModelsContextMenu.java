@@ -98,6 +98,7 @@ public class ModelsContextMenu {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void constructMenu() {
 		for (Class<? extends ModelObject> type : selectionMap.keySet().toArray(new Class[0])) {
 

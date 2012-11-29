@@ -80,7 +80,7 @@ public class PFunction extends Property {
 				 				"Root-mean-square amplitude of the signal", 0.5f), 
 				 		new PLong("Seed",
 				 				"Seed for the random number generator", 0)
-            		}));
+            		}, new String[] {"getFundamental", "getCutoff", "getRms", "getSeed"}));
             functions.add(new FnReflective(GaussianPDF.class,
                     new Property[] {
             			new PFloat("Mean",
@@ -89,7 +89,7 @@ public class PFunction extends Property {
             					"Variance of the Gaussian disribution", 0.1f),
             			new PFloat("Peak",
             					"Maximum value of the Gaussian distribution (at the mode)", 1)
-            		}));
+            		}, new String[] {"getMean", "getVariance", "getPeak"}));
         }
 
         for (Class<?> type : ClassRegistry.getInstance().getImplementations(Function.class)) {

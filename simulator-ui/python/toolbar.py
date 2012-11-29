@@ -41,7 +41,7 @@ class LayoutComboBox(JComboBox):
 from ca.nengo.math.impl import WeightedCostApproximator
 from ca.nengo.util.impl import NEFGPUInterface, NodeThreadPool
 from ca.nengo.ui.configurable.panels import BooleanPanel, IntegerPanel
-from ca.nengo.ui.configurable.descriptors import *
+from ca.nengo.ui.configurable.properties import *
 from ca.nengo.ui.configurable import *
 
 
@@ -85,7 +85,7 @@ class PGpuCount(PInt):
         default = NEFGPUInterface.getRequestedNumDevices()
         maximum = NEFGPUInterface.getNumAvailableDevices()
 
-        PInt.__init__(self, name, default, 0, maximum)
+        PInt.__init__(self, name, "", default, 0, maximum)
 
     def createInputPanel(self):
         return GpuCountPanel(self)
@@ -93,7 +93,7 @@ class PGpuCount(PInt):
 
 class PGpuUse(PBoolean):
     def __init__(self, name):
-        PBoolean.__init__(self, name, WeightedCostApproximator.getUseGPU())
+        PBoolean.__init__(self, name, "", WeightedCostApproximator.getUseGPU())
 
     def createInputPanel(self):
         return GpuUsePanel(self)
@@ -107,7 +107,7 @@ class ParallelizationConfiguration(IConfigurable):
     num_sim_GPU = NEFGPUInterface.getRequestedNumDevices()
     use_GPU_for_creation = WeightedCostApproximator.getUseGPU()
 
-    p_num_java_threads = PInt('Number of Java Threads', num_java_threads,
+    p_num_java_threads = PInt('Number of Java Threads', '', num_java_threads,
                               1, NodeThreadPool.getMaxNumJavaThreads())
     p_num_sim_GPU = PGpuCount('Number of GPU\'s for Simulation')
     p_use_GPU_for_creation = PGpuUse('Use GPU for Ensemble Creation')

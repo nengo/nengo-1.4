@@ -175,8 +175,4 @@ public abstract class Property implements Serializable {
      */
     protected abstract PropertyInputPanel createInputPanel();
 
-    /**
-     * @return Class type that this parameter's value must be
-     */
-    public abstract Class<?> getTypeClass();
 }

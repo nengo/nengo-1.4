@@ -36,13 +36,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-//import java.util.LinkedList;
+import java.util.LinkedList;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
-//import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -413,7 +411,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             public void childAdded(WorldObject wo) {
                 if (wo instanceof ModelObject) {
                     final ModelObject modelObject = ((ModelObject) wo);
-                    final Object model = modelObject.getModel();
                     final String modelName = modelObject.getName();
 
                     try {

@@ -51,10 +51,9 @@ public class FnReflective extends AbstractFn {
      */
     public FnReflective(
             Class<? extends Function> functionClass,
-            String typeName,
             Property[] properties,
             String[] getterNames) {
-        super(typeName, functionClass);
+        super(functionClass);
         if (properties.length != getterNames.length) {
             throw new IllegalArgumentException("properties and getterNames must be the same length");
         }
@@ -102,7 +101,7 @@ public class FnReflective extends AbstractFn {
         }
     }
 
-    public ConfigSchema getSchema() {
+    public Property[] getSchema() {
         if (getFunction() != null) {
             Function func = getFunction();
             for (int i = 0; i < myProperties.length; i++) {
@@ -124,7 +123,7 @@ public class FnReflective extends AbstractFn {
                 }
             }
         }
-        return new ConfigSchemaImpl(myProperties);
+        return myProperties;
     }
 
 }
