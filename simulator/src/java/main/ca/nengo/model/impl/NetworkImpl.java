@@ -1322,13 +1322,13 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                             (Integer)array.get("dimensions")
                             ));
             	 
-            	 if(array.containsKey("radius")){ py.append(", radius=" + Integer.toString((Integer)array.get("radius"))); }
+            	 if(array.containsKey("radius")){ py.append(", radius=" + Double.toString((Double)array.get("radius"))); }
             	 
             	 if(array.containsKey("rLow") && array.containsKey("rHigh"))
-            	 { py.append(", max_rate=(" + Integer.toString((Integer)array.get("rLow")) + ", " + Integer.toString((Integer)array.get("rHigh")) + ")"); }
+            	 { py.append(", max_rate=(" + Double.toString((Double)array.get("rLow")) + ", " + Double.toString((Double)array.get("rHigh")) + ")"); }
             	 
             	 if(array.containsKey("iLow") && array.containsKey("iHigh"))
-            	 { py.append(", intercept=(" + Integer.toString((Integer)array.get("iLow")) + ", " + Integer.toString((Integer)array.get("iHigh")) + ")"); }
+            	 { py.append(", intercept=(" + Double.toString((Double)array.get("iLow")) + ", " + Double.toString((Double)array.get("iHigh")) + ")"); }
             	 
             	 if(array.containsKey("useQuick"))
             	 {  
