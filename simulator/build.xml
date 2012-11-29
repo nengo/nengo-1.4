@@ -11,22 +11,8 @@
 	<path id="classpath.test">
 		<path refid="classpath.simulator"/>
 		<pathelement location="${dest.test}"/>
-		<fileset dir="${src.lib.analysis}">
-			<include name="*.jar"/>
-		</fileset>
 	</path>
-	<path id="classpath.cobertura">
-		<fileset dir="${analysis.cobertura}">
-			<include name="cobertura.jar"/>
-			<include name="lib/**/*.jar"/>
-		</fileset>
-	</path>
-	<path id="classpath.coveragetest">
-		<pathelement location="${dest.instrumented}"/>
-		<path refid="classpath.cobertura"/>
-		<path refid="classpath.test"/>
-	</path>
-	
+
     <target name="init">
     	<mkdir dir="${dest.artifacts}"/>
     	<mkdir dir="${dest.build}"/>
@@ -54,7 +40,6 @@
     <target name="clean">
     	<delete dir="${dest.artifacts}"/>
         <delete dir="${dest.build}"/>
-    	<delete dir="${dest.instrumented}"/>
     	<delete dir="${dest.test}"/>
     </target>
 	
@@ -110,119 +95,7 @@
 		</junitreport>
 	</target>
 	
-	<target description="Run the FindBugs code analysis tool."
-		depends="init,build" name="findbugs">
-		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
-			classpath="${analysis.findbugs}/lib/findbugs-ant.jar"/>
-		<mkdir dir="${dest.artifacts.analysis}"/>
-		<findbugs home="${analysis.findbugs}" output="xml:withMessages"
-				reportLevel="low" effort="max" jvmargs="-Xms100m -Xmx800m"
-				outputFile="${dest.artifacts.analysis}/findbugs.xml">
-	    	<sourcePath path="${src.main}"/>
-	    	<class location="${dest.build}"/>
-			<auxClasspath refid="classpath.simulator"/>
-	    </findbugs>
-		<findbugs home="${analysis.findbugs}" output="xml:withMessages"
-				reportLevel="low" effort="max" jvmargs="-Xms100m -Xmx800m"
-				outputFile="${dest.artifacts.analysis}/findbugs-test.xml">
-	    	<sourcePath path="${src.test}"/>
-	    	<class location="${dest.test}"/>
-			<auxClasspath refid="classpath.test"/>
-	    </findbugs>
-	</target>
-	
-	<target description="Run the Copy-Paste Detector code analysis tool." name="cpd">
-		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask"
-			classpath="${analysis.pmd}/lib/pmd-4.2.5.jar"/>
-		<mkdir dir="${dest.artifacts.analysis}"/>
-		<cpd minimumTokenCount="100" format="xml"
-			outputFile="${dest.artifacts.analysis}/cpd.xml">
-		    <fileset dir="${src.main}">
-		        <include name="**/*.java"/>
-		    </fileset>
-		</cpd>
-		<cpd minimumTokenCount="100" format="xml"
-			outputFile="${dest.artifacts.analysis}/cpd-test.xml">
-		    <fileset dir="${src.test}">
-		        <include name="**/*.java"/>
-		    </fileset>
-		</cpd>
-	</target>
-	
-	<target description="Run the PMD code analysis tool." name="pmd">
-		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"
-			classpath="${analysis.pmd}/lib/pmd-4.2.5.jar"/>
-		<mkdir dir="${dest.artifacts.analysis}"/>
-		<pmd rulesetfiles="basic,braces,clone,codesize,controversial,coupling,design,finalizers,imports,logging-java,naming,optimizations,strictexception,strings,sunsecure,typeresolution,unusedcode">
-			<formatter type="xml" toFile="${dest.artifacts.analysis}/pmd.xml"/>
-			<fileset dir="${src.main}">
-				<include name="**/*.java"/>
-			</fileset>
-	    </pmd>
-		<pmd rulesetfiles="basic,braces,clone,codesize,controversial,coupling,design,finalizers,imports,junit,logging-java,naming,optimizations,strictexception,strings,sunsecure,typeresolution,unusedcode">
-			<formatter type="xml" toFile="${dest.artifacts.analysis}/pmd-test.xml"/>
-			<fileset dir="${src.test}">
-				<include name="**/*.java"/>
-			</fileset>
-	    </pmd>
-	</target>
-	
-	<target description="Run the CheckStyle analysis tool." name="checkstyle">
-		<taskdef resource="checkstyletask.properties"
-			classpath="${analysis.checkstyle}/checkstyle-all-5.1.jar"/>
-		<mkdir dir="${dest.artifacts.analysis}"/>
-		<checkstyle config="${analysis.checkstyle}/sun_checks.xml" failOnViolation="false">
-			<formatter type="xml" tofile="${dest.artifacts.analysis}/checkstyle.xml"/>
-			<fileset dir="${src.main}">
-				<include name="**/*.java"/>
-			</fileset>
-		</checkstyle>
-		<checkstyle config="${analysis.checkstyle}/sun_checks.xml" failOnViolation="false">
-			<formatter type="xml" tofile="${dest.artifacts.analysis}/checkstyle-test.xml"/>
-			<fileset dir="${src.test}">
-				<include name="**/*.java"/>
-			</fileset>
-		</checkstyle>
-	</target>
-	
-	<target description="Do unit testing and generate Cobertura code coverage reports."
-		depends="init,build" name="cobertura">
-		<taskdef classpathref="classpath.cobertura" resource="tasks.properties" />
-		<delete dir="${dest.artifacts.junit.xml}"/>
-		<delete file="${basedir}/cobertura.ser" />
-		<delete dir="${dest.instrumented}"/>
-		<mkdir dir="${dest.artifacts.analysis}"/>
-		<mkdir dir="${dest.artifacts.junit.xml}"/>
-		<mkdir dir="${dest.artifacts.cobertura}"/>
-		<mkdir dir="${dest.instrumented}"/>
-		
-		<javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.test}" source="${java.source}" target="${java.target}">
-	        <src path="${src.test}"/>
-            <classpath refid="classpath.test"/>
-			<compilerarg value="-Xlint"/>
-        </javac>
-		<cobertura-instrument todir="${dest.instrumented}">
-			<includeClasses regex="ca.nengo.*"/>
-			<instrumentationClasspath>
-				<path refid="classpath.simulator" />
-			</instrumentationClasspath>
-		</cobertura-instrument>
-		<junit fork="yes" forkmode="once" printsummary="no" haltonfailure="no" maxmemory="1024m">
-			<sysproperty key="net.sourceforge.cobertura.datafile" value="${basedir}/cobertura.ser"/>
-			<formatter type="xml"/>
-			<classpath refid="classpath.coveragetest"/>
-			<batchtest todir="${dest.artifacts.junit.xml}" >
-				<fileset dir="${dest.test}">
-			    	<include name="**/*Test.class" />
-			    </fileset>
-			</batchtest>
-		</junit>
-		<cobertura-report format="xml" destdir="${dest.artifacts.analysis}" srcdir="${src.main}" />
-		<cobertura-report format="html"	destdir="${dest.artifacts.cobertura}" srcdir="${src.main}" />
-		<delete file="${basedir}/cobertura.ser"/>
-	</target>
-	
-	<target description="Generate all artifacts: javadoc, junit tests, FindBugs, CPD, PMD, CheckStyle, and Cobertura." name="all"
-			depends="javadoc,test,findbugs,cpd,pmd,checkstyle" />
+	<target description="Generate all artifacts: javadoc and junit tests." name="all"
+			depends="javadoc,test" />
 </project>
 
