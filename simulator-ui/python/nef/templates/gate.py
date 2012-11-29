@@ -13,7 +13,6 @@ params=[
     ]
 
 import nef
-import nef.array
 import ca.nengo
 
 def test_params(net, p):
@@ -28,7 +27,7 @@ def test_params(net, p):
     if nameIsTaken: return 'That name is already taken'
     if not gatedIsSet: return 'Must provide the name of an existing ensemble to be gated'
     target=net.network.getNode(p['gated'])
-    if not isinstance(target, nef.array.NetworkArray) and not isinstance(target, ca.nengo.model.nef.NEFEnsemble):
+    if not isinstance(target, ca.nengo.model.impl.NetworkArrayImpl) and not isinstance(target, ca.nengo.model.nef.NEFEnsemble):
         return 'The ensemble to be gated must be either an ensemble or a network array'
     if p['neurons']<1: return 'The number of neurons must be greater than zero'
     if p['pstc']<=0: return 'The post-synaptic time constant must be greater than zero'
