@@ -1288,6 +1288,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		return getNodes();
 	}
 
+	@SuppressWarnings("unchecked")
 	public String toPostScript(HashMap<String, Object> scriptData) throws ScriptGenException {
 		StringBuilder py = new StringBuilder();
 
