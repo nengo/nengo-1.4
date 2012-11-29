@@ -37,6 +37,10 @@
         <ant dir="${dir.simulator}" inheritAll="false" target="build" />
     </target>
 	
+	<target name="test-simulator">
+	    <ant dir="${dir.simulator}" inheritAll="false" target="test" />
+	</target>
+	
 	<target name="javadoc-simulator">
 	    <ant dir="${dir.simulator}" inheritAll="false" target="javadoc" />
 	</target>
@@ -80,7 +84,7 @@
 		depends="javadoc,sphinx" />
 	
 	<target description="Create a distribution folder. Requires that git is installed and working."
-		depends="clean,build,javadoc-simulator" name="dist">
+		depends="clean,build,test-simulator,javadoc-simulator" name="dist">
     	<exec executable="git" spawn="false" dir="${basedir}" outputproperty="buildhash">
     	    <arg line="rev-parse --short HEAD"/>
     	</exec>
