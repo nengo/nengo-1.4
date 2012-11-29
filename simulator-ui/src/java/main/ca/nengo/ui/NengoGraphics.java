@@ -411,7 +411,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             public void childAdded(WorldObject wo) {
                 if (wo instanceof ModelObject) {
                     final ModelObject modelObject = ((ModelObject) wo);
-                    final Object model = modelObject.getModel();
+//                    final Object model = modelObject.getModel();
                     final String modelName = modelObject.getName();
 
                     try {

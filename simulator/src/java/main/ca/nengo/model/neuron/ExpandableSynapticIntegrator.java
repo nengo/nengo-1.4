@@ -57,14 +57,6 @@ public interface ExpandableSynapticIntegrator extends SynapticIntegrator {
 	 * 		SynapticIntegrator
 	 */
 	public Termination addTermination(String name, float[] weights, float tauPSC, boolean modulatory) throws StructuralException;
-
-	/**
-	 * @param term Termination to be added
-	 * @return resulting termination
-	 * @throws StructuralException if there is already a Termination of the same name on this
-	 * 		SynapticIntegrator
-	 */
-	public Termination addTermination(Termination term) throws StructuralException;
 	
 	/**
 	 * @param name Name of Termination to remove.
@@ -74,6 +66,6 @@ public interface ExpandableSynapticIntegrator extends SynapticIntegrator {
 	 */
 	public Termination removeTermination(String name) throws StructuralException;
 
-	
+	public ExpandableSynapticIntegrator clone() throws CloneNotSupportedException;
 
 }

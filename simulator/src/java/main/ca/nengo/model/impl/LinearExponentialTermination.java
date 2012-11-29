@@ -373,14 +373,20 @@ public class LinearExponentialTermination implements PlasticNodeTermination {
     }
 
     @Override
-    public PlasticNodeTermination clone() throws CloneNotSupportedException {
-        LinearExponentialTermination result = new LinearExponentialTermination(myNode, myName, myWeights.clone(), myTauPSC);
-        // Shallow copy happens for free
-        //		result.myCurrent = myCurrent;
-        //		result.myNetRealInput = myNetRealInput;
-        //		result.myNetSpikeInput = myNetSpikeInput;
-        result.myRawInput = myRawInput.clone();
-        return result;
+    public LinearExponentialTermination clone() throws CloneNotSupportedException {
+    	return this.clone(myNode);
     }
+    
+	@Override
+	public LinearExponentialTermination clone(Node node) throws CloneNotSupportedException {
+		LinearExponentialTermination result = (LinearExponentialTermination) super.clone();
+		result.myNode = node;
+		result.myWeights = myWeights.clone();
+		result.saveWeights();
+//		result.myWeightProbabilities = myWeightProbabilities.clone();
+		result.myRawInput = (myRawInput != null) ? myRawInput.clone() : null;
+//		result.myRawInput = null;
+		return result;
+	}
 
 }

@@ -595,6 +595,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 			nodes[i] = oldNodes[i].clone();
 		}
 		result.myNodes = nodes;
+		result.myStateNames = findStateNames(nodes);
 		
 		result.myOrigins = new LinkedHashMap<String, Origin>(myOrigins.size());
 		for (Origin origin : myOrigins.values()) {
@@ -603,13 +604,13 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		
 		result.myTerminations = new LinkedHashMap<String, EnsembleTermination>(myTerminations.size());
 		for (EnsembleTermination termination : myTerminations.values()) {
-			result.myTerminations.put(termination.getName(), termination.clone());
+			result.myTerminations.put(termination.getName(), termination.clone(result));
 		}
 		
 		if (mySpikePattern != null) {
             result.mySpikePattern = (SpikePatternImpl) mySpikePattern.clone();
         }
-
+		
 		// Currently, stateNames is never modified, and therefore does not need to be cloned
 //		result.myStateNames = new LinkedHashMap<String, List<Integer>>(myStateNames.size());
 //		for (String key : myStateNames.keySet()) {

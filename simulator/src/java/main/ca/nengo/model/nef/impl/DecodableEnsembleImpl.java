@@ -554,7 +554,7 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 	}
 	
 	@Override
-	public DecodableEnsemble clone() throws CloneNotSupportedException {
+	public DecodableEnsembleImpl clone() throws CloneNotSupportedException {
 		DecodableEnsembleImpl result = (DecodableEnsembleImpl) super.clone();
 
 		result.myApproximatorFactory = myApproximatorFactory.clone();
@@ -568,6 +568,7 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 			}
 
 			try {
+				// FIXME: this should use DecodedOrigin.clone(Node)
 				DecodedOrigin newOrigin = new DecodedOrigin(
 						result,
 						oldOrigin.getName(),
@@ -588,8 +589,7 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 		
         result.myDecodedTerminations = new LinkedHashMap<String,DecodedTermination>(10);
         for (String key : myDecodedTerminations.keySet()) {
-            DecodedTermination t = (DecodedTermination) myDecodedTerminations.get(key).clone();
-            t.setNode(result);
+            DecodedTermination t = myDecodedTerminations.get(key).clone(result);
             result.myDecodedTerminations.put(key, t);
         }
 

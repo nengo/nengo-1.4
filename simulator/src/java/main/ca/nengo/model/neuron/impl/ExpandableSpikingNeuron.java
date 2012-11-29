@@ -46,7 +46,7 @@ public class ExpandableSpikingNeuron extends SpikingNeuron implements Expandable
 	private static final long serialVersionUID = 1L;
 	private static Logger ourLogger = Logger.getLogger(ExpandableSpikingNeuron.class);
 
-	private final ExpandableSynapticIntegrator mySynapticIntegrator;
+	private ExpandableSynapticIntegrator mySynapticIntegrator;
 
 	/**
 	 * Note: current = scale * (weighted sum of inputs at each termination) * (radial input) + bias.
@@ -85,16 +85,6 @@ public class ExpandableSpikingNeuron extends SpikingNeuron implements Expandable
 		
 		return mySynapticIntegrator.addTermination(name, weights[0], tauPSC, modulatory);
 	}
-    
-    public Termination addTermination(Termination term) throws StructuralException {
-		if ( !(mySynapticIntegrator instanceof ExpandableSynapticIntegrator) ) {
-			throw new StructuralException("Underlying SynapticIntegrator is not expandable");
-		}
-
-		fireVisibleChangeEvent();
-		
-		return mySynapticIntegrator.addTermination(term);
-	}
 
 	/**
 	 * @see ca.nengo.model.ExpandableNode#getDimension()
@@ -121,6 +111,12 @@ public class ExpandableSpikingNeuron extends SpikingNeuron implements Expandable
 	 */
 	public ExpandableSynapticIntegrator getSynapticIntegrator() {
 		return mySynapticIntegrator;
+	}
+	
+	public ExpandableSpikingNeuron clone() throws CloneNotSupportedException {
+		ExpandableSpikingNeuron result = (ExpandableSpikingNeuron) super.clone();
+		result.mySynapticIntegrator = mySynapticIntegrator.clone();
+		return result;
 	}
 
 }

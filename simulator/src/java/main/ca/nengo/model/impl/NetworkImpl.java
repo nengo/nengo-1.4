@@ -923,7 +923,6 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			return (Origin) super.clone();
 		}
 		
-		@Override
 		public Origin clone(Ensemble ensemble) throws CloneNotSupportedException {
 			return this.clone();
 		}
@@ -1028,8 +1027,16 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		}
 
 		@Override
-		public Termination clone() throws CloneNotSupportedException {
-			return (Termination) super.clone();
+		public TerminationWrapper clone() throws CloneNotSupportedException {
+			return this.clone(myNode);
+		}
+		
+		@Override
+		public TerminationWrapper clone(Node node) throws CloneNotSupportedException {
+			throw new CloneNotSupportedException("TerminationWrapper not cloneable");
+//			TerminationWrapper result = (TerminationWrapper) super.clone();
+//			result.myNode = node;
+//			return result;
 		}
 
 	}
@@ -1322,13 +1329,13 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                             (Integer)array.get("dimensions")
                             ));
             	 
-            	 if(array.containsKey("radius")){ py.append(", radius=" + Integer.toString((Integer)array.get("radius"))); }
+            	 if(array.containsKey("radius")){ py.append(", radius=" + Double.toString((Double)array.get("radius"))); }
             	 
             	 if(array.containsKey("rLow") && array.containsKey("rHigh"))
-            	 { py.append(", max_rate=(" + Integer.toString((Integer)array.get("rLow")) + ", " + Integer.toString((Integer)array.get("rHigh")) + ")"); }
+            	 { py.append(", max_rate=(" + Double.toString((Double)array.get("rLow")) + ", " + Double.toString((Double)array.get("rHigh")) + ")"); }
             	 
             	 if(array.containsKey("iLow") && array.containsKey("iHigh"))
-            	 { py.append(", intercept=(" + Integer.toString((Integer)array.get("iLow")) + ", " + Integer.toString((Integer)array.get("iHigh")) + ")"); }
+            	 { py.append(", intercept=(" + Double.toString((Double)array.get("iLow")) + ", " + Double.toString((Double)array.get("iHigh")) + ")"); }
             	 
             	 if(array.containsKey("useQuick"))
             	 {  

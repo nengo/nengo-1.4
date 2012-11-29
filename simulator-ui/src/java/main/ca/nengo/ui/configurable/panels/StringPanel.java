@@ -49,7 +49,7 @@ public class StringPanel extends PropertyTextPanel {
     
     @Override
     protected TextError checkValue(String text) {
-        if (text == null || text.isEmpty()) {
+        if (text == null || text.equals("")) {
         	return TextError.ValueNotSet;
         } else {
             return TextError.NoError;

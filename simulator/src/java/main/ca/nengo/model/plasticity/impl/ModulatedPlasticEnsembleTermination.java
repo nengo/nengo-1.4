@@ -120,9 +120,11 @@ public abstract class ModulatedPlasticEnsembleTermination extends PlasticEnsembl
             }
         }
     }
-
+    
     @Override
-    public ModulatedPlasticEnsembleTermination clone() throws CloneNotSupportedException {
-        return (ModulatedPlasticEnsembleTermination)super.clone();
+    public ModulatedPlasticEnsembleTermination clone(Node node) throws CloneNotSupportedException {
+    	ModulatedPlasticEnsembleTermination result = (ModulatedPlasticEnsembleTermination)super.clone(node);
+    	result.myModInput = (myModInput != null) ? myModInput.clone() : null;
+    	return result;
     }
 }

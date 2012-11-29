@@ -13,7 +13,6 @@ params=[
     ]
 
 import nef
-import nef.array
 import ca.nengo
 
 def test_params(net, p):
@@ -28,20 +27,22 @@ def test_params(net, p):
     if nameIsTaken: return 'That name is already taken'
     if not gatedIsSet: return 'Must provide the name of an existing ensemble to be gated'
     target=net.network.getNode(p['gated'])
-    if not isinstance(target, nef.array.NetworkArray) and not isinstance(target, ca.nengo.model.nef.NEFEnsemble):
+    if not isinstance(target, ca.nengo.model.impl.NetworkArrayImpl) and not isinstance(target, ca.nengo.model.nef.NEFEnsemble):
         return 'The ensemble to be gated must be either an ensemble or a network array'
     if p['neurons']<1: return 'The number of neurons must be greater than zero'
     if p['pstc']<=0: return 'The post-synaptic time constant must be greater than zero'
     
 from java.util import ArrayList
 from java.util import HashMap
+
+from ca.nengo.model.impl import NetworkArrayImpl
 def make(net,name='Gate', gated='visual', neurons=40 ,pstc=0.01):
     gate=net.make(name, neurons, 1, intercept=(-0.7, 0), encoders=[[-1]])
     def addOne(x):
         return [x[0]+1]            
     net.connect(gate, None, func=addOne, origin_name='xBiased', create_projection=False)
     output=net.network.getNode(gated)
-    if isinstance(output,nef.array.NetworkArray):
+    if isinstance(output,NetworkArrayImpl):
         weights=[[-10]]*(output.nodes[0].neurons*len(output.nodes))
     else:
         weights=[[-10]]*output.neurons

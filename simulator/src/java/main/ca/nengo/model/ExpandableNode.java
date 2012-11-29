@@ -63,5 +63,7 @@ public interface ExpandableNode extends Node {
 	 * @throws StructuralException if the Termination doesn't exist
 	 */
 	public Termination removeTermination(String name) throws StructuralException;
-
+	
+	@Override
+	public ExpandableNode clone() throws CloneNotSupportedException;
 }

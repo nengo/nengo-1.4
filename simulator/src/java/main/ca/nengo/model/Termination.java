@@ -145,5 +145,14 @@ public interface Termination extends Serializable, Resettable, Cloneable {
 	 * @throws CloneNotSupportedException if clone can't be made
 	 */
 	public Termination clone() throws CloneNotSupportedException;
+	
+	/**
+	 * Clone method that changes necessary parameters to point to a new parent,
+	 * for use in cloning ensembles, etc.
+	 * @param node New parent node
+	 * @return A clone of the termination for the new parent ensemble
+	 * @throws CloneNotSupportedException if clone cannot be made
+	 */
+	public Termination clone(Node node) throws CloneNotSupportedException;
 
 }

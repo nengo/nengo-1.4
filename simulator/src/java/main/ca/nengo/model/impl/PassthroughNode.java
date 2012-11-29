@@ -406,9 +406,16 @@ public class PassthroughNode implements Node {
 		}
 
 		@Override
-		public Termination clone() throws CloneNotSupportedException {
-			PassthroughTermination result = new PassthroughTermination(myNode, myName, myDimension, MU.clone(myTransform));
+		public PassthroughTermination clone() throws CloneNotSupportedException {
+			return this.clone(myNode);
+		}
+		
+		@Override
+		public PassthroughTermination clone(Node node) throws CloneNotSupportedException {
+			PassthroughTermination result = (PassthroughTermination) super.clone();
+			result.myNode = node;
 			result.myValues = myValues.clone();
+			result.myTransform = MU.clone(myTransform);
 			return result;
 		}
 

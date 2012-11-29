@@ -231,9 +231,13 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
     {
         myLearning = learning;
     }
-
+    
     @Override
-    public PlasticEnsembleTermination clone() throws CloneNotSupportedException {
-        return (PlasticEnsembleTermination) super.clone();
+    public PlasticEnsembleTermination clone(Node node) throws CloneNotSupportedException {
+    	PlasticEnsembleTermination result = (PlasticEnsembleTermination)super.clone(node);
+    	result.myOutput = (myOutput != null) ? myOutput.clone() : null;
+//    	result.myOutput = null;
+    	result.saveTransform();
+        return result;
     }
 }

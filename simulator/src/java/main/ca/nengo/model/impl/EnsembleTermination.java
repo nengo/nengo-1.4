@@ -27,6 +27,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.impl;
 
+import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.SimulationException;
@@ -53,9 +54,9 @@ public class EnsembleTermination implements Termination {
 
 	private static final long serialVersionUID = 1L;
 
-	private final Node myNode;
-	private final String myName;
-	private final Termination[] myNodeTerminations;
+	private Node myNode;
+	private String myName;
+	private Termination[] myNodeTerminations;
 
 	/**
 	 * @param node The parent Node
@@ -195,11 +196,27 @@ public class EnsembleTermination implements Termination {
 
 	@Override
 	public EnsembleTermination clone() throws CloneNotSupportedException {
-		try {
-			return new EnsembleTermination(myNode, myName, myNodeTerminations);
-		} catch (StructuralException e) {
-			throw new CloneNotSupportedException("Error trying to clone: " + e.getMessage());
+		return this.clone(myNode);
+	}
+	
+	@Override
+	public EnsembleTermination clone(Node node) throws CloneNotSupportedException {
+		EnsembleTermination result = (EnsembleTermination)super.clone();
+		result.myNode = node;
+		result.myName = myName;
+
+		// get terminations for nodes in new ensemble
+		result.myNodeTerminations = myNodeTerminations.clone();
+		if (node instanceof Ensemble) {
+			Ensemble ensemble = (Ensemble)node;
+			try {
+				for (int i = 0; i < result.myNodeTerminations.length; i++)
+					result.myNodeTerminations[i] = ensemble.getNodes()[i].getTermination(myNodeTerminations[i].getName());
+			} catch (StructuralException e) {
+				throw new CloneNotSupportedException("Error cloning EnsembleTermination: " + e.getMessage());
+			}
 		}
+		return result;
 	}
 
 }

@@ -74,11 +74,9 @@ public abstract class PropertyTextPanel extends PropertyInputPanel {
 	
 	protected class TextFieldFocusListener implements FocusListener {
 
-		@Override
 		public void focusGained(FocusEvent e) {
 		}
 
-		@Override
 		public void focusLost(FocusEvent e) {
 			valueUpdated();
 		}

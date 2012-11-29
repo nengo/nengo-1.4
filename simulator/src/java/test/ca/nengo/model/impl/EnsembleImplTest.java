@@ -117,6 +117,11 @@ public class EnsembleImplTest extends TestCase {
 			// TODO Auto-generated method stub
 			return null;
 		}
+		
+		@Override
+		public MockExpandableNode clone() throws CloneNotSupportedException {
+			return (MockExpandableNode) super.clone();
+		}
 
 	}
 
