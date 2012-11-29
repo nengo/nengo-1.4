@@ -40,7 +40,19 @@ public class FloatPanel extends NumberPanel {
 	}
 
 	@Override public Float getValue() {
-        return Float.parseFloat(getValueString());
+        return Float.parseFloat(getText());
+    }
+	
+	@Override protected TextError checkValue(String textValue) {
+        if (textValue == null || textValue.equals("")) {
+        	return TextError.ValueNotSet;
+        } else if (!textValue.matches("\\s*-??[0-9]*[.]??[0-9]*([eE][-|\\+]??[0-9]+)??\\s*")) {
+        	return TextError.InvalidFormat;
+        } else if (getDescriptor().isCheckingRange() && !getDescriptor().isInRange(getValue())) {
+        	return TextError.OutOfRange;
+        } else {
+        	return TextError.NoError;
+        }
     }
 
 }

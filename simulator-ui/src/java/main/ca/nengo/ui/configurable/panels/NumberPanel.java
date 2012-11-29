@@ -26,6 +26,9 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.configurable.panels;
 
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+
 import javax.swing.JTextField;
 
 import ca.nengo.ui.configurable.PropertyInputPanel;
@@ -40,49 +43,76 @@ public abstract class NumberPanel extends PropertyInputPanel {
 
     private JTextField tf;
 
+	protected enum TextError {
+		NoError (""),
+		ValueNotSet ("Value not set"),
+		InvalidFormat ("Invalid number format"),
+		OutOfRange ("Out of valid range");
+		
+		private String message;
+		
+		private TextError(String message) {
+			this.message = message;
+		}
+		
+		public String getMessage() {
+			return message;
+		}
+	}
+
     /**
      * @param property Property associated with this NumberPanel
      */
     public NumberPanel(PNumber property) {
         super(property);
         tf = new JTextField(10);
+        tf.addFocusListener(new TextFieldFocusListener());
         add(tf);
-    }
-
-    protected String getValueString() {
-    	return tf.getText();
     }
     
     @Override public PNumber getDescriptor() {
         return (PNumber) super.getDescriptor();
     }
-
+    
     @Override public boolean isValueSet() {
-        String textValue = tf.getText();
-
-        if (textValue == null || textValue.equals("")) {
-//        	setStatusMsg("cannot be empty");
-            return false;
-        }
-
-        try {
-            Object value = getValue();
-            PNumber pnumber = getDescriptor();
-
-            if (pnumber.isCheckingRange() && !pnumber.isInRange(value)) {
-            	setStatusMsg("number outside of range " + pnumber.getRange());
-            	return false;
-            }
-        } catch (NumberFormatException e) {
-        	setStatusMsg("invalid number format");
-            return false;
-        }
-
-        return true;
-    }
+		return (checkValue(getText()) == TextError.NoError);
+	}
+    
+	/**
+	 * Check if a string is valid as the value for this property, and set
+	 * the appropriate status message.
+	 * @param value the current text
+	 * @return true if the text is valid, false otherwise
+	 */
+	protected abstract TextError checkValue(String value);
 
     @Override public void setValue(Object value) {
-        tf.setText(value.toString());
+    	tf.setText(value.toString());
+        checkValue(getText());
     }
+    
+    protected void valueUpdated() {
+		TextError error = checkValue(getText());
+		setStatusMsg(error.getMessage());
+	}
+	
+    @Override public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        tf.setEnabled(enabled);
+    }
+    
+	protected String getText() {
+		return tf.getText();
+	}
+
+    protected class TextFieldFocusListener implements FocusListener {
+
+		@Override public void focusGained(FocusEvent e) {
+		}
+
+		@Override public void focusLost(FocusEvent e) {
+			valueUpdated();
+		}
+	}
 
 }

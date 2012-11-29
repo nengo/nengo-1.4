@@ -40,7 +40,24 @@ public class LongPanel extends NumberPanel {
 	}
 
 	@Override public Long getValue() {
-        return Long.parseLong(getValueString());
+        return Long.parseLong(getText());
+    }
+
+	@Override protected TextError checkValue(String textValue) {
+        if (textValue == null || textValue.equals("")) {
+        	return TextError.ValueNotSet;
+        }
+        
+        try {
+            Long value = getValue();
+            if (getDescriptor().isCheckingRange() && !getDescriptor().isInRange(value)) {
+            	return TextError.OutOfRange;
+            }
+        } catch (NumberFormatException e) {
+        	return TextError.InvalidFormat;
+        }
+        
+        return TextError.NoError;
     }
 
 }

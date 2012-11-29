@@ -42,6 +42,8 @@ import ca.nengo.ui.configurable.properties.PFloat;
 import ca.nengo.ui.configurable.properties.PInt;
 import ca.nengo.ui.configurable.properties.PNodeFactory;
 import ca.nengo.ui.configurable.properties.PSign;
+import ca.nengo.ui.lib.util.UserMessages;
+import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.models.nodes.UINEFEnsemble;
 import ca.nengo.util.VectorGenerator;
 import ca.nengo.util.impl.RandomHypersphereVG;
@@ -138,6 +140,13 @@ public class CNEFEnsemble extends CNode {
                 return ensemble;
             }
         } catch (StructuralException e) {
+        	Util.debugMsg("StructuralException: " + e.toString());
+
+			if (e.getMessage() != null) {
+				UserMessages.showWarning(e.getMessage());
+			} else {
+				Util.showException(e);
+			}
             e.printStackTrace();
         }
         return null;

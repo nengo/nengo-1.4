@@ -78,7 +78,7 @@ public abstract class Property implements Serializable {
     /**
      * @return the input panel
      */
-    public PropertyInputPanel getInputPanel() {
+    public final PropertyInputPanel getInputPanel() {
         // Instantiate a new input panel for each call, this is ok.
         Util.Assert(!(!isEditable && (getDefaultValue() == null)),
                 "An input panel cannot be disabled and have no default value");

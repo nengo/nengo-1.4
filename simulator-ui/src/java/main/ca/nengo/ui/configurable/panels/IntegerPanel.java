@@ -40,7 +40,23 @@ public class IntegerPanel extends NumberPanel {
 	}
 
 	@Override public Integer getValue() {
-        return Integer.parseInt(getValueString());
+        return Integer.parseInt(getText());
     }
 
+	@Override protected TextError checkValue(String textValue) {
+        if (textValue == null || textValue.equals("")) {
+        	return TextError.ValueNotSet;
+        }
+        
+        try {
+            Integer value = getValue();
+            if (getDescriptor().isCheckingRange() && !getDescriptor().isInRange(value)) {
+            	return TextError.OutOfRange;
+            }
+        } catch (NumberFormatException e) {
+        	return TextError.InvalidFormat;
+        }
+        
+        return TextError.NoError;
+    }
 }
