@@ -166,7 +166,6 @@ public class ProbeableOrigin implements Origin {
 		return (ProbeableOrigin)super.clone();
 	}
 	
-	@Override
 	public ProbeableOrigin clone(Ensemble ensemble) throws CloneNotSupportedException {
 		return this.clone();
 	}

@@ -195,7 +195,6 @@ public class EnsembleOrigin implements Origin {
 		return new EnsembleOrigin(myNode, myName, myNodeOrigins);
 	}
 	
-	@Override
 	public EnsembleOrigin clone(Ensemble ensemble) throws CloneNotSupportedException {
 		EnsembleOrigin result = new EnsembleOrigin(myNode, myName, new Origin[myNodeOrigins.length]);
 		

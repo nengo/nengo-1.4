@@ -923,7 +923,6 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			return (Origin) super.clone();
 		}
 		
-		@Override
 		public Origin clone(Ensemble ensemble) throws CloneNotSupportedException {
 			return this.clone();
 		}

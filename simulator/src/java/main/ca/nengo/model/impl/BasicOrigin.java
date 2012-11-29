@@ -240,7 +240,6 @@ public class BasicOrigin implements Origin, Noise.Noisy, Resettable, Configurabl
 		return result;
 	}
 	
-	@Override
 	public BasicOrigin clone(Ensemble e) throws CloneNotSupportedException {
 		return this.clone();
 	}
