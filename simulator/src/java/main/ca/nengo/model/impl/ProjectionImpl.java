@@ -411,7 +411,7 @@ public class ProjectionImpl implements Projection {
 	    	return "";
 	    }
 
-	    String n = fns[0].getClass().getCanonicalName();
+//	    String n = fns[0].getClass().getCanonicalName();
     	if(fns.length > 0 && fns[0].getClass().getCanonicalName() == "org.python.proxies.nef.functions$PythonFunction$3")
     	{
     		AbstractFunction absFun = (AbstractFunction) fns[0];

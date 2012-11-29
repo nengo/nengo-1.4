@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -65,7 +64,7 @@ public class PlasticEnsembleImpl extends EnsembleImpl implements TaskSpawner {
     private float myLastPlasticityTime;
     private boolean myLearning = true;
 
-    protected final Map<String, PlasticEnsembleTermination> myPlasticEnsembleTerminations;
+    protected Map<String, PlasticEnsembleTermination> myPlasticEnsembleTerminations;
 
     private ArrayList<LearningTask> myTasks;
 
@@ -225,8 +224,21 @@ public class PlasticEnsembleImpl extends EnsembleImpl implements TaskSpawner {
     }
 
     @Override
-    public Ensemble clone() throws CloneNotSupportedException {
+    public PlasticEnsembleImpl clone() throws CloneNotSupportedException {
         PlasticEnsembleImpl result = (PlasticEnsembleImpl) super.clone();
+        
+        result.myTasks = new ArrayList<LearningTask>(myTasks.size());
+        for (LearningTask task : myTasks) {
+        	result.myTasks.add(task.clone(result));
+        }
+        
+        
+        result.myPlasticEnsembleTerminations = new LinkedHashMap<String, PlasticEnsembleTermination>(6);
+        for (String key : myPlasticEnsembleTerminations.keySet()) {
+        	PlasticEnsembleTermination term = myPlasticEnsembleTerminations.get(key);
+        	result.myPlasticEnsembleTerminations.put(key, term.clone(result));
+        }
+        
         return result;
     }
 }

@@ -1027,8 +1027,16 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		}
 
 		@Override
-		public Termination clone() throws CloneNotSupportedException {
-			return (Termination) super.clone();
+		public TerminationWrapper clone() throws CloneNotSupportedException {
+			return this.clone(myNode);
+		}
+		
+		@Override
+		public TerminationWrapper clone(Node node) throws CloneNotSupportedException {
+			throw new CloneNotSupportedException("TerminationWrapper not cloneable");
+//			TerminationWrapper result = (TerminationWrapper) super.clone();
+//			result.myNode = node;
+//			return result;
 		}
 
 	}

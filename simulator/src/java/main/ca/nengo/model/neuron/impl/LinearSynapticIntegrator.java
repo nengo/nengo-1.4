@@ -197,19 +197,6 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
 
 		return result;
 	}
-	
-	/**
-	 * @see ca.nengo.model.neuron.ExpandableSynapticIntegrator#addTermination(ca.nengo.model.Termination)
-	 */
-	public Termination addTermination(Termination term) throws StructuralException {
-		if (myTerminations.containsKey(term.getName())) {
-			throw new StructuralException("This SynapticIntegrator already has a Termination named " + term.getName());
-		}
-		
-		myTerminations.put(term.getName(), (LinearExponentialTermination)term);
-		return term;
-		
-	}
 
 	/**
 	 * @see ca.nengo.model.neuron.ExpandableSynapticIntegrator#removeTermination(java.lang.String)
@@ -237,15 +224,12 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
 	}
 
 	@Override
-	public SynapticIntegrator clone() throws CloneNotSupportedException {
+	public LinearSynapticIntegrator clone() throws CloneNotSupportedException {
 		LinearSynapticIntegrator result = (LinearSynapticIntegrator) super.clone();
 
 		result.myTerminations = new HashMap<String, LinearExponentialTermination>(10);
 		for (LinearExponentialTermination oldTerm : myTerminations.values()) {
-			String name = oldTerm.getName();
-			LinearExponentialTermination newTerm = (LinearExponentialTermination) oldTerm.clone();
-			newTerm.setNode(result.myNode);
-			result.myTerminations.put(name, newTerm);
+			result.myTerminations.put(oldTerm.getName(), oldTerm.clone(result.myNode));
 		}
 
 		return result;

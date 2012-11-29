@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import ca.nengo.model.Ensemble;
 import ca.nengo.model.ExpandableNode;
 import ca.nengo.model.Node;
 import ca.nengo.model.SimulationMode;
@@ -60,7 +59,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 
 	private static final long serialVersionUID = 1L;
 
-	protected final ExpandableNode[] myExpandableNodes;
+	protected ExpandableNode[] myExpandableNodes;
 	protected Map<String, Termination> myExpandedTerminations;
 
 	/**
@@ -203,27 +202,18 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	}
 
 	@Override
-	public Ensemble clone() throws CloneNotSupportedException {
+	public EnsembleImpl clone() throws CloneNotSupportedException {
 		EnsembleImpl result = (EnsembleImpl) super.clone();
 
+		result.myExpandableNodes = new ExpandableNode[myExpandableNodes.length];
+		for (int i = 0; i < myExpandableNodes.length; i++) {
+			result.myExpandableNodes[i] = myExpandableNodes[i].clone();
+		}
+		
 		result.myExpandedTerminations = new LinkedHashMap<String, Termination>(10);
-
 		for (String key : myExpandedTerminations.keySet()) {
-			EnsembleTermination et = (EnsembleTermination)myExpandedTerminations.get(key);
-			Node[] nodes = result.getNodes();
-			Termination[] terms = et.getNodeTerminations();
-			Termination[] newterms = new Termination[terms.length];
-			try
-			{
-				for(int i=0; i < terms.length; i++)
-					newterms[i] = nodes[i].getTermination(terms[i].getName());
-				result.myExpandedTerminations.put(key, new EnsembleTermination(result, et.getName(), newterms));
-			}
-			catch(StructuralException se)
-			{
-				throw new CloneNotSupportedException("Error trying to clone: " + se.getMessage());
-			}
-
+			result.myExpandedTerminations.put(key, 
+					myExpandedTerminations.get(key).clone(result));
 		}
 
 		return result;

@@ -1040,7 +1040,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
     }
 
 	@Override
-    public NEFEnsemble clone() throws CloneNotSupportedException {
+    public NEFEnsembleImpl clone() throws CloneNotSupportedException {
 		NEFEnsembleImpl result = (NEFEnsembleImpl) super.clone();
 
 		result.myEncoders = MU.clone(myEncoders);
