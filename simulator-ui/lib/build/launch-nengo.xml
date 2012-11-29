@@ -14,25 +14,27 @@
   <manifest></manifest>
   <icon></icon>
   <classPath>
-    <mainClass>ca.nengo.ui.NengoGraphics</mainClass>
+    <mainClass>ca.nengo.ui.NengoLauncher</mainClass>
     <cp>.</cp>
     <cp>lib/Blas.jar</cp>
     <cp>lib/colt.jar</cp>
     <cp>lib/commons-collections-3.2.jar</cp>
     <cp>lib/formsrt.jar</cp>
+    <cp>lib/itextpdf-5.3.4.jar</cp>
     <cp>lib/Jama-1.0.2.jar</cp>
     <cp>lib/jcommon-1.0.0.jar</cp>
     <cp>lib/jfreechart-1.0.1.jar</cp>
+    <cp>lib/jgrapht-jdk1.5-0.7.3.jar</cp>
     <cp>lib/jmatio.jar</cp>
+    <cp>lib/jnumeric-0.1.jar</cp>
     <cp>lib/jung-1.7.6.jar</cp>
     <cp>lib/jython.jar</cp>
     <cp>lib/log4j-1.2.16.jar</cp>
+    <cp>lib/macify-1.4.jar</cp>
     <cp>lib/piccolo.jar</cp>
     <cp>lib/piccolox.jar</cp>
     <cp>lib/qdox-1.6.3.jar</cp>
     <cp>lib/ssj.jar</cp>
-    <cp>lib/jgrapht-jdk1.5-0.7.3.jar</cp>
-    <cp>lib/itextpdf-5.3.4.jar</cp>
     <cp>nengo-BUILDNUMBER.jar</cp>
   </classPath>
   <jre>
