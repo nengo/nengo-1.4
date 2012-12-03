@@ -199,7 +199,6 @@ public class EnsembleTermination implements Termination {
 		return this.clone(myNode);
 	}
 	
-	@Override
 	public EnsembleTermination clone(Node node) throws CloneNotSupportedException {
 		EnsembleTermination result = (EnsembleTermination)super.clone();
 		result.myNode = node;

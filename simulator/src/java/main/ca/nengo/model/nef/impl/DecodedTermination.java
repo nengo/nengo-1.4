@@ -462,7 +462,6 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 		return this.clone(myNode);
 	}
 	
-	@Override
 	public DecodedTermination clone(Node node) throws CloneNotSupportedException {
 		try {
 			DecodedTermination result = (DecodedTermination)super.clone();

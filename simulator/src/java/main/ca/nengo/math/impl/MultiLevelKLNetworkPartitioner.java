@@ -429,6 +429,7 @@ public class MultiLevelKLNetworkPartitioner implements NetworkPartitioner {
 	 * 
 	 * @author Eric Crawford
 	 */
+	@SuppressWarnings("unchecked")
 	private <V extends Vertex> Set<V> multilevelKL(WeightedGraph<V, DefaultWeightedEdge> graph){
 		
 		Set<V> vertexSet = graph.vertexSet();

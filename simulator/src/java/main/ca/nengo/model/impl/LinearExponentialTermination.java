@@ -377,7 +377,6 @@ public class LinearExponentialTermination implements PlasticNodeTermination {
     	return this.clone(myNode);
     }
     
-	@Override
 	public LinearExponentialTermination clone(Node node) throws CloneNotSupportedException {
 		LinearExponentialTermination result = (LinearExponentialTermination) super.clone();
 		result.myNode = node;

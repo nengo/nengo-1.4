@@ -202,7 +202,6 @@ public class BasicTermination implements Termination, Resettable {
 		return this.clone(myNode);
 	}
 	
-	@Override
 	public BasicTermination clone(Node node) throws CloneNotSupportedException {
 		BasicTermination result = (BasicTermination) super.clone();
 		result.myNode = node;
