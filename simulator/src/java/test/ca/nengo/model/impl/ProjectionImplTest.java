@@ -336,7 +336,6 @@ public class ProjectionImplTest extends TestCase {
 			return this.clone(null);
 		}
 		
-		@Override
 		public MockTermination clone(Node node) throws CloneNotSupportedException {
 			return (MockTermination)super.clone();
 		}
