@@ -410,7 +410,6 @@ public class PassthroughNode implements Node {
 			return this.clone(myNode);
 		}
 		
-		@Override
 		public PassthroughTermination clone(Node node) throws CloneNotSupportedException {
 			PassthroughTermination result = (PassthroughTermination) super.clone();
 			result.myNode = node;
