@@ -142,22 +142,18 @@
         <pathconvert targetos="unix" property="libs.unix" refid="distlibs">
             <chainedmapper>
             	<flattenmapper />
-            	<globmapper from="*" to="/lib/*"/>
+            	<globmapper from="*" to="lib/*"/>
             </chainedmapper>
         </pathconvert>
 		<replace dir="${dist.dir}" token="LIBS" value="${libs.unix}">
 		    <include name="nengo"/>
 		    <include name="nengo-cl"/>
 	    </replace>
-		
-		<echo>
-		  ${libs.unix}
-	    </echo>
 
         <pathconvert targetos="windows" property="libs.windows" refid="distlibs">
             <chainedmapper>
                 <flattenmapper />
-                <globmapper from="*" to="/lib/*"/>
+                <globmapper from="*" to="lib/*"/>
             </chainedmapper>
         </pathconvert>
 		<replace dir="${dist.dir}" token="LIBS" value="${libs.windows}">
@@ -165,14 +161,10 @@
 		    <include name="nengo-cl.bat"/>
 		</replace>
 
-        <echo>
-          ${libs.windows}
-        </echo>
-
 		<pathconvert pathsep="\n" property="libs.xml" refid="distlibs">
             <chainedmapper>
                 <flattenmapper />
-                <globmapper from="*" to="/lib/*"/>
+                <globmapper from="*" to="lib/*"/>
                 <globmapper from="*" to="    &lt;cp&gt;*&lt;/cp&gt;"/>
             </chainedmapper>
         </pathconvert>
@@ -180,11 +172,6 @@
             <include name="lib/build/launch-nengo.xml"/>
             <include name="lib/build/launch-nengo-cl.xml"/>
         </replace>
-
-        <echo>
-          ${libs.xml}
-        </echo>
-
 
         <taskdef name="launch4j"
             classname="net.sf.launch4j.ant.Launch4jTask"
