@@ -66,7 +66,7 @@ class SimpleNode(Node,Probeable):
     """A SimpleNode allows you to put arbitary code as part of a Nengo model.
         
     This object has Origins and Terminations which can be used just like
-    any other Nengo component.  Arbitary code can be run every time step,
+    any other Nengo component.  Arbitrary code can be run every time step,
     making this useful for simulating sensory systems (reading data
     from a file or a webcam, for example), motor systems (writing data to
     a file or driving a robot, for example), or even parts of the brain
@@ -90,7 +90,7 @@ class SimpleNode(Node,Probeable):
       
     You can have as many origins and terminations as you like.  The dimensionality
     of the origins are set by the length of the returned vector of floats.  The
-    dimensionality of the terminations can be set by specifing the dimensionality
+    dimensionality of the terminations can be set by specifying the dimensionality
     in the method definition::
     
       class SquaringFiveValues(nef.SimpleNode):

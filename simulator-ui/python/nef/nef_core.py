@@ -558,7 +558,7 @@ class Network:
         *pre* and *post* can be strings giving the names of the nodes, or they
         can be the nodes themselves (FunctionInputs and NEFEnsembles are
         supported).  They can also be actual Origins or Terminations, or any
-        combinaton of the above. If *post* is set to an integer or None, an origin
+        combination of the above. If *post* is set to an integer or None, an origin
         will be created on the *pre* population, but no other action will be taken.
 
         pstc is the post-synaptic time constant of the new Termination
