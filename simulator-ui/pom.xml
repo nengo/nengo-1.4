@@ -59,9 +59,6 @@
     </dependencies>
     
     <build>
-        <directory>target</directory>
-        <outputDirectory>target/classes</outputDirectory>
-        <testOutputDirectory>target/test-classes</testOutputDirectory>
         <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
         <resources>
             <resource>
