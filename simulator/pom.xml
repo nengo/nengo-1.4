@@ -35,6 +35,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <cmake.generator>Visual Studio 10</cmake.generator>
+        <cmake.platform>Win32</cmake.platform>
+        <cmake.config>Release</cmake.config>
     </properties>
 
     <dependencies>
@@ -79,6 +82,12 @@
             <artifactId>jmatio</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>net.java.abeille</groupId>
+            <artifactId>abeille</artifactId>
+            <version>3.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     
     <build>
@@ -86,18 +95,36 @@
         <outputDirectory>target/classes</outputDirectory>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <testOutputDirectory>target/test-classes</testOutputDirectory>
-        <sourceDirectory>src/java/main</sourceDirectory>
         <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
-        <testSourceDirectory>src/test/java</testSourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/resources</directory>
-            </resource>
-        </resources>
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>
     </build>
+    <repositories>
+        <repository>
+            <id>simulation</id>
+            <url>http://www.simulation.tudelft.nl/maven</url>
+        </repository>
+        <repository>
+            <id>codehaus-release</id>
+            <name>Codehaus</name>
+            <url>http://repository.codehaus.org</url>
+        </repository>
+        <repository>
+            <id>sonatype-release</id>
+            <name>Sonatype</name>
+            <url>http://repository.sonatype.org/content/groups/public</url>
+        </repository>
+        <repository>
+            <id>central</id>
+            <name>Maven Repository Switchboard</name>
+            <layout>default</layout>
+            <url>http://repo1.maven.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>
