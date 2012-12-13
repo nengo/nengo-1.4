@@ -1,0 +1,4 @@
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/target/bin)
+set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/target/bin)
+
+add_library(NengoGPU SHARED NengoGPUData.c NengoGPU_JNI.c NengoGPU.c NengoGPU_CUDA.cu)
