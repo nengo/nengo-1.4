@@ -1,12 +1,7 @@
 #ifndef NENGO_GPU_DATA_H
 #define NENGO_GPU_DATA_H
-
-#ifdef __cplusplus
-extern "C"{
-#endif
-
 #define NEURONS_PER_GPU 100000
-
+#include "jni_md.h"
 
 /*
  Used to extract ensemble data out of arrays passed in through JNI.
@@ -54,7 +49,7 @@ typedef enum NetworkArrayDataIndex_enum NetworkArrayDataIndex;
 */
 
 struct intArray_t{
-  int* array;
+  jint* array;
   int size;
   char* name;
   int onDevice;
@@ -78,15 +73,15 @@ floatArray* newFloatArray(int size, const char* name);
 void freeFloatArray(floatArray* a);
 floatArray* newFloatArrayOnDevice(int size, const char* name);
 
-void checkBounds(char* verb, char* name, int size, int index);
-void checkLocation(char* verb, char* name, int onDevice, int size, int index);
+void checkBounds(char* verb, char* name, jint size, jint index);
+void checkLocation(char* verb, char* name, int onDevice, jint size, jint index);
 
 void intArraySetElement(intArray* a, int index, int value);
 void floatArraySetElement(floatArray* a, int index, float value);
 int intArrayGetElement(intArray* a, int index);
 float floatArrayGetElement(floatArray* a, int index);
 
-void intArraySetData(intArray* a, int* data, int dataSize);
+void intArraySetData(intArray* a, jint* data, jint dataSize);
 void floatArraySetData(floatArray* a, float* data, int dataSize);
 
 /*
@@ -108,7 +103,7 @@ struct projection_t{
 
 typedef struct projection_t projection;
 
-void storeProjection(projection* proj, int* data);
+void storeProjection(projection* proj, jint* data);
 void printProjection(projection* proj);
 
 
@@ -134,7 +129,7 @@ struct int_queue_t{
 };
 
 int_queue* new_int_queue();
-int pop_int_queue(int_queue* queue);
+jint pop_int_queue(int_queue* queue);
 void add_int_queue(int_queue* queue, int val);
 void free_int_queue(int_queue* queue);
 
@@ -292,9 +287,5 @@ void moveToDeviceIntArray(intArray* a);
 void moveToDeviceFloatArray(floatArray* a);
 void moveToHostFloatArray(floatArray* a);
 void moveToHostIntArray(intArray* a);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

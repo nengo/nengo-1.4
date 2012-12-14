@@ -1,30 +1,27 @@
-
-#ifdef __cplusplus
-extern "C"{
-#endif
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#ifndef _MSC_VER
 #include <pthread.h>
+#endif
 
 #include "NengoGPU.h"
 #include "NengoGPU_CUDA.h"
 #include "NengoGPUData.h"
 
 
-int totalNumEnsembles = 0;
-int totalNumNetworkArrays = 0;
+jint totalNumEnsembles = 0;
+jint totalNumNetworkArrays = 0;
 
 // indicates which device each ensemble has been assigned to
-int* deviceForEnsemble;
-int* deviceForNetworkArray;
+jint* deviceForEnsemble;
+jint* deviceForNetworkArray;
 
 // The data for each device.
 NengoGPUData** nengoDataArray;
 float startTime = 0, endTime = 0;
-volatile int myCVsignal = 0;
-int numDevices = 0;
+volatile jint myCVsignal = 0;
+jint numDevices = 0;
 
 pthread_cond_t* cv_GPUThreads = NULL;
 pthread_cond_t* cv_JNI = NULL;
@@ -33,7 +30,7 @@ pthread_mutex_t* mutex = NULL;
 FILE* fp;
 
 float* sharedInput;
-int sharedInputSize;
+jint sharedInputSize;
 
 // Actions:
 // -1 - destroy
@@ -43,9 +40,9 @@ int sharedInputSize;
 // 3 - set to value
 // 4 - add value
 // Keeps track of how many nodes have been processed. Implemented as a function like this for the sake of encapsulation and synchronization.
-int manipulateNumDevicesFinished(int action, int value)
+jint manipulateNumDevicesFinished(jint action, jint value)
 {
-  static int numDevicesFinished;
+  static jint numDevicesFinished;
   static pthread_mutex_t* myMutex;
 
   if(action == 0)
@@ -72,7 +69,7 @@ int manipulateNumDevicesFinished(int action, int value)
 
   pthread_mutex_lock(myMutex);
 
-  int temp = 0;
+  jint temp = 0;
 
   switch(action)
   {
@@ -96,9 +93,9 @@ int manipulateNumDevicesFinished(int action, int value)
 // 0 - check
 // 1 - kill 
 // Keeps track of whether the signal to end the run has been issued.
-int manipulateKill(int action)
+jint manipulateKill(jint action)
 {
-  static int kill;
+  static jint kill;
 
   switch(action)
   {
@@ -145,7 +142,7 @@ void run_start()
   NengoGPUData* currentData;
 
   // Start the node-processing threads. Their starting function is start_GPU_thread.
-  int i = 0;
+  jint i = 0;
   for(;i < numDevices; i++)
   {
     currentData = nengoDataArray[i];
@@ -177,7 +174,7 @@ void* start_GPU_thread(void* arg)
 {
   NengoGPUData* nengoData = (NengoGPUData*) arg;
 
-  int numDevicesFinished;
+  jint numDevicesFinished;
 
   printf("GPU Thread %d: about to acquire device\n", nengoData->device);
   initGPUDevice(nengoData->device);
@@ -269,7 +266,3 @@ void run_kill()
   free(cv_JNI);
 }
 
-#ifdef __cplusplus
-}
-
-#endif

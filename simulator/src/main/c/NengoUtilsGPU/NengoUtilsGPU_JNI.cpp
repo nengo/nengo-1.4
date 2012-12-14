@@ -1,9 +1,3 @@
- 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <jni.h>
@@ -13,8 +7,7 @@ extern "C"
 #include "customCudaUtils.h"
 #include "NengoUtilsGPU.h"
 
-JNIEXPORT jboolean JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_hasGPU
-  (JNIEnv *env, jclass class)
+JNIEXPORT jboolean JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_hasGPU(JNIEnv *env, jclass clazz)
 {
   jboolean hasGPU = (jboolean) (getGPUDeviceCount() > 0);
 
@@ -26,7 +19,7 @@ JNIEXPORT jboolean JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_hasG
   Takes a matrix as input and returns its pseudoInverse. Used to pseudo invert gamma.
 */
 JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_nativePseudoInverse
-  (JNIEnv* env, jclass class, jobjectArray java_matrix, jfloat minSV, jint numSV)
+  (JNIEnv* env, jclass clazz, jobjectArray java_matrix, jfloat minSV, jint numSV)
 {
     jsize M = (*env)->GetArrayLength(env, java_matrix);
     jfloatArray temp_array = (jfloatArray) (*env)->GetObjectArrayElement(env, java_matrix, 0);
@@ -40,7 +33,7 @@ JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_
     if(!A || !A_row_major)
         exit(EXIT_FAILURE);
    
-    int i = 0;
+    jint i = 0;
 
     // move the data in to a C array
     for(;i < M; i++)
@@ -51,7 +44,7 @@ JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_
 
     switchFloatArrayStorage(A_row_major, A, N, M);
 
-    A = pseudoInverse(A, (int)M, (int)N, (float)minSV, (int)numSV, 0, 0);
+    A = pseudoInverse(A, (jint)M, (jint)N, (float)minSV, (jint)numSV, 0, 0);
 
     switchFloatArrayStorage(A, A_row_major, N, M);
 
@@ -75,13 +68,13 @@ JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_
   Takes A as input and returns gamma = A * A_transpose 
 */
 JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_nativeFindGamma
-  (JNIEnv *env, jclass class, jobjectArray noisy_values_JAVA)
+  (JNIEnv *env, jclass clazz, jobjectArray noisy_values_JAVA)
 {
-  int numNeurons = (int) (*env)->GetArrayLength(env, noisy_values_JAVA);
+  jint numNeurons = (jint) (*env)->GetArrayLength(env, noisy_values_JAVA);
   jfloatArray temp_array = (jfloatArray) (*env)->GetObjectArrayElement(env, noisy_values_JAVA, 0);
-  int numEvalPoints = (int) (*env)->GetArrayLength(env, temp_array);
+  jint numEvalPoints = (jint) (*env)->GetArrayLength(env, temp_array);
 
-  int i;
+  jint i;
 
   // The java array noisy_values_JAVA is just A, not A_transpose, but when we move it to a C array, 
   // we get it in row major format the CUDA routines expect column major format, so we really have A_transpose
@@ -118,15 +111,15 @@ JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_
   Takes A as an input value, finds gamma = (A * A_tranpose) and then finds pseudoInverse(gamma).
 */
 JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_nativeFindGammaPseudoInverse
-  (JNIEnv *env, jclass class, jobjectArray noisy_values_JAVA, jfloat minSV, jint numSV)
+  (JNIEnv *env, jclass clazz, jobjectArray noisy_values_JAVA, jfloat minSV, jint numSV)
 {
-  int numNeurons = (int) (*env)->GetArrayLength(env, noisy_values_JAVA);
+  jint numNeurons = (jint) (*env)->GetArrayLength(env, noisy_values_JAVA);
   jfloatArray temp_array = (jfloatArray) (*env)->GetObjectArrayElement(env, noisy_values_JAVA, 0);
-  int numEvalPoints = (int) (*env)->GetArrayLength(env, temp_array);
+  jint numEvalPoints = (jint) (*env)->GetArrayLength(env, temp_array);
 
   printf("Using GPU to find gamma and its pseudoInverse. %d neurons, %d sample points\n", numNeurons, numEvalPoints);
 
-  int i;
+  jint i;
 
   // The java array noisy_values_JAVA is just A, not A_transpose, but when we move it to a C array, 
   // we get it in row major format the CUDA routines expect column major format, so we really have A_transpose
@@ -143,7 +136,7 @@ JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_
   }
 
   float* gamma = findGamma(A_transpose, numNeurons, numEvalPoints, 0, 1);
-  float* gamma_inv = pseudoInverse(gamma, numNeurons, numNeurons, (float)minSV, (int)numSV, 1, 0);
+  float* gamma_inv = pseudoInverse(gamma, numNeurons, numNeurons, (float)minSV, (jint)numSV, 1, 0);
 
   jobjectArray result = (jobjectArray) (*env)->NewObjectArray(env, numNeurons, (*env)->GetObjectClass(env, temp_array), 0);
 
@@ -160,9 +153,4 @@ JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_
   return result;
 }
 
-
-
-#ifdef __cplusplus
-}
-#endif
 

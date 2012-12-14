@@ -1,16 +1,13 @@
-
-#ifdef __cplusplus
-extern "C"{
-#endif
-
 #include <stdlib.h>
 #include <jni.h>
-#include <pthread.h>
 #include <string.h>
 #include <limits.h>
 #include <math.h>
 #include <sys/timeb.h>
 #include <assert.h>
+#ifndef _MSC_VER
+#include <pthread.h>
+#endif
 
 #include "NEFGPUInterface_JNI.h"
 #include "NengoGPU.h"
@@ -20,13 +17,13 @@ extern "C"{
 // returns not the sorted array but the indices of the values in the sorted order. So newOrder[0] is the index of 
 // the largest element in values, newOrder[1] is the index of the second largest, etc.
 // Order allows the user to choose between ascending and descending. 1 
-int* sort(int* values, int length, int order)
+jint* sort(jint* values, jint length, jint order)
 {
-  int* newOrder = (int*) malloc( length * sizeof(int));
-  int* scratch = (int*) malloc( length * sizeof(int));
-  memset(scratch, '\0', length * sizeof(int));
+  jint* newOrder = (jint*) malloc( length * sizeof(jint));
+  jint* scratch = (jint*) malloc( length * sizeof(jint));
+  memset(scratch, '\0', length * sizeof(jint));
 
-  int i, j;
+  jint i, j;
 
   for(i = 0; i < length; i++)
   {
@@ -47,9 +44,9 @@ int* sort(int* values, int length, int order)
   return newOrder;
 }
 
-void adjustProjections(int numProjections, projection* projections, int* networkArrayJavaIndexToDeviceIndex)
+void adjustProjections(jint numProjections, projection* projections, jint* networkArrayJavaIndexToDeviceIndex)
 {
-  int i;
+  jint i;
   projection* p;
   for(i = 0; i < numProjections; i++)
   {
@@ -62,9 +59,9 @@ void adjustProjections(int numProjections, projection* projections, int* network
 
 // since terminations do not typically take up as much room as encoders and decoders, we are not at pains to minimize the
 // space they take up
-void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArray tau_JAVA, jobjectArray isDecodedTermination_JAVA, NengoGPUData* currentData, int* networkArrayData)
+void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArray tau_JAVA, jobjectArray isDecodedTermination_JAVA, NengoGPUData* currentData, jint* networkArrayData)
 {
-  int h, i, j, k, l;
+  jint h, i, j, k, l;
 
   jintArray tempIntArray_JAVA;
   jobjectArray transformsForCurrentEnsemble_JAVA;
@@ -73,15 +70,15 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
   jfloatArray tauForCurrentEnsemble_JAVA;
   float* currentTransformRow = (float*)malloc(currentData->maxDecodedTerminationDimension * sizeof(float));
 
-  int dimensionOfCurrentEnsemble = 0, dimensionOfCurrentTermination = 0, numTerminationsForCurrentEnsemble = 0;
+  jint dimensionOfCurrentEnsemble = 0, dimensionOfCurrentTermination = 0, numTerminationsForCurrentEnsemble = 0;
 
-  int* isDecodedTermination  = (int*)malloc(currentData->numTerminations * sizeof(int));
+  jint* isDecodedTermination  = (jint*)malloc(currentData->numTerminations * sizeof(jint));
   
-  int ensembleIndexInJavaArray = 0, NDterminationIndex = 0, transformRowIndex = 0, dimensionIndex = 0;
-  int NDterminationIndexInEnsemble = 0;
-  int startEnsembleIndex, endEnsembleIndex, networkArrayIndexInJavaArray, networkArrayOffsetInTerminations = 0;
-  int networkArrayTerminationIndex = 0;
-  int terminationOffset = 0;
+  jint ensembleIndexInJavaArray = 0, NDterminationIndex = 0, transformRowIndex = 0, dimensionIndex = 0;
+  jint NDterminationIndexInEnsemble = 0;
+  jint startEnsembleIndex, endEnsembleIndex, networkArrayIndexInJavaArray, networkArrayOffsetInTerminations = 0;
+  jint networkArrayTerminationIndex = 0;
+  jint terminationOffset = 0;
 
   for(h = 0; h < currentData->numNetworkArrays; h++)
   {
@@ -96,16 +93,16 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
 
       intArraySetElement(currentData->NDterminationEnsembleOffset, i, NDterminationIndex);
 
-      transformsForCurrentEnsemble_JAVA = (jobjectArray) (*env)->GetObjectArrayElement(env, transforms_JAVA, ensembleIndexInJavaArray);
-      numTerminationsForCurrentEnsemble = (int) (*env)->GetArrayLength(env, transformsForCurrentEnsemble_JAVA);
+      transformsForCurrentEnsemble_JAVA = (jobjectArray) env->GetObjectArrayElement(transforms_JAVA, ensembleIndexInJavaArray);
+      numTerminationsForCurrentEnsemble = (jint) env->GetArrayLength(transformsForCurrentEnsemble_JAVA);
 
-      tauForCurrentEnsemble_JAVA = (jfloatArray) (*env)->GetObjectArrayElement(env, tau_JAVA, ensembleIndexInJavaArray);
+      tauForCurrentEnsemble_JAVA = (jfloatArray) env->GetObjectArrayElement(tau_JAVA, ensembleIndexInJavaArray);
 
       if(i == startEnsembleIndex)
       {
         if(numTerminationsForCurrentEnsemble + networkArrayTerminationIndex <= currentData->numInputs)
         {
-          (*env)->GetFloatArrayRegion(env, tauForCurrentEnsemble_JAVA, 0, numTerminationsForCurrentEnsemble, currentData->terminationTau->array + networkArrayTerminationIndex);
+          env->GetFloatArrayRegion(tauForCurrentEnsemble_JAVA, 0, numTerminationsForCurrentEnsemble, currentData->terminationTau->array + networkArrayTerminationIndex);
         }
         else
         {
@@ -115,9 +112,9 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
       }
 
       // get the array that says whether a termination is decoded for the current ensemble
-      tempIntArray_JAVA = (jintArray)(*env)->GetObjectArrayElement(env, isDecodedTermination_JAVA, ensembleIndexInJavaArray);
-      (*env)->GetIntArrayRegion(env, tempIntArray_JAVA, 0, numTerminationsForCurrentEnsemble, isDecodedTermination);
-      (*env)->DeleteLocalRef(env, tempIntArray_JAVA);
+      tempIntArray_JAVA = (jintArray)env->GetObjectArrayElement(isDecodedTermination_JAVA, ensembleIndexInJavaArray);
+      env->GetIntArrayRegion(tempIntArray_JAVA, 0, numTerminationsForCurrentEnsemble, isDecodedTermination);
+      env->DeleteLocalRef(tempIntArray_JAVA);
 
       terminationOffset = 0;
 
@@ -130,15 +127,15 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
         if(isDecodedTermination[j])
         {
           // for decoded terminations
-          currentTransform_JAVA = (jobjectArray) (*env)->GetObjectArrayElement(env, transformsForCurrentEnsemble_JAVA, j);
-          dimensionOfCurrentEnsemble = (int) (*env)->GetArrayLength(env, currentTransform_JAVA);
+          currentTransform_JAVA = (jobjectArray) env->GetObjectArrayElement(transformsForCurrentEnsemble_JAVA, j);
+          dimensionOfCurrentEnsemble = (jint) env->GetArrayLength(currentTransform_JAVA);
 
           for(k = 0; k < dimensionOfCurrentEnsemble; k++)
           {
-            currentTransformRow_JAVA = (jfloatArray)(*env)->GetObjectArrayElement(env, currentTransform_JAVA, k);
-            dimensionOfCurrentTermination = (*env)->GetArrayLength(env, currentTransformRow_JAVA);
+            currentTransformRow_JAVA = (jfloatArray)env->GetObjectArrayElement(currentTransform_JAVA, k);
+            dimensionOfCurrentTermination = env->GetArrayLength(currentTransformRow_JAVA);
 
-            (*env)->GetFloatArrayRegion(env, currentTransformRow_JAVA, 0, dimensionOfCurrentTermination, currentTransformRow);
+            env->GetFloatArrayRegion(currentTransformRow_JAVA, 0, dimensionOfCurrentTermination, currentTransformRow);
 
             for(l = 0; l < dimensionOfCurrentTermination; l++)
             {
@@ -150,7 +147,7 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
 
             transformRowIndex++;
 
-            (*env)->DeleteLocalRef(env, currentTransformRow_JAVA);
+            env->DeleteLocalRef(currentTransformRow_JAVA);
           }
 
           terminationOffset += currentData->totalEnsembleDimension;
@@ -161,17 +158,17 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
             networkArrayTerminationIndex++;
           }
 
-          (*env)->DeleteLocalRef(env, currentTransform_JAVA);
+          env->DeleteLocalRef(currentTransform_JAVA);
         }
         else
         {
           // for non decoded terminations
-          currentTransform_JAVA = (jobjectArray) (*env)->GetObjectArrayElement(env, transformsForCurrentEnsemble_JAVA, j);
-          currentTransformRow_JAVA = (jfloatArray)(*env)->GetObjectArrayElement(env, currentTransform_JAVA, 0);
+          currentTransform_JAVA = (jobjectArray) env->GetObjectArrayElement(transformsForCurrentEnsemble_JAVA, j);
+          currentTransformRow_JAVA = (jfloatArray)env->GetObjectArrayElement(currentTransform_JAVA, 0);
 
-          dimensionOfCurrentTermination = (*env)->GetArrayLength(env, currentTransformRow_JAVA);
+          dimensionOfCurrentTermination = env->GetArrayLength(currentTransformRow_JAVA);
 
-          (*env)->GetFloatArrayRegion(env, currentTransformRow_JAVA, 0, dimensionOfCurrentTermination, currentTransformRow);
+          env->GetFloatArrayRegion(currentTransformRow_JAVA, 0, dimensionOfCurrentTermination, currentTransformRow);
 
           for(l = 0; l < dimensionOfCurrentTermination; l++)
           {
@@ -189,8 +186,8 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
 
           NDterminationIndex++;
 
-          (*env)->DeleteLocalRef(env, currentTransform_JAVA);
-          (*env)->DeleteLocalRef(env, currentTransformRow_JAVA);
+          env->DeleteLocalRef(currentTransform_JAVA);
+          env->DeleteLocalRef(currentTransformRow_JAVA);
         }
         
       }
@@ -201,8 +198,8 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
 
       dimensionIndex += dimensionOfCurrentEnsemble;
 
-      (*env)->DeleteLocalRef(env, transformsForCurrentEnsemble_JAVA);
-      (*env)->DeleteLocalRef(env, tauForCurrentEnsemble_JAVA);
+      env->DeleteLocalRef(transformsForCurrentEnsemble_JAVA);
+      env->DeleteLocalRef(tauForCurrentEnsemble_JAVA);
     }
 
     networkArrayOffsetInTerminations += numTerminationsForCurrentEnsemble;
@@ -212,26 +209,26 @@ void storeTerminationData(JNIEnv* env, jobjectArray transforms_JAVA, jobjectArra
   free(currentTransformRow);
 }
 
-void storeNeuronData(JNIEnv *env, jobjectArray neuronData_JAVA, int* isSpikingEnsemble, NengoGPUData* currentData)
+void storeNeuronData(JNIEnv *env, jobjectArray neuronData_JAVA, jint* isSpikingEnsemble, NengoGPUData* currentData)
 {
-  int i, j, currentNumNeurons, neuronDataLength;
+  jint i, j, currentNumNeurons, neuronDataLength;
 
   jfloatArray neuronDataForCurrentEnsemble_JAVA;
   float* neuronDataForCurrentEnsemble;
   
-  int ensembleJavaIndex = 0, neuronIndex = 0;
+  jint ensembleJavaIndex = 0, neuronIndex = 0;
 
   for(i = 0; i < currentData->numEnsembles; i++)
   {
     ensembleJavaIndex = intArrayGetElement(currentData->ensembleIndexInJavaArray, i);
-    neuronDataForCurrentEnsemble_JAVA = (jfloatArray) (*env)->GetObjectArrayElement(env, neuronData_JAVA, ensembleJavaIndex);
-    neuronDataLength = (*env)->GetArrayLength(env, neuronDataForCurrentEnsemble_JAVA);
+    neuronDataForCurrentEnsemble_JAVA = (jfloatArray) env->GetObjectArrayElement(neuronData_JAVA, ensembleJavaIndex);
+    neuronDataLength = env->GetArrayLength(neuronDataForCurrentEnsemble_JAVA);
     neuronDataForCurrentEnsemble = (float*) malloc( neuronDataLength * sizeof(float));
-    (*env)->GetFloatArrayRegion(env, neuronDataForCurrentEnsemble_JAVA, 0, neuronDataLength, neuronDataForCurrentEnsemble);
+    env->GetFloatArrayRegion(neuronDataForCurrentEnsemble_JAVA, 0, neuronDataLength, neuronDataForCurrentEnsemble);
 
-    (*env)->DeleteLocalRef(env, neuronDataForCurrentEnsemble_JAVA);
+    env->DeleteLocalRef(neuronDataForCurrentEnsemble_JAVA);
 
-    currentNumNeurons = neuronDataForCurrentEnsemble[0];
+    currentNumNeurons = (jint)neuronDataForCurrentEnsemble[0];
     intArraySetElement(currentData->ensembleNumNeurons, i, currentNumNeurons);
     floatArraySetElement(currentData->ensembleTauRC, i, neuronDataForCurrentEnsemble[1]);
     floatArraySetElement(currentData->ensembleTauRef, i, neuronDataForCurrentEnsemble[2]);
@@ -256,18 +253,18 @@ void storeNeuronData(JNIEnv *env, jobjectArray neuronData_JAVA, int* isSpikingEn
 
 void storeEncoders(JNIEnv *env, jobjectArray encoders_JAVA, NengoGPUData* currentData)
 {
-  int i, j, k;
-  int ensembleIndexInJavaArray = 0;
-  int numNeuronsForCurrentEnsemble;
-  int dimensionOfCurrentEnsemble;
+  jint i, j, k;
+  jint ensembleIndexInJavaArray = 0;
+  jint numNeuronsForCurrentEnsemble;
+  jint dimensionOfCurrentEnsemble;
 
   jobjectArray encoderForCurrentEnsemble_JAVA;
   jfloatArray currentEncoderRow_JAVA;
 
   float* temp_encoders = (float*) malloc(currentData->totalEncoderSize * sizeof(float));
-  int* temp_encoder_offset = (int*)malloc(currentData->numEnsembles * sizeof(int));
+  jint* temp_encoder_offset = (jint*)malloc(currentData->numEnsembles * sizeof(jint));
 
-  int offset = 0;
+  jint offset = 0;
   // totalNumEnsembles is a global variable denoting the number of ensembles in the entire run, not just those allocated to this device
   // here we get encoders for this device out of encoders java array, but they're not in the order we want
   for(i = 0; i < currentData->numEnsembles; i++)
@@ -275,20 +272,20 @@ void storeEncoders(JNIEnv *env, jobjectArray encoders_JAVA, NengoGPUData* curren
     temp_encoder_offset[i] = offset; 
 
     ensembleIndexInJavaArray = intArrayGetElement(currentData->ensembleIndexInJavaArray, i);
-    encoderForCurrentEnsemble_JAVA = (jobjectArray) (*env)->GetObjectArrayElement(env, encoders_JAVA, ensembleIndexInJavaArray);
+    encoderForCurrentEnsemble_JAVA = (jobjectArray) env->GetObjectArrayElement(encoders_JAVA, ensembleIndexInJavaArray);
     numNeuronsForCurrentEnsemble = intArrayGetElement(currentData->ensembleNumNeurons, i);
     dimensionOfCurrentEnsemble = intArrayGetElement(currentData->ensembleDimension, i);
 
     for(j = 0; j < numNeuronsForCurrentEnsemble; j++)
     {
-      currentEncoderRow_JAVA = (jfloatArray) (*env)->GetObjectArrayElement(env, encoderForCurrentEnsemble_JAVA, j);
-      (*env)->GetFloatArrayRegion(env, currentEncoderRow_JAVA, 0, dimensionOfCurrentEnsemble, temp_encoders + offset); 
+      currentEncoderRow_JAVA = (jfloatArray) env->GetObjectArrayElement(encoderForCurrentEnsemble_JAVA, j);
+      env->GetFloatArrayRegion(currentEncoderRow_JAVA, 0, dimensionOfCurrentEnsemble, temp_encoders + offset); 
       offset += dimensionOfCurrentEnsemble;
 
-      (*env)->DeleteLocalRef(env, currentEncoderRow_JAVA);
+      env->DeleteLocalRef(currentEncoderRow_JAVA);
     }
     
-    (*env)->DeleteLocalRef(env, encoderForCurrentEnsemble_JAVA);
+    env->DeleteLocalRef(encoderForCurrentEnsemble_JAVA);
   }
 
   // So now we have all the encoders in a C array, temp_encoders, but not in the order we want them in
@@ -297,7 +294,7 @@ void storeEncoders(JNIEnv *env, jobjectArray encoders_JAVA, NengoGPUData* curren
   // order ensembles by decreasing dimension
   char* name = "ensembleOrderInEncoders";
   currentData->ensembleOrderInEncoders = newIntArray(currentData->numEnsembles, name);
-  int* temp = sort(currentData->ensembleDimension->array, currentData->numEnsembles, 1);
+  jint* temp = sort(currentData->ensembleDimension->array, currentData->numEnsembles, 1);
   intArraySetData(currentData->ensembleOrderInEncoders, temp, currentData->numEnsembles);
   free(temp);
 
@@ -305,7 +302,7 @@ void storeEncoders(JNIEnv *env, jobjectArray encoders_JAVA, NengoGPUData* curren
   // we have to make an array of offsets into the final encoder array so that we know how long each row is
   // what this is essentially doing is recording, for each x between 1 and the max number of dimensions,
   // how many ensembles have at least x dimensions
-  int numNeurons;
+  jint numNeurons;
   for(i = 1; i <= currentData->maxDimension; i++)
   {
     numNeurons = 0;
@@ -324,9 +321,9 @@ void storeEncoders(JNIEnv *env, jobjectArray encoders_JAVA, NengoGPUData* curren
 
   // now we have the order we want the encoders to appear in the array, and the row lengths in the new array, 
   // so we just have to transform temp_encoders using this ordering
-  int rowOffset;
-  int neuronOffset = 0;
-  int ensembleIndex = 0;
+  jint rowOffset;
+  jint neuronOffset = 0;
+  jint ensembleIndex = 0;
 
   for(i = 0; i < currentData->numEnsembles; i++)
   {
@@ -357,7 +354,7 @@ void storeEncoders(JNIEnv *env, jobjectArray encoders_JAVA, NengoGPUData* curren
 
 
   // construct array encoderRowToEnsembleIndexor which maintains, for each row encoder row, which ensemble it belongs to
-  int encoderRowIndex = 0, ensembleOffsetInNeurons;
+  jint encoderRowIndex = 0, ensembleOffsetInNeurons;
   for(i = 0; i < currentData->numEnsembles; i++)
   {
     ensembleIndex = intArrayGetElement(currentData->ensembleOrderInEncoders, i);
@@ -375,28 +372,28 @@ void storeEncoders(JNIEnv *env, jobjectArray encoders_JAVA, NengoGPUData* curren
 
 }
 
-void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* currentData, int* networkArrayData)
+void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* currentData, jint* networkArrayData)
 {
-  int i, j, k;
+  jint i, j, k;
 
   jobjectArray decodersForCurrentEnsemble_JAVA;
   jobjectArray currentDecoder_JAVA;
   jfloatArray currentDecoderRow_JAVA;
-  int decoderIndex = 0, dimensionOfCurrentDecoder, numDecodersForCurrentEnsemble, ensembleIndexInJavaArray;
+  jint decoderIndex = 0, dimensionOfCurrentDecoder, numDecodersForCurrentEnsemble, ensembleIndexInJavaArray;
 
-  int* ensembleOutputSize = (int*)malloc(currentData->numEnsembles * sizeof(int)); 
-  int* ensembleOffsetInOutput = (int*)malloc(currentData->numEnsembles * sizeof(int)); 
+  jint* ensembleOutputSize = (jint*)malloc(currentData->numEnsembles * sizeof(jint)); 
+  jint* ensembleOffsetInOutput = (jint*)malloc(currentData->numEnsembles * sizeof(jint)); 
 
   // populate currentData->originOffsetInOutput and ensembleOutputSize
-  int outputSize, originOffsetInOutput = 0;
+  jint outputSize, originOffsetInOutput = 0;
 
   decoderIndex = 0;
   for(j = 0; j < currentData->numEnsembles; j++)
   {
     ensembleIndexInJavaArray = intArrayGetElement(currentData->ensembleIndexInJavaArray,j);
 
-    decodersForCurrentEnsemble_JAVA = (jobjectArray) (*env)->GetObjectArrayElement(env, decoders_JAVA, ensembleIndexInJavaArray);
-    numDecodersForCurrentEnsemble = (int) (*env)->GetArrayLength(env, decodersForCurrentEnsemble_JAVA);
+    decodersForCurrentEnsemble_JAVA = (jobjectArray) env->GetObjectArrayElement(decoders_JAVA, ensembleIndexInJavaArray);
+    numDecodersForCurrentEnsemble = (jint) env->GetArrayLength(decodersForCurrentEnsemble_JAVA);
 
     outputSize = 0;
 
@@ -404,10 +401,10 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
 
     for(k = 0; k < numDecodersForCurrentEnsemble; k++)
     {
-      currentDecoder_JAVA = (jobjectArray) (*env)->GetObjectArrayElement(env, decodersForCurrentEnsemble_JAVA, k);
-      currentDecoderRow_JAVA = (jfloatArray) (*env)->GetObjectArrayElement(env, currentDecoder_JAVA, 0);
+      currentDecoder_JAVA = (jobjectArray) env->GetObjectArrayElement(decodersForCurrentEnsemble_JAVA, k);
+      currentDecoderRow_JAVA = (jfloatArray) env->GetObjectArrayElement(currentDecoder_JAVA, 0);
 
-      dimensionOfCurrentDecoder = (int) (*env)->GetArrayLength(env, currentDecoderRow_JAVA);
+      dimensionOfCurrentDecoder = (jint) env->GetArrayLength(currentDecoderRow_JAVA);
       intArraySetElement(currentData->ensembleOriginDimension, decoderIndex, dimensionOfCurrentDecoder);
 
       outputSize += dimensionOfCurrentDecoder;
@@ -417,18 +414,18 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
       originOffsetInOutput += dimensionOfCurrentDecoder;
       decoderIndex++;
 
-      (*env)->DeleteLocalRef(env, currentDecoder_JAVA);
-      (*env)->DeleteLocalRef(env, currentDecoderRow_JAVA);
+      env->DeleteLocalRef(currentDecoder_JAVA);
+      env->DeleteLocalRef(currentDecoderRow_JAVA);
     }
 
     ensembleOutputSize[j] = outputSize;
 
-    (*env)->DeleteLocalRef(env, decodersForCurrentEnsemble_JAVA);
+    env->DeleteLocalRef(decodersForCurrentEnsemble_JAVA);
   }
   
   
  // populate decoder stride
-  int numOutputs;
+  jint numOutputs;
   for(i = 1; i <= currentData->maxNumNeurons; i++)
   {
     numOutputs = 0;
@@ -447,17 +444,17 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
   // sort the ensembles in order of decreasing number of neurons
   char* name = "ensembleOrderInDecoders";
   currentData->ensembleOrderInDecoders = newIntArray(currentData->numEnsembles, name); 
-  int* temp = sort(currentData->ensembleNumNeurons->array, currentData->numEnsembles, 1);
+  jint* temp = sort(currentData->ensembleNumNeurons->array, currentData->numEnsembles, 1);
   intArraySetData(currentData->ensembleOrderInDecoders, temp, currentData->numEnsembles);
   free(temp);
 
 
 
-  int ensembleIndex = 0;
-  int numNeuronsForCurrentEnsemble;
-  int decoderRowIndex = 0;
-  int offset = 0;
-  int rowOffset = 0;
+  jint ensembleIndex = 0;
+  jint numNeuronsForCurrentEnsemble;
+  jint decoderRowIndex = 0;
+  jint offset = 0;
+  jint rowOffset = 0;
 
   for(i = 0; i < currentData->numEnsembles; i++)
   {
@@ -466,8 +463,8 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
 
     numNeuronsForCurrentEnsemble = intArrayGetElement(currentData->ensembleNumNeurons,ensembleIndex);
 
-    decodersForCurrentEnsemble_JAVA = (jobjectArray) (*env)->GetObjectArrayElement(env, decoders_JAVA, ensembleIndexInJavaArray);
-    numDecodersForCurrentEnsemble = (int) (*env)->GetArrayLength(env, decodersForCurrentEnsemble_JAVA);
+    decodersForCurrentEnsemble_JAVA = (jobjectArray) env->GetObjectArrayElement(decoders_JAVA, ensembleIndexInJavaArray);
+    numDecodersForCurrentEnsemble = (jint) env->GetArrayLength(decodersForCurrentEnsemble_JAVA);
 
     intArraySetElement(currentData->ensembleNumOrigins, ensembleIndex, numDecodersForCurrentEnsemble);
 
@@ -478,14 +475,14 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
       decoderRowIndex = offset;
       for(k = 0; k < numDecodersForCurrentEnsemble; k++)
       {
-        currentDecoder_JAVA = (jobjectArray) (*env)->GetObjectArrayElement(env, decodersForCurrentEnsemble_JAVA, k);
-        currentDecoderRow_JAVA = (jfloatArray) (*env)->GetObjectArrayElement(env, currentDecoder_JAVA, j);
+        currentDecoder_JAVA = (jobjectArray) env->GetObjectArrayElement(decodersForCurrentEnsemble_JAVA, k);
+        currentDecoderRow_JAVA = (jfloatArray) env->GetObjectArrayElement(currentDecoder_JAVA, j);
         
-        dimensionOfCurrentDecoder = (*env)->GetArrayLength(env, currentDecoderRow_JAVA);
+        dimensionOfCurrentDecoder = env->GetArrayLength(currentDecoderRow_JAVA);
 
         if(rowOffset + decoderRowIndex + dimensionOfCurrentDecoder <= currentData->totalDecoderSize)
         {
-          (*env)->GetFloatArrayRegion(env, currentDecoderRow_JAVA, 0, dimensionOfCurrentDecoder, currentData->decoders->array + rowOffset + decoderRowIndex);
+          env->GetFloatArrayRegion(currentDecoderRow_JAVA, 0, dimensionOfCurrentDecoder, currentData->decoders->array + rowOffset + decoderRowIndex);
         }
         else
         {
@@ -495,8 +492,8 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
 
         decoderRowIndex += dimensionOfCurrentDecoder;
          
-        (*env)->DeleteLocalRef(env, currentDecoder_JAVA);
-        (*env)->DeleteLocalRef(env, currentDecoderRow_JAVA);
+        env->DeleteLocalRef(currentDecoder_JAVA);
+        env->DeleteLocalRef(currentDecoderRow_JAVA);
       }
 
       rowOffset += intArrayGetElement(currentData->decoderStride,j);
@@ -504,11 +501,11 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
     
     offset = decoderRowIndex;
 
-    (*env)->DeleteLocalRef(env, decodersForCurrentEnsemble_JAVA);
+    env->DeleteLocalRef(decodersForCurrentEnsemble_JAVA);
   }
 
 
-  int offsetInOutput;
+  jint offsetInOutput;
   decoderRowIndex = 0;
 
   // set decoderRowIndexors. Tells each decoder which ensemble it belongs to and where to put its output
@@ -532,14 +529,14 @@ void storeDecoders(JNIEnv* env, jobjectArray decoders_JAVA, NengoGPUData* curren
 }
 
 
-void assignNetworkArrayToDevice(int networkArrayIndex, int* networkArrayData, int* ensembleData, int* collectSpikes, NengoGPUData* currentData)
+void assignNetworkArrayToDevice(jint networkArrayIndex, jint* networkArrayData, jint* ensembleData, jint* collectSpikes, NengoGPUData* currentData)
 {
   currentData->numNetworkArrays++;
   currentData->numInputs += networkArrayData[NENGO_NA_DATA_NUM * networkArrayIndex + NENGO_NA_DATA_NUM_TERMINATIONS];
   currentData->totalInputSize += networkArrayData[NENGO_NA_DATA_NUM * networkArrayIndex + NENGO_NA_DATA_TOTAL_INPUT_SIZE];
   currentData->numNetworkArrayOrigins += networkArrayData[NENGO_NA_DATA_NUM * networkArrayIndex + NENGO_NA_DATA_NUM_ORIGINS];
 
-  int i, startEnsembleIndex, endEnsembleIndex;
+  jint i, startEnsembleIndex, endEnsembleIndex;
   startEnsembleIndex = networkArrayData[NENGO_NA_DATA_NUM * networkArrayIndex + NENGO_NA_DATA_FIRST_INDEX];
   endEnsembleIndex = networkArrayData[NENGO_NA_DATA_NUM * networkArrayIndex + NENGO_NA_DATA_END_INDEX];
 
@@ -603,18 +600,18 @@ void assignNetworkArrayToDevice(int networkArrayIndex, int* networkArrayData, in
   }
 }
 
-void setupIO(int numProjections, projection* projections, NengoGPUData* currentData, int* networkArrayData, int** originRequiredByJava)
+void setupIO(jint numProjections, projection* projections, NengoGPUData* currentData, jint* networkArrayData, jint** originRequiredByJava)
 {
-  int i, j, k, l;
-  int currentDimension, networkArrayIndex = -1, terminationIndexInNetworkArray = -1;
-  int projectionMatches, currentNumTerminations = 0, networkArrayJavaIndex; 
+  jint i, j, k, l;
+  jint currentDimension, networkArrayIndex = -1, terminationIndexInNetworkArray = -1;
+  jint projectionMatches, currentNumTerminations = 0, networkArrayJavaIndex; 
 
-  int* flattenedProjections = (int*) malloc(2 * numProjections * sizeof(int));
+  jint* flattenedProjections = (jint*) malloc(2 * numProjections * sizeof(jint));
 
-  int JavaInputIndex = 0, GPUInputIndex = 0, CPUInputIndex = 0;
+  jint JavaInputIndex = 0, GPUInputIndex = 0, CPUInputIndex = 0;
   
   // 0 = GPU, 1 = Java, 2 = CPU
-  int* terminationLocation = (int*)malloc(currentData->numInputs * sizeof(int));
+  jint* terminationLocation = (jint*)malloc(currentData->numInputs * sizeof(jint));
 
   // flatten the termination side of the projection array
   for(i = 0; i < currentData->numInputs; i++)
@@ -681,7 +678,7 @@ void setupIO(int numProjections, projection* projections, NengoGPUData* currentD
 
   // adjust the terminationOffsets to reflect the location of each termination (GPU, Java or CPU)
   // can only be done once we know the size of each location
-  int oldVal, location;
+  jint oldVal, location;
   for(i = 0; i < currentData->numInputs; i++)
   {
     oldVal = intArrayGetElement(currentData->terminationOffsetInInput, i);
@@ -704,8 +701,8 @@ void setupIO(int numProjections, projection* projections, NengoGPUData* currentD
   free(terminationLocation);
 
 
-  int ensembleOriginDimension, ensembleOriginIndex = 0, naOriginIndex = 0, numOrigins, originDimension;
-  int naOffsetInEnsembleOriginIndices = 0, naIndexInJavaArray, startEnsembleIndex, endEnsembleIndex;
+  jint ensembleOriginDimension, ensembleOriginIndex = 0, naOriginIndex = 0, numOrigins, originDimension;
+  jint naOffsetInEnsembleOriginIndices = 0, naIndexInJavaArray, startEnsembleIndex, endEnsembleIndex;
 
   // here goal is to set networkArrayNumOrigins and networkArrayOriginDimension;
   //
@@ -741,8 +738,8 @@ void setupIO(int numProjections, projection* projections, NengoGPUData* currentD
     naOffsetInEnsembleOriginIndices += numOrigins * (endEnsembleIndex - startEnsembleIndex);
   }
 
-  int interGPUFlag, interGPUOutputSize = 0, CPUOutputIndex = 0, GPUOutputIndex = 0, JavaOutputIndex = 0;
-  int* originLocation = (int*)malloc(currentData->numNetworkArrayOrigins * sizeof(int));
+  jint interGPUFlag, interGPUOutputSize = 0, CPUOutputIndex = 0, GPUOutputIndex = 0, JavaOutputIndex = 0;
+  jint* originLocation = (jint*)malloc(currentData->numNetworkArrayOrigins * sizeof(jint));
 
   naOriginIndex = 0;
 
@@ -859,7 +856,7 @@ void setupIO(int numProjections, projection* projections, NengoGPUData* currentD
   naOffsetInEnsembleOriginIndices = 0;
   naOriginIndex = 0;
   
-  int indexInNetworkArrayOutput, indexInEnsembleOutput;
+  jint indexInNetworkArrayOutput, indexInEnsembleOutput;
 
   for(i = 0; i < currentData->numNetworkArrays; i++)
   {  
@@ -900,7 +897,7 @@ void setupIO(int numProjections, projection* projections, NengoGPUData* currentD
   // Use the flattened projections to create a map from the input to the output following the projections
   // This way we can launch a kernel for each projection on the GPU, have it look up where it gets its output from
   // fetch it from the output array and put it in the input array
-  int terminationIndexOnDevice, originIndexOnDevice, terminationOffsetInInput, originOffsetInOutput;
+  jint terminationIndexOnDevice, originIndexOnDevice, terminationOffsetInInput, originOffsetInOutput;
   for(i = 0; i < numProjections; i++)
   {
     if(projections[i].sourceDevice == currentData->device && projections[i].destDevice == currentData->device)
@@ -939,13 +936,13 @@ void setupIO(int numProjections, projection* projections, NengoGPUData* currentD
 
 
 // this function should be called before setupIO, but after setupNeuronData.
-void setupSpikes(int* collectSpikes, NengoGPUData* currentData)
+void setupSpikes(jint* collectSpikes, NengoGPUData* currentData)
 {
   //create an array which can be used by the GPU to extract the spikes we want to send back form the main spike array 
   currentData->spikeMap = newIntArray(currentData->numSpikesToSendBack, "spikeMap");
 
   //populate these arrays
-  int i, j, indexInJavaArray, spikeIndex = 0, currentNumNeurons, currentOffsetInNeurons;
+  jint i, j, indexInJavaArray, spikeIndex = 0, currentNumNeurons, currentOffsetInNeurons;
   for(i = 0; i < currentData->numEnsembles; i++)
   {
     indexInJavaArray = intArrayGetElement(currentData->ensembleIndexInJavaArray, i);
@@ -967,9 +964,9 @@ void setupSpikes(int* collectSpikes, NengoGPUData* currentData)
 // this sets the shared memory maps (maps for getting data out of the output arrays and into
 // the shared input arrays which is the means of inter-gpu communication). relies on the offsetInSource
 // and offsetInDestination fields of the projection structure being set properly (happens in setupIO).
-void createSharedMemoryMaps(int numProjections, projection* projections)
+void createSharedMemoryMaps(jint numProjections, projection* projections)
 {
-  int i, j, sharedIndex = 0, indexInProjection;
+  jint i, j, sharedIndex = 0, indexInProjection;
   projection* p;
   NengoGPUData* currentData;
 
@@ -994,8 +991,7 @@ void createSharedMemoryMaps(int numProjections, projection* projections)
   }
 }
 
-JNIEXPORT jint JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeGetNumDevices
-  (JNIEnv *env, jclass class)
+JNIEXPORT jint JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeGetNumDevices(JNIEnv *env, jclass clazz)
 {
   jint numGPU = (jint) getGPUDeviceCount();
 
@@ -1004,25 +1000,38 @@ JNIEXPORT jint JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeGetNumDevic
 
 // This function takes as arguments all the information required by the ensembles to run that won't change from step to step: decoders, encoders, transformations.
 // This is called only once, at the beginning of a run (specifically, when the GPUNodeThreadPool is created). 
-JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
-  (JNIEnv *env, jclass class, jobjectArray terminationTransforms_JAVA, jobjectArray isDecodedTermination_JAVA, 
-  jobjectArray terminationTau_JAVA, jobjectArray encoders_JAVA, jobjectArray decoders_JAVA, 
-  jobjectArray neuronData_JAVA, jobjectArray projections_JAVA, jobjectArray networkArrayData_JAVA, jobjectArray ensembleData_JAVA, 
-  jintArray isSpikingEnsemble_JAVA, jintArray collectSpikes_JAVA, jobjectArray originRequiredByJava_JAVA, jfloat maxTimeStep, jintArray deviceForNetworkArrays_JAVA, jint numDevicesRequested)
+JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun(
+	JNIEnv *env,
+	jclass clazz,
+	jobjectArray terminationTransforms_JAVA,
+	jobjectArray isDecodedTermination_JAVA,
+	jobjectArray terminationTau_JAVA,
+	jobjectArray encoders_JAVA,
+	jobjectArray decoders_JAVA,
+	jobjectArray neuronData_JAVA,
+	jobjectArray projections_JAVA,
+	jobjectArray networkArrayData_JAVA,
+	jobjectArray ensembleData_JAVA,
+	jintArray isSpikingEnsemble_JAVA, jintArray collectSpikes_JAVA,
+	jobjectArray originRequiredByJava_JAVA,
+	jfloat maxTimeStep,
+	jintArray deviceForNetworkArrays_JAVA,
+	jint numDevicesRequested
+)
 {
   printf("NengoGPU: SETUP\n"); 
 
-  int i, j, k;
+  jint i, j, k;
   
-  int numAvailableDevices = getGPUDeviceCount();
+  jint numAvailableDevices = getGPUDeviceCount();
   numDevices = numDevicesRequested;
 
   printf("Using %d devices. %d available\n", numDevices, numAvailableDevices);
 
   nengoDataArray = (NengoGPUData**) malloc(sizeof(NengoGPUData*) * numDevices);
 
-  totalNumEnsembles = (int) (*env)->GetArrayLength(env, neuronData_JAVA);
-  totalNumNetworkArrays = (int)(*env)->GetArrayLength(env, networkArrayData_JAVA);
+  totalNumEnsembles = (jint) env->GetArrayLength(neuronData_JAVA);
+  totalNumNetworkArrays = (jint)env->GetArrayLength(networkArrayData_JAVA);
 
   jintArray tempIntArray_JAVA;
 
@@ -1036,62 +1045,62 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
   }
 
   // sort out the projections
-  int numProjections = (int) (*env)->GetArrayLength(env, projections_JAVA);
-  int* currentProjection = (int*)malloc(PROJECTION_DATA_SIZE * sizeof(int));
+  jint numProjections = (jint) env->GetArrayLength(projections_JAVA);
+  jint* currentProjection = (jint*)malloc(PROJECTION_DATA_SIZE * sizeof(jint));
   projection* projections = (projection*) malloc( numProjections * sizeof(projection));
   for(i=0; i < numProjections; i++)
   {
-    tempIntArray_JAVA = (jintArray)(*env)->GetObjectArrayElement(env, projections_JAVA, i);
-    (*env)->GetIntArrayRegion(env, tempIntArray_JAVA, 0, PROJECTION_DATA_SIZE, currentProjection);
+    tempIntArray_JAVA = (jintArray)env->GetObjectArrayElement(projections_JAVA, i);
+    env->GetIntArrayRegion(tempIntArray_JAVA, 0, PROJECTION_DATA_SIZE, currentProjection);
     storeProjection(projections + i, currentProjection);
 
-    (*env)->DeleteLocalRef(env, tempIntArray_JAVA);
+    env->DeleteLocalRef(tempIntArray_JAVA);
   }
 
   free(currentProjection);
-  (*env)->DeleteLocalRef(env, projections_JAVA);
+  env->DeleteLocalRef(projections_JAVA);
 
-  int* networkArrayData = (int*)malloc(totalNumNetworkArrays * NENGO_NA_DATA_NUM * sizeof(int));
-  int* ensembleData = (int*)malloc(totalNumEnsembles * NENGO_ENSEMBLE_DATA_NUM * sizeof(int));
+  jint* networkArrayData = (jint*)malloc(totalNumNetworkArrays * NENGO_NA_DATA_NUM * sizeof(jint));
+  jint* ensembleData = (jint*)malloc(totalNumEnsembles * NENGO_ENSEMBLE_DATA_NUM * sizeof(jint));
 
-  int numNeurons;
+  jint numNeurons;
   jintArray dataRow_JAVA;
 
   // store Network Array Data, and in a separate array store the number of neurons for each
   // networkArray to be used in creating the device configuration
   for(i = 0; i < totalNumNetworkArrays; i++)
   {
-    dataRow_JAVA = (jintArray) (*env)->GetObjectArrayElement(env, networkArrayData_JAVA, i);
-    (*env)->GetIntArrayRegion(env, dataRow_JAVA, 0, NENGO_NA_DATA_NUM, networkArrayData + i * NENGO_NA_DATA_NUM);
+    dataRow_JAVA = (jintArray) env->GetObjectArrayElement(networkArrayData_JAVA, i);
+    env->GetIntArrayRegion(dataRow_JAVA, 0, NENGO_NA_DATA_NUM, networkArrayData + i * NENGO_NA_DATA_NUM);
     
     numNeurons = networkArrayData[i * NENGO_NA_DATA_NUM + NENGO_NA_DATA_NUM_NEURONS];
 
-    (*env)->DeleteLocalRef(env, dataRow_JAVA);
+    env->DeleteLocalRef(dataRow_JAVA);
   }
 
-  (*env)->DeleteLocalRef(env, networkArrayData_JAVA);
+  env->DeleteLocalRef(networkArrayData_JAVA);
 
   // store ensemble data
   for(i = 0; i < totalNumEnsembles; i++)
   {
-    dataRow_JAVA = (jintArray) (*env)->GetObjectArrayElement(env, ensembleData_JAVA, i);
-    (*env)->GetIntArrayRegion(env, dataRow_JAVA, 0, NENGO_ENSEMBLE_DATA_NUM, ensembleData + i * NENGO_ENSEMBLE_DATA_NUM);
-    (*env)->DeleteLocalRef(env, dataRow_JAVA);
+    dataRow_JAVA = (jintArray) env->GetObjectArrayElement(ensembleData_JAVA, i);
+    env->GetIntArrayRegion(dataRow_JAVA, 0, NENGO_ENSEMBLE_DATA_NUM, ensembleData + i * NENGO_ENSEMBLE_DATA_NUM);
+    env->DeleteLocalRef(dataRow_JAVA);
   }
 
-  (*env)->DeleteLocalRef(env, ensembleData_JAVA);
+  env->DeleteLocalRef(ensembleData_JAVA);
  
   // Distribute the ensembles to the devices. Tries to minimize communication required between GPUs.
   //generateNengoGPUDeviceConfiguration(totalNumNeurons, networkArrayNumNeurons, numProjections, projections, adjacencyMatrix, deviceForNetworkArray);
   
-  deviceForNetworkArray = (int*) malloc(totalNumNetworkArrays * sizeof(int));
-  deviceForEnsemble = (int*) malloc(totalNumEnsembles * sizeof(int));
+  deviceForNetworkArray = (jint*) malloc(totalNumNetworkArrays * sizeof(jint));
+  deviceForEnsemble = (jint*) malloc(totalNumEnsembles * sizeof(jint));
 
-  (*env)->GetIntArrayRegion(env, deviceForNetworkArrays_JAVA, 0, totalNumNetworkArrays, deviceForNetworkArray); 
-  (*env)->DeleteLocalRef(env, deviceForNetworkArrays_JAVA);
+  env->GetIntArrayRegion(deviceForNetworkArrays_JAVA, 0, totalNumNetworkArrays, deviceForNetworkArray); 
+  env->DeleteLocalRef(deviceForNetworkArrays_JAVA);
 
   // Store which device each ensemble belongs to based on which device each network array belongs to
-  int endIndex;
+  jint endIndex;
   for(i = 0; i < totalNumNetworkArrays; i++)
   {
     j = networkArrayData[i * NENGO_NA_DATA_NUM + NENGO_NA_DATA_FIRST_INDEX];
@@ -1103,7 +1112,7 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
     }
   }
 
-  int originNodeIndex, termNodeIndex;
+  jint originNodeIndex, termNodeIndex;
   for(i = 0; i < numProjections; i++)
   {
     originNodeIndex = projections[i].sourceNode;
@@ -1113,30 +1122,30 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
     projections[i].destDevice = deviceForNetworkArray[termNodeIndex];
   }
 
-  int* isSpikingEnsemble = (int*) malloc(totalNumEnsembles * sizeof(int));
-  (*env)->GetIntArrayRegion(env, isSpikingEnsemble_JAVA, 0, totalNumEnsembles, isSpikingEnsemble); 
-  (*env)->DeleteLocalRef(env, isSpikingEnsemble_JAVA);
+  jint* isSpikingEnsemble = (jint*) malloc(totalNumEnsembles * sizeof(jint));
+  env->GetIntArrayRegion(isSpikingEnsemble_JAVA, 0, totalNumEnsembles, isSpikingEnsemble); 
+  env->DeleteLocalRef(isSpikingEnsemble_JAVA);
 
-  int* collectSpikes = (int*) malloc(totalNumEnsembles * sizeof(int));
-  (*env)->GetIntArrayRegion(env, collectSpikes_JAVA, 0, totalNumEnsembles, collectSpikes); 
-  (*env)->DeleteLocalRef(env, collectSpikes_JAVA);
+  jint* collectSpikes = (jint*) malloc(totalNumEnsembles * sizeof(jint));
+  env->GetIntArrayRegion(collectSpikes_JAVA, 0, totalNumEnsembles, collectSpikes); 
+  env->DeleteLocalRef(collectSpikes_JAVA);
 
-  int** originRequiredByJava = (int**) malloc(totalNumNetworkArrays * sizeof(int*));
+  jint** originRequiredByJava = (jint**) malloc(totalNumNetworkArrays * sizeof(jint*));
   for(i = 0; i < totalNumNetworkArrays; i++)
   {
-    tempIntArray_JAVA = (jintArray) (*env)->GetObjectArrayElement(env, originRequiredByJava_JAVA, i); 
-    j = (*env)->GetArrayLength(env, tempIntArray_JAVA);
+    tempIntArray_JAVA = (jintArray) env->GetObjectArrayElement(originRequiredByJava_JAVA, i); 
+    j = env->GetArrayLength(tempIntArray_JAVA);
 
-    originRequiredByJava[i] = (int*) malloc(j * sizeof(int));
-    (*env)->GetIntArrayRegion(env, tempIntArray_JAVA, 0, j, originRequiredByJava[i]); 
+    originRequiredByJava[i] = (jint*) malloc(j * sizeof(jint));
+    env->GetIntArrayRegion(tempIntArray_JAVA, 0, j, originRequiredByJava[i]); 
     
-    (*env)->DeleteLocalRef(env, tempIntArray_JAVA);
+    env->DeleteLocalRef(tempIntArray_JAVA);
   }
 
-  (*env)->DeleteLocalRef(env, originRequiredByJava_JAVA);
+  env->DeleteLocalRef(originRequiredByJava_JAVA);
 
   // set the number fields in the NengoGPUData structs so that it knows how big to make its internal arrays
-  int* networkArrayJavaIndexToDeviceIndex = (int*)malloc(totalNumEnsembles * sizeof(int));
+  jint* networkArrayJavaIndexToDeviceIndex = (jint*)malloc(totalNumEnsembles * sizeof(jint));
   for(i = 0; i < totalNumNetworkArrays; i++)
   {
     currentData = nengoDataArray[deviceForNetworkArray[i]];
@@ -1213,12 +1222,12 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
     sharedInputSize += currentData->JavaInputSize + currentData->CPUInputSize;
   }
 
-  (*env)->DeleteLocalRef(env, terminationTransforms_JAVA);
-  (*env)->DeleteLocalRef(env, terminationTau_JAVA);
-  (*env)->DeleteLocalRef(env, isDecodedTermination_JAVA);
-  (*env)->DeleteLocalRef(env, neuronData_JAVA);
-  (*env)->DeleteLocalRef(env, encoders_JAVA);
-  (*env)->DeleteLocalRef(env, decoders_JAVA);
+  env->DeleteLocalRef(terminationTransforms_JAVA);
+  env->DeleteLocalRef(terminationTau_JAVA);
+  env->DeleteLocalRef(isDecodedTermination_JAVA);
+  env->DeleteLocalRef(neuronData_JAVA);
+  env->DeleteLocalRef(encoders_JAVA);
+  env->DeleteLocalRef(decoders_JAVA);
 
   
   for(i = 0; i < totalNumNetworkArrays; i++)
@@ -1256,9 +1265,15 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeSetupRun
 // Called once per step from the Java code. Puts the representedInputValues in the proper form for processing, then tells each GPU thread
 // to take a step. Once they've finished the step, this function puts the representedOutputValues and spikes in the appropriate Java
 // arrays so that they can be read on the Java side when this call returns.
-JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
-  (JNIEnv *env, jclass class, jobjectArray input, jobjectArray output, jobjectArray spikes, jfloat startTime_JAVA, jfloat endTime_JAVA)
-{
+JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep(
+	JNIEnv *env,
+	jclass clazz,
+	jobjectArray input,
+	jobjectArray output,
+	jobjectArray spikes,
+	jfloat startTime_JAVA,
+	jfloat endTime_JAVA
+) {
   startTime = (float) startTime_JAVA;
   endTime = (float) endTime_JAVA;
 
@@ -1267,8 +1282,8 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
   
   NengoGPUData* currentData;
 
-  int i, j, k, l;
-  int naIndexInJavaArray, inputIndex, numInputs, inputDimension;
+  jint i, j, k, l;
+  jint naIndexInJavaArray, inputIndex, numInputs, inputDimension;
 
   for( i = 0; i < numDevices; i++)
   {
@@ -1280,22 +1295,22 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
     {
       naIndexInJavaArray = intArrayGetElement(currentData->networkArrayIndexInJavaArray,j);
         
-      currentInputs_JAVA = (jobjectArray) (*env)->GetObjectArrayElement(env, input, naIndexInJavaArray);
+      currentInputs_JAVA = (jobjectArray) env->GetObjectArrayElement(input, naIndexInJavaArray);
       
       if(currentInputs_JAVA != NULL)
       {
-        numInputs = (*env)->GetArrayLength(env, currentInputs_JAVA);
+        numInputs = env->GetArrayLength(currentInputs_JAVA);
 
         for(k = 0; k < numInputs; k++)
         {
-          currentInput_JAVA = (jfloatArray)(*env)->GetObjectArrayElement(env, currentInputs_JAVA, k);
+          currentInput_JAVA = (jfloatArray)env->GetObjectArrayElement(currentInputs_JAVA, k);
           if(currentInput_JAVA != NULL)
           {
-            inputDimension = (*env)->GetArrayLength(env, currentInput_JAVA);
+            inputDimension = env->GetArrayLength(currentInput_JAVA);
 
             if(inputIndex  + inputDimension <= currentData->JavaInputSize)
             {
-              (*env)->GetFloatArrayRegion(env, currentInput_JAVA, 0, inputDimension, sharedInput + currentData->offsetInSharedInput + inputIndex);
+              env->GetFloatArrayRegion(currentInput_JAVA, 0, inputDimension, sharedInput + currentData->offsetInSharedInput + inputIndex);
             }
             else
             {
@@ -1306,15 +1321,15 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
             inputIndex += inputDimension;
           }
             
-          (*env)->DeleteLocalRef(env, currentInput_JAVA);
+          env->DeleteLocalRef(currentInput_JAVA);
         }
       }
 
-      (*env)->DeleteLocalRef(env, currentInputs_JAVA);
+      env->DeleteLocalRef(currentInputs_JAVA);
     }
   }
 
-  (*env)->DeleteLocalRef(env, input);
+  env->DeleteLocalRef(input);
 
   // tell the runner threads to run and then wait for them to finish. The last of them to finish running will wake this thread up. 
   pthread_mutex_lock(mutex);
@@ -1327,8 +1342,8 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
   jfloatArray currentSpikes_JAVA;
 
   //store represented output in java array
-  int numOutputs, outputDimension, outputIndex, spikeIndex, sharedIndex, ensembleNumNeurons;
-  int ensembleIndexInJavaArray;
+  jint numOutputs, outputDimension, outputIndex, spikeIndex, sharedIndex, ensembleNumNeurons;
+  jint ensembleIndexInJavaArray;
 
   for(i = 0; i < numDevices; i++)
   {
@@ -1340,20 +1355,20 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
     {
       naIndexInJavaArray = intArrayGetElement(currentData->networkArrayIndexInJavaArray,k);
 
-      currentOutputs_JAVA = (jobjectArray)(*env)->GetObjectArrayElement(env, output, naIndexInJavaArray);
-      numOutputs = (*env)->GetArrayLength(env, currentOutputs_JAVA); 
+      currentOutputs_JAVA = (jobjectArray)env->GetObjectArrayElement(output, naIndexInJavaArray);
+      numOutputs = env->GetArrayLength(currentOutputs_JAVA); 
 
       for(l = 0; l < numOutputs; l++)
       {
-        currentOutput_JAVA = (jfloatArray) (*env)->GetObjectArrayElement(env, currentOutputs_JAVA, l);
+        currentOutput_JAVA = (jfloatArray) env->GetObjectArrayElement(currentOutputs_JAVA, l);
 
         if(currentOutput_JAVA != NULL)
         {
-          outputDimension = (*env)->GetArrayLength(env, currentOutput_JAVA);
+          outputDimension = env->GetArrayLength(currentOutput_JAVA);
 
           if(outputIndex + outputDimension <= currentData->JavaOutputSize)
           {
-             (*env)->SetFloatArrayRegion(env, currentOutput_JAVA, 0, outputDimension, currentData->outputHost->array + outputIndex);
+             env->SetFloatArrayRegion(currentOutput_JAVA, 0, outputDimension, currentData->outputHost->array + outputIndex);
           }
           else
           {
@@ -1362,11 +1377,11 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
           }
 
           outputIndex += outputDimension;
-          (*env)->DeleteLocalRef(env, currentOutput_JAVA);
+          env->DeleteLocalRef(currentOutput_JAVA);
         }
       }
       
-      (*env)->DeleteLocalRef(env, currentOutputs_JAVA);
+      env->DeleteLocalRef(currentOutputs_JAVA);
     }
 
     spikeIndex = 0;
@@ -1375,17 +1390,17 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
     {
       ensembleIndexInJavaArray = intArrayGetElement(currentData->ensembleIndexInJavaArray,k);
 
-      currentSpikes_JAVA = (*env)->GetObjectArrayElement(env, spikes, ensembleIndexInJavaArray);
+      currentSpikes_JAVA = (jfloatArray)env->GetObjectArrayElement(spikes, ensembleIndexInJavaArray);
 
       if(currentSpikes_JAVA != NULL)
       {
-        ensembleNumNeurons = (int) (*env)->GetArrayLength(env, currentSpikes_JAVA);
+        ensembleNumNeurons = (jint) env->GetArrayLength(currentSpikes_JAVA);
 
-        (*env)->SetFloatArrayRegion(env, currentSpikes_JAVA, 0, ensembleNumNeurons, currentData->outputHost->array + currentData->CPUOutputSize + spikeIndex);
+        env->SetFloatArrayRegion(currentSpikes_JAVA, 0, ensembleNumNeurons, currentData->outputHost->array + currentData->CPUOutputSize + spikeIndex);
 
         spikeIndex += ensembleNumNeurons;
 
-        (*env)->DeleteLocalRef(env, currentSpikes_JAVA);
+        env->DeleteLocalRef(currentSpikes_JAVA);
       }
     }
 
@@ -1400,17 +1415,12 @@ JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeStep
   }
 
 
-  (*env)->DeleteLocalRef(env, output);
-  (*env)->DeleteLocalRef(env, spikes);
+  env->DeleteLocalRef(output);
+  env->DeleteLocalRef(spikes);
 }
 
-JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeKill
-(JNIEnv *env, jclass class)
+JNIEXPORT void JNICALL Java_ca_nengo_util_impl_NEFGPUInterface_nativeKill(JNIEnv *env, jclass clazz)
 {
   printf("NengoGPU: KILL\n");
   run_kill();
 }
-
-#ifdef __cplusplus
-}
-#endif

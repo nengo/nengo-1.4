@@ -1,19 +1,17 @@
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <stdlib.h>
-#include <cula_lapack_device.h>
 #include <cuda_runtime.h>
 #include <cublas.h>
 
 #include "customCudaUtils.h"
+    
+#ifdef NENGO_USE_CULA
+#include <cula_lapack_device.h>
+#endif
 
 // get number of devices available
-int getGPUDeviceCount(){
+jint getGPUDeviceCount(){
   cudaError_t err;
-  int numDevices;
+  jint numDevices;
   
   err = cudaGetDeviceCount(&numDevices);
   checkCudaError(err);
@@ -22,7 +20,7 @@ int getGPUDeviceCount(){
 }
 
 // get the max or min in a float array. type is 'M' for max, 'm' for min
-float findExtremeFloatArray(float* A, int size, int onDevice, char type, int* index)
+float findExtremeFloatArray(float* A, jint size, jint onDevice, char type, jint* index)
 {
   cudaError_t err;
 
@@ -35,7 +33,7 @@ float findExtremeFloatArray(float* A, int size, int onDevice, char type, int* in
     checkCudaError(err);
   }
 
-  int i;
+  jint i;
   float max = 0;
   for(i = 0; i < size; i++)
   {
@@ -62,7 +60,7 @@ float findExtremeFloatArray(float* A, int size, int onDevice, char type, int* in
   return max;
 }
 
-void printFloatArray(float* A, int M, int N, int onDevice)
+void printFloatArray(float* A, jint M, jint N, jint onDevice)
 {
   cudaError_t err;
 
@@ -75,7 +73,7 @@ void printFloatArray(float* A, int M, int N, int onDevice)
     checkCudaError(err);
   }
 
-  int i, j;
+  jint i, j;
   for(i = 0; i < M; i++)
   {
     for(j = 0; j < N; j++)
@@ -97,9 +95,9 @@ void printFloatArray(float* A, int M, int N, int onDevice)
 // Takes in two arrays, each of size ldA * ldB. It takes the contents of A and stores it in B
 // in the opposite storage orientation (eg if A is row major, then B comes out column major)
 // lda is the leading dimension of A, ldb that of B
-void switchFloatArrayStorage(float* A, float* B, int ldA, int ldB)
+void switchFloatArrayStorage(float* A, float* B, jint ldA, jint ldB)
 {
-    int i, j;
+    jint i, j;
 
     for(i=0;i<ldA; i++)
     {
@@ -110,9 +108,9 @@ void switchFloatArrayStorage(float* A, float* B, int ldA, int ldB)
     }
 }
 
-void printMatrixToFile(FILE *fp, float* A, int M, int N)
+void printMatrixToFile(FILE *fp, float* A, jint M, jint N)
 {
-    int i = 0;
+    jint i = 0;
 
     for(;i<N*M;i++)
     {
@@ -125,7 +123,7 @@ void printMatrixToFile(FILE *fp, float* A, int M, int N)
     fprintf(fp, "\n");
 }
 
-void printDeviceMatrixToFile(FILE *fp, float* devicePointer, int M, int N)
+void printDeviceMatrixToFile(FILE *fp, float* devicePointer, jint M, jint N)
 {
 	float* temp = (float*)malloc(N*M*sizeof(float));
 
@@ -134,8 +132,9 @@ void printDeviceMatrixToFile(FILE *fp, float* devicePointer, int M, int N)
 	printMatrixToFile(fp, temp, M, N);
 
 	free(temp);
-}	
+}
 
+#ifdef NENGO_USE_CULA
 __host__ void checkStatus(culaStatus status)
 {
     if(!status)
@@ -156,20 +155,16 @@ __host__ void checkStatus(culaStatus status)
     culaShutdown();
     exit(EXIT_FAILURE);
 }
-
+#endif
 
 __host__ void checkCudaError(cudaError_t err)
 {
-	
     if(!err)
         return;
 
     printf("%s\n", cudaGetErrorString(err));
-
+#ifdef NENGO_USE_CULA
     culaShutdown();
-    exit(EXIT_FAILURE);
+#endif
 }
 
-#ifdef __cplusplus
-}
-#endif

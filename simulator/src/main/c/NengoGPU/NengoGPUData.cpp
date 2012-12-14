@@ -1,7 +1,4 @@
-#ifdef __cplusplus
-extern "C"{
-#endif
-
+#define _CRT_NONSTDC_NO_WARNINGS
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -18,27 +15,27 @@ extern FILE* fp;
 ///////////////////////////////////////////////////////
 // intArray and floatArray allocating and freeing
 ///////////////////////////////////////////////////////
-intArray* newIntArray(int size, const char* name)
+intArray* newIntArray(jint size, const char* name)
 {
-  intArray* new = (intArray*)malloc(sizeof(intArray));
-  if(!new)
+  intArray* retVal = (intArray*)malloc(sizeof(intArray));
+  if(!retVal)
   {
     printf("Failed to allocate memory for intArray. name: %s, attemped size: %d\n", name, size);
     exit(EXIT_FAILURE);
   }
 
-  new->array = (int*)malloc(size * sizeof(int));
-  if(!new->array)
+  retVal->array = (jint*)malloc(size * sizeof(jint));
+  if(!retVal->array)
   {
     printf("Failed to allocate memory for intArray. name: %s, attemped size: %d\n", name, size);
     exit(EXIT_FAILURE);
   }
   
-  new->size = size;
-  new->name = strdup(name);
-  new->onDevice = 0;
+  retVal->size = size;
+  retVal->name = strdup(name);
+  retVal->onDevice = 0;
 
-  return new;
+  return retVal;
 }
 
 void freeIntArray(intArray* a)
@@ -55,44 +52,44 @@ void freeIntArray(intArray* a)
   free(a);
 }
 
-intArray* newIntArrayOnDevice(int size, const char* name)
+intArray* newIntArrayOnDevice(jint size, const char* name)
 {
-  intArray* new = (intArray*)malloc(sizeof(intArray));
+  intArray* retVal = (intArray*)malloc(sizeof(intArray));
 
-  new->array = allocateCudaIntArray(size);
-  new->size = size;
-  new->name = strdup(name);
-  new->onDevice = 1;
+  retVal->array = allocateCudaIntArray(size);
+  retVal->size = size;
+  retVal->name = strdup(name);
+  retVal->onDevice = 1;
 
-  return new;
+  return retVal;
 }
 
-floatArray* newFloatArray(int size, const char* name)
+floatArray* newFloatArray(jint size, const char* name)
 {
-  floatArray* new = (floatArray*)malloc(sizeof(floatArray));
-  if(!new)
+  floatArray* retVal = (floatArray*)malloc(sizeof(floatArray));
+  if(!retVal)
   {
     printf("Failed to allocate memory for floatArray. name: %s, attemped size: %d\n", name, size);
     exit(EXIT_FAILURE);
   }
 
-  new->array = (float*)malloc(size * sizeof(float));
-  if(!new->array)
+  retVal->array = (float*)malloc(size * sizeof(float));
+  if(!retVal->array)
   {
     printf("Failed to allocate memory for floatArray. name: %s, attemped size: %d\n", name, size);
     exit(EXIT_FAILURE);
   }
 
-  new->size = size;
-  new->name = strdup(name);
-  new->onDevice = 0;
+  retVal->size = size;
+  retVal->name = strdup(name);
+  retVal->onDevice = 0;
 
-  return new;
+  return retVal;
 }
 
 void freeFloatArray(floatArray* a)
 {
-  //printf("freeing %s, size: %d, onDevice: %d, address: %d\n", a->name, a->size, a->onDevice, (int)a->array);
+  //printf("freeing %s, size: %d, onDevice: %d, address: %d\n", a->name, a->size, a->onDevice, (jint)a->array);
 
   if(!a)
     return;
@@ -106,16 +103,16 @@ void freeFloatArray(floatArray* a)
   free(a);
 }
 
-floatArray* newFloatArrayOnDevice(int size, const char* name)
+floatArray* newFloatArrayOnDevice(jint size, const char* name)
 {
-  floatArray* new = (floatArray*)malloc(sizeof(floatArray));
+  floatArray* retVal = (floatArray*)malloc(sizeof(floatArray));
 
-  new->array = allocateCudaFloatArray(size);
-  new->size = size;
-  new->name = strdup(name);
-  new->onDevice = 1;
+  retVal->array = allocateCudaFloatArray(size);
+  retVal->size = size;
+  retVal->name = strdup(name);
+  retVal->onDevice = 1;
 
-  return new;
+  return retVal;
 }
   
 
@@ -123,7 +120,7 @@ floatArray* newFloatArrayOnDevice(int size, const char* name)
 // intArray and floatArray safe getters and setters
 ///////////////////////////////////////////////////////
 
-void checkBounds(char* verb, char* name, int size, int index)
+void checkBounds(char* verb, char* name, jint size, jint index)
 {
   if(index >= size || index < 0)
   {
@@ -132,7 +129,7 @@ void checkBounds(char* verb, char* name, int size, int index)
   }
 }
 
-void checkLocation(char* verb, char* name, int onDevice, int size, int index)
+void checkLocation(char* verb, char* name, jint onDevice, jint size, jint index)
 {
   if(onDevice)
   {
@@ -141,7 +138,7 @@ void checkLocation(char* verb, char* name, int onDevice, int size, int index)
   }
 }
 
-void intArraySetElement(intArray* a, int index, int value)
+void intArraySetElement(intArray* a, jint index, jint value)
 {
   checkBounds("Setting", a->name, a->size, index);
   checkLocation("Setting", a->name, a->onDevice, a->size, index);
@@ -149,7 +146,7 @@ void intArraySetElement(intArray* a, int index, int value)
   a->array[index] = value;
 }
 
-void floatArraySetElement(floatArray* a, int index, float value)
+void floatArraySetElement(floatArray* a, jint index, float value)
 {
   checkBounds("Setting", a->name, a->size, index);
   checkLocation("Setting", a->name, a->onDevice, a->size, index);
@@ -157,7 +154,7 @@ void floatArraySetElement(floatArray* a, int index, float value)
   a->array[index] = value;
 }
 
-int intArrayGetElement(intArray* a, int index)
+jint intArrayGetElement(intArray* a, jint index)
 {
   checkBounds("Getting", a->name, a->size, index);
   checkLocation("Getting", a->name, a->onDevice, a->size, index);
@@ -165,7 +162,7 @@ int intArrayGetElement(intArray* a, int index)
   return a->array[index];
 }
 
-float floatArrayGetElement(floatArray* a, int index)
+float floatArrayGetElement(floatArray* a, jint index)
 {
   checkBounds("Getting", a->name, a->size, index);
   checkLocation("Getting", a->name, a->onDevice, a->size, index);
@@ -173,17 +170,17 @@ float floatArrayGetElement(floatArray* a, int index)
   return a->array[index];
 }
 
-void intArraySetData(intArray* a, int* data, int dataSize)
+void intArraySetData(intArray* a, jint* data, jint dataSize)
 {
   if(dataSize > a->size)
   {
     printf("Warning: calling intArraySetData with a data set that is too large; truncating data. name: %s, size: %d, dataSize: %d", a->name, a->size, dataSize);
   }
   
-  memcpy(a->array, data, dataSize * sizeof(int));
+  memcpy(a->array, data, dataSize * sizeof(jint));
 }
 
-void floatArraySetData(floatArray* a, float* data, int dataSize)
+void floatArraySetData(floatArray* a, float* data, jint dataSize)
 {
   if(dataSize > a->size)
   {
@@ -196,7 +193,7 @@ void floatArraySetData(floatArray* a, float* data, int dataSize)
 ///////////////////////////////////////////////////////
 // projection storing and printing
 ///////////////////////////////////////////////////////
-void storeProjection(projection* proj, int* data)
+void storeProjection(projection* proj, jint* data)
 {
   proj->sourceNode = data[0];
   proj->sourceOrigin = data[1];
@@ -215,12 +212,12 @@ void printProjection(projection* proj)
 ///////////////////////////////////////////////////////
 // int_list functions 
 ///////////////////////////////////////////////////////
-int_list* cons_int_list(int_list* list, int item)
+int_list* cons_int_list(int_list* list, jint item)
 {
-  int_list* new = (int_list*)malloc(sizeof(int_list));
-  new->first = item;
-  new->next = list;
-  return new;
+  int_list* retVal = (int_list*)malloc(sizeof(int_list));
+  retVal->first = item;
+  retVal->next = list;
+  return retVal;
 }
 
 void free_int_list(int_list* list)
@@ -238,20 +235,20 @@ void free_int_list(int_list* list)
 ///////////////////////////////////////////////////////
 int_queue* new_int_queue()
 {
-  int_queue* new = (int_queue*) malloc(sizeof(int_queue));
+  int_queue* retVal = (int_queue*) malloc(sizeof(int_queue));
 
-  new->size = 0;
-  new->head = NULL;
-  new->tail = NULL;
+  retVal->size = 0;
+  retVal->head = NULL;
+  retVal->tail = NULL;
 
-  return new;
+  return retVal;
 }
 
-int pop_int_queue(int_queue* queue)
+jint pop_int_queue(int_queue* queue)
 {
   if(queue )
   {
-    int val;
+    jint val;
     switch(queue->size)
     {
       case 0:
@@ -283,7 +280,7 @@ int pop_int_queue(int_queue* queue)
   }
 }
 
-void add_int_queue(int_queue* queue, int val)
+void add_int_queue(int_queue* queue, jint val)
 {
   if(queue)
   {
@@ -314,127 +311,127 @@ void free_int_queue(int_queue* queue)
 // return a fresh NengoGPUData object with all numerical values zeroed out and all pointers set to null
 NengoGPUData* getNewNengoGPUData()
 {
-  NengoGPUData* new = (NengoGPUData*)malloc(sizeof(NengoGPUData));
+  NengoGPUData* retVal = (NengoGPUData*)malloc(sizeof(NengoGPUData));
 
-  new-> onDevice = 0;
-  new-> device = 0;
-  new-> maxTimeStep = 0;
+  retVal-> onDevice = 0;
+  retVal-> device = 0;
+  retVal-> maxTimeStep = 0;
    
-  new-> numNetworkArrays = 0;
+  retVal-> numNetworkArrays = 0;
 
-  new-> numNeurons = 0;
-  new-> numInputs = 0;
-  new-> numEnsembles = 0;
-  new-> numTerminations = 0;
-  new-> numDecodedTerminations = 0;
-  new-> numNDterminations = 0;
-  new-> numNetworkArrayOrigins = 0;
-  new-> numOrigins = 0;
+  retVal-> numNeurons = 0;
+  retVal-> numInputs = 0;
+  retVal-> numEnsembles = 0;
+  retVal-> numTerminations = 0;
+  retVal-> numDecodedTerminations = 0;
+  retVal-> numNDterminations = 0;
+  retVal-> numNetworkArrayOrigins = 0;
+  retVal-> numOrigins = 0;
 
-  new->totalInputSize = 0;
-  new->totalTransformSize = 0;
-  new->totalNumTransformRows = 0;
-  new->totalEnsembleDimension = 0;
-  new->totalEncoderSize = 0;
-  new->totalDecoderSize = 0;
-  new->totalOutputSize = 0;
+  retVal->totalInputSize = 0;
+  retVal->totalTransformSize = 0;
+  retVal->totalNumTransformRows = 0;
+  retVal->totalEnsembleDimension = 0;
+  retVal->totalEncoderSize = 0;
+  retVal->totalDecoderSize = 0;
+  retVal->totalOutputSize = 0;
 
-  new->maxDecodedTerminationDimension = 0;
-  new->maxNumDecodedTerminations = 0;
-  new->maxDimension = 0;
-  new->maxNumNeurons = 0;
-  new->maxOriginDimension = 0;
-  new->maxEnsembleNDTransformSize = 0;
+  retVal->maxDecodedTerminationDimension = 0;
+  retVal->maxNumDecodedTerminations = 0;
+  retVal->maxDimension = 0;
+  retVal->maxNumNeurons = 0;
+  retVal->maxOriginDimension = 0;
+  retVal->maxEnsembleNDTransformSize = 0;
   
-  new->numNDterminations = 0;
+  retVal->numNDterminations = 0;
 
-  new->numSpikesToSendBack = 0;
+  retVal->numSpikesToSendBack = 0;
 
-  new->GPUOutputSize = 0;
-  new->JavaOutputSize = 0;
-  new->CPUOutputSize = 0;
+  retVal->GPUOutputSize = 0;
+  retVal->JavaOutputSize = 0;
+  retVal->CPUOutputSize = 0;
 
-  new->input = NULL;
-  new->terminationOffsetInInput = NULL;
-  new->networkArrayIndexInJavaArray = NULL;
+  retVal->input = NULL;
+  retVal->terminationOffsetInInput = NULL;
+  retVal->networkArrayIndexInJavaArray = NULL;
 
-  new->terminationTransforms = NULL;
-  new->transformRowToInputIndexor = NULL;
-  new->terminationTau = NULL;
-  new->inputDimension = NULL;
-  new->terminationOutput = NULL;
-  new->terminationOutputIndexor = NULL;
+  retVal->terminationTransforms = NULL;
+  retVal->transformRowToInputIndexor = NULL;
+  retVal->terminationTau = NULL;
+  retVal->inputDimension = NULL;
+  retVal->terminationOutput = NULL;
+  retVal->terminationOutputIndexor = NULL;
 
-  new->ensembleSums = NULL;
-  new->encoders = NULL;
-  new->decoders = NULL;
-  new->encodeResult = NULL;
+  retVal->ensembleSums = NULL;
+  retVal->encoders = NULL;
+  retVal->decoders = NULL;
+  retVal->encodeResult = NULL;
 
-  new->neuronVoltage = NULL;
-  new->neuronReftime = NULL;
-  new->neuronBias = NULL;
-  new->neuronScale = NULL;
-  new->ensembleTauRC = NULL;
-  new->ensembleTauRef = NULL;
-  new->neuronToEnsembleIndexor = NULL;
+  retVal->neuronVoltage = NULL;
+  retVal->neuronReftime = NULL;
+  retVal->neuronBias = NULL;
+  retVal->neuronScale = NULL;
+  retVal->ensembleTauRC = NULL;
+  retVal->ensembleTauRef = NULL;
+  retVal->neuronToEnsembleIndexor = NULL;
 
-  new->isSpikingEnsemble = NULL;
+  retVal->isSpikingEnsemble = NULL;
 
-  new->ensembleNumTerminations = NULL;
-  new->ensembleDimension = NULL;
-  new->ensembleNumNeurons = NULL;
-  new->ensembleNumOrigins = NULL;
+  retVal->ensembleNumTerminations = NULL;
+  retVal->ensembleDimension = NULL;
+  retVal->ensembleNumNeurons = NULL;
+  retVal->ensembleNumOrigins = NULL;
 
-  new->ensembleOffsetInDimensions = NULL;
-  new->ensembleOffsetInNeurons = NULL;
-  new->encoderRowToEnsembleIndexor = NULL;
-  new->encoderRowToNeuronIndexor = NULL;
-  new->decoderRowToEnsembleIndexor = NULL;
+  retVal->ensembleOffsetInDimensions = NULL;
+  retVal->ensembleOffsetInNeurons = NULL;
+  retVal->encoderRowToEnsembleIndexor = NULL;
+  retVal->encoderRowToNeuronIndexor = NULL;
+  retVal->decoderRowToEnsembleIndexor = NULL;
 
-  new->encoderStride = NULL;
-  new->decoderStride = NULL;
+  retVal->encoderStride = NULL;
+  retVal->decoderStride = NULL;
 
-  new->ensembleOrderInEncoders = NULL;
-  new->ensembleOrderInDecoders = NULL;
+  retVal->ensembleOrderInEncoders = NULL;
+  retVal->ensembleOrderInDecoders = NULL;
 
-  new->spikes = NULL;
+  retVal->spikes = NULL;
 
-  new->ensembleOutput = NULL;
-  new->output = NULL;
-  new->outputHost = NULL;
-  new->decoderRowToOutputIndexor = NULL;
+  retVal->ensembleOutput = NULL;
+  retVal->output = NULL;
+  retVal->outputHost = NULL;
+  retVal->decoderRowToOutputIndexor = NULL;
   
-  new->ensembleOriginDimension = NULL;
+  retVal->ensembleOriginDimension = NULL;
 
-  new->ensembleOriginOffsetInOutput = NULL;
-  new->networkArrayOriginOffsetInOutput = NULL; 
-  new->networkArrayOriginDimension = NULL; 
-  new->networkArrayNumOrigins = NULL;
+  retVal->ensembleOriginOffsetInOutput = NULL;
+  retVal->networkArrayOriginOffsetInOutput = NULL; 
+  retVal->networkArrayOriginDimension = NULL; 
+  retVal->networkArrayNumOrigins = NULL;
 
-  new->spikeMap = NULL;
-  new->GPUTerminationToOriginMap = NULL;
-  new->ensembleOutputToNetworkArrayOutputMap = NULL;
-  new->ensembleIndexInJavaArray = NULL;
+  retVal->spikeMap = NULL;
+  retVal->GPUTerminationToOriginMap = NULL;
+  retVal->ensembleOutputToNetworkArrayOutputMap = NULL;
+  retVal->ensembleIndexInJavaArray = NULL;
   
-  new->NDterminationInputIndexor = NULL;
-  new->NDterminationCurrents = NULL;
-  new->NDterminationWeights = NULL;
-  new->NDterminationEnsembleOffset = NULL;
-  new->NDterminationEnsembleSums = NULL;
+  retVal->NDterminationInputIndexor = NULL;
+  retVal->NDterminationCurrents = NULL;
+  retVal->NDterminationWeights = NULL;
+  retVal->NDterminationEnsembleOffset = NULL;
+  retVal->NDterminationEnsembleSums = NULL;
 
-  new->sharedData_outputIndex = NULL;
-  new->sharedData_sharedIndex = NULL;
+  retVal->sharedData_outputIndex = NULL;
+  retVal->sharedData_sharedIndex = NULL;
 
 
-  return new;
+  return retVal;
 }
 
 
 // Should only be called once the NengoGPUData's numerical values have been set. This function allocates memory of the approprate size for each pointer.
 // Memory is allocated on the host. The idea is to call this before we load the data in from the JNI structures, so we have somewhere to put that data. Later, we will move most of the data to the device.
-void initializeNengoGPUData(NengoGPUData* new)
+void initializeNengoGPUData(NengoGPUData* retVal)
 {
-  if(new == NULL)
+  if(retVal == NULL)
   {
      return;
   }
@@ -442,106 +439,106 @@ void initializeNengoGPUData(NengoGPUData* new)
   char* name; 
 
   name = "networkArrayIndexInJavaArray";
-  new->networkArrayIndexInJavaArray = newIntArray(new->numNetworkArrays, name);
+  retVal->networkArrayIndexInJavaArray = newIntArray(retVal->numNetworkArrays, name);
 
   name = "terminationOffsetInInput";
-  new->terminationOffsetInInput = newIntArray(new->numInputs, name);
+  retVal->terminationOffsetInInput = newIntArray(retVal->numInputs, name);
 
   name = "terminationTranforms";
-  new->terminationTransforms = newFloatArray(new->totalTransformSize, name);
-  memset(new->terminationTransforms->array, '\0', new->terminationTransforms->size * sizeof(float));
+  retVal->terminationTransforms = newFloatArray(retVal->totalTransformSize, name);
+  memset(retVal->terminationTransforms->array, '\0', retVal->terminationTransforms->size * sizeof(float));
 
   name = "transformRowToInputIndexor";
-  new->transformRowToInputIndexor = newIntArray(new->totalNumTransformRows, name);
+  retVal->transformRowToInputIndexor = newIntArray(retVal->totalNumTransformRows, name);
   name = "terminationTau";
-  new->terminationTau = newFloatArray(new->numInputs, name);
+  retVal->terminationTau = newFloatArray(retVal->numInputs, name);
   name = "inputDimension";
-  new->inputDimension = newIntArray(new->numInputs, name);
+  retVal->inputDimension = newIntArray(retVal->numInputs, name);
   name = "terminationOutputIndexor";
-  new->terminationOutputIndexor = newIntArray(new->totalNumTransformRows, name);
+  retVal->terminationOutputIndexor = newIntArray(retVal->totalNumTransformRows, name);
  
   name = "encoders";
-  new->encoders = newFloatArray(new->totalEncoderSize, name);
+  retVal->encoders = newFloatArray(retVal->totalEncoderSize, name);
   name = "decoders";
-  new->decoders = newFloatArray(new->totalDecoderSize, name);
+  retVal->decoders = newFloatArray(retVal->totalDecoderSize, name);
 
   name = "neuronBias";
-  new->neuronBias = newFloatArray(new->numNeurons, name);
+  retVal->neuronBias = newFloatArray(retVal->numNeurons, name);
   name = "neuronScale";
-  new->neuronScale = newFloatArray(new->numNeurons, name);
+  retVal->neuronScale = newFloatArray(retVal->numNeurons, name);
   name = "ensembleTauRC";
-  new->ensembleTauRC = newFloatArray(new->numEnsembles, name);
+  retVal->ensembleTauRC = newFloatArray(retVal->numEnsembles, name);
   name = "ensembleTauRef";
-  new->ensembleTauRef = newFloatArray(new->numEnsembles, name);
+  retVal->ensembleTauRef = newFloatArray(retVal->numEnsembles, name);
 
   name = "isSpikingEnsemble";
-  new->isSpikingEnsemble = newIntArray(new->numEnsembles, name);
+  retVal->isSpikingEnsemble = newIntArray(retVal->numEnsembles, name);
 
   name = "ensembleNumTerminations";
-  new->ensembleNumTerminations = newIntArray(new->numEnsembles, name);
+  retVal->ensembleNumTerminations = newIntArray(retVal->numEnsembles, name);
   name = "ensembleDimension";
-  new->ensembleDimension = newIntArray(new->numEnsembles, name);
+  retVal->ensembleDimension = newIntArray(retVal->numEnsembles, name);
   name = "ensembleNumNeurons";
-  new->ensembleNumNeurons = newIntArray(new->numEnsembles, name);
+  retVal->ensembleNumNeurons = newIntArray(retVal->numEnsembles, name);
   name = "ensembleNumOrigins";
-  new->ensembleNumOrigins = newIntArray(new->numEnsembles, name);
+  retVal->ensembleNumOrigins = newIntArray(retVal->numEnsembles, name);
 
 
   name = "ensembleOffsetInDimensions";
-  new->ensembleOffsetInDimensions = newIntArray(new->numEnsembles, name);
+  retVal->ensembleOffsetInDimensions = newIntArray(retVal->numEnsembles, name);
   name = "ensembleOffsetInNeurons";
-  new->ensembleOffsetInNeurons = newIntArray(new->numEnsembles, name);
+  retVal->ensembleOffsetInNeurons = newIntArray(retVal->numEnsembles, name);
 
   name = "encoderRowToEnsembleIndexor";
-  new->encoderRowToEnsembleIndexor = newIntArray(new->numNeurons, name);
+  retVal->encoderRowToEnsembleIndexor = newIntArray(retVal->numNeurons, name);
   name = "encoderRowToNeuronIndexor";
-  new->encoderRowToNeuronIndexor = newIntArray(new->numNeurons, name);
+  retVal->encoderRowToNeuronIndexor = newIntArray(retVal->numNeurons, name);
   name = "decoderRowToEnsembleIndexor";
-  new->decoderRowToEnsembleIndexor = newIntArray(new->totalOutputSize, name);
+  retVal->decoderRowToEnsembleIndexor = newIntArray(retVal->totalOutputSize, name);
   name = "decoderRowToOutputIndexor";
-  new->decoderRowToOutputIndexor = newIntArray(new->totalOutputSize, name);
+  retVal->decoderRowToOutputIndexor = newIntArray(retVal->totalOutputSize, name);
   name = "neuronToEnsembleIndexor";
-  new->neuronToEnsembleIndexor = newIntArray(new->numNeurons, name);
+  retVal->neuronToEnsembleIndexor = newIntArray(retVal->numNeurons, name);
 
   name = "encoderStride";
-  new->encoderStride = newIntArray(new->maxDimension, name);
+  retVal->encoderStride = newIntArray(retVal->maxDimension, name);
   name = "decoderStride";
-  new->decoderStride = newIntArray(new->maxNumNeurons, name);
+  retVal->decoderStride = newIntArray(retVal->maxNumNeurons, name);
 
   name = "ensembleOrderInEncoders";
-  new->ensembleOrderInEncoders = newIntArray(new->numEnsembles, name);
+  retVal->ensembleOrderInEncoders = newIntArray(retVal->numEnsembles, name);
 
   name = "ensembleOrderInDecoders";
-  new->ensembleOrderInDecoders = newIntArray(new->numEnsembles, name); 
+  retVal->ensembleOrderInDecoders = newIntArray(retVal->numEnsembles, name); 
 
   name = "ensembleOriginDimension";
-  new->ensembleOriginDimension = newIntArray(new->numOrigins, name);
+  retVal->ensembleOriginDimension = newIntArray(retVal->numOrigins, name);
 
   name = "ensembleOriginOffsetInOutput";
-  new->ensembleOriginOffsetInOutput = newIntArray(new->numOrigins, name);
+  retVal->ensembleOriginOffsetInOutput = newIntArray(retVal->numOrigins, name);
 
   name = "networkArrayOriginOffsetInOutput";
-  new->networkArrayOriginOffsetInOutput = newIntArray(new->numNetworkArrayOrigins, name);
+  retVal->networkArrayOriginOffsetInOutput = newIntArray(retVal->numNetworkArrayOrigins, name);
 
   name = "networkArrayOriginDimension";
-  new->networkArrayOriginDimension = newIntArray(new->numNetworkArrayOrigins, name);
+  retVal->networkArrayOriginDimension = newIntArray(retVal->numNetworkArrayOrigins, name);
 
   name = "networkArrayNumOrigins";
-  new->networkArrayNumOrigins = newIntArray(new->numNetworkArrays, name);
+  retVal->networkArrayNumOrigins = newIntArray(retVal->numNetworkArrays, name);
 
   name = "ensembleIndexInJavaArray";
-  new->ensembleIndexInJavaArray = newIntArray(new->numEnsembles, name);
+  retVal->ensembleIndexInJavaArray = newIntArray(retVal->numEnsembles, name);
 
   name = "ensembleOutputToNetworkArrayOutputMap";
-  new->ensembleOutputToNetworkArrayOutputMap = newIntArray(new->totalOutputSize, name);
+  retVal->ensembleOutputToNetworkArrayOutputMap = newIntArray(retVal->totalOutputSize, name);
 
   name = "NDterminationInputIndexor";
-  new->NDterminationInputIndexor = newIntArray(new->numNDterminations, name);
+  retVal->NDterminationInputIndexor = newIntArray(retVal->numNDterminations, name);
   name = "NDterminationWeights";
-  new->NDterminationWeights = newFloatArray(new->totalNonDecodedTransformSize, name);
+  retVal->NDterminationWeights = newFloatArray(retVal->totalNonDecodedTransformSize, name);
 
   name = "NDterminationEnsembleOffset";
-  new->NDterminationEnsembleOffset = newIntArray(new->numEnsembles, name);
+  retVal->NDterminationEnsembleOffset = newIntArray(retVal->numEnsembles, name);
 
 }
 
@@ -549,7 +546,7 @@ void initializeNengoGPUData(NengoGPUData* new)
 // Called at the end of initializeNengoGPUData to determine whether any of the mallocs failed.
 void checkNengoGPUData(NengoGPUData* currentData)
 {
-  int status = 0;
+  jint status = 0;
 
   if(status)
   {
@@ -689,7 +686,7 @@ void freeNengoGPUData(NengoGPUData* currentData)
 };
 
 // print the NengoGPUData. Should only be called once the data has been set.
-void printNengoGPUData(NengoGPUData* currentData, int printArrays)
+void printNengoGPUData(NengoGPUData* currentData, jint printArrays)
 {
   
   printf("printing NengoGPUData:\n");
@@ -815,7 +812,7 @@ void printNengoGPUData(NengoGPUData* currentData, int printArrays)
     printIntArray(currentData->sharedData_sharedIndex, currentData->interGPUOutputSize, 1);
   }
 
-//  int bytesOnGPU = sizeof(float) * (8 * currentData->numEnsembles + currentData->totalInputSize + currentData->totalTransformSize + 2 * currentData->totalNumTransformRows + 2 * currentData->numTerminations + currentData->maxNumDecodedTerminations * currentData->totalEnsembleDimension + currentData->maxDimension * currentData->numNeurons + currentData->totalEnsembleDimension + currentData->numNeurons * 6 + currentData->maxNumNeurons * currentData->totalOutputSize + 2 * currentData->totalOutputSize);
+//  jint bytesOnGPU = sizeof(float) * (8 * currentData->numEnsembles + currentData->totalInputSize + currentData->totalTransformSize + 2 * currentData->totalNumTransformRows + 2 * currentData->numTerminations + currentData->maxNumDecodedTerminations * currentData->totalEnsembleDimension + currentData->maxDimension * currentData->numNeurons + currentData->totalEnsembleDimension + currentData->numNeurons * 6 + currentData->maxNumNeurons * currentData->totalOutputSize + 2 * currentData->totalOutputSize);
  // printf("bytes on GPU: %d\n", bytesOnGPU);
  
 }
@@ -880,7 +877,7 @@ void printDynamicNengoGPUData(NengoGPUData* currentData)
 }
 
 
-void printIntArray(intArray* a, int n, int m)
+void printIntArray(intArray* a, jint n, jint m)
 {
   if(!a)
     return;
@@ -896,7 +893,7 @@ void printIntArray(intArray* a, int n, int m)
 
   printf("%s:\n", a->name);
 
-  int i, j;
+  jint i, j;
   for(i = 0; i < m; i++)
   {
     for(j = 0; j < n; j++)
@@ -909,7 +906,7 @@ void printIntArray(intArray* a, int n, int m)
   printf("\n");
 }
 
-void printFloatArray(floatArray* a, int n, int m)
+void printFloatArray(floatArray* a, jint n, jint m)
 {
   if(!a)
     return;
@@ -925,7 +922,7 @@ void printFloatArray(floatArray* a, int n, int m)
 
   printf("%s:\n", a->name);
 
-  int i, j;
+  jint i, j;
 
   for(i = 0; i < m; i++)
   {
@@ -944,19 +941,19 @@ void moveToDeviceIntArray(intArray* a)
   if(a->onDevice)
     return;
 
-  int* result;
+  jint* result;
   cudaError_t err;
 
-  int size = a->size;
+  jint size = a->size;
 
-  err = cudaMalloc((void**)&result, size * sizeof(int));
+  err = cudaMalloc((void**)&result, size * sizeof(jint));
   if(err)
   {
     printf("%s", cudaGetErrorString(err));
     exit(EXIT_FAILURE);
   }
 
-  err = cudaMemcpy(result, a->array, size * sizeof(int), cudaMemcpyHostToDevice);
+  err = cudaMemcpy(result, a->array, size * sizeof(jint), cudaMemcpyHostToDevice);
   if(err)
   {
     printf("%s", cudaGetErrorString(err));
@@ -976,7 +973,7 @@ void moveToDeviceFloatArray(floatArray* a)
   float* result;
   cudaError_t err;
 
-  int size = a->size;
+  jint size = a->size;
 
   err = cudaMalloc((void**)&result, size * sizeof(float));
   if(err)
@@ -1004,7 +1001,7 @@ void moveToHostFloatArray(floatArray* a)
     return;
 
   float* result;
-  int size = a->size;
+  jint size = a->size;
   result = (float*)malloc(size * sizeof(float));
   cudaMemcpy(result, a->array, size * sizeof(float), cudaMemcpyDeviceToHost);
   cudaFree(a->array);
@@ -1017,16 +1014,12 @@ void moveToHostIntArray(intArray* a)
   if(!a->onDevice)
     return;
 
-  int* result;
-  int size = a->size;
-  result = (int*)malloc(size * sizeof(int));
-  cudaMemcpy(result, a->array, size * sizeof(int), cudaMemcpyDeviceToHost);
+  jint* result;
+  jint size = a->size;
+  result = (jint*)malloc(size * sizeof(jint));
+  cudaMemcpy(result, a->array, size * sizeof(jint), cudaMemcpyDeviceToHost);
   cudaFree(a->array);
   a->array = result;
   a->onDevice = 0;
 }
-
-#ifdef __cplusplus
-}
-#endif
 
