@@ -92,7 +92,10 @@
 	            <exclude name="**/*.java"/>
 	        </fileset>
 	    </copy>
-		<delete dir="${dist.dir}"/>
+		<delete includeEmptyDirs="true" removeNotFollowedSymlinks="true" quiet="true">
+		    <fileset dir="${dist.dir}" erroronmissingdir="false"
+		    	followsymlinks="false" defaultexcludes="false" />
+	    </delete>
 		<mkdir dir="${dist.dir}"/>
 		<jar destfile="${dist.dir}/nengo-${buildhash}.jar" basedir="${dest.build}">
 	    	<manifest>
