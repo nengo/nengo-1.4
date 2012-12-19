@@ -561,29 +561,12 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 		result.myApproximators = new HashMap<String, LinearApproximator>(5);
 		result.myDecodedOrigins = new LinkedHashMap<String,DecodedOrigin>(10);
 		for (DecodedOrigin oldOrigin : myDecodedOrigins.values()) {
-			Function[] oldFunctions = oldOrigin.getFunctions();
-			Function[] newFunctions = new Function[oldFunctions.length];
-			for (int i = 0; i < newFunctions.length; i++) {
-				newFunctions[i] = oldFunctions[i].clone();
-			}
-
 			try {
-				// FIXME: this should use DecodedOrigin.clone(Node)
-				DecodedOrigin newOrigin = new DecodedOrigin(
-						result,
-						oldOrigin.getName(),
-						result.getNodes(),
-						oldOrigin.getNodeOrigin(),
-						newFunctions,
-						MU.clone(oldOrigin.getDecoders()));
-				if (oldOrigin.getNoise() != null) {
-                    newOrigin.setNoise(oldOrigin.getNoise());
-                }
-				newOrigin.setMode(oldOrigin.getMode());
+				DecodedOrigin newOrigin = oldOrigin.clone(result);
 				result.myDecodedOrigins.put(newOrigin.getName(), newOrigin);
 				newOrigin.reset(false);
-			} catch (StructuralException e) {
-				throw new CloneNotSupportedException("Error cloning DecodedOrigin: " + e.getMessage());
+			} catch (CloneNotSupportedException e) {
+				throw new CloneNotSupportedException("Error cloning DecodableEnsembleImpl: " + e.getMessage());
 			}
 		}
 		

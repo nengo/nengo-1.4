@@ -94,6 +94,6 @@ public interface Origin extends Serializable, Cloneable {
 	 * @return A clone of the origin for the new parent ensemble
 	 * @throws CloneNotSupportedException if clone cannot be made
 	 */
-	public Origin clone(Ensemble e) throws CloneNotSupportedException;
+	public Origin clone(Node node) throws CloneNotSupportedException;
 
 }

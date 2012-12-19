@@ -479,7 +479,7 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 			result.setNode(node);
 			return result;
 		} catch (StructuralException e) {
-			throw new CloneNotSupportedException("Problem trying to clone: " + e.getMessage());
+			throw new CloneNotSupportedException("Error cloning DecodedTermination: " + e.getMessage());
 		}
 	}
 
