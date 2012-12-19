@@ -28,6 +28,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model.impl;
 
 import ca.nengo.model.Ensemble;
+import ca.nengo.model.Network;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -192,20 +193,37 @@ public class EnsembleOrigin implements Origin {
 	 */
 	@Override
 	public EnsembleOrigin clone() throws CloneNotSupportedException {
-		return new EnsembleOrigin(myNode, myName, myNodeOrigins);
+		return this.clone(myNode);
 	}
 	
-	public EnsembleOrigin clone(Ensemble ensemble) throws CloneNotSupportedException {
-		EnsembleOrigin result = new EnsembleOrigin(myNode, myName, new Origin[myNodeOrigins.length]);
+	public EnsembleOrigin clone(Node node) throws CloneNotSupportedException {
+		if (!(node instanceof Ensemble) && !(node instanceof Network)) {
+			throw new CloneNotSupportedException("Error cloning EnsembleOrigin: Invalid node type");
+		}
 		
-		// get origins for nodes in new ensemble
 		try {
-			for (int i = 0; i < myNodeOrigins.length; i++)
-				result.myNodeOrigins[i] = ensemble.getNodes()[i].getOrigin(myNodeOrigins[i].getName());
+			EnsembleOrigin result = (EnsembleOrigin) super.clone();
+			result.myNode = node;
+			
+			// get origins for nodes in new ensemble
+			Origin[] origins = new Origin[myNodeOrigins.length];
+			if (node instanceof Ensemble) {
+				Ensemble ensemble = (Ensemble)node;
+				for (int i = 0; i < myNodeOrigins.length; i++)
+					origins[i] = ensemble.getNodes()[i].getOrigin(myNodeOrigins[i].getName());
+			}
+			if (node instanceof Network) {
+				Network network = (Network)node;
+				for (int i = 0; i < myNodeOrigins.length; i++)
+					origins[i] = network.getNodes()[i].getOrigin(myNodeOrigins[i].getName());
+			}
+			result.myNodeOrigins = origins;
+			return result;
 		} catch (StructuralException e) {
 			throw new CloneNotSupportedException("Error cloning EnsembleOrigin: " + e.getMessage());
+		} catch (CloneNotSupportedException e) {
+			throw new CloneNotSupportedException("Error cloning EnsembleOrigin: " + e.getMessage());
 		}
-		return result;
 	}
 
 }

@@ -40,7 +40,6 @@ import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
 import ca.nengo.math.impl.FixedSignalFunction;
 import ca.nengo.math.impl.WeightedCostApproximator;
-import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Noise;
@@ -53,6 +52,7 @@ import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.RealOutputImpl;
+import ca.nengo.model.nef.DecodableEnsemble;
 import ca.nengo.model.nef.ExpressModel;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.plasticity.ShortTermPlastic;
@@ -568,25 +568,38 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 
 	@Override
 	public DecodedOrigin clone() throws CloneNotSupportedException {
-		Function[] functions = new Function[myFunctions.length];
-		for (int i = 0; i < functions.length; i++) {
-			functions[i] = myFunctions[i].clone();
+		return this.clone(myNode);
+	}
+	
+	public DecodedOrigin clone(Node node) throws CloneNotSupportedException {
+		if (!(node instanceof DecodableEnsemble)) {
+			throw new CloneNotSupportedException("Error cloning DecodedOrigin: Invalid node type");
 		}
+				
 		try {
-			DecodedOrigin result = new DecodedOrigin(myNode, myName, myNodes, myNodeOrigin, functions, MU.clone(myDecoders));
+			DecodableEnsemble de = (DecodableEnsemble) node;
+
+			DecodedOrigin result = (DecodedOrigin) super.clone();
+			result.setDecoders(MU.clone(myDecoders));
+			
+			Function[] functions = new Function[myFunctions.length];
+			for (int i = 0; i < functions.length; i++) {
+				functions[i] = myFunctions[i].clone();
+			}
+			result.myFunctions = functions;
+			
+			result.myNodeOrigin = myNodeOrigin;
+			result.myNodes = de.getNodes();
+			result.myNode = de;
 			result.myOutput = (RealOutput) myOutput.clone();
             if (myNoise != null) {
 			    result.setNoise(myNoise.clone());
             }
 			result.setMode(myMode);
 			return result;
-		} catch (StructuralException e) {
-			throw new CloneNotSupportedException("Error trying to clone: " + e.getMessage());
+		} catch (CloneNotSupportedException e) {
+			throw new CloneNotSupportedException("Error cloning DecodedOrigin: " + e.getMessage());
 		}
-	}
-	
-	public DecodedOrigin clone(Ensemble e) throws CloneNotSupportedException {
-		return this.clone();
 	}
 
 	/**

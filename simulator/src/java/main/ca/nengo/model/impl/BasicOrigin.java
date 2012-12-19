@@ -236,11 +236,13 @@ public class BasicOrigin implements Origin, Noise.Noisy, Resettable, Configurabl
 		if (myNoise != null) {
             result.setNoise(myNoise.clone());
         }
-		result.setValues(myValues.clone());
+		if (myValues != null) {
+			result.setValues(myValues.clone());			
+		}
 		return result;
 	}
 	
-	public BasicOrigin clone(Ensemble e) throws CloneNotSupportedException {
+	public BasicOrigin clone(Node node) throws CloneNotSupportedException {
 		return this.clone();
 	}
 
