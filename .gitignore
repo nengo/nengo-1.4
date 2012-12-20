@@ -14,3 +14,6 @@ simulator-ui/quick/*
 simulator-ui/python/timeview/layout.db.bak
 /simulator/target/
 /simulator-ui/target/
+/simulator-ui/build
+/simulator-ui/dist
+/simulator-ui/python/NengoUI.egg-info
