@@ -1,43 +1,27 @@
-/*
- * Created on 24-May-2006
- */
 package ca.nengo.util.impl;
-
-import java.util.Properties;
 
 import ca.nengo.model.Probeable;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.Units;
 import ca.nengo.util.Probe;
 import ca.nengo.util.TimeSeries;
-import ca.nengo.util.impl.ProbeImpl;
-import ca.nengo.util.impl.TimeSeries1DImpl;
-import junit.framework.TestCase;
+import java.util.Properties;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for RecorderImpl. 
- * 
- * @author Bryan Tripp
- */
-public class RecorderImplTest extends TestCase {
-
-	private Probe myRecorder;
+public class RecorderImplTest {
+	private Probe myRecorder = new ProbeImpl();
 	
-	protected void setUp() throws Exception {
-		super.setUp();
-		
-		myRecorder = new ProbeImpl();
+	@Test(expected=SimulationException.class)
+	public void expected() throws SimulationException {
+		myRecorder.connect(new MockProbeable(1f), "y", true);
 	}
-
+	
 	/*
 	 * Test method for 'ca.bpt.cn.util.impl.RecorderImpl.getData()'
 	 */
-	public void testGetData() throws SimulationException {
-		try {
-			myRecorder.connect(new MockProbeable(1f), "y", true);
-			fail("Should have thrown exception because state y does not exist");
-		} catch (SimulationException e) {} //exception is expected
-		
+	@Test
+	public void getData() throws SimulationException {
 		myRecorder.connect(new MockProbeable(1f), "x", true);
 		myRecorder.collect(1);
 		
@@ -53,7 +37,8 @@ public class RecorderImplTest extends TestCase {
 		assertEquals(0, myRecorder.getData().getValues().length);
 	}
 	
-	public void testSamplingRate() throws SimulationException {
+	@Test
+	public void samplingRate() throws SimulationException {
 		myRecorder.connect(new MockProbeable(1f), "x", true);
 		myRecorder.setSamplingRate(100);
 		
@@ -66,7 +51,8 @@ public class RecorderImplTest extends TestCase {
 		assertEquals(2, ts.getValues().length);		
 	}
 	
-	public void testRetention() throws SimulationException {
+	@Test
+	public void retention() throws SimulationException {
 		myRecorder.connect(new MockProbeable(1f), "x", true);
 		myRecorder.collect(1);
 		myRecorder.collect(2);

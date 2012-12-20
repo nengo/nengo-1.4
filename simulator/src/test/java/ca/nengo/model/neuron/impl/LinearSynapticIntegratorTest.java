@@ -1,6 +1,3 @@
-/*
- * Created on 26-May-2006
- */
 package ca.nengo.model.neuron.impl;
 
 import ca.nengo.model.InstantaneousOutput;
@@ -12,22 +9,11 @@ import ca.nengo.model.impl.SpikeOutputImpl;
 import ca.nengo.model.neuron.ExpandableSynapticIntegrator;
 import ca.nengo.model.neuron.impl.LinearSynapticIntegrator;
 import ca.nengo.util.TimeSeries1D;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for LinearSynapticIntegrator. 
- * 
- * @author Bryan Tripp
- */
-public class LinearSynapticIntegratorTest extends TestCase {
-
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.LinearSynapticIntegrator.getTerminations()'
-	 */
+public class LinearSynapticIntegratorTest {
+	@Test
 	public void testGetTerminations() throws StructuralException {
 		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(1, Units.ACU);
 		assertEquals(0, si.getTerminations().length);
@@ -36,7 +22,7 @@ public class LinearSynapticIntegratorTest extends TestCase {
 		assertEquals(1, si.getTerminations().length);
 		assertEquals("test1", si.getTerminations()[0].getName());
 		assertEquals(2, si.getTerminations()[0].getDimensions());
-		assertEquals(1f, si.getTerminations()[0].getTau());
+		assertEquals(1f, si.getTerminations()[0].getTau(), 0.0f);
 		
 		si.addTermination("test2", new float[0], 1f, false);
 		assertEquals(2, si.getTerminations().length);
@@ -50,9 +36,7 @@ public class LinearSynapticIntegratorTest extends TestCase {
 		} catch (StructuralException e) {} //exception is expected
 	}
 
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.LinearSynapticIntegrator.run(float, float)'
-	 */
+	@Test
 	public void testRun() throws StructuralException, SimulationException {
 		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(.001f, Units.ACU);
 		si.addTermination("one", new float[]{1f}, 1f, false);
@@ -75,9 +59,7 @@ public class LinearSynapticIntegratorTest extends TestCase {
 		}
 	}
 
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.LinearSynapticIntegrator.reset(boolean)'
-	 */
+	@Test
 	public void testReset() throws StructuralException, SimulationException {
 		ExpandableSynapticIntegrator si = new LinearSynapticIntegrator(.001f, Units.ACU);
 		si.addTermination("test", new float[]{1f}, 1f, false);
@@ -95,5 +77,4 @@ public class LinearSynapticIntegratorTest extends TestCase {
 		current = si.run(.011f, .012f);
 		assertTrue(current.getValues1D()[1] < .01f);
 	}
-
 }

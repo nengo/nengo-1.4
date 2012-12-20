@@ -1,22 +1,11 @@
-/*
- * Created on 13-Jun-2006
- */
 package ca.nengo.math.impl;
 
 import ca.nengo.math.PDF;
-import ca.nengo.math.impl.IndicatorPDF;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for IndicatorPDF. 
- * 
- * @author Bryan Tripp
- */
-public class IndicatorPDFTest extends TestCase {
-
-	/*
-	 * Test method for 'ca.nengo.math.impl.IndicatorPDF.sample()'
-	 */
+public class IndicatorPDFTest {
+	@Test
 	public void testSample() {
 		PDF pdf = new IndicatorPDF(-1, 1);
 		
@@ -27,47 +16,34 @@ public class IndicatorPDFTest extends TestCase {
 		}
 		
 		pdf = new IndicatorPDF(0, 0);
-		assertEquals(0f, pdf.sample()[0]);
+		assertEquals(0f, pdf.sample()[0], 0.0f);
 	}
 
-	/*
-	 * Test method for 'ca.nengo.math.impl.IndicatorPDF.getDimension()'
-	 */
+	@Test
 	public void testGetDimension() {
 		PDF pdf = new IndicatorPDF(-1, 1);
 		assertEquals(1, pdf.getDimension());
 	}
 
-	/*
-	 * Test method for 'ca.nengo.math.impl.IndicatorPDF.map(float[])'
-	 */
+	@Test
 	public void testMap() {
 		PDF pdf = new IndicatorPDF(-1, 1);
-		assertClose(0f, pdf.map(new float[]{-1.5f}));
-		assertClose(.5f, pdf.map(new float[]{-0.5f}));
-		assertClose(.5f, pdf.map(new float[]{0.5f}));
-		assertClose(0f, pdf.map(new float[]{1.5f}));
+		assertEquals(0f, pdf.map(new float[]{-1.5f}), 0.1f);
+		assertEquals(.5f, pdf.map(new float[]{-0.5f}), 0.1f);
+		assertEquals(.5f, pdf.map(new float[]{0.5f}), 0.1f);
+		assertEquals(0f, pdf.map(new float[]{1.5f}), 0.1f);
 		
 		pdf = new IndicatorPDF(5, 5);
-		assertEquals(Float.POSITIVE_INFINITY, pdf.map(new float[]{5}));
+		assertEquals(Float.POSITIVE_INFINITY, pdf.map(new float[]{5}), 0.0f);
 	}
 
-	/*
-	 * Test method for 'ca.nengo.math.impl.IndicatorPDF.multiMap(float[][])'
-	 */
+	@Test
 	public void testMultiMap() {
 		PDF pdf = new IndicatorPDF(-1, 1);
 		float[] result = pdf.multiMap(new float[][]{new float[]{0f}, new float[]{2f}});
 		
 		assertEquals(2, result.length);
-		assertClose(.5f, result[0]);
-		assertClose(0f, result[1]);
+		assertEquals(.5f, result[0], 0.1f);
+		assertEquals(0f, result[1], 0.1f);
 	}
-	
-	//b is within .01 of a
-	private static void assertClose(float a, float b) {
-		assertTrue(b > a-.01);
-		assertTrue(b < a+.01);
-	}
-
 }

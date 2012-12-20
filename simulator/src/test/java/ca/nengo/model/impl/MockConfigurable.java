@@ -19,8 +19,6 @@ import ca.nengo.model.Units;
  * A dummy Configurable class for testing purposes.
  * 
  * TODO: can we get rid of list methods if we don't need listeners?  
- * 
- * @author Bryan Tripp
  */
 public class MockConfigurable implements Configurable {
 	private int myIntField;

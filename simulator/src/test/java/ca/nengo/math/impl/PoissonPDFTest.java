@@ -1,33 +1,10 @@
-/**
- * 
- */
 package ca.nengo.math.impl;
 
-import ca.nengo.TestUtil;
-import ca.nengo.math.impl.PoissonPDF;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for PoissonPDF. 
- * 
- * @author Bryan Tripp
- */
-public class PoissonPDFTest extends TestCase {
-
-	/**
-	 * @param arg0
-	 */
-	public PoissonPDFTest(String arg0) {
-		super(arg0);
-	}
-
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-	
+public class PoissonPDFTest {
+	@Test
 	public void testMap() {
 		//values taken from http://stattrek.com/Tables/poisson.aspx
 		doTestMap(5, 0, 0.00673794699908547f);
@@ -51,9 +28,10 @@ public class PoissonPDFTest extends TestCase {
 		float tolerance = .00001f;
 		PoissonPDF pdf = new PoissonPDF(rate);
 		float result = pdf.map(new float[]{observation});
-		TestUtil.assertClose(probability, result, tolerance);
+		assertEquals(probability, result, tolerance);
 	}
 	
+	@Test
 	public void testSample() {
 		doTestSample(1);
 		doTestSample(2);
@@ -76,9 +54,7 @@ public class PoissonPDFTest extends TestCase {
 			if (sample < bins.length) bins[sample]++;
 		}
 		for (int i = 0; i < bins.length; i++) {
-			TestUtil.assertClose(pdf.map(new float[]{i}), (float) bins[i]/ (float) n, .05f);
+			assertEquals(pdf.map(new float[]{i}), (float) bins[i]/ (float) n, .05f);
 		}
-		
 	}
-	
 }

@@ -10,43 +10,24 @@ import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.impl.SpikeOutputImpl;
 import ca.nengo.model.neuron.Neuron;
 import ca.nengo.model.neuron.SpikeGenerator;
-import ca.nengo.model.neuron.impl.SpikeGeneratorOrigin;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for SpikeGeneratorOrigin. 
- * 
- * @author Bryan Tripp
- */
-public class SpikeGeneratorOriginTest extends TestCase {
+public class SpikeGeneratorOriginTest {
+	private MockSpikeGenerator myGenerator = new MockSpikeGenerator();
+	private SpikeGeneratorOrigin myOrigin = new SpikeGeneratorOrigin(null, myGenerator);
 
-	private SpikeGeneratorOrigin myOrigin;
-	private MockSpikeGenerator myGenerator;
-	
-	protected void setUp() throws Exception {
-		super.setUp();
-		
-		myGenerator = new MockSpikeGenerator();
-		myOrigin = new SpikeGeneratorOrigin(null, myGenerator);
-	}
-
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.SpikeGeneratorOrigin.getName()'
-	 */
+	@Test
 	public void testGetName() {
 		assertEquals(Neuron.AXON, myOrigin.getName());
 	}
 
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.SpikeGeneratorOrigin.getDimensions()'
-	 */
+	@Test
 	public void testGetDimensions() {
 		assertEquals(1, myOrigin.getDimensions());
 	}
 
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.SpikeGeneratorOrigin.getValues()'
-	 */
+	@Test
 	public void testGetValues() throws SimulationException {
 		myGenerator.setNextOutput(true, 1f);
 		

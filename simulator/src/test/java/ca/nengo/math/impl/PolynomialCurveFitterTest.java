@@ -1,32 +1,21 @@
-/*
- * Created June 12, 2007
- */
 package ca.nengo.math.impl;
 
-import junit.framework.TestCase;
-import ca.nengo.TestUtil;
 import ca.nengo.math.Function;
 import ca.nengo.model.Units;
 import ca.nengo.plot.Plotter;
 import ca.nengo.util.TimeSeries1D;
 import ca.nengo.util.impl.TimeSeries1DImpl;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/*
- * Unit tests for PolynomialCurveFitter
- */
-public class PolynomialCurveFitterTest extends TestCase {
-
-	/*
-	 * Test method for 'ca.nengo.math.impl.PolynomialCurveFitter.getOrder()'
-	 */
+public class PolynomialCurveFitterTest {
+	@Test
 	public void testGetOrder() {
 		PolynomialCurveFitter pcf = new PolynomialCurveFitter(6);
 		assertEquals(6, pcf.getOrder());
 	}
 
-	/*
-	 * Test method for 'ca.nengo.math.impl.PolynomialCurveFitter.fit()'
-	 */
+	@Test
 	public void testFindCoefficients() {
 		Function target = new Polynomial(new float[]{1f,4f,-3f,0.5f,0.01f});
 		PolynomialCurveFitter pcf = new PolynomialCurveFitter(3);
@@ -39,15 +28,12 @@ public class PolynomialCurveFitterTest extends TestCase {
 
 		Function fitted = pcf.fit(values[0], values[1]);
 
-//		Plotter.plot(target, -10, 0.05f, 10, "target");
-//		Plotter.plot(fitted, -10, 0.05f, 10, "fitted");
-
 		float targetVal = 0f;
 		float fittedVal = 0f;
 		for (int i=-8; i<9; i=i+2) {
 			targetVal = target.map(new float[]{i});
 			fittedVal = fitted.map(new float[]{i});
-			TestUtil.assertClose(targetVal, fittedVal, 10f);
+			assertEquals(targetVal, fittedVal, 10f);
 		}
 
 		pcf = new PolynomialCurveFitter(2);
@@ -64,11 +50,8 @@ public class PolynomialCurveFitterTest extends TestCase {
 			y[i] = fitted.map(new float[]{x[i]});
 		}
 
-//		TimeSeries1D approx = new TimeSeries1DImpl(x, y, Units.UNK);
-//		TimeSeries1D actual = new TimeSeries1DImpl(examplex, exampley, Units.UNK);
-
 		for (int i = 0; i < examplex.length; i++) {
-			TestUtil.assertClose(exampley[i], fitted.map(new float[]{examplex[i]}), 0.5f);
+			assertEquals(exampley[i], fitted.map(new float[]{examplex[i]}), 0.5f);
 		}
 
 	}

@@ -1,42 +1,28 @@
-/*
- * Created on 16-Jan-08
- */
 package ca.nengo.config.impl;
 
-import java.awt.BorderLayout;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.ToolTipManager;
-
-import junit.framework.TestCase;
 import ca.nengo.config.ListProperty;
 import ca.nengo.config.ui.ConfigurationTreeCellEditor;
 import ca.nengo.config.ui.ConfigurationTreeCellRenderer;
 import ca.nengo.config.ui.ConfigurationTreeModel;
 import ca.nengo.config.ui.ConfigurationTreePopupListener;
 import ca.nengo.model.StructuralException;
+import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.ToolTipManager;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests fof ListPropertyImpl
- *
- * @author Bryan Tripp
- */
-public class ListPropertyImplTest extends TestCase {
+public class ListPropertyImplTest {
+	private MockObject myObject = new MockObject();
+	private ConfigurationImpl myConfiguration = new ConfigurationImpl(myObject);
 
-	private MockObject myObject;
-	private ConfigurationImpl myConfiguration;
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		myObject = new MockObject();
-		myConfiguration = new ConfigurationImpl(myObject);
+	public ListPropertyImplTest() throws Exception {
 		myConfiguration.defineProperty(ListPropertyImpl.getListProperty(myConfiguration, "A", String.class));
 		myConfiguration.defineProperty(ListPropertyImpl.getListProperty(myConfiguration, "B", String.class));
 		myConfiguration.defineProperty(ListPropertyImpl.getListProperty(myConfiguration, "C", String.class));
@@ -51,6 +37,7 @@ public class ListPropertyImplTest extends TestCase {
 		return (ListProperty) myConfiguration.getProperty(name);
 	}
 
+	@Test
 	public void testGetNumValues() throws StructuralException {
 		assertEquals(1, getProperty("A").getNumValues());
 		assertEquals(1, getProperty("B").getNumValues());
@@ -61,6 +48,7 @@ public class ListPropertyImplTest extends TestCase {
 		assertEquals(2, getProperty("G").getNumValues());
 	}
 
+	@Test
 	public void testGetValue() throws StructuralException {
 		assertEquals("1", getProperty("A").getValue(0));
 		assertEquals("1", getProperty("B").getValue(0));
@@ -72,6 +60,7 @@ public class ListPropertyImplTest extends TestCase {
 		assertEquals(1f, getProperty("G").getValue(0));
 	}
 
+	@Test
 	public void testSetValue() throws StructuralException {
 		getProperty("A").setValue(0, "1a");
 		getProperty("B").setValue(0, "1a");
@@ -104,6 +93,7 @@ public class ListPropertyImplTest extends TestCase {
 
 	}
 
+	@Test
 	public void testAddValue() throws StructuralException {
 		try {
 			getProperty("A").addValue("2");
@@ -138,6 +128,7 @@ public class ListPropertyImplTest extends TestCase {
 		} catch (StructuralException e) {}
 	}
 
+	@Test
 	public void testInsert() throws StructuralException {
 		try {
 			getProperty("A").insert(0, "2");
@@ -175,6 +166,7 @@ public class ListPropertyImplTest extends TestCase {
 		} catch (StructuralException e) {}
 	}
 
+	@Test
 	public void testRemove() throws StructuralException {
 		try {
 			getProperty("A").remove(0);
@@ -206,6 +198,7 @@ public class ListPropertyImplTest extends TestCase {
 		} catch (StructuralException e) {}
 	}
 
+	@Test
 	public void testIsFixedCardinality() throws StructuralException {
 		assertEquals(true, getProperty("A").isFixedCardinality());
 		assertEquals(false, getProperty("B").isFixedCardinality());
@@ -215,6 +208,7 @@ public class ListPropertyImplTest extends TestCase {
 		assertEquals(false, getProperty("F").isFixedCardinality());
 	}
 
+	@Test
 	public void testIsMutable() throws StructuralException {
 		assertEquals(true, getProperty("A").isMutable());
 		assertEquals(true, getProperty("B").isMutable());

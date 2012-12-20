@@ -1,41 +1,22 @@
-/*
- * Created on 24-May-2006
- */
 package ca.nengo.math.impl;
 
 import ca.nengo.math.Function;
 import ca.nengo.math.FunctionBasis;
-import ca.nengo.math.impl.FunctionBasisImpl;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for FunctionBasisImpl. 
- * 
- * TODO: test Function methods 
- * 
- * @author Bryan Tripp
- */
-public class FunctionBasisImplTest extends TestCase {
+public class FunctionBasisImplTest {
 
-	private FunctionBasis myFunctionBasis;
+	private FunctionBasis myFunctionBasis = new FunctionBasisImpl(
+		new Function[]{new MockFunction(-1), new MockFunction(1)}
+	);
 	
-	protected void setUp() throws Exception {
-		super.setUp();
-		
-		Function[] functions = new Function[]{new MockFunction(-1), new MockFunction(1)};
-		myFunctionBasis = new FunctionBasisImpl(functions);
-	}
-
-	/*
-	 * Test method for 'ca.bpt.cn.math.impl.FunctionBasisImpl.getDimensions()'
-	 */
+	@Test
 	public void testGetDimensions() {
 		assertEquals(2, myFunctionBasis.getBasisDimension());
 	}
 
-	/*
-	 * Test method for 'ca.bpt.cn.math.impl.FunctionBasisImpl.getFunction(int)'
-	 */
+	@Test
 	public void testGetFunction() {
 		float[] from = new float[]{0, 0};
 		assertTrue(myFunctionBasis.getFunction(0).map(from) < 0);
@@ -52,14 +33,17 @@ public class FunctionBasisImplTest extends TestCase {
 			myConstantResult = constantResult;
 		}
 		
+		@Override
 		public int getDimension() {
 			return 1;
 		}
 
+		@Override
 		public float map(float[] from) {
 			return myConstantResult;
 		}
 
+		@Override
 		public float[] multiMap(float[][] from) {
 			throw new RuntimeException("not implemented");
 		}
@@ -68,7 +52,5 @@ public class FunctionBasisImplTest extends TestCase {
 		public Function clone() throws CloneNotSupportedException {
 			return (Function) super.clone();
 		}
-		
 	}
-
 }

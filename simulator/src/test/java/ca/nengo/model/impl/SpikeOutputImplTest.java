@@ -1,47 +1,26 @@
-/*
- * Created on 24-May-2006
- */
 package ca.nengo.model.impl;
 
 import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.Units;
-import ca.nengo.model.impl.SpikeOutputImpl;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for SpikeOutputImpl. 
- * 
- * @author Bryan Tripp
- */
-public class SpikeOutputImplTest extends TestCase {
+public class SpikeOutputImplTest {
+	private SpikeOutput mySpikeOutput = new SpikeOutputImpl(new boolean[]{true}, Units.SPIKES, 0);
 
-	private SpikeOutput mySpikeOutput;
-	
-	protected void setUp() throws Exception {
-		super.setUp();		
-		mySpikeOutput = new SpikeOutputImpl(new boolean[]{true}, Units.SPIKES, 0);
-	}
-
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.SpikeOutputImpl.getValues()'
-	 */
+	@Test
 	public void testGetValues() {
 		assertEquals(1, mySpikeOutput.getValues().length);
 		assertEquals(true, mySpikeOutput.getValues()[0]);
 	}
 
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.SpikeOutputImpl.getUnits()'
-	 */
+	@Test
 	public void testGetUnits() {
 		assertEquals(Units.SPIKES, mySpikeOutput.getUnits());
 	}
 
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.SpikeOutputImpl.getDimension()'
-	 */
+	@Test
 	public void testGetDimension() {
 		assertEquals(1, mySpikeOutput.getDimension());
 	}
-
 }

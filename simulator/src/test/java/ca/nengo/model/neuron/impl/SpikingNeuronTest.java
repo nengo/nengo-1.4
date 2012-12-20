@@ -1,9 +1,4 @@
-/*
- * Created on 29-May-2006
- */
 package ca.nengo.model.neuron.impl;
-
-import org.apache.log4j.Logger;
 
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.RealOutput;
@@ -15,35 +10,18 @@ import ca.nengo.model.Units;
 import ca.nengo.model.impl.RealOutputImpl;
 import ca.nengo.model.neuron.ExpandableSynapticIntegrator;
 import ca.nengo.model.neuron.SpikeGenerator;
-import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
-import ca.nengo.model.neuron.impl.LinearSynapticIntegrator;
-import ca.nengo.model.neuron.impl.SpikeGeneratorOrigin;
-import ca.nengo.model.neuron.impl.SpikingNeuron;
-import junit.framework.TestCase;
+import org.apache.log4j.Logger;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for SpikingNeuron. 
- *  
- * @author Bryan Tripp
- */
-public class SpikingNeuronTest extends TestCase {
-
+public class SpikingNeuronTest {
 	private static Logger ourLogger = Logger.getLogger(SpikingNeuronTest.class);
 	
-	private ExpandableSynapticIntegrator myIntegrator;
-	private SpikeGenerator myGenerator;
-	private SpikingNeuron myNeuron;
+	private ExpandableSynapticIntegrator myIntegrator = new LinearSynapticIntegrator(.001f, Units.ACU);
+	private SpikeGenerator myGenerator = new LIFSpikeGenerator(.001f, .01f, .001f);
+	private SpikingNeuron myNeuron = new SpikingNeuron(myIntegrator, myGenerator, 1, 0, "test");
 	
-	protected void setUp() throws Exception {
-		super.setUp();
-		myIntegrator = new LinearSynapticIntegrator(.001f, Units.ACU);
-		myGenerator = new LIFSpikeGenerator(.001f, .01f, .001f);
-		myNeuron = new SpikingNeuron(myIntegrator, myGenerator, 1, 0, "test");		
-	}
-	
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.SpikingNeuron.getHistory(String)'
-	 */
+	@Test
 	public void testGetHistory() throws SimulationException {
 		myNeuron.getHistory("I");
 		myNeuron.getHistory("V");
@@ -54,24 +32,13 @@ public class SpikingNeuronTest extends TestCase {
 		} catch (SimulationException e) {} //exception is expected
 	}	
 
-//	/*
-//	 * Test method for 'ca.bpt.cn.model.impl.SpikingNeuron.getIntegrator()'
-//	 */
-//	public void testGetIntegrator() {
-//		assertEquals(myIntegrator, myNeuron.getIntegrator());
-//	}
-
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.SpikingNeuron.getOrigins()'
-	 */
+	@Test
 	public void testGetOrigins() {
 		assertEquals(2, myNeuron.getOrigins().length);
 		assertTrue(myNeuron.getOrigins()[0] instanceof SpikeGeneratorOrigin);
 	}
 
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.SpikingNeuron.getMode()'
-	 */
+	@Test
 	public void testGetMode() {
 		assertEquals(SimulationMode.DEFAULT, myNeuron.getMode());
 		
@@ -82,9 +49,7 @@ public class SpikingNeuronTest extends TestCase {
 		assertEquals(SimulationMode.CONSTANT_RATE, myNeuron.getMode());
 	}
 
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.SpikingNeuron.run(float, float)'
-	 */
+	@Test
 	public void testRun() throws StructuralException, SimulationException {
 		myIntegrator.addTermination("test", new float[]{1}, .005f, false);
 		myIntegrator.getTerminations()[0].setValues(new RealOutputImpl(new float[]{5}, Units.SPIKES_PER_S, 0));
@@ -105,5 +70,4 @@ public class SpikingNeuronTest extends TestCase {
 		assertTrue(((RealOutput) output).getValues()[0] > 100);
 		ourLogger.info(((RealOutput) output).getValues()[0]);
 	}
-
 }

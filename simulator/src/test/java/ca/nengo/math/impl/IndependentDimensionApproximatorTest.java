@@ -1,23 +1,14 @@
-/*
- * Created June 3, 2007
- */
 package ca.nengo.math.impl;
 
-import junit.framework.TestCase;
-import ca.nengo.TestUtil;
+import static org.junit.Assert.*;
 import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
 import ca.nengo.math.impl.IndependentDimensionApproximator.EncoderFactory;
 import ca.nengo.util.MU;
+import org.junit.Test;
 
-/**
- * Unit tests for IndependentDimensionApproximator.
- */
-public class IndependentDimensionApproximatorTest extends TestCase {
-
-	/*
-	 * Test method for 'ca.nengo.math.impl.IndependentDimensionApproximator.findCoefficients()'
-	 */
+public class IndependentDimensionApproximatorTest {
+	@Test
 	public void testFindCoefficients() {
 		float[][] polyCoeffs = new float[][]{{5,5},{1,-2},{-2,3}};
 
@@ -46,13 +37,11 @@ public class IndependentDimensionApproximatorTest extends TestCase {
 			for (int i = 0; i < polyCoeffs.length; i++) {
 				approx += coefficients[i] * values[i][j];
 			}
-			TestUtil.assertClose(approx, target.map(new float[]{evalPoints[j]}), 0.0001f);
+			assertEquals(approx, target.map(new float[]{evalPoints[j]}), 0.0001f);
 		}
 	}
 
     public static void main(String[] args) {
-//      EvalPointFactory epf = new EvalPointFactory(1, 10);
-//      float[][] foo = epf.genVectors(100, 3);
         EncoderFactory ef = new EncoderFactory(1);
         float[][] foo = ef.genVectors(10, 3);
         System.out.println(MU.toString(foo, 10));

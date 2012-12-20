@@ -1,6 +1,3 @@
-/*
- * Created on 15-Nov-07
- */
 package ca.nengo.model.impl;
 
 import java.util.ArrayList;
@@ -12,19 +9,12 @@ import ca.nengo.model.Origin;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
-import ca.nengo.model.impl.AbstractEnsemble;
-import ca.nengo.model.impl.AbstractNode;
-import ca.nengo.model.impl.BasicOrigin;
 import ca.nengo.util.ScriptGenException;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for AbstractEnsemble. 
- * 
- * @author Bryan Tripp
- */
-public class AbstractEnsembleTest extends TestCase {
-
+public class AbstractEnsembleTest {
+	@Test
 	public void testFindCommon1DOrigins() {
 		Origin one = new BasicOrigin(null, "2D", 2, Units.UNK);
 		Origin two = new BasicOrigin(null, "unique", 1, Units.UNK);

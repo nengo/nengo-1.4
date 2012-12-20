@@ -6,13 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- * Unit tests for TimeSeries1DImpl. 
- * 
- * @author Bryan Tripp
- */
 public class TimeSeries1DImplTest {
-
 	private TimeSeries1D myTimeSeries =
 		new TimeSeries1DImpl(
 			new float[]{0f, 1f},

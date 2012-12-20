@@ -1,37 +1,10 @@
-/**
- * 
- */
 package ca.nengo.math.impl;
 
-import ca.nengo.math.impl.LinearFunction;
-//import ca.nengo.util.MU;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for LinearFunction. 
- * 
- * @author Bryan Tripp
- */
-public class LinearFunctionTest extends TestCase {
-
-	/**
-	 * @param arg0
-	 */
-	public LinearFunctionTest(String arg0) {
-		super(arg0);
-	}
-
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	/**
-	 * Test method for {@link ca.nengo.math.impl.AbstractFunction#clone()}.
-	 * @throws CloneNotSupportedException 
-	 */
+public class LinearFunctionTest {
+	@Test
 	public void testClone() throws CloneNotSupportedException {
 		float[] map = new float[]{1, 1};
 		LinearFunction f = new LinearFunction(map, 0, true);
@@ -44,5 +17,4 @@ public class LinearFunctionTest extends TestCase {
 		assertTrue(f1.getBias() < .5f);
 		assertTrue(f1.getRectified());
 	}
-
 }

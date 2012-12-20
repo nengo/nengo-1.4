@@ -1,14 +1,15 @@
 package ca.nengo.model.plasticity.impl;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.impl.LinearExponentialTermination;
 import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
+import org.junit.Test;
 
-public class PlasticEnsembleTerminationTest extends TestCase {
-
+public class PlasticEnsembleTerminationTest {
+	@Test
     public void testGetTransform() throws StructuralException {
         float[][] transform = new float[10][];
         for(int i = 0; i < transform.length; i++) {
@@ -37,6 +38,7 @@ public class PlasticEnsembleTerminationTest extends TestCase {
         }
     }
 
+	@Test
     public void testSetTransform() throws StructuralException{
         float[][] transform = new float[10][];
         float[][] newtransform = new float[10][];

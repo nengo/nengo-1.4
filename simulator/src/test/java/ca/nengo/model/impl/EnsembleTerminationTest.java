@@ -1,52 +1,25 @@
-/**
- * 
- */
 package ca.nengo.model.impl;
 
-import ca.nengo.TestUtil;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
-import ca.nengo.model.impl.EnsembleTermination;
-import ca.nengo.model.impl.LinearExponentialTermination;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for EnsembleTermination. 
- * 
- * @author Bryan Tripp
- */
-public class EnsembleTerminationTest extends TestCase {
+public class EnsembleTerminationTest {
 
 	private static float ourTau = .005f;
 	private static float ourTolerance = 1e-5f;
 	
-	private Termination[] myNodeTerminations;
+	private Termination[] myNodeTerminations = new Termination[10];
 	private EnsembleTermination myEnsembleTermination;
 	
-	/**
-	 * @param arg0
-	 */
-	public EnsembleTerminationTest(String arg0) {
-		super(arg0);
-	}
-
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-		
-		myNodeTerminations = new Termination[10];
-		for (int i = 0; i < myNodeTerminations.length; i++) {
+	public EnsembleTerminationTest() throws Exception {
+		for (int i = 0; i < myNodeTerminations.length; i++)
 			myNodeTerminations[i] = new LinearExponentialTermination(null, ""+i, new float[]{1}, ourTau);
-		}
-		
 		myEnsembleTermination = new EnsembleTermination(null, "test", myNodeTerminations);
 	}
 
-	/**
-	 * Test method for {@link ca.nengo.model.impl.EnsembleTermination#setModulatory(boolean)}.
-	 */
+	@Test
 	public void testSetModulatory() {
 		assertFalse(myEnsembleTermination.getModulatory());
 		myNodeTerminations[0].setModulatory(true);
@@ -58,19 +31,15 @@ public class EnsembleTerminationTest extends TestCase {
 		assertTrue(myNodeTerminations[1].getModulatory());
 	}
 
-	/**
-	 * Test method for {@link ca.nengo.model.impl.EnsembleTermination#setTau(float)}.
-	 * @throws StructuralException 
-	 */
+	@Test
 	public void testSetTau() throws StructuralException {
-		TestUtil.assertClose(ourTau, myEnsembleTermination.getTau(), ourTolerance);
+		assertEquals(ourTau, myEnsembleTermination.getTau(), ourTolerance);
 		myNodeTerminations[0].setTau(ourTau*2);
 		assertTrue(myEnsembleTermination.getTau() > ourTau*1.01f);
 		
 		myEnsembleTermination.setTau(ourTau*2);
-		TestUtil.assertClose(ourTau*2, myEnsembleTermination.getTau(), ourTolerance);
-		TestUtil.assertClose(ourTau*2, myNodeTerminations[0].getTau(), ourTolerance);
-		TestUtil.assertClose(ourTau*2, myNodeTerminations[0].getTau(), ourTolerance);
+		assertEquals(ourTau*2, myEnsembleTermination.getTau(), ourTolerance);
+		assertEquals(ourTau*2, myNodeTerminations[0].getTau(), ourTolerance);
+		assertEquals(ourTau*2, myNodeTerminations[0].getTau(), ourTolerance);
 	}
-
 }

@@ -1,28 +1,16 @@
-/*
- * Created May 30, 2007
- */
 package ca.nengo.math.impl;
 
-import ca.nengo.TestUtil;
 import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
-import ca.nengo.math.impl.ConstantFunction;
-import ca.nengo.math.impl.FourierFunction;
-import ca.nengo.math.impl.WeightedCostApproximator;
 import ca.nengo.model.Units;
 import ca.nengo.util.MU;
 import ca.nengo.util.impl.TimeSeries1DImpl;
 import Jama.Matrix;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for WeightedCostApproximator. 
- */
-public class WeightedCostApproximatorTest extends TestCase {
-
-	/*
-	 * Test method for 'ca.nengo.math.impl.WeightedCostApproximator.pseudoInverse()'
-	 */
+public class WeightedCostApproximatorTest {
+	@Test
 	public void testPseudoInverse() {
 		WeightedCostApproximator a = new WeightedCostApproximator(new float[][]{new float[]{0f},new float[]{1f},new float[]{2f}}, 
 				new float[][]{new float[]{3f,2f,3f},new float[]{1f,2f,3f}}, 
@@ -32,15 +20,13 @@ public class WeightedCostApproximatorTest extends TestCase {
 		Matrix aM = new Matrix(new double[][]{new double[]{1,2},new double[]{3,4}});
 		Matrix apsaM = aM.times(psM.times(aM));
 		
-		TestUtil.assertClose((float)apsaM.get(0,0), (float)aM.get(0,0), 0.0001f );
-		TestUtil.assertClose((float)apsaM.get(0,1), (float)aM.get(0,1), 0.0001f );
-		TestUtil.assertClose((float)apsaM.get(1,0), (float)aM.get(1,0), 0.0001f );
-		TestUtil.assertClose((float)apsaM.get(1,1), (float)aM.get(1,1), 0.0001f );
+		assertEquals(apsaM.get(0,0), aM.get(0,0), 0.0001f);
+		assertEquals(apsaM.get(0,1), aM.get(0,1), 0.0001f);
+		assertEquals(apsaM.get(1,0), aM.get(1,0), 0.0001f);
+		assertEquals(apsaM.get(1,1), aM.get(1,1), 0.0001f);
 	}
 	
-	/* 
-	 * Test method for 'ca.nengo.math.impl.WeightedCostApproximator.findCoefficients()'
-	 */
+	@Test
 	public void testFindCoefficients() {
 		float[] frequencies = new float[]{1, 5, 8};
 		float[] amplitudes = new float[]{.1f, .2f, .3f};
@@ -72,7 +58,7 @@ public class WeightedCostApproximatorTest extends TestCase {
 			for (int i = 0; i < frequencies.length; i++) {
 				approx += coefficients[i] * values[i][j];
 			}
-			TestUtil.assertClose(approx, target.map(evalPoints[j]), 0.0001f);
+			assertEquals(approx, target.map(evalPoints[j]), 0.0001f);
 		}
 		
 		//testing with eval signals
@@ -100,15 +86,6 @@ public class WeightedCostApproximatorTest extends TestCase {
 			}
 		}
 		
-		TestUtil.assertClose(0.0f, MU.sum(MU.difference(approxsig,targetsig.getValues1D())), 0.0001f);
-		
-		
+		assertEquals(0.0f, MU.sum(MU.difference(approxsig,targetsig.getValues1D())), 0.0001f);
 	}
-	
-	public static void main(String[] args)
-	{
-		WeightedCostApproximatorTest t = new WeightedCostApproximatorTest();
-		t.testFindCoefficients();
-	}
-
 }

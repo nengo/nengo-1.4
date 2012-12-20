@@ -1,12 +1,5 @@
-/*
- * Created on 21-Mar-08
- */
 package ca.nengo.model.neuron.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import ca.nengo.TestUtil;
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.model.Network;
@@ -17,47 +10,39 @@ import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.FunctionInput;
 import ca.nengo.model.impl.NetworkImpl;
-import ca.nengo.model.neuron.impl.IzhikevichSpikeGenerator;
-import ca.nengo.model.neuron.impl.LinearSynapticIntegrator;
-import ca.nengo.model.neuron.impl.ExpandableSpikingNeuron;
 import ca.nengo.plot.Plotter;
 import ca.nengo.util.MU;
 import ca.nengo.util.Probe;
-import junit.framework.TestCase;
+import java.util.ArrayList;
+import java.util.List;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for IzhikevichSpikeGenerator. 
- * 
- * @author Bryan Tripp
- */
-public class IzhikevichSpikeGeneratorTest extends TestCase {
-
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
+public class IzhikevichSpikeGeneratorTest {
+	@Test
 	public void testSetPreset() {
 		float tolerance = 1e-10f;
 		
 		IzhikevichSpikeGenerator sg = new IzhikevichSpikeGenerator(IzhikevichSpikeGenerator.Preset.DEFAULT);
-		TestUtil.assertClose(.02f, sg.getA(), tolerance);
-		TestUtil.assertClose(.2f, sg.getB(), tolerance);
-		TestUtil.assertClose(-65f, sg.getC(), tolerance);
-		TestUtil.assertClose(2f, sg.getD(), tolerance);
+		assertEquals(.02f, sg.getA(), tolerance);
+		assertEquals(.2f, sg.getB(), tolerance);
+		assertEquals(-65f, sg.getC(), tolerance);
+		assertEquals(2f, sg.getD(), tolerance);
 		
 		sg.setPreset(IzhikevichSpikeGenerator.Preset.CHATTERING);
-		TestUtil.assertClose(-50f, sg.getC(), tolerance);
+		assertEquals(-50f, sg.getC(), tolerance);
 
 		sg.setPreset(IzhikevichSpikeGenerator.Preset.RESONATOR);
-		TestUtil.assertClose(.1f, sg.getA(), tolerance);  
-		TestUtil.assertClose(.26f, sg.getB(), tolerance);
-		TestUtil.assertClose(-65f, sg.getC(), tolerance);
+		assertEquals(.1f, sg.getA(), tolerance);  
+		assertEquals(.26f, sg.getB(), tolerance);
+		assertEquals(-65f, sg.getC(), tolerance);
 		
 		sg.setA(.05f);
 		assertTrue(sg.getPreset() == IzhikevichSpikeGenerator.Preset.CUSTOM);
-		TestUtil.assertClose(.05f, sg.getA(), tolerance);  
+		assertEquals(.05f, sg.getA(), tolerance);  
 	}
 
+	@Test
 	public void testRun() {
 		//we will compare spike times against results from matlab
 		IzhikevichSpikeGenerator rs = new IzhikevichSpikeGenerator(IzhikevichSpikeGenerator.Preset.REGULAR_SPIKING);		
@@ -106,5 +91,4 @@ public class IzhikevichSpikeGeneratorTest extends TestCase {
 		Plotter.plot(v.getData(), "voltage");
 		Plotter.plot(u.getData(), "recovery");
 	}
-
 }
