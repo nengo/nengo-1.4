@@ -146,7 +146,7 @@ public class ProjectionImpl implements Projection {
 		NEFEnsemble pre = (NEFEnsemble) baseOrigin.getNode();
 		NEFEnsemble post = (NEFEnsemble) baseTermination.getNode();
 
-		myBiasOrigin = pre.addBiasOrigin(baseOrigin, numInterneurons, getUniqueNodeName(post.getName() + ":" + baseTermination.getName()), excitatory);
+		myBiasOrigin = pre.addBiasOrigin(baseOrigin, numInterneurons, getUniqueNodeName(post.getName() + "_" + baseTermination.getName()), excitatory);
 		myInterneurons = myBiasOrigin.getInterneurons();
 		myNetwork.addNode(myInterneurons);
 		BiasTermination[] bt = post.addBiasTerminations(baseTermination, tauBias, myBiasOrigin.getDecoders(), baseOrigin.getDecoders());
