@@ -59,7 +59,7 @@ class TemplateConstructor(IConfigurable):
         elif len(a)-len(d) == 2:
             make_func(self.network,self.node,**args)
         else:
-            print 'Invalid make function:',make_func
+            raise ConfigException('Invalid template make function: %s'%make_func)
     def preConfiguration(self,props):
         args = {}
         for k,p in self.properties._properties.items():
