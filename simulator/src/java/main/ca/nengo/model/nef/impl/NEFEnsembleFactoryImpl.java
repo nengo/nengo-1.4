@@ -49,6 +49,7 @@ import ca.nengo.model.neuron.Neuron;
 import ca.nengo.model.neuron.impl.LIFNeuronFactory;
 import ca.nengo.util.MU;
 import ca.nengo.util.VectorGenerator;
+import ca.nengo.util.VisiblyMutableUtils;
 import ca.nengo.util.impl.RandomHypersphereVG;
 
 /**
@@ -305,6 +306,7 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 	 */
 	protected NEFEnsemble construct(String name, NEFNode[] nodes, float[][] encoders, ApproximatorFactory af, float[][] evalPoints, float[] radii)
 			throws StructuralException {
+		if (!VisiblyMutableUtils.isValidName(name)) throw new StructuralException("name '"+name+"' must not contain '.' or ':'");
 		return new NEFEnsembleImpl(name, nodes, encoders, af, evalPoints, radii);
 	}
 

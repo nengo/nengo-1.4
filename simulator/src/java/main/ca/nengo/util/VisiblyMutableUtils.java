@@ -65,6 +65,12 @@ public class VisiblyMutableUtils {
 		}
 	}
 	
+	public static boolean isValidName(final String name) {
+		if (name.indexOf('.')>=0) return false;
+		if (name.indexOf(':')>=0) return false;
+		return true;
+	}
+	
 
 	/**
 	 * @param vm The changed VisiblyMutable object
@@ -75,6 +81,8 @@ public class VisiblyMutableUtils {
 	 */
 	public static void nameChanged(final VisiblyMutable vm, final String oldName, final String newName, 
 			List<VisiblyMutable.Listener> listeners) throws StructuralException {
+			
+		if (!isValidName(newName)) throw new StructuralException("Name '"+newName+"' must not contain '.' or ':'");
 		
 		VisiblyMutable.NameChangeEvent event = new VisiblyMutable.NameChangeEvent() {
 

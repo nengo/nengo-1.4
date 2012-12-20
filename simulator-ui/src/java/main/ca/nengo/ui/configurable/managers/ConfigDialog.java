@@ -43,10 +43,12 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.text.MutableAttributeSet;
 
+import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.Property;
@@ -303,8 +305,15 @@ public class ConfigDialog extends JDialog {
                         try {
                             completeConfiguration();
                         } catch (ConfigException e) {
-                            configException = e;
-
+                            configException = e;                            
+                        } catch (RuntimeException e) {
+                        	Throwable cause=e;
+                        	while (cause.getCause()!=null) cause=cause.getCause();
+                        	configException = new ConfigException(cause.getMessage());
+                        }
+                        
+                        if (configException!=null) {
+                        	JOptionPane.showMessageDialog(NengoGraphics.getInstance(), configException.getMessage());
                         }
 
                         myConfigManager.dialogConfigurationFinished(configException);
