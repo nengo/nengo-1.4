@@ -109,6 +109,7 @@
                 <executions>
                     <execution>
                         <id>cmake-generate</id>
+						<phase>none</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -127,6 +128,7 @@
                     </execution>
                     <execution>
                         <id>cmake-compile</id>
+						<phase>none</phase>
                         <goals>
                             <goal>compile</goal>
                         </goals>
