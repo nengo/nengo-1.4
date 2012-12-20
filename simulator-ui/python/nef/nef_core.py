@@ -75,6 +75,8 @@ class Network:
             PDFTools.setSeed(seed)    
             random.seed(seed)
             
+        self.alias={}    
+            
         
     def make(self,name,neurons,dimensions,
                   tau_rc=0.02,tau_ref=0.002,
@@ -676,6 +678,8 @@ class Network:
         post_nodes = None
 
         if isinstance(pre, basestring):
+            pre=self.alias.get(pre, pre) # handle aliased names
+
             pre_nodes = self._get_nodes(pre)
             pre = pre_nodes[-1]
         elif isinstance(pre,Origin):
@@ -686,6 +690,7 @@ class Network:
                 raise Exception('Cannot connect directly from a Node that is not in this network')
                 
         if isinstance(post, basestring):
+            post=self.alias.get(post, post) # handle aliased names
             post_nodes = self._get_nodes(post)
             post = post_nodes[-1]
         elif isinstance(post,Termination):
@@ -1123,6 +1128,18 @@ class Network:
                     else:
                         return default    
         return node
+        
+    def set_alias(self, alias, node):
+        """Adds a named shortcut to an existing node within this network to be
+        used to simplify connect() calls.
+        
+        For example, you can do::
+        
+            net.set_alias('vision','A.B.C.D.E')
+            net.set_alias('motor','W.X.Y.Z')
+            net.connect('vision','motor')            
+        """    
+        self.alias[alias]=node
 
     def releaseMemory(self):
         """Attempt to release extra memory used by the Network.  Call only after all
