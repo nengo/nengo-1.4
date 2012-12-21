@@ -456,7 +456,11 @@ class Network:
         network=NetworkImpl()
         network.name=name
         parent.addNode(network)
-        return Network(network)
+        if self.seed is None:
+            seed = None
+        else:
+            seed = self.random.randrange(0x7fffffff)
+        return Network(network, seed=seed, fixed_seed=self.fixed_seed)
 
     def _parse_pre(self,pre,func,origin_name):
         if isinstance(pre,Origin):
