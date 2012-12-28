@@ -7,6 +7,7 @@ import inspect
 
 class SPA:
     randomize_vectors=True
+    verbose=False
 
     def __init__(self,network):
         self.net=network
@@ -19,12 +20,16 @@ class SPA:
         self.connect()
         
     def init(self):
+        modules=[]
         for k,v in inspect.getmembers(self):
-          if not k.startswith('_'):
-            if isinstance(v,module.Module):
-                self.add_module(k,v)
-            elif isinstance(v,(int,float,str)):
-                self.params[k]=v
+            if not k.startswith('_'):
+                if isinstance(v,module.Module):
+                    modules.append((k,v))
+                elif isinstance(v,(int,float,str)):
+                    self.params[k]=v
+        for k,v in modules:        
+            if self.verbose: print 'Initializing module:',k            
+            self.add_module(k,v)
     
     def add_module(self, name, module):
         self.modules[name]=module
@@ -32,11 +37,21 @@ class SPA:
         module.net = net
         module.spa = self
         module.name = name
-        module.init()
+        module.init(**self.extract_parameters(module, module.init))
 
     def connect(self):
         for module in self.modules.values():
-            module.connect()
+            module.connect(**self.extract_parameters(module, module.connect))
+            
+    def extract_parameters(self, module, func):
+        p={}
+        args,vargs,kw,defaults=inspect.getargspec(func)
+        for arg in args[1:]:
+            try:
+                p[arg]=self.get_param_value(arg, module)
+            except KeyError:
+                pass
+        return p
 
     
     def get_module_name(self, module):

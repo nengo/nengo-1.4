@@ -1,0 +1,130 @@
+import module
+
+import numeric as np
+
+class Thalamus(module.Module):
+    def __init__(self,bg,**params):
+        module.Module.__init__(self,**params)
+        self.bg=bg
+    
+    def init(self, N=50, rule_threshold=0.2, mutual_inhibit=1, pstc_mutual=0.008):
+        D=self.bg.rules.count()
+        
+        self.net.make_input('bias', [1])
+        self.net.make_array('rule', N, D, intercept=(rule_threshold, 1), encoders=[[1]])
+        self.net.connect('bias', 'rule')
+        
+        if mutual_inhibit>0:
+            self.net.connect('rule', 'rule', (np.eye(D)-1)*mutual_inhibit, pstc=pstc_mutual)       
+
+    def connect(self, weight_GPi=-3, pstc_GPi=0.008, pstc_output=0.01):
+        self.bg.rules.initialize(self.spa)
+
+        # Store rules in the documentation comment for this network for use in the interactive mode view    
+        self.net.network.documentation = 'THAL: ' + ','.join(self.bg.rules.names)
+                
+        self.spa.net.connect(self.bg.name+'.GPi', self.name+'.rule', weight=weight_GPi, pstc=pstc_GPi, func=self.bg.get_output_function())
+
+
+        for name in self.spa.sinks.keys():
+            t=self.bg.rules.rhs_direct(name)
+            if t is not None:
+                self.spa.net.connect(self.name+'.rule', 'sink_'+name, t, pstc_output)
+
+
+
+"""        
+    def create(self,rule_neurons=40,rule_threshold=0.2,bg_output_weight=-3,
+               pstc_output=0.015,mutual_inhibit=1,pstc_inhibit=0.008,
+               pstc_to_gate=0.002,pstc_gate=0.008,N_per_D=30,
+               pstc_route_input=0.002,pstc_route_output=0.002,neurons_gate=25,
+               route_scale=1,pstc_input=0.01):
+        D=self.bg.rules.rule_count
+        
+        self.bias=self.net.make_input('bias',[1])
+        self.rules=self.net.make_array('rules',rule_neurons,D,intercept=(rule_threshold,1),encoders=[[1]],quick=True,storage_code="%d")
+        self.net.connect(self.bias,self.rules)
+
+
+
+        self.net.network.exposeOrigin(self.rules.getOrigin('X'),'rules')
+
+        if mutual_inhibit>0:
+            self.net.connect(self.rules,self.rules,(numeric.eye(D)-1)*mutual_inhibit,pstc=pstc_inhibit)
+
+
+    def connect(self):
+        o,t=self.net.connect(self.bg.net.network.getOrigin('output'),self.rules,
+                        weight=self.get_param('bg_output_weight'),create_projection=False,pstc=self.p.pstc_input)
+        self.net.network.exposeTermination(t,'bg')
+        self.spa.net.network.addProjection(self.bg.net.network.getOrigin('output'),self.net.network.getTermination('bg'))
+
+        self.bg.rules.initialize(self.spa)
+
+        # Store rules in the documentation comment for this network for use in the interactive mode view    
+        self.net.network.documentation = 'THAL: ' + ','.join(self.bg.rules.names)
+        
+        for name,source in self.spa.sinks.items():
+            t=self.bg.rules.rhs_direct(name)
+            if t is not None:
+                self.spa.connect_to_sink(self.net.network.getOrigin('rules'),
+                                         name,t,self.get_param('pstc_output'))
+
+        for source_name,sink_name,weight in self.bg.rules.get_rhs_routes():
+            t=self.bg.rules.rhs_route(source_name,sink_name,weight)
+
+            gname='gate_%s_%s'%(source_name,sink_name)
+            if weight!=1: gname+='(%1.1f)'%weight
+            gate=self.net.make(gname,self.p.neurons_gate,1,
+                               quick=True,encoders=[[1]],intercept=(0.3,1))
+            self.net.connect(self.rules,gate,transform=t,pstc=self.p.pstc_to_gate)
+            self.net.connect(self.bias,gate)
+
+            source=self.spa.sources[source_name]
+            sink=self.spa.sinks[sink_name]
+            cname='channel_%s_%s'%(source_name,sink_name)
+            if weight!=1: cname+='(%1.1f)'%weight
+
+            sink_module=self.spa.sink_modules[sink_name]
+            source_module=self.spa.source_modules[source_name]
+
+            if sink_module.p.dimensions<=source_module.p.dimensions:
+                module=sink_module
+                use_sink=True
+            else:
+                module=source_module
+                use_sink=False
+            
+            if module.has_param('subdimensions') and module.p.subdimensions is not None:
+                channel=self.net.make_array(cname,module.p.N_per_D*module.p.subdimensions,module.p.dimensions/module.p.subdimensions,dimensions=module.p.subdimensions,quick=True)
+            else:
+                channel=self.net.make(cname,module.p.N_per_D*module.p.dimensions,module.p.dimensions,quick=True)
+            #channel=self.net.make_array(cname,self.p.N_per_D,sink.dimension,quick=True)
+
+            self.net.network.exposeOrigin(channel.getOrigin('X'),cname)
+            
+
+            v1=self.spa.vocab(source_name)
+            v2=self.spa.vocab(sink_name)
+            if v1 is v2: transform=None
+            else: transform=v1.transform_to(v2)
+
+
+            if use_sink:
+                tr1=transform
+                tr2=None
+            else:
+                tr1=None
+                tr2=transform
+            
+            self.spa.connect_to_sink(self.net.network.getOrigin(cname),sink_name,tr2,
+                                     self.p.pstc_output,termination_name=cname)
+
+
+            o1,t1=self.net.connect(source,channel,pstc=self.p.pstc_route_input,weight=weight*self.p.route_scale,transform=tr1,create_projection=False)
+            self.net.network.exposeTermination(t1,cname)
+            self.spa.net.network.addProjection(o1,self.net.network.getTermination(cname))
+
+            channel.addTermination('gate',[[-10.0]]*(module.p.N_per_D*module.p.dimensions),self.p.pstc_gate,False)
+            self.net.connect(gate,channel.getTermination('gate'))
+"""

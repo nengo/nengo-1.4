@@ -1,3 +1,4 @@
+import inspect
 
 class Module:
     def __init__(self, **params):
