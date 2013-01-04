@@ -1,13 +1,5 @@
-/*
- * Created on 24-May-2006
- */
 package ca.nengo.model.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import ca.nengo.TestUtil;
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.model.Ensemble;
@@ -18,7 +10,6 @@ import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
-import ca.nengo.model.impl.NetworkImpl;
 import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.nengo.model.nef.impl.NEFEnsembleImpl;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
@@ -27,21 +18,17 @@ import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.SpikePattern;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
-import junit.framework.TestCase;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-public class NetworkImplTest extends TestCase {
+public class NetworkImplTest {
 
-	private NetworkImpl myNetwork;
+	private NetworkImpl myNetwork = new NetworkImpl();
 
-	protected void setUp() throws Exception {
-		super.setUp();
-
-		myNetwork = new NetworkImpl();
-	}
-
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.NetworkImpl.getNodes()'
-	 */
+	@Test
 	public void testGetNodes() throws StructuralException {
 		Ensemble a = new MockEnsemble("a");
 		myNetwork.addNode(a);
@@ -66,9 +53,7 @@ public class NetworkImplTest extends TestCase {
 		assertEquals(a, myNetwork.getNodes()[0]);
 	}
 
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.NetworkImpl.getProjections()'
-	 */
+	@Test
 	public void testGetProjections() throws StructuralException {
 		Origin o1 = new ProjectionImplTest.MockOrigin("o1", 1);
 		Origin o2 = new ProjectionImplTest.MockOrigin("o2", 1);
@@ -97,6 +82,7 @@ public class NetworkImplTest extends TestCase {
 		assertEquals(t1, myNetwork.getProjections()[0].getTermination());
 	}
 	
+	@Test
 	public void testNodeNameChange() throws StructuralException {
 		MockEnsemble e1 = new MockEnsemble("one");
 		myNetwork.addNode(e1);
@@ -119,6 +105,7 @@ public class NetworkImplTest extends TestCase {
 		} catch (StructuralException e) {}
 	}
 	
+	@Test
 	public void testKillNeurons() throws StructuralException
 	{
 		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
@@ -179,6 +166,7 @@ public class NetworkImplTest extends TestCase {
 		return numDead;
 	}
 	
+	@Test
 	public void testAddNode() throws StructuralException
 	{
 		Ensemble a = new MockEnsemble("a");
@@ -207,6 +195,7 @@ public class NetworkImplTest extends TestCase {
 		
 	}
 	
+	@Test
 	public void testRemoveNode() throws StructuralException, SimulationException
 	{
 		Ensemble a = new MockEnsemble("a");
@@ -269,6 +258,7 @@ public class NetworkImplTest extends TestCase {
 			fail("Origin not unexposed correctly");
 	}
 	
+	@Test
 	public void testExposeOrigin() throws StructuralException
 	{
 		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
@@ -293,6 +283,7 @@ public class NetworkImplTest extends TestCase {
 		myNetwork.removeNode("a");
 	}
 	
+	@Test
 	public void testHideOrigin() throws StructuralException
 	{
 		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
@@ -319,56 +310,12 @@ public class NetworkImplTest extends TestCase {
 		myNetwork.removeNode("a");
 	}
 	
-//	public void testChanged() throws StructuralException, SimulationException
-//	{
-//		NetworkImpl b = new NetworkImpl();
-//		b.setName("b");
-//		myNetwork.addNode(b);
-//		
-//		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
-//		NEFEnsembleImpl a = (NEFEnsembleImpl)ef.make("a", 10, 1);
-//		b.addNode(a);
-//		
-////		b.exposeOrigin(a.getOrigin("X"), "exposed");
-////		
-////		NEFEnsembleImpl c = (NEFEnsembleImpl)ef.make("c", 10, 1);
-////		float[][] tmp = new float[1][1];
-////		tmp[0][0] = 1;
-////		c.addDecodedTermination("in", tmp, 0.007f, false);
-////		myNetwork.addNode(c);
-////		
-////		myNetwork.addProjection(b.getOrigin("exposed"), c.getTermination("in"));
-////		
-////		if(myNetwork.getProjections().length != 1)
-////			fail("Projection not created properly");
-////		
-////		b.hideOrigin("exposed");
-////		
-////		if(myNetwork.getProjections().length != 0)
-////			fail("Projection not removed");
-////		
-////		myNetwork.removeNode("b");
-////		myNetwork.removeNode("c");
-//		
-//		b.getSimulator().addProbe("a", "X", true);
-//		myNetwork.collectAllProbes();
-//		
-//		if(myNetwork.getSimulator().getProbes().length != 1)
-//			fail("Probe not added");
-//		
-//		b.removeNode("a");
-//		
-//		if(myNetwork.getSimulator().getProbes().length != 0)
-//			fail("Probe not removed when node removed");
-//		
-//		myNetwork.removeNode("b");
-//	}
-	
+	@Test
 	public void testGetNodeTerminations() throws StructuralException
 	{
 		NetworkImpl net = new NetworkImpl();
 		
-		if(net.getNodeTerminations().size() != 0)
+		if(!net.getNodeTerminations().isEmpty())
 			fail("Network has terminations when it shouldn't");
 		
 		NEFEnsembleFactoryImpl ef = new NEFEnsembleFactoryImpl();
@@ -383,6 +330,7 @@ public class NetworkImplTest extends TestCase {
 			fail("Network hasn't found node termination");
 	}
 	
+	@Test
 	public void testGetNodeOrigins() throws StructuralException
 	{
 		NetworkImpl net = new NetworkImpl();
@@ -400,6 +348,7 @@ public class NetworkImplTest extends TestCase {
 		
 	}
 	
+	@Test
 	public void testReset() throws StructuralException, SimulationException
 	{
 		NetworkImpl net = new NetworkImpl();
@@ -429,10 +378,11 @@ public class NetworkImplTest extends TestCase {
 		
 		for(int i=0; i < results1.length; i++)
 			for(int j=0; j < results1[i].length; j++)
-				TestUtil.assertClose(results1[i][j], results2[i][j], 0.0001f);
+				assertEquals(results1[i][j], results2[i][j], 0.0001f);
 		
 	}
 	
+	@Test
 	public void testClone() throws StructuralException, CloneNotSupportedException{
 		NetworkImpl top = new NetworkImpl();
 	    
@@ -474,92 +424,100 @@ public class NetworkImplTest extends TestCase {
 			myName = name;
 		}
 
+		@Override
 		public String getName() {
 			return myName;
 		}
 		
+		@Override
 		public void setName(String name) throws StructuralException {
 			VisiblyMutableUtils.nameChanged(this, getName(), name, myListeners);
 			myName = name;
 		}
 
+		@Override
 		public Node[] getNodes() {
 			throw new RuntimeException("not implemented");
 		}
 
-//		public void addNeuron(Neuron neuron) {
-//			throw new RuntimeException("not implemented");
-//		}
-
-//		public void removeNeuron(int index) {
-//			throw new RuntimeException("not implemented");
-//		}
-
+		@Override
 		public Origin[] getOrigins() {
 			throw new RuntimeException("not implemented");
 		}
 
+		@Override
 		public Termination[] getTerminations() {
 			throw new RuntimeException("not implemented");
 		}
 
+		@Override
 		public void setMode(SimulationMode mode) {
 			throw new RuntimeException("not implemented");
 		}
 
+		@Override
 		public SimulationMode getMode() {
 			throw new RuntimeException("not implemented");
 		}
 
+		@Override
 		public void run(float startTime, float endTime)
 				throws SimulationException {
 			throw new RuntimeException("not implemented");
 		}
 
+		@Override
 		public void reset(boolean randomize) {
 			throw new RuntimeException("not implemented");
 		}
 
+		@Override
 		public Origin getOrigin(String name) throws StructuralException {
 			throw new RuntimeException("not implemented");
 		}
 
+		@Override
 		public Termination getTermination(String name)
 				throws StructuralException {
 			throw new RuntimeException("not implemented");
 		}
 
+		@Override
 		public SpikePattern getSpikePattern() {
 			throw new RuntimeException("not implemented");
 		}
 
+		@Override
 		public void collectSpikes(boolean collect) {
 			throw new RuntimeException("not implemented");
 		}
 
+		@Override
 		public String getDocumentation() {
 			throw new RuntimeException("not implemented");
 		}
 
+		@Override
 		public void setDocumentation(String text) {
 			throw new RuntimeException("not implemented");
 		}
 
+		@Override
 		public boolean isCollectingSpikes() {
 			throw new RuntimeException("not implemented");
 		}
 
+		@Override
 		public void redefineNodes(Node[] nodes) {
 			throw new RuntimeException("not implemented");			
 		}
 
+		@Override
 		public void stopProbing(String stateName) {
 			throw new RuntimeException("not implemented");			
 		}
 		
-		/**
-		 * @see ca.nengo.util.VisiblyMutable#addChangeListener(ca.nengo.util.VisiblyMutable.Listener)
-		 */
+		@Override
 		public void addChangeListener(Listener listener) {
 			if (myListeners == null) {
 				myListeners = new ArrayList<Listener>(2);
@@ -567,9 +525,7 @@ public class NetworkImplTest extends TestCase {
 			myListeners.add(listener);
 		}
 
-		/**
-		 * @see ca.nengo.util.VisiblyMutable#removeChangeListener(ca.nengo.util.VisiblyMutable.Listener)
-		 */
+		@Override
 		public void removeChangeListener(Listener listener) {
 			myListeners.remove(listener);
 		}
@@ -579,13 +535,13 @@ public class NetworkImplTest extends TestCase {
 			return (Node) super.clone();
 		}
 
+		@Override
 		public Node[] getChildren() {
-			
 			return null;
 		}
 
+		@Override
 		public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
-			// TODO Auto-generated method stub
 			return null;
 		}
 	}

@@ -1,18 +1,12 @@
-/*
- * Created on 25-Jul-2006
- */
 package ca.nengo.math.impl;
 
-import junit.framework.TestCase;
 import ca.nengo.math.Function;
 import ca.nengo.plot.Plotter;
+import org.junit.Test;
 
-public class ConvolutionTest extends TestCase {
+public class ConvolutionTest {
 
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
+	@Test
     public void testNothing() {
     }
 

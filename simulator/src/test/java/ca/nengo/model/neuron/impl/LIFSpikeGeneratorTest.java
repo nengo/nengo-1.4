@@ -1,6 +1,3 @@
-/*
- * Created on 29-May-2006
- */
 package ca.nengo.model.neuron.impl;
 
 import ca.nengo.model.RealOutput;
@@ -10,22 +7,11 @@ import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.TimeSeries1D;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for LIFSpikeGenerator. 
- *  
- * @author Bryan Tripp
- */
-public class LIFSpikeGeneratorTest extends TestCase {
-
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.LIFSpikeGenerator.getHistory(String)'
-	 */
+public class LIFSpikeGeneratorTest {
+	@Test
 	public void testGetHistory() throws SimulationException {
 		LIFSpikeGenerator sg = new LIFSpikeGenerator(.0005f, .02f, .002f);
 		TimeSeries history = sg.getHistory("V");
@@ -46,9 +32,7 @@ public class LIFSpikeGeneratorTest extends TestCase {
 		} catch (SimulationException e) {} //exception is expected
 	}
 
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.LIFSpikeGenerator.reset(boolean)'
-	 */
+	@Test
 	public void testReset() throws SimulationException {
 		float initialVoltage = .2f;
 		LIFSpikeGenerator sg = new LIFSpikeGenerator(.0005f, .02f, .002f, initialVoltage);
@@ -68,9 +52,7 @@ public class LIFSpikeGeneratorTest extends TestCase {
 		assertBetween(voltage3[0], .2f, .23f);
 	}
 
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.LIFSpikeGenerator.runConstantRate(float, float)'
-	 */
+	@Test
 	public void testRunConstantRate() {
 		float maxTimeStep = .0005f;
 		float[] current = new float[]{0f, 2f, 5f};
@@ -102,9 +84,7 @@ public class LIFSpikeGeneratorTest extends TestCase {
 		assertBetween(((RealOutput) sg.run(new float[1], new float[]{current[2]})).getValues()[0], 154f, 155f);
 	}
 	
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.LIFSpikeGenerator.run(float[], float[])'
-	 */
+	@Test
 	public void testRun() throws SimulationException {
 		float maxTimeStep = .0005f;
 		float[] current = new float[]{0f, 2f, 5f};
@@ -131,9 +111,9 @@ public class LIFSpikeGeneratorTest extends TestCase {
 		assertSpikesCloseToRate(sg, current[1], 1);
 		assertSpikesCloseToRate(sg, current[2], 10);
 	}
-		
-		
-public void testRunPrecise() throws SimulationException {
+
+	@Test
+	public void testRunPrecise() throws SimulationException {
 		LIFSpikeGenerator sg = new LIFSpikeGenerator(0.001f, 0.02f, 0.002f);
 
 		assertSpikesCloseToRate(sg, 1.46335061f, 1, SimulationMode.DEFAULT);
@@ -167,10 +147,7 @@ public void testRunPrecise() throws SimulationException {
 		assertSpikesCloseToRate(sg, current[0], 1, SimulationMode.PRECISE);
 		assertSpikesCloseToRate(sg, current[1], 1, SimulationMode.PRECISE);
 		assertSpikesCloseToRate(sg, current[2], 2, SimulationMode.PRECISE);
-		
-		
-
-}
+	}
 
 	private static void assertBetween(float value, float low, float high) {
 		assertTrue(value + " is out of range", value > low && value < high);
@@ -179,8 +156,7 @@ public void testRunPrecise() throws SimulationException {
 	private static void assertSpikesCloseToRate(LIFSpikeGenerator sg, float current, float tolerance) throws SimulationException {
 		assertSpikesCloseToRate(sg,current,tolerance,SimulationMode.DEFAULT);
 	}
-	
-	
+
 	private static void assertSpikesCloseToRate(LIFSpikeGenerator sg, float current, float tolerance, SimulationMode mode) throws SimulationException {
 		float stepSize = .001f;
 		int steps = 1000;

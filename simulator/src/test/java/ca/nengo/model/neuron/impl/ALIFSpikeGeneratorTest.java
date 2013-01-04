@@ -1,10 +1,6 @@
-/*
- * Created on 1-Aug-07
- */
 package ca.nengo.model.neuron.impl;
 
-import junit.framework.TestCase;
-import ca.nengo.TestUtil;
+import static org.junit.Assert.*;
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.math.impl.PiecewiseConstantFunction;
@@ -24,48 +20,41 @@ import ca.nengo.model.neuron.Neuron;
 import ca.nengo.plot.Plotter;
 import ca.nengo.util.Probe;
 import ca.nengo.util.TimeSeries;
+import org.junit.Test;
 
-/**
- * Unit tests for ALIFSpikeGenerator.
- *
- * @author Bryan Tripp
- */
-public class ALIFSpikeGeneratorTest extends TestCase {
-
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
+public class ALIFSpikeGeneratorTest {
+	@Test
 	public void testGetOnsetRate() throws SimulationException {
 		float I = 10;
 		ALIFSpikeGenerator g1 = new ALIFSpikeGenerator(.002f, .02f, .2f, .1f);
 		float rate = run(g1, .001f, 1, I);
-		TestUtil.assertClose(rate, g1.getOnsetRate(I), .5f);
+		assertEquals(rate, g1.getOnsetRate(I), .5f);
 
 		ALIFSpikeGenerator g2 = new ALIFSpikeGenerator(.001f, .01f, .1f, .2f);
 		rate = run(g2, .001f, 1, I);
-		TestUtil.assertClose(rate, g2.getOnsetRate(I), .5f);
+		assertEquals(rate, g2.getOnsetRate(I), .5f);
 	}
 
+	@Test
 	public void testGetAdaptedRate() throws SimulationException {
 		float I = 10;
 		ALIFSpikeGenerator g1 = new ALIFSpikeGenerator(.002f, .02f, .2f, .1f);
 		float rate = run(g1, .001f, 1000, I);
-		TestUtil.assertClose(rate, g1.getAdaptedRate(I), .5f);
+		assertEquals(rate, g1.getAdaptedRate(I), .5f);
 
 		ALIFSpikeGenerator g2 = new ALIFSpikeGenerator(.002f, .02f, .1f, .2f);
 		rate = run(g2, .001f, 1000, I);
-		TestUtil.assertClose(rate, g2.getAdaptedRate(I), .75f);
+		assertEquals(rate, g2.getAdaptedRate(I), .75f);
 
 		//TODO: are these too far off (~ 0.75%)?
 
 		ALIFSpikeGenerator g3 = new ALIFSpikeGenerator(.001f, .01f, .1f, .2f);
 		rate = run(g3, .001f, 1000, I);
-		TestUtil.assertClose(rate, g3.getAdaptedRate(I), 1.5f);
+		assertEquals(rate, g3.getAdaptedRate(I), 1.5f);
 
 		I = 15;
 		rate = run(g3, .001f, 1000, I);
-		TestUtil.assertClose(rate, g3.getAdaptedRate(I), 2f);
+		assertEquals(rate, g3.getAdaptedRate(I), 2f);
 	}
 
 	//returns final firing rate
@@ -80,6 +69,7 @@ public class ALIFSpikeGeneratorTest extends TestCase {
 		return history.getValues()[0][0];
 	}
 
+	@Test
 	public void testRun() throws SimulationException {
 		float maxTimeStep = .0005f;
 		float[] current = new float[]{0f, 2f, 5f};
@@ -108,8 +98,6 @@ public class ALIFSpikeGeneratorTest extends TestCase {
 		assertSpikesCloseToRate(sg, current[2], 10);
 	}
 
-
-
 	private static void assertSpikesCloseToRate(ALIFSpikeGenerator sg, float current, float tolerance) throws SimulationException {
 		float stepSize = .001f;
 		int steps = 1000;
@@ -134,6 +122,7 @@ public class ALIFSpikeGeneratorTest extends TestCase {
 				spikeCount > rate-tolerance && spikeCount < rate+tolerance);
 	}
 
+	@Test
 	public void testAdaptation() throws StructuralException, SimulationException {
 		NetworkImpl network = new NetworkImpl();
 		LinearSynapticIntegrator integrator = new LinearSynapticIntegrator(.001f, Units.ACU);
@@ -143,28 +132,17 @@ public class ALIFSpikeGeneratorTest extends TestCase {
 		network.addNode(neuron);
 
 		Function f = new PiecewiseConstantFunction(new float[]{1, 2}, new float[]{0, 1, -1});
-//		Function f = new SineFunction((float) Math.PI, 1f / (float) Math.PI);
-//		Plotter.plot(f, 0, .01f, 3, "input");
 		FunctionInput input = new FunctionInput("input", new Function[]{f}, Units.UNK);
 		network.addNode(input);
 
 		network.addProjection(input.getOrigin(FunctionInput.ORIGIN_NAME), t);
 
-//		Probe rate = network.getSimulator().addProbe("neuron", "rate", true);
-//		Probe N = network.getSimulator().addProbe("neuron", "N", true);
-//		Probe dNdt = network.getSimulator().addProbe("neuron", "dNdt", true);
-//		Probe I = network.getSimulator().addProbe("neuron", "I", true);
-
 		setTau(neuron, .1f);
 		network.setMode(SimulationMode.RATE);
 		network.run(0, 3);
-
-//		Plotter.plot(rate.getData(), "rate");
-//		Plotter.plot(N.getData(), "N");
 	}
 
 	private void setTau(SpikingNeuron neuron, float tau) {
-//		float g_N = 1;
 		float alpha = getSlope(neuron) / neuron.getScale();
 		float b = neuron.getBias();
 		float c = neuron.getScale();
@@ -173,14 +151,7 @@ public class ALIFSpikeGeneratorTest extends TestCase {
 		float A_N = (1/tau - 1/tauN) / alpha;
 
 		//optimal A_N to maximize adaptation range with reasonable tau (see notes 14 April)
-//		float A_N = (1/tau - 1e-2f) / alpha;
 		((ALIFSpikeGenerator) neuron.getGenerator()).setIncN(A_N);
-
-//		if (tau >= 1/(g_N * A_N * alpha)) {
-//			throw new IllegalArgumentException("The requested time constant is too long (can't be supported by other neuron params)");
-//		}
-
-//		float tauN = tau / (1 - g_N*A_N*alpha*tau);
 		((ALIFSpikeGenerator) neuron.getGenerator()).setTauN(tauN);
 	}
 
@@ -225,18 +196,8 @@ public class ALIFSpikeGeneratorTest extends TestCase {
 
         try {
             Network network = new NetworkImpl();
-
-            //x, .3: varying x keeps time constant, changes adapted rate
-//          ALIFSpikeGenerator generator = new ALIFSpikeGenerator(.002f, .02f, .5f, .01f);  //.2: .01 to .3 (150 to 20ms)
-//          SynapticIntegrator integrator = new LinearSynapticIntegrator(.001f, Units.ACU);
-//          PlasticExpandableSpikingNeuron neuron = new PlasticExpandableSpikingNeuron(integrator, generator, 15f, 0f, "alif");
-
             ALIFNeuronFactory factory = new ALIFNeuronFactory(new IndicatorPDF(200, 400), new IndicatorPDF(-2.5f, -1.5f),
                     new IndicatorPDF(.1f, .1001f), .0005f, .02f, .2f);
-
-//          VectorGenerator vg = new RandomHypersphereVG(false, 1, 0);
-//          ApproximatorFactory factory = new WeightedCostApproximator.Factory(.1f);
-//          NEFEnsemble ensemble = new NEFEnsembleImpl("ensemble", new NEFNode[]{neuron}, new float[][]{new float[]{1}}, factory, vg.genVectors(100, 1));
 
             Node[] neurons = new Node[50];
             float[][] weights = new float[neurons.length][];
@@ -254,18 +215,11 @@ public class ALIFSpikeGeneratorTest extends TestCase {
 
             network.addProjection(input.getOrigin(FunctionInput.ORIGIN_NAME), ensemble.getTermination("input"));
 
-//          Probe vProbe = network.getSimulator().addProbe("ensemble", 0, "V", true);
-//          Probe nProbe = network.getSimulator().addProbe("ensemble", 0, "N", true);
-//          Probe iProbe = network.getSimulator().addProbe("ensemble", 0, "I", true);
             Probe rProbe = network.getSimulator().addProbe("ensemble", "rate", true);
 
             network.setMode(SimulationMode.RATE);
             network.run(0, 1);
 
-//          Plotter.plot(ensemble.getSpikePattern());
-//          Plotter.plot(vProbe.getData(), "V");
-//          Plotter.plot(nProbe.getData(), "N");
-//          Plotter.plot(iProbe.getData(), "I");
             Plotter.plot(rProbe.getData(), "Rate");
 
         } catch (StructuralException e) {

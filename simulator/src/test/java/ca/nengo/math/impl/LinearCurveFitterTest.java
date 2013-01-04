@@ -1,26 +1,12 @@
-/*
- * Created June 8, 2007
- */
 package ca.nengo.math.impl;
 
-import ca.nengo.TestUtil;
 import ca.nengo.math.CurveFitter;
 import ca.nengo.math.Function;
-import ca.nengo.math.impl.LinearCurveFitter;
-import ca.nengo.math.impl.Polynomial;
-import ca.nengo.math.impl.InterpolatedFunction;
-//import ca.nengo.plot.Plotter;
-//import ca.nengo.util.MU;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/*
- * Unit tests for LinearCurveFitter
- */
-public class LinearCurveFitterTest extends TestCase {
-
-	/* 
-	 * Test method for 'ca.nengo.math.impl.LinearCurveFitter.fit()'
-	 */
+public class LinearCurveFitterTest {
+	@Test
 	public void testFindCoefficients() {
 		Function target = new Polynomial(new float[]{1f,4f,-3f,0.5f});
 		CurveFitter lcf = new LinearCurveFitter();
@@ -33,19 +19,17 @@ public class LinearCurveFitterTest extends TestCase {
 		
 		Function fitted = lcf.fit(values[0], values[1]);
 		
-//		Plotter.plot(target, -10, 0.1f, 10, "target");
-//		Plotter.plot(fitted, -10, 0.5f, 10, "fitted");
-		
 		float targetVal = 0f;
 		float fittedVal = 0f;
 		for (int i=-8; i<9; i=i+2) {
 			targetVal = target.map(new float[]{i});
 			fittedVal = fitted.map(new float[]{i});
-			TestUtil.assertClose(targetVal, fittedVal, 15f);
+			assertEquals(targetVal, fittedVal, 15f);
 		}
 	
 	}
 	
+	@Test
 	public void testCloneInterpolatedFunction() throws CloneNotSupportedException {
 		float[] x = new float[]{0, 1};
 		float[] y = new float[]{1, 2};

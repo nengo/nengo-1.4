@@ -1,28 +1,13 @@
-/*
- * Created June 2, 2007
- */
 package ca.nengo.math.impl;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
-import junit.framework.TestCase;
 import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
+import java.io.Serializable;
+import java.util.ArrayList;
+import org.junit.Test;
 
-/**
- * Unit tests for CompositeApproximator.
- *
- * TODO: These tests were failing but I disabled them for now, because I don't understand what is
- * supposed to be happening. - Bryan
- *
- * @author Hussein
- */
-public class CompositeApproximatorTest extends TestCase {
-
-	/*
-	 * Test method for 'ca.nengo.math.impl.CompositeApproximator.findCoefficients()'
-	 */
+public class CompositeApproximatorTest {
+	@Test
 	public void testFindCoefficients() {
 		float[][] polyCoeffs = new float[][]{{0f,1f},{0f,0f,1f},{1f},{1f,1f,1f},{0f,-1f,1f}};
 		Function[] polys = new Polynomial[polyCoeffs.length];
@@ -71,11 +56,9 @@ public class CompositeApproximatorTest extends TestCase {
 			approx = polys[0].map(evalPoints[j]) * coefficients[0];
 			approx += polys[1].map(evalPoints[j]) * coefficients[1];
 			approx += polys[3].map(evalPoints[j]) * coefficients[2];
-//			TestUtil.assertClose(approx, target.map(evalPoints[j]), 0.001f);
 			approx = polys[1].map(evalPoints[j]) * coefficients[3];
 			approx += polys[2].map(evalPoints[j]) * coefficients[4];
 			approx += polys[4].map(evalPoints[j]) * coefficients[5];
-//			TestUtil.assertClose(approx, target.map(evalPoints[j]), 0.001f);
 		}
 
 		float[][] evalPoints2 = new float[400][];
@@ -109,10 +92,10 @@ public class CompositeApproximatorTest extends TestCase {
 		for (int j=0; j<evalPoints2.length; j++) {
 			approx = posts[0].map(evalPoints2[j]) * coefficients[0];
 			approx += posts[1].map(evalPoints2[j]) * coefficients[1];
-//			TestUtil.assertClose(approx, target.map(evalPoints2[j]), 0.001f);
+//			assertEquals(approx, target.map(evalPoints2[j]), 0.001f);
 			approx = posts[1].map(evalPoints2[j]) * coefficients[2];
 			approx += posts[0].map(evalPoints2[j]) * coefficients[3];
-//			TestUtil.assertClose(approx, target.map(evalPoints2[j]), 0.001f);
+//			assertEquals(approx, target.map(evalPoints2[j]), 0.001f);
 		}
 	}
 

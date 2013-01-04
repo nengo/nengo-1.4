@@ -1,51 +1,37 @@
-/*
- * Created on 22-May-2007
- */
 package ca.nengo.math.impl;
 
-import ca.nengo.TestUtil;
-import ca.nengo.math.impl.SineFunction;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class SineFunctionTest extends TestCase {
-
-	/*
-	 * Test method for 'ca.nengo.math.impl.SineFunction.getDimension()'
-	 */
-	public void testGetDimension() {
+public class SineFunctionTest {
+	@Test
+	public void getDimension() {
 		SineFunction f = new SineFunction(0.5f);
 		assertEquals(1, f.getDimension());
 	}
 	
-	/*
-	 * Test method for 'ca.nengo.math.impl.SineFunction.getOmega()'
-	 */
-	public void testGetOmega() {
+	@Test
+	public void getOmega() {
 		SineFunction f = new SineFunction(0.5f);
-		assertEquals(0.5f, f.getOmega());
+		assertEquals(0.5f, f.getOmega(), 0.0f);
 	}
 
-	/*
-	 * Test method for 'ca.nengo.math.impl.SineFunction.map(float[])'
-	 */
-	public void testMap() {
+	@Test
+	public void map() {
 		SineFunction f = new SineFunction(0.5f);
-		TestUtil.assertClose(0f, f.map(new float[]{0f}), .00001f);
-		TestUtil.assertClose(1f, f.map(new float[]{(float)Math.PI}), .00001f);
-		TestUtil.assertClose(0.84147f, f.map(new float[]{2f}), .00001f);
+		assertEquals(0f, f.map(new float[]{0f}), .00001f);
+		assertEquals(1f, f.map(new float[]{(float)Math.PI}), .00001f);
+		assertEquals(0.84147f, f.map(new float[]{2f}), .00001f);
 	}
 
-	/*
-	 * Test method for 'ca.nengo.math.impl.SineFunction.multiMap(float[][])'
-	 */
-	public void testMultiMap() {
+	@Test
+	public void multiMap() {
 		SineFunction f = new SineFunction(0.5f);
 
 		float[] values = f.multiMap(new float[][]{new float[]{3f}, new float[]{-2f}, new float[]{(float)-Math.PI}});
-		TestUtil.assertClose(0.997495f, values[0], .00001f);
-		TestUtil.assertClose(-0.84147f, values[1], .00001f);
-		TestUtil.assertClose(-1f, values[2], .00001f);
+		assertEquals(0.997495f, values[0], .00001f);
+		assertEquals(-0.84147f, values[1], .00001f);
+		assertEquals(-1f, values[2], .00001f);
 	}
-	
-
 }

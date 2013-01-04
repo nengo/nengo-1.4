@@ -1,43 +1,33 @@
-/*
- * Created on 20-Jun-2006
- */
 package ca.nengo.dynamics.impl;
 
-import ca.nengo.dynamics.impl.CanonicalModel;
-import ca.nengo.dynamics.impl.LTISystem;
-import ca.nengo.dynamics.impl.SimpleLTISystem;
 import ca.nengo.model.Units;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-public class CanonicalModelTest extends TestCase {
-
-	/*
-	 * Test method for 'ca.nengo.dynamics.impl.CanonicalModel.getRealization(float[], float[], float)'
-	 */
+public class CanonicalModelTest {
+	@Test
 	public void testGetRealization() {
 		LTISystem system = CanonicalModel.getRealization(new float[]{0f, 1f}, new float[]{10f, 100f}, 1f);
 		
 		float[][] A = system.getA(0f);
-		assertClose(0f, A[0][0]);
-		assertClose(1f, A[0][1]);
-		assertClose(-100f, A[1][0]);
-		assertClose(-10f, A[1][1]);
+		assertEquals(0f, A[0][0], 0.001f);
+		assertEquals(1f, A[0][1], 0.001f);
+		assertEquals(-100f, A[1][0], 0.001f);
+		assertEquals(-10f, A[1][1], 0.001f);
 
 		float[][] B = system.getB(0f);
-		assertClose(0f, B[0][0]);
-		assertClose(1f, B[1][0]);
+		assertEquals(0f, B[0][0], 0.001f);
+		assertEquals(1f, B[1][0], 0.001f);
 
 		float[][] C = system.getC(0f);
-		assertClose(1f, C[0][0]);
-		assertClose(0f, C[0][1]);
+		assertEquals(1f, C[0][0], 0.001f);
+		assertEquals(0f, C[0][1], 0.001f);
 
 		float[][] D = system.getD(0f);
-		assertClose(1f, D[0][0]);
+		assertEquals(1f, D[0][0], 0.001f);
 	}
 	
-	/*
-	 * Test method for 'ca.nengo.dynamics.impl.CanonicalModel.isControllableCanonical(LTISystem)'
-	 */
+	@Test
 	public void testIsControllableCanonical() {
 		LTISystem system = CanonicalModel.getRealization(new float[]{0f, 1f}, new float[]{10f, 100f}, 1f);
 		assertTrue(CanonicalModel.isControllableCanonical(system));
@@ -63,28 +53,20 @@ public class CanonicalModelTest extends TestCase {
 		
 	}
 
-	/*
-	 * Test method for 'ca.nengo.dynamics.impl.CanonicalModel.changeTimeConstant(LTISystem, float)'
-	 */
+	@Test
 	public void testChangeTimeConstant() {
 		//distinct roots
 		LTISystem system = CanonicalModel.getRealization(new float[]{0f, 1f}, new float[]{30f, 200f}, 1f);
 		system = CanonicalModel.changeTimeConstant(system, 1f/5f);
 		float[][] A = system.getA(0f);
-		assertClose(-100f, A[1][0]);
-		assertClose(-25f, A[1][1]);
+		assertEquals(-100f, A[1][0], 0.001f);
+		assertEquals(-25f, A[1][1], 0.001f);
 		
 		//complex conjugate roots
 		system = CanonicalModel.getRealization(new float[]{0f, 1f}, new float[]{2f, 2f}, 1f);
 		system = CanonicalModel.changeTimeConstant(system, 1f/5f);
 		A = system.getA(0f);
-		assertClose(-26f, A[1][0]);
-		assertClose(-10f, A[1][1]);
+		assertEquals(-26f, A[1][0], 0.001f);
+		assertEquals(-10f, A[1][1], 0.001f);
 	}
-
-	private static void assertClose(float a, float b) {
-		assertTrue(a > b-.001);
-		assertTrue(a < b+.001);
-	}
-
 }

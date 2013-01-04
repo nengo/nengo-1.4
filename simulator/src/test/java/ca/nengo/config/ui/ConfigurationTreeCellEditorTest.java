@@ -1,26 +1,15 @@
 package ca.nengo.config.ui;
 
-import ca.nengo.config.ui.NewConfigurableDialog;
 import ca.nengo.dynamics.impl.LTISystem;
 import ca.nengo.dynamics.impl.SimpleLTISystem;
-import junit.framework.TestCase;
+import org.junit.Test;
 
-/**
- * This is currently a functional test for tree cell resizing on the mac. 
- * 
- * @author Bryan Tripp
- */
-public class ConfigurationTreeCellEditorTest extends TestCase {
-
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-	
+public class ConfigurationTreeCellEditorTest {
+	@Test
 	public void testNothing() {		
 	}
 	
 	public static void main(String[] args) {
 		NewConfigurableDialog.showDialog(null, LTISystem.class, SimpleLTISystem.class);
 	}
-
 }

@@ -1,31 +1,17 @@
-/*
- * Created on 22-Jun-2006
- */
 package ca.nengo.util.impl;
 
-import ca.nengo.util.impl.SpikePatternImpl;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for SpikePatternImpl. 
- * 
- * @author Bryan Tripp
- */
-public class SpikePatternImplTest extends TestCase {
-
-	/*
-	 * Test method for 'ca.nengo.model.impl.SpikePatternImpl.getNumNeurons()'
-	 */
-	public void testGetNumNeurons() {
+public class SpikePatternImplTest {
+	@Test
+	public void getNumNeurons() {
 		SpikePatternImpl sp = new SpikePatternImpl(10);
 		assertEquals(10, sp.getNumNeurons());
 	}
 
-	/*
-	 * Test method for 'ca.nengo.model.impl.SpikePatternImpl.getSpikeTimes(int)'
-	 */
-	public void testGetSpikeTimes() {
-		
+	@Test
+	public void getSpikeTimes() {
 		SpikePatternImpl sp = new SpikePatternImpl(2);
 		
 		for (int i = 0; i < 150; i++) { //important to test more than initial buffer size of 100

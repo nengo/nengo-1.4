@@ -1,9 +1,5 @@
-/*
- * Created on 16-Nov-07
- */
 package ca.nengo.util;
 
-import ca.nengo.TestUtil;
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.SineFunction;
 import ca.nengo.model.Network;
@@ -16,29 +12,20 @@ import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.nengo.plot.Plotter;
-import ca.nengo.util.DataUtils;
-import ca.nengo.util.MU;
-import ca.nengo.util.SpikePattern;
-import ca.nengo.util.TimeSeries;
 import ca.nengo.util.impl.SpikePatternImpl;
 import ca.nengo.util.impl.TimeSeriesImpl;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
-/**
- * Unit tests for DataUtils. 
- *  
- * @author Bryan Tripp
- */
-public class DataUtilsTest extends TestCase {
+public class DataUtilsTest {
 
 	private TimeSeries myOriginalSeries;
 	private SpikePattern myOriginalPattern;
 	private float myTolerance;
 	
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		
+	@Before
+	public void setUp() throws Exception {
 		float[] times = MU.makeVector(1, 1, 10);
 		float[][] valuesT = new float[3][];
 		valuesT[0] = MU.makeVector(.1f, .1f, 1);
@@ -54,67 +41,71 @@ public class DataUtilsTest extends TestCase {
 			}
 		}
 		myOriginalPattern = pattern;
-		
 		myTolerance = .00001f;
 	}
 
-	public void testExtractDimension() {
+	@Test
+	public void extractDimension() {
 		TimeSeries ts = DataUtils.extractDimension(myOriginalSeries, 0);
 		assertEquals(myOriginalSeries.getTimes().length, ts.getTimes().length);
-		TestUtil.assertClose(myOriginalSeries.getTimes()[0], ts.getTimes()[0], myTolerance);
-		TestUtil.assertClose(myOriginalSeries.getTimes()[1], ts.getTimes()[1], myTolerance);
+		assertEquals(myOriginalSeries.getTimes()[0], ts.getTimes()[0], myTolerance);
+		assertEquals(myOriginalSeries.getTimes()[1], ts.getTimes()[1], myTolerance);
 
 		assertEquals(myOriginalSeries.getValues().length, ts.getValues().length);
 		assertEquals(1, ts.getValues()[0].length);
-		TestUtil.assertClose(myOriginalSeries.getValues()[0][0], ts.getValues()[0][0], myTolerance);
-		TestUtil.assertClose(myOriginalSeries.getValues()[1][0], ts.getValues()[1][0], myTolerance);
+		assertEquals(myOriginalSeries.getValues()[0][0], ts.getValues()[0][0], myTolerance);
+		assertEquals(myOriginalSeries.getValues()[1][0], ts.getValues()[1][0], myTolerance);
 		
 		ts = DataUtils.extractDimension(myOriginalSeries, 1);
-		TestUtil.assertClose(myOriginalSeries.getValues()[0][1], ts.getValues()[0][0], myTolerance);
-		TestUtil.assertClose(myOriginalSeries.getValues()[1][1], ts.getValues()[1][0], myTolerance);
+		assertEquals(myOriginalSeries.getValues()[0][1], ts.getValues()[0][0], myTolerance);
+		assertEquals(myOriginalSeries.getValues()[1][1], ts.getValues()[1][0], myTolerance);
 	}
 
-	public void testExtractTime() {
+	@Test
+	public void extractTime() {
 		TimeSeries ts = DataUtils.extractTime(myOriginalSeries, 3, 7);		
 		assertEquals(5, ts.getTimes().length);
-		TestUtil.assertClose(3, ts.getTimes()[0], myTolerance);
-		TestUtil.assertClose(4, ts.getTimes()[1], myTolerance);
+		assertEquals(3, ts.getTimes()[0], myTolerance);
+		assertEquals(4, ts.getTimes()[1], myTolerance);
 		
 		assertEquals(5, ts.getValues().length);
 		assertEquals(3, ts.getValues()[0].length);
-		TestUtil.assertClose(.3f, ts.getValues()[0][0], myTolerance);
-		TestUtil.assertClose(.4f, ts.getValues()[1][0], myTolerance);
-		TestUtil.assertClose(1.3f, ts.getValues()[0][1], myTolerance);
+		assertEquals(.3f, ts.getValues()[0][0], myTolerance);
+		assertEquals(.4f, ts.getValues()[1][0], myTolerance);
+		assertEquals(1.3f, ts.getValues()[0][1], myTolerance);
 	}
 
-	public void testSubsample() {
+	@Test
+	public void subsample() {
 		TimeSeries ts = DataUtils.subsample(myOriginalSeries, 2);
 		assertEquals(5, ts.getTimes().length);
-		TestUtil.assertClose(1, ts.getTimes()[0], myTolerance);
-		TestUtil.assertClose(3, ts.getTimes()[1], myTolerance);
+		assertEquals(1, ts.getTimes()[0], myTolerance);
+		assertEquals(3, ts.getTimes()[1], myTolerance);
 		
 		assertEquals(5, ts.getValues().length);
 		assertEquals(3, ts.getValues()[0].length);
-		TestUtil.assertClose(.1f, ts.getValues()[0][0], myTolerance);
-		TestUtil.assertClose(.3f, ts.getValues()[1][0], myTolerance);
-		TestUtil.assertClose(1.1f, ts.getValues()[0][1], myTolerance);
+		assertEquals(.1f, ts.getValues()[0][0], myTolerance);
+		assertEquals(.3f, ts.getValues()[1][0], myTolerance);
+		assertEquals(1.1f, ts.getValues()[0][1], myTolerance);
 	}
 
-	public void testSubsetSpikePatternIntIntInt() {
+	@Test
+	public void subsetSpikePatternIntIntInt() {
 		SpikePattern p = DataUtils.subset(myOriginalPattern, 2, 3, 5);
 		assertEquals(2, p.getNumNeurons());
 		assertEquals(2, p.getSpikeTimes(0).length);
 		assertEquals(5, p.getSpikeTimes(1).length);
-		TestUtil.assertClose(1, p.getSpikeTimes(0)[1], myTolerance);
+		assertEquals(1, p.getSpikeTimes(0)[1], myTolerance);
 	}
 
-	public void testSubsetSpikePatternIntArray() {
+	@Test
+	public void subsetSpikePatternIntArray() {
 		SpikePattern p = DataUtils.subset(myOriginalPattern, new int[]{9, 8, 7});
 		assertEquals(3, p.getNumNeurons());
 		assertEquals(9, p.getSpikeTimes(0).length);
 		assertEquals(8, p.getSpikeTimes(1).length);
 		assertEquals(7, p.getSpikeTimes(2).length);
-		TestUtil.assertClose(1, p.getSpikeTimes(0)[1], myTolerance);
+		assertEquals(1, p.getSpikeTimes(0)[1], myTolerance);
 	}
 
 	/**
@@ -155,5 +146,4 @@ public class DataUtilsTest extends TestCase {
 			e.printStackTrace();
 		}
 	}
-	
 }

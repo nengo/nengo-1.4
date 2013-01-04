@@ -1,18 +1,11 @@
-/*
- * Created on 25-Jul-2006
- */
 package ca.nengo.math.impl;
 
-import junit.framework.TestCase;
 import ca.nengo.math.PDF;
 import ca.nengo.plot.Plotter;
+import org.junit.Test;
 
-public class ExponentialPDFTest extends TestCase {
-
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
+public class ExponentialPDFTest {
+	@Test
     public void testNothing() {
     }
 

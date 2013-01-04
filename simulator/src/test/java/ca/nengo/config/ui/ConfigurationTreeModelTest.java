@@ -1,31 +1,20 @@
 package ca.nengo.config.ui;
 
+import ca.nengo.config.ConfigUtil;
+import ca.nengo.config.JavaSourceParser;
+import ca.nengo.math.impl.IndicatorPDF;
+import ca.nengo.model.impl.NoiseFactory;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-import ca.nengo.config.ConfigUtil;
-import ca.nengo.config.JavaSourceParser;
-import ca.nengo.math.impl.IndicatorPDF;
-import ca.nengo.model.impl.NoiseFactory;
-
-/**
- * This is currently a functional test for tree cell resizing on the mac.
- *
- * @author Bryan Tripp
- */
-public class ConfigurationTreeModelTest extends TestCase {
-
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
+public class ConfigurationTreeModelTest {
+	@Test
 	public void testNothing() {
 	}
 

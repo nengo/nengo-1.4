@@ -1,14 +1,5 @@
-/*
- * Created on 13-Mar-08
- */
 package ca.nengo.model.impl;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import junit.framework.TestCase;
 import ca.nengo.dynamics.impl.SimpleLTISystem;
 import ca.nengo.model.ExpandableNode;
 import ca.nengo.model.Node;
@@ -17,19 +8,15 @@ import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.util.MU;
 import ca.nengo.util.ScriptGenException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for EnsembleImpl.
- *
- * @author Bryan Tripp
- */
-public class EnsembleImplTest extends TestCase {
-
-	@Override
-    protected void setUp() throws Exception {
-		super.setUp();
-	}
-
+public class EnsembleImplTest {
+	@Test
 	public void testClone() throws StructuralException, CloneNotSupportedException {
         System.out.println("EnsembleImplTest");
 		MockExpandableNode node1 = new MockExpandableNode("1", new Origin[0],
@@ -47,12 +34,6 @@ public class EnsembleImplTest extends TestCase {
         System.out.println("Termination Name");
         System.out.println( copy.getTermination("existing").getClass().getName());
 		assertTrue(copy.getTermination("existing") instanceof EnsembleTermination);
-//		try {
-//			copy.removeTermination("existing");
-//			fail("Should have thrown exception (can't remove non-expanded terminations)");
-//		} catch (StructuralException e) {
-//			e.printStackTrace();
-//		}
 	}
 
 	public class MockExpandableNode extends AbstractNode implements ExpandableNode {

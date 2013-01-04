@@ -1,29 +1,15 @@
-/*
- * 
- *  TODO: give range on 'scale to extrema' some headroom.
- *  
- *   think about rounding to time step
- * */
-
 package ca.nengo.plot;
 
-//import java.awt.BorderLayout;
-//import java.awt.GridBagLayout;
-//import java.awt.GridBagConstraints;
-//import java.awt.Image;
+import ca.nengo.util.Probe;
+import com.jeta.forms.components.panel.FormPanel;
+import com.jeta.forms.gui.common.FormException;
 import java.awt.Color;
-import java.awt.geom.*;
 import java.awt.event.*;
-//import java.io.IOException;
+import java.awt.geom.*;
 import java.lang.reflect.*;
 import java.util.*;
-
 import javax.swing.*;
 import javax.swing.event.*;
-//import javax.swing.JFrame;
-import javax.swing.JPanel;
-//import javax.imageio.ImageIO;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -31,10 +17,6 @@ import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.xy.*;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-
-import ca.nengo.util.Probe;
-import com.jeta.forms.components.panel.FormPanel;
-import com.jeta.forms.gui.common.FormException;
 
 public class Scope {
 	private Probe _probe;

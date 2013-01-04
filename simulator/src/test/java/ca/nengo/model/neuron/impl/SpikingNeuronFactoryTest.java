@@ -1,25 +1,12 @@
-/*
- * Created on 29-May-2006
- */
 package ca.nengo.model.neuron.impl;
 
-import java.awt.Frame;
-
-import junit.framework.TestCase;
 import ca.nengo.config.ConfigUtil;
 import ca.nengo.math.impl.IndicatorPDF;
+import java.awt.Frame;
+import org.junit.Test;
 
-/**
- * Unit tests for SpikingNeuron.
- * 
- * @author Bryan Tripp
- */
-public class SpikingNeuronFactoryTest extends TestCase {
-
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
+public class SpikingNeuronFactoryTest {
+	@Test
     public void testNothing() {
     }
 

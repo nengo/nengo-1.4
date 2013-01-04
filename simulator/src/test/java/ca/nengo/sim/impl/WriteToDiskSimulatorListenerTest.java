@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
 import ca.nengo.model.Network;
 import ca.nengo.model.SimulationException;
@@ -23,7 +23,7 @@ import ca.nengo.util.Probe;
  * 
  * @author Trevor Bekolay
  */
-public class WriteToDiskSimulatorListenerTest extends TestCase {
+public class WriteToDiskSimulatorListenerTest {
 
 	/*
 	 * Test method for 'ca.nengo.sim.impl.WriteToDiskSimulatorListener'

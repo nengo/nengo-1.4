@@ -1,25 +1,11 @@
-/*
- * Created on 19-Jun-2006
- */
 package ca.nengo.dynamics.impl;
 
-import ca.nengo.dynamics.impl.ImpulseIntegral;
-import ca.nengo.dynamics.impl.LTISystem;
 import ca.nengo.model.Units;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Units tests for ImpulseIntegral. 
- * 
- * @author Bryan Tripp
- */
-public class ImpulseIntegralTest extends TestCase {
-
-	/*
-	 * Test method for 'ca.nengo.dynamics.impl.ImpulseIntegral.integrate(LTISystem)'
-	 * 
-	 * 1st order decay
-	 */
+public class ImpulseIntegralTest {
+	@Test
 	public void testIntegrate1stOrder() {
 		
 		float[][] D = new float[][]{new float[]{0f}};		
@@ -43,14 +29,10 @@ public class ImpulseIntegralTest extends TestCase {
 		);
 				
 		float[][] integral = ImpulseIntegral.integrate(system);
-		assertClose(1.01f, integral[0][0], .000001f);
+		assertEquals(1.01f, integral[0][0], .000001f);
 	}
 	
-	/*
-	 * Test method for 'ca.nengo.dynamics.impl.ImpulseIntegral.integrate(LTISystem)'
-	 * 
-	 * 2nd order system with distinct poles
-	 */
+	@Test
 	public void testIntegrate2ndOrder() {
 		float eig1 = -100f;
 		float eig2 = -500f;
@@ -68,14 +50,10 @@ public class ImpulseIntegralTest extends TestCase {
 		float[][] integral = ImpulseIntegral.integrate(system);
 		assertEquals(1, integral.length);
 		assertEquals(1, integral[0].length);
-		assertClose(.00002f, integral[0][0], .000000001f);
+		assertEquals(.00002f, integral[0][0], .000000001f);
 	}
 	
-	/*
-	 * Test method for 'ca.nengo.dynamics.impl.ImpulseIntegral.integrate(LTISystem)'
-	 * 
-	 * Repeated pole
-	 */ 	
+	@Test	
 	public void testIntegrate2ndOrderRepeated() {
 		float eig1 = -100f;
 		float eig2 = -100f;
@@ -91,14 +69,10 @@ public class ImpulseIntegralTest extends TestCase {
 		);
 		
 		float[][] integral = ImpulseIntegral.integrate(system);
-		assertClose(.0001f, integral[0][0], .00000001f);		
+		assertEquals(.0001f, integral[0][0], .00000001f);		
 	}
 
-	/*
-	 * Test method for 'ca.nengo.dynamics.impl.ImpulseIntegral.integrate(LTISystem)'
-	 * 
-	 * Complex eigenvalues (oscillatory)
-	 */ 
+	@Test
 	public void testIntegrate2ndOrderComplex() {
 		float a0 = 200;
 		float a1 = 30000;
@@ -112,14 +86,10 @@ public class ImpulseIntegralTest extends TestCase {
 		);
 		
 		float[][] integral = ImpulseIntegral.integrate(system);
-		assertClose(.000033333f, integral[0][0], .00000001f);				
+		assertEquals(.000033333f, integral[0][0], .00000001f);				
 	}
 	
-	/*
-	 * Test method for 'ca.nengo.dynamics.impl.ImpulseIntegral.integrate(LTISystem)'
-	 * 
-	 * Multi-input-multi-output
-	 */ 
+	@Test
 	public void testMIMO() {
 		float eig1 = -100f;
 		float eig2 = -500f;
@@ -137,20 +107,13 @@ public class ImpulseIntegralTest extends TestCase {
 		float[][] integral = ImpulseIntegral.integrate(system);
 		assertEquals(2, integral.length);
 		assertEquals(3, integral[0].length);
-		assertClose(.00002f, integral[0][0], .000000001f);		
-		assertClose(.00002f, integral[0][1], .000000001f);		
-		assertClose(.00002f, integral[0][2], .000000001f);		
-		assertClose(.00004f, integral[1][0], .000000002f);		
-		assertClose(.00004f, integral[1][1], .000000002f);		
-		assertClose(.00004f, integral[1][2], .000000002f);		
+		assertEquals(.00002f, integral[0][0], .000000001f);		
+		assertEquals(.00002f, integral[0][1], .000000001f);		
+		assertEquals(.00002f, integral[0][2], .000000001f);		
+		assertEquals(.00004f, integral[1][0], .000000002f);		
+		assertEquals(.00004f, integral[1][1], .000000002f);		
+		assertEquals(.00004f, integral[1][2], .000000002f);		
 	}
-
-	//checks that first two values are close to each other
-	private static void assertClose(float a, float b, float tol) {
-		assertTrue(a > b-tol);
-		assertTrue(a < b+tol);
-	}
- 
 
 	public static void main(String[] args) {
 		ImpulseIntegralTest test = new ImpulseIntegralTest();

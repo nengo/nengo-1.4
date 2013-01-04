@@ -1,6 +1,3 @@
-/*
- * Created on 21-Jan-08
- */
 package ca.nengo.config.impl;
 
 import java.awt.BorderLayout;
@@ -11,38 +8,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.ToolTipManager;
 
 import ca.nengo.config.NamedValueProperty;
-import ca.nengo.config.impl.ConfigurationImpl;
-import ca.nengo.config.impl.NamedValuePropertyImpl;
 import ca.nengo.config.ui.ConfigurationTreeCellEditor;
 import ca.nengo.config.ui.ConfigurationTreeCellRenderer;
 import ca.nengo.config.ui.ConfigurationTreeModel;
 import ca.nengo.config.ui.ConfigurationTreePopupListener;
 import ca.nengo.model.StructuralException;
-//import ca.nengo.model.nef.NEFEnsembleFactory;
-//import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
+import javax.swing.JScrollPane;
+import javax.swing.JFrame;
+import javax.swing.JTree;
+import javax.swing.ToolTipManager;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+public class NamedValuePropertyImplTest {
 
-/**
- * Unit tests for NamedValuePropertyImpl. 
- * 
- * @author Bryan Tripp
- */
-public class NamedValuePropertyImplTest extends TestCase {
-
-	private MockObject myObject;
-	private ConfigurationImpl myConfiguration;
+	private MockObject myObject = new MockObject();
+	private ConfigurationImpl myConfiguration = new ConfigurationImpl(myObject);
 	
-	protected void setUp() throws Exception {
-		super.setUp();
-		myObject = new MockObject();
-		myConfiguration = new ConfigurationImpl(myObject);
+	public NamedValuePropertyImplTest() throws Exception {
 		myConfiguration.defineProperty(NamedValuePropertyImpl.getNamedValueProperty(myConfiguration, "A", String.class));
 		myConfiguration.defineProperty(NamedValuePropertyImpl.getNamedValueProperty(myConfiguration, "B", MockNamedObject.class));
 		myConfiguration.defineProperty(NamedValuePropertyImpl.getNamedValueProperty(myConfiguration, "C", String.class));
@@ -55,6 +40,7 @@ public class NamedValuePropertyImplTest extends TestCase {
 		return (NamedValueProperty) myConfiguration.getProperty(name);
 	}
 
+	@Test
 	public void testIsMutable() throws StructuralException {
 		assertFalse(myConfiguration.getProperty("A").isMutable());
 		assertFalse(myConfiguration.getProperty("B").isMutable());
@@ -63,6 +49,7 @@ public class NamedValuePropertyImplTest extends TestCase {
 		assertTrue(myConfiguration.getProperty("E").isMutable());
 	}
 
+	@Test
 	public void testGetValue() throws StructuralException {
 		assertEquals("1", getProperty("A").getValue("1"));
 		assertEquals("1", ((MockNamedObject) getProperty("B").getValue("1")).getValue());
@@ -71,6 +58,7 @@ public class NamedValuePropertyImplTest extends TestCase {
 		assertEquals("1", getProperty("E").getValue("1"));
 	}
 
+	@Test
 	public void testGetValueNames() throws StructuralException {
 		List<String> names = null;
 		
@@ -91,6 +79,7 @@ public class NamedValuePropertyImplTest extends TestCase {
 		assertEquals("1", names.get(0));
 	}
 
+	@Test
 	public void testIsNamedAutomatically() throws StructuralException {
 		assertFalse(getProperty("A").isNamedAutomatically());
 		assertFalse(getProperty("B").isNamedAutomatically());
@@ -99,6 +88,7 @@ public class NamedValuePropertyImplTest extends TestCase {
 		assertFalse(getProperty("E").isNamedAutomatically());
 	}
 
+	@Test
 	public void testRemoveValue() throws StructuralException {
 		try {
 			getProperty("A").removeValue("1");			
@@ -118,6 +108,7 @@ public class NamedValuePropertyImplTest extends TestCase {
 		assertEquals(0, getProperty("E").getValueNames().size());
 	}
 
+	@Test
 	public void testSetValueStringObject() throws StructuralException {
 		try {
 			getProperty("A").setValue("1", "2");
@@ -139,6 +130,7 @@ public class NamedValuePropertyImplTest extends TestCase {
 		assertEquals("2", getProperty("E").getValue("1"));		
 	}
 
+	@Test
 	public void testSetValueObject() throws StructuralException {
 		try {
 			getProperty("A").setValue("2");
@@ -164,6 +156,7 @@ public class NamedValuePropertyImplTest extends TestCase {
 		} catch (StructuralException e) {}
 	}
 
+	@Test
 	public void testIsFixedCardinality() throws StructuralException {
 		assertTrue(getProperty("A").isFixedCardinality());
 		assertTrue(getProperty("B").isFixedCardinality());

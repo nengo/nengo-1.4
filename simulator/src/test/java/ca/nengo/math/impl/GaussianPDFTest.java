@@ -1,28 +1,15 @@
-/*
- * Created on 25-Jul-2006
- */
 package ca.nengo.math.impl;
 
-import org.apache.log4j.Logger;
-
-import ca.nengo.TestUtil;
-import ca.nengo.math.impl.GaussianPDF;
 import ca.nengo.plot.Plotter;
-import junit.framework.TestCase;
+import org.apache.log4j.Logger;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit test for GaussianPDF. 
- * 
- * TODO: more thorough 
- * 
- * @author Bryan Tripp
- */
-public class GaussianPDFTest extends TestCase {
+public class GaussianPDFTest {
 
 	private static Logger ourLogger = Logger.getLogger(GaussianPDFTest.class);
-	/*
-	 * Test method for 'ca.nengo.math.impl.GaussianPDF.sample()'
-	 */
+	
+	@Test
 	public void testSample() {
 		int n = 1000;
 		
@@ -49,50 +36,39 @@ public class GaussianPDFTest extends TestCase {
 		assertTrue(c > 620 && c < 740); 
 	}
 
-	/*
-	 * Test method for 'ca.nengo.math.impl.GaussianPDF.getDimension()'
-	 */
+	@Test
 	public void testGetDimension() {
 		GaussianPDF pdf = new GaussianPDF(0f, 1f);
 		assertEquals(1, pdf.getDimension());
 	}
 
-	/*
-	 * Test method for 'ca.nengo.math.impl.GaussianPDF.map(float[])'
-	 */
+	@Test
 	public void testMap() {
 		float tolerance = .0001f;
 
 		GaussianPDF pdf = new GaussianPDF(0f, 1f);		
-		TestUtil.assertClose(0.1109f, pdf.map(new float[]{-1.6f}), tolerance); 
-		TestUtil.assertClose(0.3989f, pdf.map(new float[]{0f}), tolerance); 
-		TestUtil.assertClose(0.3910f, pdf.map(new float[]{.2f}), tolerance); 
+		assertEquals(0.1109f, pdf.map(new float[]{-1.6f}), tolerance); 
+		assertEquals(0.3989f, pdf.map(new float[]{0f}), tolerance); 
+		assertEquals(0.3910f, pdf.map(new float[]{.2f}), tolerance); 
 
 		pdf = new GaussianPDF(1f, 2f);		
-		TestUtil.assertClose(0.0521f, pdf.map(new float[]{-1.6f}), tolerance); 
-		TestUtil.assertClose(0.2197f, pdf.map(new float[]{0f}), tolerance); 
-		TestUtil.assertClose(0.2404f, pdf.map(new float[]{.2f}), tolerance); 
+		assertEquals(0.0521f, pdf.map(new float[]{-1.6f}), tolerance); 
+		assertEquals(0.2197f, pdf.map(new float[]{0f}), tolerance); 
+		assertEquals(0.2404f, pdf.map(new float[]{.2f}), tolerance); 
 	}
 	
-	/**
-	 * Test of optional peak constructor argument
-	 */
+	@Test
 	public void testScale() {
 		float tolerance = .002f;
 
 		GaussianPDF pdf = new GaussianPDF(1f, 2f, 10f); 
 		float scale = 35.4491f; //based on unscaled peak of .2821
-		TestUtil.assertClose(scale*0.0521f, pdf.map(new float[]{-1.6f}), tolerance); 
-		TestUtil.assertClose(scale*0.2197f, pdf.map(new float[]{0f}), tolerance); 
-		TestUtil.assertClose(scale*0.2404f, pdf.map(new float[]{.2f}), tolerance); 
-		
-//		Plotter.plot(pdf, -3, .001f, 3, "foo");
-//		try { Thread.sleep(1000*10); } catch (InterruptedException e) {}
+		assertEquals(scale*0.0521f, pdf.map(new float[]{-1.6f}), tolerance); 
+		assertEquals(scale*0.2197f, pdf.map(new float[]{0f}), tolerance); 
+		assertEquals(scale*0.2404f, pdf.map(new float[]{.2f}), tolerance); 
 	}
 
-	/*
-	 * Test method for 'ca.nengo.math.impl.GaussianPDF.multiMap(float[][])'
-	 */
+	@Test
 	public void testMultiMap() {
 		GaussianPDF pdf = new GaussianPDF(0f, 1f);
 		float[] from1 = new float[]{-.5f};		
@@ -101,13 +77,12 @@ public class GaussianPDFTest extends TestCase {
 		float val2 = pdf.map(from2);
 		
 		float[] vals = pdf.multiMap(new float[][]{from1, from2});
-		TestUtil.assertClose(val1, vals[0], .0001f);
-		TestUtil.assertClose(val2, vals[1], .0001f);
+		assertEquals(val1, vals[0], .0001f);
+		assertEquals(val2, vals[1], .0001f);
 	}
 	
 	public static void main(String[] args) {
 		GaussianPDF pdf = new GaussianPDF(1f, 2f);
 		Plotter.plot(pdf, -2, .01f, 2, "Gaussian");
 	}
-
 }

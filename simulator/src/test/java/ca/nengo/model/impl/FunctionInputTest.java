@@ -1,6 +1,3 @@
-/*
- * Created on 24-Jul-2006
- */
 package ca.nengo.model.impl;
 
 import ca.nengo.math.Function;
@@ -11,23 +8,18 @@ import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Units;
-import ca.nengo.model.impl.FunctionInput;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-public class FunctionInputTest extends TestCase {
-
-	/*
-	 * Test method for 'ca.nengo.model.impl.FunctionInput.getName()'
-	 */
+public class FunctionInputTest {
+	@Test
 	public void testGetName() throws StructuralException {
 		String name = "test";
 		FunctionInput input = new FunctionInput(name, new Function[]{new ConstantFunction(1, 1f)}, Units.UNK);
 		assertEquals(name, input.getName());
 	}
 
-	/*
-	 * Test method for 'ca.nengo.model.impl.FunctionInput.getDimensions()'
-	 */
+	@Test
 	public void testGetDimensions() throws StructuralException {
 		FunctionInput input = new FunctionInput("test", new Function[]{new ConstantFunction(1, 1f)}, Units.UNK);
 		assertEquals(1, input.getOrigin(FunctionInput.ORIGIN_NAME).getDimensions());
@@ -41,9 +33,7 @@ public class FunctionInputTest extends TestCase {
 		} catch (Exception e) {} //exception is expected
 	}
 
-	/*
-	 * Test method for 'ca.nengo.model.impl.FunctionInput.getValues()'
-	 */
+	@Test
 	public void testGetValues() throws StructuralException, SimulationException {
 		FunctionInput input = new FunctionInput("test", new Function[]{new ConstantFunction(1, 1f), new ConstantFunction(1, 2f)}, Units.UNK);
 		Origin origin = input.getOrigin(FunctionInput.ORIGIN_NAME);
@@ -59,17 +49,13 @@ public class FunctionInputTest extends TestCase {
 		assertTrue(value > 1.9f);
 	}
 
-	/*
-	 * Test method for 'ca.nengo.model.impl.FunctionInput.getMode()'
-	 */
+	@Test
 	public void testGetMode() throws StructuralException {
 		FunctionInput input = new FunctionInput("test", new Function[]{new ConstantFunction(1, 1f)}, Units.UNK);
 		assertEquals(SimulationMode.DEFAULT, input.getMode());
 	}
 
-	/*
-	 * Test method for 'ca.nengo.model.impl.FunctionInput.getHistory(String)'
-	 */
+	@Test
 	public void testGetHistory() throws StructuralException, SimulationException {
 		FunctionInput input = new FunctionInput("test", new Function[]{new ConstantFunction(1, 1f), new ConstantFunction(1, 2f)}, Units.UNK);
 		assertEquals(1, input.listStates().size());

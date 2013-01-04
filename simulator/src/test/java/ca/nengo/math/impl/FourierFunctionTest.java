@@ -1,17 +1,10 @@
-/*
- * Created on 25-Jul-2006
- */
 package ca.nengo.math.impl;
 
-import ca.nengo.math.impl.FourierFunction;
-//import ca.nengo.plot.Plotter;
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-public class FourierFunctionTest extends TestCase {
-
-	/*
-	 * Test method for 'ca.nengo.math.impl.FourierFunction.FourierFunction(float[], float[], float[])'
-	 */
+public class FourierFunctionTest {
+	@Test
 	public void testFourierFunctionFloatArrayFloatArrayFloatArray() {
 		FourierFunction f = new FourierFunction(new float[]{1.5f}, new float[]{5f}, new float[]{.2f});
 		assertClose(0.0000f, f.map(new float[]{.2f}));
@@ -19,14 +12,11 @@ public class FourierFunctionTest extends TestCase {
 		assertClose(2.9389f, f.map(new float[]{2.8f}));
 	}
 
-	/*
-	 * Test method for 'ca.nengo.math.impl.FourierFunction.FourierFunction(float, float, float)'
-	 * 
-	 * TODO: make this self-verifying 
+	/**
+	 * TODO:  Make this self-verifying
 	 */
+	@Test
 	public void testFourierFunctionFloatFloatFloat() {
-//		FourierFunction f = new FourierFunction(1, 20, 1, (long) Math.random());
-		
 		int n = 100;
 		float[][] from = new float[n][];
 		float[] from2 = new float[n];
@@ -35,22 +25,15 @@ public class FourierFunctionTest extends TestCase {
 			from[i] = new float[]{x};
 			from2[i] = x;
 		}
-//		float[] result = f.multiMap(from);
-		
-//		Plotter.plot(f, 0, .001f, 1, "fourier");
 	}
 
-	/*
-	 * Test method for 'ca.nengo.math.impl.FourierFunction.getDimension()'
-	 */
+	@Test
 	public void testGetDimension() {
 		FourierFunction f = new FourierFunction(new float[]{1f}, new float[]{1f}, new float[]{0f});
 		assertEquals(1, f.getDimension());
 	}
 
-	/*
-	 * Test method for 'ca.nengo.math.impl.FourierFunction.multiMap(float[][])'
-	 */
+	@Test
 	public void testMultiMap() {
 		FourierFunction f = new FourierFunction(new float[]{1f}, new float[]{1f}, new float[]{0f});
 
@@ -71,6 +54,7 @@ public class FourierFunctionTest extends TestCase {
 		}
 	}
 	
+	@Test
 	public void testClone() throws CloneNotSupportedException {
 		FourierFunction f1 = new FourierFunction(new float[]{1.5f}, new float[]{5f}, new float[]{.2f});
 		FourierFunction f2 = (FourierFunction) f1.clone();
@@ -79,17 +63,4 @@ public class FourierFunctionTest extends TestCase {
 		assertClose(1.5451f, f1.map(new float[]{1.5f}));
 		assertClose(2.9389f, f1.map(new float[]{2.8f}));
 	}
-	
-//	public static void main(String[] args) {
-////		FourierFunctionTest test = new FourierFunctionTest();
-////		test.testFourierFunctionFloatFloatFloat();
-//		
-//		float[][] frequencies = new float[][]{new float[]{1, 1}, new float[]{1, 3.5f}};
-//		float[] amplitudes = new float[]{1, 1};
-//		float[][] phases = new float[][]{new float[]{0, 0}, new float[]{0, 0}};
-//		FourierFunction f = new FourierFunction(frequencies, amplitudes, phases);
-//		
-//		Plotter.plot(f, 0, .01f, 1, "foo");
-//	}
-
 }

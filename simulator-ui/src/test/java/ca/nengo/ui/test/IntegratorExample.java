@@ -105,14 +105,6 @@ public class IntegratorExample {
 		Thread.sleep(1000);
 		network.addNode(input);
 		Thread.sleep(1000);
-		// UINEFEnsemble uiIntegrator = new UINEFEnsemble(integrator);
-		// uiViewer.addNeoNode(uiIntegrator);
-		// uiIntegrator.collectSpikes(true);
-
-		// UITermination uiInterm =
-		// uiIntegrator.showTermination(interm.getName());
-		// UITermination uiFbterm =
-		// uiIntegrator.showTermination(fbterm.getName());
 
 		network.addProjection(input.getOrigin(FunctionInput.ORIGIN_NAME), interm);
 		Thread.sleep(500);

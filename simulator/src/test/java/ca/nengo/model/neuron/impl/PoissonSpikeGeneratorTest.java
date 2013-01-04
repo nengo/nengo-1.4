@@ -1,6 +1,6 @@
 package ca.nengo.model.neuron.impl;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.FourierFunction;
 import ca.nengo.math.impl.IndicatorPDF;
@@ -22,18 +22,10 @@ import ca.nengo.plot.Plotter;
 import ca.nengo.util.MU;
 import ca.nengo.util.Probe;
 import ca.nengo.util.SpikePattern;
+import org.junit.Test;
 
-/**
- * Unit tests for SpikeGeneratorOrigin.
- *
- * @author Bryan Tripp
- */
-public class PoissonSpikeGeneratorTest extends TestCase {
-
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
+public class PoissonSpikeGeneratorTest {
+	@Test
     public void testNothing() {
     }
 
@@ -108,7 +100,5 @@ public class PoissonSpikeGeneratorTest extends TestCase {
         } catch (SimulationException e) {
             e.printStackTrace();
         }
-
     }
-
 }

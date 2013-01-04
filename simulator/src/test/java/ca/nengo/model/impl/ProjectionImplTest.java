@@ -1,9 +1,5 @@
-/*
- * Created on 24-May-2006
- */
 package ca.nengo.model.impl;
 
-import junit.framework.TestCase;
 import ca.nengo.math.Function;
 import ca.nengo.math.impl.IdentityFunction;
 import ca.nengo.model.Ensemble;
@@ -27,119 +23,26 @@ import ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl;
 import ca.nengo.util.DataUtils;
 import ca.nengo.util.MU;
 import ca.nengo.util.Probe;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-/**
- * Unit tests for ProjectionImpl.
- *
- * @author Bryan Tripp
- */
-public class ProjectionImplTest extends TestCase {
+public class ProjectionImplTest {
 
-	private Projection myProjection;
-	private Origin myOrigin;
-	private Termination myTermination;
+	private Origin myOrigin = new MockOrigin("mock origin", 1);
+	private Termination myTermination = new MockTermination("mock termination", 1);
+	private Projection myProjection = new ProjectionImpl(myOrigin, myTermination, null);
 
-	@Override
-    protected void setUp() throws Exception {
-		super.setUp();
-
-		myOrigin = new MockOrigin("mock origin", 1);
-		myTermination = new MockTermination("mock termination", 1);
-		myProjection = new ProjectionImpl(myOrigin, myTermination, null);
-	}
-
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.ProjectionImpl.getOrigin()'
-	 */
+	@Test
 	public void testGetOrigin() {
 		assertEquals(myOrigin, myProjection.getOrigin());
 	}
 
-	/*
-	 * Test method for 'ca.bpt.cn.model.impl.ProjectionImpl.getTermination()'
-	 */
+	@Test
 	public void testGetTermination() {
 		assertEquals(myTermination, myProjection.getTermination());
 	}
 
-//	public void testAddBias() throws StructuralException, SimulationException {
-//		//TODO: transient dominating error calc
-//      //TODO: speed up this test, or something, it takes forever and fails half the time.
-//		Network network = new NetworkImpl();
-//		FunctionInput input = new FunctionInput("input", new Function[]{new IdentityFunction(1, 0)}, Units.UNK);
-//		network.addNode(input);
-//		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl();
-//		int n = 200;
-//		NEFEnsemble pre = ef.make("pre", n, 1);
-//		pre.addDecodedTermination("input", MU.I(1), .005f, false);
-//		network.addNode(pre);
-//		network.addProjection(input.getOrigin(FunctionInput.ORIGIN_NAME), pre.getTermination("input"));
-//		NEFEnsemble post = ef.make("post", n, 1);
-//		network.addNode(post);
-//		post.addDecodedTermination("input", MU.I(1), .01f, false);
-//		Projection p = network.addProjection(pre.getOrigin(NEFEnsemble.X), post.getTermination("input"));
-//
-//		DecodedOrigin o = (DecodedOrigin) pre.getOrigin(NEFEnsemble.X);
-//		DecodedTermination t = (DecodedTermination) post.getTermination("input");
-//		float[][] directWeights = MU.prod(post.getEncoders(), MU.prod(t.getTransform(), MU.transpose(o.getDecoders())));
-//		System.out.println("Direct weights: " + MU.min(directWeights) + " to " + MU.max(directWeights));
-//
-//		Probe probe = network.getSimulator().addProbe(post.getName(), NEFEnsemble.X, true);
-//		network.setMode(SimulationMode.CONSTANT_RATE);
-//		network.run(-1.5f, 1);
-//		network.setMode(SimulationMode.DEFAULT);
-//		float[] reference = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
-//
-//		network.run(-1.5f, 1);
-////		Plotter.plot(probe.getData(), "mixed weights");
-//		float[] mixed = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
-//		getError(reference, mixed);
-//
-//		p.addBias(300, .005f, .01f, true, false);
-//		BiasOrigin bo = (BiasOrigin) pre.getOrigin("post:input");
-//		BiasTermination bt = (BiasTermination) post.getTermination("input:bias");
-//		assertTrue(MU.min(getNetWeights(directWeights, bo, bt)) > -1e-10);
-//		network.run(-1.5f, 1);
-////		Plotter.plot(probe.getData(), "positive non-optimal");
-//		float[] positiveNonOptimal = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
-//		float error = getError(reference, positiveNonOptimal);
-//		assertTrue(error > 1e-10 && error < 5e-3);	// used to be 5e-4, but was
-//													// slightly over that
-//		p.removeBias();
-//
-//		p.addBias(300, .005f, .01f, true, true);
-//		bo = (BiasOrigin) pre.getOrigin("post:input");
-//		bt = (BiasTermination) post.getTermination("input:bias");
-//		assertTrue(MU.min(getNetWeights(directWeights, bo, bt)) > -1e-10);
-//		network.run(-1.5f, 1);
-////		Plotter.plot(probe.getData(), "positive optimal");
-//		float[] positiveOptimal = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
-//		float error2 = getError(reference, positiveOptimal);
-//		assertTrue(error2 > 1e-10 && error2 < 2.5e-4 && error2 < error);
-//		p.removeBias();
-//
-//		p.addBias(300, .005f, .01f, false, false);
-//		bo = (BiasOrigin) pre.getOrigin("post:input");
-//		bt = (BiasTermination) post.getTermination("input:bias");
-//		assertTrue(MU.min(getNetWeights(directWeights, bo, bt)) < 1e-10);
-//		network.run(-1.5f, 1);
-////		Plotter.plot(probe.getData(), "negative non-optimal");
-//		float[] negativeNonOptimal = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
-//		error = getError(reference, negativeNonOptimal);
-//		assertTrue(error > 1e-10 && error < 7e-4);
-//		p.removeBias();
-//
-//		p.addBias(300, .005f, .01f, false, true);
-//		bo = (BiasOrigin) pre.getOrigin("post:input");
-//		bt = (BiasTermination) post.getTermination("input:bias");
-//		assertTrue(MU.min(getNetWeights(directWeights, bo, bt)) < 1e-10);
-//		network.run(-1.5f, 1);
-////		Plotter.plot(probe.getData(), "negative optimal");
-//		float[] negativeOptimal = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
-//		error2 = getError(reference, negativeOptimal);
-//		assertTrue(error2 > 1e-10 && error2 < 3.5e-4 && error2 < error);
-//	}
-
+	@Test
 	public void testAddBias2D() throws StructuralException, SimulationException {
 		Network network = new NetworkImpl();
 		FunctionInput input = new FunctionInput("input", new Function[]{new IdentityFunction(1, 0)}, Units.UNK);
@@ -167,7 +70,6 @@ public class ProjectionImplTest extends TestCase {
 		float[] reference = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
 
 		network.run(-1.5f, 1);
-//		Plotter.plot(probe.getData(), "mixed weights");
 		float[] mixed = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
 		getError(reference, mixed);
 
@@ -176,10 +78,6 @@ public class ProjectionImplTest extends TestCase {
 		BiasTermination bt = (BiasTermination) post.getTermination("input:bias");
 		assertTrue(MU.min(getNetWeights(directWeights, bo, bt)) > -1e-10);
 		network.run(-1.5f, 1);
-//		Plotter.plot(probe.getData(), "positive non-optimal");
-//		float[] positiveNonOptimal = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
-//		float error = getError(reference, positiveNonOptimal);
-//		assertTrue(error > 1e-10 && error < 5e-4);
 		p.removeBias();
 
 		p.addBias(300, .005f, .01f, true, true);
@@ -187,10 +85,6 @@ public class ProjectionImplTest extends TestCase {
 		bt = (BiasTermination) post.getTermination("input:bias");
 		assertTrue(MU.min(getNetWeights(directWeights, bo, bt)) > -1e-10);
 		network.run(-1.5f, 1);
-//		Plotter.plot(probe.getData(), "positive optimal");
-//		float[] positiveOptimal = MU.transpose(DataUtils.filter(probe.getData(), .01f).getValues())[0];
-//		float error2 = getError(reference, positiveOptimal);
-//		assertTrue(error2 > 1e-10 && error2 < 2.5e-4 && error2 < error);
 		p.removeBias();
 	}
 
@@ -201,7 +95,6 @@ public class ProjectionImplTest extends TestCase {
 		System.arraycopy(MU.difference(data, reference), start, difference, 0, length);
 
 		float result = MU.variance(difference, 0);
-//		Plotter.plot(difference, "error variance: " + result);
 		System.out.println("error" + result);
 		return result;
 	}
