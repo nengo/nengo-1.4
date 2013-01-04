@@ -1,0 +1,1 @@
+add_library(NengoUtilsGPU SHARED customCudaUtils.cpp NengoUtilsGPU_JNI.cpp weightedCostApproximatorGPU.cu)

@@ -1,10 +1,5 @@
-
 #ifndef NENGO_GPU_JNI_H
 #define NENGO_GPU_JNI_H
-
-#ifdef __cplusplus
-extern "C"{
-#endif
 
 #include <stdio.h>
 #include <jni.h>
@@ -24,9 +19,5 @@ void assignNetworkArrayToDevice(int networkArrayIndex, int* networkArrayData, in
 void setupIO(int numProjections, projection* projections, NengoGPUData* currentData, int* networkArrayData, int** originRequiredByJava);
 
 void setupSpikes(int* collectSpikes, NengoGPUData* currentData);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -1,13 +1,7 @@
-
 #ifndef NENGO_GPU_CUDA_H
 #define NENGO_GPU_CUDA_H
 
-#ifdef __cplusplus
-extern "C"{
-#endif
-
 #include <cuda_runtime.h>
-
 #include "NengoGPUData.h"
 
 void printIntArrayFromDevice(FILE* fp, intArray* array, int n, int m, int labels);
@@ -44,12 +38,8 @@ __global__ void moveGPUData(int size, int* map, float* to, float* from);
 void run_NEFEnsembles(NengoGPUData*, float, float);
 
 float* allocateCudaFloatArray(int size);
-int* allocateCudaIntArray(int size);
+jint* allocateCudaIntArray(int size);
 long getDeviceCapacity(int device);
 void initializeDeviceInputAndOutput(NengoGPUData* currentData);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif 

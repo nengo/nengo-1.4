@@ -4,9 +4,6 @@
 
 #ifndef _Included_ca_nengo_math_impl_WeightedCostApproximator
 #define _Included_ca_nengo_math_impl_WeightedCostApproximator
-#ifdef __cplusplus
-extern "C" {
-#endif
 #undef ca_nengo_math_impl_WeightedCostApproximator_serialVersionUID
 #define ca_nengo_math_impl_WeightedCostApproximator_serialVersionUID 1LL
 /*
@@ -41,20 +38,11 @@ JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_
 JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_nativeFindGammaPseudoInverse
   (JNIEnv *, jclass, jobjectArray, jfloat, jint);
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 /* Header for class ca_nengo_math_impl_WeightedCostApproximator_Factory */
 
 #ifndef _Included_ca_nengo_math_impl_WeightedCostApproximator_Factory
 #define _Included_ca_nengo_math_impl_WeightedCostApproximator_Factory
-#ifdef __cplusplus
-extern "C" {
-#endif
 #undef ca_nengo_math_impl_WeightedCostApproximator_Factory_serialVersionUID
 #define ca_nengo_math_impl_WeightedCostApproximator_Factory_serialVersionUID -3390244062379730498LL
-#ifdef __cplusplus
-}
-#endif
 #endif

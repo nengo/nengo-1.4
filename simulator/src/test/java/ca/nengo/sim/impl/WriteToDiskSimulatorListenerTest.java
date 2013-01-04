@@ -44,7 +44,7 @@ public class WriteToDiskSimulatorListenerTest extends TestCase {
 		
 		assertTrue(file.exists());
 		assertTrue(file.length() > 0);
-		assertTrue(file.delete());
+		file.delete();
 	}
 	
 	/*
