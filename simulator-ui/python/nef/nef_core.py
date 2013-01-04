@@ -558,7 +558,7 @@ class Network:
     def connect(self, pre, post,
                 transform=None,weight=1,index_pre=None,index_post=None,
                 pstc=0.01,func=None,weight_func=None,expose_weights=False,origin_name=None,
-                modulatory=False,plastic_array=False,create_projection=True):
+                modulatory=False,plastic_array=False,create_projection=True, encoders=None):
         """Connect two nodes in the network.
 
         *pre* and *post* can be strings giving the names of the nodes, or they
@@ -717,28 +717,39 @@ class Network:
         # determine the origin and its dimensions (builds if necessary)
         origin=self._parse_pre(pre,func,origin_name)
         dim_pre=origin.dimensions
-
+        
+       
         # check for the special case of being given a pre-existing termination
-        if isinstance(post,Termination):
+        if isinstance(post,Termination) or encoders!=None:
             if transform is not None: raise Exception('transform cannot be specified when connecting to an existing termination')
             if index_pre is not None: raise Exception('index_pre cannot be specified when connecting to an existing termination')
             if index_post is not None: raise Exception('index_post cannot be specified when connecting to an existing termination')
             if weight_func is not None: raise Exception('weight_func cannot be specified when connecting to an existing termination')
             if weight!=1: raise Exception('weight cannot be specified when connecting to an existing termination')
             if expose_weights: raise Exception('expose_weights cannot be specified when connecting to an existing termination')
-            if modulatory: raise Exception('modulatory cannot be specified when connecting to an existing termination')
-            if pstc!=0.01: raise Exception('pstc cannot be specified when connecting to an existing termination')
+            if encoders is None and modulatory: raise Exception('modulatory cannot be specified when connecting to an existing termination')
+            if encoders is None and pstc!=0.01: raise Exception('pstc cannot be specified when connecting to an existing termination')
+
+            if encoders!=None:
+                if isinstance(encoders, (float, int)): encoders=[[encoders]]*post.neurons
+                post.addTermination(pre.name, encoders, pstc, modulatory)
+                post=post.getTermination(pre.name)
             
             if create_projection:
                 self.network.addProjection(origin,post)
             return
+                
 
+            
         if isinstance(post, int):
             dim_post=post
         elif post is None:
             dim_post = 1
         else:
             dim_post=post.dimension
+
+            
+
 
         if transform is None:
             transform=self.compute_transform(dim_pre,dim_post,weight,index_pre,index_post)
