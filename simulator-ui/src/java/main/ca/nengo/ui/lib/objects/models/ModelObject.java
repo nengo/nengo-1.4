@@ -1,6 +1,7 @@
 package ca.nengo.ui.lib.objects.models;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import javax.swing.JPopupMenu;
@@ -24,8 +25,6 @@ import ca.nengo.ui.models.tooltips.TooltipBuilder;
  * @author User
  */
 public abstract class ModelObject extends ElasticObject implements Interactable {
-
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * The property name that identifies a change in this node's Model
@@ -102,7 +101,9 @@ public abstract class ModelObject extends ElasticObject implements Interactable 
 	 */
 	protected void constructMenu(PopupMenuBuilder menu) {
 		if (showRemoveModelAction()) {
-			menu.addAction(new RemoveModelAction("Remove model", this));
+			ArrayList<ModelObject> arrayOfMe = new ArrayList<ModelObject>();
+			arrayOfMe.add(this);
+			menu.addAction(new RemoveModelAction("Remove model", arrayOfMe));
 		}
 	}
 

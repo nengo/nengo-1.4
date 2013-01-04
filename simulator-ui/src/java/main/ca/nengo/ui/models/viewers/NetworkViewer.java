@@ -1,32 +1,37 @@
 /*
-The contents of this file are subject to the Mozilla Public License Version 1.1 
-(the "License"); you may not use this file except in compliance with the License. 
+The contents of this file are subject to the Mozilla Public License Version 1.1
+(the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.mozilla.org/MPL/
 
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT
-WARRANTY OF ANY KIND, either express or implied. See the License for the specific 
+WARRANTY OF ANY KIND, either express or implied. See the License for the specific
 language governing rights and limitations under the License.
 
-The Original Code is "NetworkViewer.java". Description: 
+The Original Code is "NetworkViewer.java". Description:
 "Viewer for peeking into a Network
-  
+
   @author Shu Wu"
 
 The Initial Developer of the Original Code is Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Copyright (C) 2006-2008. All Rights Reserved.
 
-Alternatively, the contents of this file may be used under the terms of the GNU 
-Public License license (the GPL License), in which case the provisions of GPL 
-License are applicable  instead of those above. If you wish to allow use of your 
-version of this file only under the terms of the GPL License and not to allow 
-others to use your version of this file under the MPL, indicate your decision 
-by deleting the provisions above and replace  them with the notice and other 
+Alternatively, the contents of this file may be used under the terms of the GNU
+Public License license (the GPL License), in which case the provisions of GPL
+License are applicable  instead of those above. If you wish to allow use of your
+version of this file only under the terms of the GPL License and not to allow
+others to use your version of this file under the MPL, indicate your decision
+by deleting the provisions above and replace  them with the notice and other
 provisions required by the GPL License.  If you do not delete the provisions above,
 a recipient may use your version of this file under either the MPL or the GPL License.
  */
 
 package ca.nengo.ui.models.viewers;
 
-import java.awt.geom.Point2D;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,7 +39,6 @@ import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
 
-import ca.nengo.config.ClassRegistry;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -43,23 +47,15 @@ import ca.nengo.model.Projection;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.NetworkImpl;
-import ca.nengo.ui.NengoGraphics;
-import ca.nengo.ui.actions.CreateModelAction;
-import ca.nengo.ui.actions.CreateModelAdvancedAction;
-import ca.nengo.ui.actions.OpenNeoFileAction;
-import ca.nengo.ui.actions.PasteAction;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.Util;
-import ca.nengo.ui.lib.util.menus.MenuBuilder;
 import ca.nengo.ui.lib.util.menus.PopupMenuBuilder;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.UINeoNode;
-import ca.nengo.ui.models.constructors.ConstructableNode;
-import ca.nengo.ui.models.constructors.ModelFactory;
 import ca.nengo.ui.models.nodes.UINetwork;
 import ca.nengo.ui.models.nodes.widgets.UIOrigin;
 import ca.nengo.ui.models.nodes.widgets.UIProbe;
@@ -75,383 +71,348 @@ import edu.umd.cs.piccolo.util.PBounds;
  * @author Shu Wu
  */
 public class NetworkViewer extends NodeViewer implements NodeContainer {
-	private static final boolean ELASTIC_LAYOUT_ENABLED_DEFAULT = false;
+    private static final boolean ELASTIC_LAYOUT_ENABLED_DEFAULT = false;
+    private File layoutFile;
+    private File backupLayoutFile;
 
-	private static final long serialVersionUID = -3018937112672942653L;
+    /**
+     * @param pNetwork
+     *            Parent Network UI wrapper
+     */
+    public NetworkViewer(UINetwork pNetwork) {
+        super(pNetwork);
+        String layoutFileName = "layouts/" + pNetwork.getName() + ".layout";
+        this.layoutFile = new File(layoutFileName);
+        this.backupLayoutFile = new File(layoutFileName + ".bak");
+    }
 
-	/**
-	 * Name given to the current layout by default, saved when the viewer is
-	 * closed
-	 */
-	public static final String DEFAULT_NODE_LAYOUT_NAME = "AutoSaved";
+    @Override
+    protected boolean canRemoveChildModel(Node node) {
+        return true;
+    }
 
-	/**
-	 * @param pNetwork
-	 *            Parent Network UI wrapper
-	 */
-	public NetworkViewer(UINetwork pNetwork) {
-		super(pNetwork);
+    private HashSet<Origin> exposedOrigins;
+    private HashSet<Termination> exposedTerminations;
 
-	}
+    @Override
+    protected void initialize() {
+        exposedOrigins = new HashSet<Origin>(getModel().getOrigins().length);
+        exposedTerminations = new HashSet<Termination>(getModel().getTerminations().length);
 
-	@Override
-	protected boolean canRemoveChildModel(Node node) {
-		return true;
-	}
+        super.initialize();
+        updateSimulatorProbes();
+    }
 
-	@Override
-	protected void constructLayoutMenu(MenuBuilder menu) {
-		super.constructLayoutMenu(menu);
-		menu.addSection("File");
-		menu.addAction(new SaveLayout("Save"));
+    @Override
+    protected void removeChildModel(Node node) {
+        try {
+            getModel().removeNode(node.getName());
+        } catch (StructuralException e) {
+            e.printStackTrace();
+        }
+    }
 
-		MenuBuilder restoreLayout = menu.addSubMenu("Restore");
-
-		String[] layoutNames = getConfig().getLayoutNames();
-
-		if (layoutNames.length > 0) {
-			for (String element : layoutNames) {
-				restoreLayout.addAction(new RestoreLayout(element));
-			}
-		} else {
-			restoreLayout.addLabel("none");
-		}
-
-		MenuBuilder deleteLayout = restoreLayout.addSubMenu("Delete");
-
-		if (layoutNames.length > 0) {
-			for (String element : layoutNames) {
-				deleteLayout.addAction(new DeleteLayout(element));
-			}
-		} else {
-			deleteLayout.addLabel("none");
-		}
-
-	}
-
-	private HashSet<Origin> exposedOrigins;
-	private HashSet<Termination> exposedTerminations;
-
-	@Override
-	protected void initialize() {
-		exposedOrigins = new HashSet<Origin>(getModel().getOrigins().length);
-		exposedTerminations = new HashSet<Termination>(getModel().getTerminations().length);
-
-		super.initialize();
-		updateSimulatorProbes();
-	}
-
-	@Override
-	protected void prepareForDestroy() {
-
-		saveLayoutAsDefault();
-		super.prepareForDestroy();
-	}
-
-	@Override
-	protected void removeChildModel(Node node) {
-		try {
-			getModel().removeNode(node.getName());
-		} catch (StructuralException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
-	protected Double newItemPositionX;
-	protected Double newItemPositionY;
-	public void setNewItemPosition(Double x, Double y) {
-		newItemPositionX=x;
-		newItemPositionY=y;
-	}
-	
-
-	/**
-	 * Construct UI Nodes from the NEO Network model
-	 */
-	protected void updateViewFromModel(boolean isFirstUpdate) {
-
-		/*
-		 * Get the current children and map them
-		 */
-		HashMap<Node, UINeoNode> currentNodes = new HashMap<Node, UINeoNode>(
-				getGround().getChildrenCount());
-
-		Enumeration<UINeoNode> en = neoNodesChildren.elements();
-		while (en.hasMoreElements()) {
-			UINeoNode node = en.nextElement();
-			if (!node.isDestroyed()) {
-				Util.Assert(node.getModel() != null);
-				currentNodes.put(node.getModel(), node);
-			}
-		}
-		neoNodesChildren.clear();
-
-		/*
-		 * Construct Nodes from the Network model
-		 */
-		Node[] nodes = getModel().getNodes();
-
-		for (Node node : nodes) {
-			if (getUINode(node) == null) {
-				UINeoNode nodeUI = currentNodes.get(node);
-
-				if (nodeUI == null) {
-					/*
-					 * Create UI Wrappers here
-					 */
-					nodeUI = UINeoNode.createNodeUI(node);
-
-					
-					if (newItemPositionX != null && newItemPositionY != null) {
-						nodeUI.setOffset(newItemPositionX, newItemPositionY);
-						neoNodesChildren.put(nodeUI.getModel(), nodeUI);
-						getGround().addChildFancy(nodeUI, false);
-
-					} else {
-						boolean centerAndNotify = !isFirstUpdate;
-						addUINode(nodeUI, centerAndNotify, false);
-						if (centerAndNotify) {
-							nodeUI.showPopupMessage("Node " + node.getName() + " added to Network");
-						}
-					}
-				} else {
-					neoNodesChildren.put(nodeUI.getModel(), nodeUI);
-				}
-
-			} else {
-				Util.Assert(false, "Trying to add node which already exists");
-			}
-		}
-		
-		newItemPositionX=null;
-		newItemPositionY=null;
+    protected Double newItemPositionX;
+    protected Double newItemPositionY;
+    public void setNewItemPosition(Double x, Double y) {
+        newItemPositionX=x;
+        newItemPositionY=y;
+    }
 
 
-		/*
-		 * Prune existing nodes by deleting them
-		 */
-		for (Node node : currentNodes.keySet()) {
-			// Remove nodes which are no longer referenced by the network model
-			if (getUINode(node) == null) {
-				UINeoNode nodeUI = currentNodes.get(node);
-				nodeUI.showPopupMessage("Node " + nodeUI.getName() + " removed from Network");
-				nodeUI.destroy();
-			}
-		}
+    /**
+     * Construct UI Nodes from the NEO Network model
+     */
+    protected void updateViewFromModel(boolean isFirstUpdate) {
 
-		/*
-		 * Create projection map
-		 */
-		HashSet<Projection> projectionsToAdd = new HashSet<Projection>(
-				getModel().getProjections().length);
-		for (Projection projection : getModel().getProjections()) {
-			projectionsToAdd.add(projection);
-		}
+        /*
+         * Get the current children and map them
+         */
+        HashMap<Node, UINeoNode> currentNodes = new HashMap<Node, UINeoNode>(
+                getGround().getChildrenCount());
 
-		HashMap<Termination, Projection> projectionMap = new HashMap<Termination, Projection>(
-				projectionsToAdd.size());
+        Enumeration<UINeoNode> en = neoNodesChildren.elements();
+        while (en.hasMoreElements()) {
+            UINeoNode node = en.nextElement();
+            if (!node.isDestroyed()) {
+                Util.Assert(node.getModel() != null);
+                currentNodes.put(node.getModel(), node);
+            }
+        }
+        neoNodesChildren.clear();
 
-		for (Projection projection : projectionsToAdd) {
-			Util.Assert(!projectionMap.containsKey(projection.getTermination()),
-					"More than one projection found per termination");
+        /*
+         * Construct Nodes from the Network model
+         */
+        Node[] nodes = getModel().getNodes();
 
-			projectionMap.put(projection.getTermination(), projection);
-		}
+        for (Node node : nodes) {
+            if (getUINode(node) == null) {
+                UINeoNode nodeUI = currentNodes.get(node);
 
-		/*
-		 * Get UI projections
-		 */
-		LinkedList<UIProjection> projectionsToRemove = new LinkedList<UIProjection>();
+                if (nodeUI == null) {
+                    /*
+                     * Create UI Wrappers here
+                     */
+                    nodeUI = UINeoNode.createNodeUI(node);
 
-		for (UINeoNode nodeUI : getUINodes()) {
-			for (UITermination terminationUI : nodeUI.getVisibleTerminations()) {
-				if (terminationUI.getConnector() != null) {
-					UIOrigin originUI = terminationUI.getConnector().getOriginUI();
 
-					Termination termination = terminationUI.getModel();
-					Origin origin = originUI.getModel();
+                    if (newItemPositionX != null && newItemPositionY != null) {
+                        nodeUI.setOffset(newItemPositionX, newItemPositionY);
+                        neoNodesChildren.put(nodeUI.getModel(), nodeUI);
+                        getGround().addChildFancy(nodeUI, false);
 
-					Projection projection = projectionMap.get(termination);
-					if (projection != null && projection.getOrigin() == origin) {
-						/*
-						 * Projection already exists
-						 */
-						projectionsToAdd.remove(projectionMap.get(termination));
+                    } else {
+                        boolean centerAndNotify = !isFirstUpdate;
+                        addUINode(nodeUI, centerAndNotify, false);
+                        if (centerAndNotify) {
+                            nodeUI.showPopupMessage("Node " + node.getName() + " added to Network");
+                        }
+                    }
+                } else {
+                    neoNodesChildren.put(nodeUI.getModel(), nodeUI);
+                }
 
-					} else {
-						projectionsToRemove.add(terminationUI.getConnector());
-					}
-				}
-			}
-		}
+            } else {
+                Util.Assert(false, "Trying to add node which already exists");
+            }
+        }
 
-		/*
-		 * Destroy unreferenced projections
-		 */
-		for (UIProjection projectionUI : projectionsToRemove) {
-			UITermination terminationUI = projectionUI.getTermination();
+        newItemPositionX=null;
+        newItemPositionY=null;
 
-			projectionUI.destroy();
-			if (!isFirstUpdate) {
-				terminationUI.showPopupMessage("REMOVED Projection to "
-						+ terminationUI.getNodeParent().getName() + "." + terminationUI.getName());
-			}
-		}
 
-		/*
-		 * Construct projections
-		 */
-		for (Projection projection : projectionsToAdd) {
-			Origin origin = projection.getOrigin();
-			Termination term = projection.getTermination();
+        /*
+         * Prune existing nodes by deleting them
+         */
+        for (Node node : currentNodes.keySet()) {
+            // Remove nodes which are no longer referenced by the network model
+            if (getUINode(node) == null) {
+                UINeoNode nodeUI = currentNodes.get(node);
+                nodeUI.showPopupMessage("Node " + nodeUI.getName() + " removed from Network");
+                nodeUI.destroy();
+            }
+        }
 
-			UINeoNode nodeOrigin = getUINode(origin.getNode());
+        /*
+         * Create projection map
+         */
+        HashSet<Projection> projectionsToAdd = new HashSet<Projection>(
+                getModel().getProjections().length);
+        for (Projection projection : getModel().getProjections()) {
+            projectionsToAdd.add(projection);
+        }
 
-			UINeoNode nodeTerm = getUINode(term.getNode());
+        HashMap<Termination, Projection> projectionMap = new HashMap<Termination, Projection>(
+                projectionsToAdd.size());
 
-			if (nodeOrigin != null && nodeTerm != null) {
-				UIOrigin originUI = nodeOrigin.showOrigin(origin.getName());
-				UITermination termUI = nodeTerm.showTermination(term.getName());
+        for (Projection projection : projectionsToAdd) {
+            Util.Assert(!projectionMap.containsKey(projection.getTermination()),
+                    "More than one projection found per termination");
 
-				originUI.connectTo(termUI, false);
-				if (!isFirstUpdate) {
-					termUI.showPopupMessage("NEW Projection to " + termUI.getName() + "."
-							+ getName());
-				}
-			} else {
-				if (nodeOrigin == null) {
-					Util.Assert(false, "Could not find a Origin attached to a projection: "
-							+ origin.getNode().getName());
-				}
-				if (nodeTerm == null) {
-					Util.Assert(false, "Could not find a Termination attached to a projection: "
-							+ term.getNode().getName());
-				}
-			}
+            projectionMap.put(projection.getTermination(), projection);
+        }
 
-		}
+        /*
+         * Get UI projections
+         */
+        LinkedList<UIProjection> projectionsToRemove = new LinkedList<UIProjection>();
 
-		updateViewExposed();
-	}
+        for (UINeoNode nodeUI : getUINodes()) {
+            for (UITermination terminationUI : nodeUI.getVisibleTerminations()) {
+                if (terminationUI.getConnector() != null) {
+                    UIOrigin originUI = terminationUI.getConnector().getOriginUI();
 
-	private void updateViewExposed() {
-		/*
-		 * Get exposed Origins and Terminations
-		 */
-		HashSet<Origin> exposedOriginsTemp = new HashSet<Origin>(getModel().getOrigins().length);
-		HashSet<Termination> exposedTerminationsTemp = new HashSet<Termination>(
-				getModel().getTerminations().length);
+                    Termination termination = terminationUI.getModel();
+                    Origin origin = originUI.getModel();
 
-		for (Origin origin : getModel().getOrigins()) {
-			if (origin instanceof NetworkImpl.OriginWrapper) {
-				NetworkImpl.OriginWrapper originWr = (NetworkImpl.OriginWrapper) origin;
-				exposedOriginsTemp.add(originWr.getWrappedOrigin());
-			}
-		}
+                    Projection projection = projectionMap.get(termination);
+                    if (projection != null && projection.getOrigin() == origin) {
+                        /*
+                         * Projection already exists
+                         */
+                        projectionsToAdd.remove(projectionMap.get(termination));
 
-		for (Termination termination : getModel().getTerminations()) {
-			if (termination instanceof NetworkImpl.TerminationWrapper) {
-				NetworkImpl.TerminationWrapper terminationWr = (NetworkImpl.TerminationWrapper) termination;
-				exposedTerminationsTemp.add(terminationWr.getWrappedTermination());
-			}
-		}
+                    } else {
+                        projectionsToRemove.add(terminationUI.getConnector());
+                    }
+                }
+            }
+        }
 
-		/*
-		 * Check to see if terminations have been added or removed
-		 */
-		boolean exposedOriginsChanged = false;
-		if (exposedOriginsTemp.size() != exposedOrigins.size()) {
-			exposedOriginsChanged = true;
-		} else {
-			/*
-			 * Iterate through origins to see if any have changed
-			 */
-			for (Origin origin : exposedOriginsTemp) {
-				if (!exposedOrigins.contains(origin)) {
-					break;
-				}
-				exposedOriginsChanged = true;
-			}
-		}
-		// Copy changed exposed origins if needed
-		if (exposedOriginsChanged) {
-			exposedOrigins = exposedOriginsTemp;
-		}
+        /*
+         * Destroy unreferenced projections
+         */
+        for (UIProjection projectionUI : projectionsToRemove) {
+            UITermination terminationUI = projectionUI.getTermination();
 
-		boolean exposedTerminationsChanged = false;
-		if (exposedTerminationsTemp.size() != exposedTerminations.size()) {
-			exposedTerminationsChanged = true;
-		} else {
-			/*
-			 * Iterate through Termination to see if any have changed
-			 */
-			for (Termination termination : exposedTerminationsTemp) {
-				if (!exposedTerminations.contains(termination)) {
-					break;
-				}
-				exposedTerminationsChanged = true;
-			}
-		}
-		// Copy changed exposed terminations if needed
-		if (exposedTerminationsChanged) {
-			exposedTerminations = exposedTerminationsTemp;
-		}
+            projectionUI.destroy();
+            if (!isFirstUpdate) {
+                terminationUI.showPopupMessage("REMOVED Projection to "
+                        + terminationUI.getNodeParent().getName() + "." + terminationUI.getName());
+            }
+        }
 
-		if (exposedTerminationsChanged || exposedOriginsChanged) {
-			/*
-			 * Update exposed terminations and origins
-			 */
-			for (WorldObject wo : getGround().getChildren()) {
-				if (wo instanceof UINeoNode) {
-					UINeoNode nodeUI = (UINeoNode) wo;
+        /*
+         * Construct projections
+         */
+        for (Projection projection : projectionsToAdd) {
+            Origin origin = projection.getOrigin();
+            Termination term = projection.getTermination();
 
-					if (exposedOriginsChanged) {
-						for (UIOrigin originUI : nodeUI.getVisibleOrigins()) {
-							boolean isExposed = exposedOrigins.contains(originUI.getModel());
-							originUI.setExposed(isExposed);
-						}
-					}
-					if (exposedTerminationsChanged) {
-						for (UITermination terminationUI : nodeUI.getVisibleTerminations()) {
-							boolean isExposed = exposedTerminations.contains(terminationUI.getModel());
-							terminationUI.setExposed(isExposed);
-						}
-					}
-				}
-			}
-		}
-	}
+            UINeoNode nodeOrigin = getUINode(origin.getNode());
 
-	@Override
-	public void applyDefaultLayout() {
-		if (getUINodes().size() != 0) {
-			if (restoreNodeLayout(DEFAULT_NODE_LAYOUT_NAME)) {
-				return;
-			} else {
-				applySortLayout(SortMode.BY_NAME);
-				// applyJungLayout(KKLayout.class);
-			}
-		}
-		if (ELASTIC_LAYOUT_ENABLED_DEFAULT) {
-			// enable elastic layout for Jung && when no nodes are loaded.
-			getGround().setElasticEnabled(true);
-		}
-	}
+            UINeoNode nodeTerm = getUINode(term.getNode());
 
-	@Override
-	public void constructMenu(PopupMenuBuilder menu) {
-		super.constructMenu(menu);
+            if (nodeOrigin != null && nodeTerm != null) {
+                UIOrigin originUI = nodeOrigin.showOrigin(origin.getName());
+                UITermination termUI = nodeTerm.showTermination(term.getName());
 
-		/*
-		 * Construct simulator menu
-		 */
-		UINetwork.constructSimulatorMenu(menu, getViewerParent());
+                originUI.connectTo(termUI, false);
+                if (!isFirstUpdate) {
+                    termUI.showPopupMessage("NEW Projection to " + termUI.getName() + "."
+                            + getName());
+                }
+            } else {
+                if (nodeOrigin == null) {
+                    Util.Assert(false, "Could not find a Origin attached to a projection: "
+                            + origin.getNode().getName());
+                }
+                if (nodeTerm == null) {
+                    Util.Assert(false, "Could not find a Termination attached to a projection: "
+                            + term.getNode().getName());
+                }
+            }
 
-		/*
-		 * Create new models
-		 */
-		menu.addSection("Add model");
+        }
+
+        updateViewExposed();
+    }
+
+    private void updateViewExposed() {
+        /*
+         * Get exposed Origins and Terminations
+         */
+        HashSet<Origin> exposedOriginsTemp = new HashSet<Origin>(getModel().getOrigins().length);
+        HashSet<Termination> exposedTerminationsTemp = new HashSet<Termination>(
+                getModel().getTerminations().length);
+
+        for (Origin origin : getModel().getOrigins()) {
+            if (origin instanceof NetworkImpl.OriginWrapper) {
+                NetworkImpl.OriginWrapper originWr = (NetworkImpl.OriginWrapper) origin;
+                exposedOriginsTemp.add(originWr.getWrappedOrigin());
+            }
+        }
+
+        for (Termination termination : getModel().getTerminations()) {
+            if (termination instanceof NetworkImpl.TerminationWrapper) {
+                NetworkImpl.TerminationWrapper terminationWr = (NetworkImpl.TerminationWrapper) termination;
+                exposedTerminationsTemp.add(terminationWr.getWrappedTermination());
+            }
+        }
+
+        /*
+         * Check to see if terminations have been added or removed
+         */
+        boolean exposedOriginsChanged = false;
+        if (exposedOriginsTemp.size() != exposedOrigins.size()) {
+            exposedOriginsChanged = true;
+        } else {
+            /*
+             * Iterate through origins to see if any have changed
+             */
+            for (Origin origin : exposedOriginsTemp) {
+                if (!exposedOrigins.contains(origin)) {
+                    break;
+                }
+                exposedOriginsChanged = true;
+            }
+        }
+        // Copy changed exposed origins if needed
+        if (exposedOriginsChanged) {
+            exposedOrigins = exposedOriginsTemp;
+        }
+
+        boolean exposedTerminationsChanged = false;
+        if (exposedTerminationsTemp.size() != exposedTerminations.size()) {
+            exposedTerminationsChanged = true;
+        } else {
+            /*
+             * Iterate through Termination to see if any have changed
+             */
+            for (Termination termination : exposedTerminationsTemp) {
+                if (!exposedTerminations.contains(termination)) {
+                    break;
+                }
+                exposedTerminationsChanged = true;
+            }
+        }
+        // Copy changed exposed terminations if needed
+        if (exposedTerminationsChanged) {
+            exposedTerminations = exposedTerminationsTemp;
+        }
+
+        if (exposedTerminationsChanged || exposedOriginsChanged) {
+            /*
+             * Update exposed terminations and origins
+             */
+            for (WorldObject wo : getGround().getChildren()) {
+                if (wo instanceof UINeoNode) {
+                    UINeoNode nodeUI = (UINeoNode) wo;
+
+                    if (exposedOriginsChanged) {
+                        for (UIOrigin originUI : nodeUI.getVisibleOrigins()) {
+                            boolean isExposed = exposedOrigins.contains(originUI.getModel());
+                            originUI.setExposed(isExposed);
+                        }
+                    }
+                    if (exposedTerminationsChanged) {
+                        for (UITermination terminationUI : nodeUI.getVisibleTerminations()) {
+                            boolean isExposed = exposedTerminations.contains(terminationUI.getModel());
+                            terminationUI.setExposed(isExposed);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void applyDefaultLayout() {
+        if (getUINodes().size() != 0) {
+            if (restoreNodeLayout()) {
+                return;
+            } else {
+                applySortLayout(SortMode.BY_NAME);
+                // applyJungLayout(KKLayout.class);
+            }
+        }
+        if (ELASTIC_LAYOUT_ENABLED_DEFAULT) {
+            // enable elastic layout for Jung && when no nodes are loaded.
+            getGround().setElasticEnabled(true);
+        }
+    }
+
+    @Override
+    public void constructMenu(PopupMenuBuilder menu, Double posX, Double posY) {
+        super.constructMenu(menu, posX, posY);
+
+        /*
+         * Origins & Terminations
+         */
+        menu.addSection("Origins and Terminations");
+        menu.addAction(new SetOTVisiblityAction("Unhide all", true));
+        menu.addAction(new SetOTVisiblityAction("Hide all", false));
+
+        /*
+         * Construct simulator menu
+         */
+        UINetwork.constructSimulatorMenu(menu, getViewerParent());
+
+        /*
+         * Create new models
+         */
+        /*menu.addSection("Add model");
 		MenuBuilder createNewMenu = menu.addSubMenu("Create new");
 
 		// Nodes
@@ -466,319 +427,383 @@ public class NetworkViewer extends NodeViewer implements NodeContainer {
 			}
 		}
 
-		menu.addAction(new OpenNeoFileAction(this));
+		menu.addAction(new OpenNeoFileAction(this));*/
 
-		/*
-		 * Origins & Terminations
-		 */
-		menu.addSection("Origins and Terminations");
-		menu.addAction(new SetOTVisiblityAction("Unhide all", true));
-		menu.addAction(new SetOTVisiblityAction("Hide all", false));
+    }
 
-	}
 
-	/**
-	 * @param name
-	 *            Name of layout to delete
-	 */
-	public void deleteNodeLayout(String name) {
-		NetworkViewerConfig layouts = getConfig();
-		layouts.removeLayout(name);
-	}
+    @Override
+    public Network getModel() {
+        return (Network) super.getModel();
+    }
 
-	/**
-	 * @return Static settings including saved layouts
-	 */
-	public NetworkViewerConfig getConfig() {
-		return getViewerParent().getSavedConfig();
-	}
+    @Override
+    public UINetwork getViewerParent() {
+        return (UINetwork) super.getViewerParent();
+    }
 
-	@Override
-	public Network getModel() {
-		return (Network) super.getModel();
-	}
+    /**
+     * @return Whether the operation was successful
+     */
+    public boolean restoreNodeLayout() {
+    	File fileToOpen = layoutFile;
+    	boolean loadFromBackup = false;
+    	boolean readFailed = false;
+    	
+        if (!layoutFile.exists()) {
+            if (!backupLayoutFile.exists()) {
+            	return false;
+            }
+            else {
+            	System.err.println("NetworkViewer.restoreNodeLayout() - Layout file not found, attempting to restore from backup.");
+            	fileToOpen = backupLayoutFile;
+            	loadFromBackup = true;
+            }
+        }
+        
+        getGround().setElasticEnabled(false);
+        boolean enableElasticMode = false;
 
-	@Override
-	public UINetwork getViewerParent() {
-		return (UINetwork) super.getViewerParent();
-	}
+        HashMap<String, Float[]> nodeXY = new HashMap<String, Float[]>();
+        String line = null;
+        PBounds fullBounds = null;
+        
+        while (true) {
+	        BufferedReader reader = null;
+	        try {
+	            reader = new BufferedReader(new FileReader(fileToOpen));
+	        } catch (IOException e) {
+	            System.err.println("NetworkViewer.restoreNodeLayout() - IOException encountered attempting to create BufferedReader: " 
+	            		           + e.getMessage());
+	            readFailed = true;
+	        }
+	
+	        try {
+	            while((line = reader.readLine()) != null) {
+	                if (line.length() >= 2 && line.substring(0, 2).equals("# ")) {
+	                    if (line.indexOf("elasticmode=") != -1) {
+	                        enableElasticMode = Boolean.parseBoolean(
+	                                line.substring(line.indexOf('=') + 1));
+	                    } else if (line.indexOf("viewbounds=") != -1) {
+	                        float x = Float.parseFloat(line.substring(
+	                                line.indexOf("x=") + 2, line.indexOf(',')));
+	                        float y = Float.parseFloat(line.substring(
+	                                line.indexOf("y=") + 2, line.indexOf(',', line.indexOf("y="))));
+	                        float width = Float.parseFloat(line.substring(
+	                                line.indexOf("width=") + 6, line.indexOf(',', line.indexOf("width="))));
+	                        float height = Float.parseFloat(line.substring(
+	                                line.indexOf("height=") + 7, line.indexOf(']', line.indexOf("height="))));
+	                        // TODO: Hax
+	                        x += 161.5;
+	                        y += 100;
+	                        width -= 323;
+	                        height -= 200;
+	                        fullBounds = new PBounds(x, y, width, height);
+	                    } else {
+	                        float x = Float.parseFloat(line.substring(
+	                                line.indexOf(")=Point2D.Double[") + 17, line.indexOf(',',
+	                                        line.indexOf(")=Point2D.Double["))));
+	                        float y = Float.parseFloat(line.substring(
+	                                line.indexOf(",", line.indexOf(")=Point2D.Double[")) + 1,
+	                                line.indexOf(']', line.indexOf(")=Point2D.Double["))));
+	                        String fullName = line.substring(2,
+	                                line.indexOf("=Point2D.Double["));
+	                        nodeXY.put(fullName, new Float[]{x, y});
+	                    }
+	                }
+	            }
+		        reader.close();
+	        } catch (IOException e) {
+	            System.err.println("NetworkViewer.restoreNodeLayout() - IOException encountered attempting to parse file: " + 
+	            		           e.getMessage());
+	            readFailed = true;
+	        } catch (StringIndexOutOfBoundsException e) {
+	        	System.err.println("NetworkViewer.restoreNodeLayout() - StringIndexOutOfBoundsException encountered attempting to parse file: " + 
+	        			           e.getMessage());
+	        	readFailed = true;
+	        } catch (NumberFormatException e) {
+	        	System.err.println("NetworkViewer.restoreNodeLayout() - NumberFormatException encountered attempting to parse file: " + 
+	        			           e.getMessage());
+	        	readFailed = true;
+	        }
+	        
+	        if (readFailed) {
+	        	// If backup file does not exists, don't bother trying to load from it.
+	            if (!backupLayoutFile.exists()) {
+	            	return false;
+	            }
+	            if (!loadFromBackup) {
+	            	System.err.println("NetworkViewer.restoreNodeLayout() - Attempting to load from backup layout file.");
+	            	fileToOpen = backupLayoutFile;
+	            	loadFromBackup = true;
+	            	readFailed = false;
+	            }
+	            else {
+	            	System.err.println("NetworkViewer.restoreNodeLayout() - Failed loading backup layout file.");
+	            	return false;
+	            }
+	        }
+	        else {
+	        	// Successful loading of layout file information
+	        	break;
+	        }
+        }
+        
+        // Load successful, make a backup copy of the layout file. (only if not loading from backup)
+        // TODO: Perhaps we should call the save function here instead of just making a copy? This will ensure that even if 
+        //       the original file read failed, it will still save a new working version of the layout file?
+        if (!loadFromBackup) {
+	        try {
+	            Util.copyFile(layoutFile, backupLayoutFile);
+	        } catch(IOException e) {
+	            System.err.println("NetworkViewer.restoreNodeLayout() - IOException encountered attempting to copyFile: " + 
+	            		           e.getMessage());
+	        }
+        }
+        
+        for (UINeoNode node : getUINodes()) {
+            Float[] xy = nodeXY.get(node.getFullName());
 
-	/**
-	 * @return Whether the operation was successful
-	 * @param name
-	 *            Name of layout to restore
-	 */
-	public boolean restoreNodeLayout(String name) {
+            if (xy != null) {
+                if (!enableElasticMode) {
+                    node.animateToPositionScaleRotation(xy[0], xy[1], 1, 0, 700);
+                } else {
+                    node.setOffset(xy[0], xy[1]);
+                }
+            }
+        }
 
-		NetworkViewerConfig config = getConfig();
-		NodeLayout layout = config.getLayout(name);
+        if (fullBounds != null) {
+            zoomToBounds(fullBounds, 700);
+        }
 
-		if (layout == null) {
-			return false;
-		}
-		getGround().setElasticEnabled(false);
-		boolean enableElasticMode = layout.elasticModeEnabled();
+        if (enableElasticMode) {
+            getGround().setElasticEnabled(true);
+        }
 
-		double startX = Double.MAX_VALUE;
-		double startY = Double.MAX_VALUE;
-		double endX = Double.MIN_VALUE;
-		double endY = Double.MIN_VALUE;
-		boolean foundSavedPosition = false;
+        return fullBounds != null;
+    }
 
-		for (UINeoNode node : getUINodes()) {
+    /**
+     * 
+     */
+    public void saveNodeLayout() {
+        StringBuilder newfile = new StringBuilder();
+        if (layoutFile.exists()) {
+            try {
+                Util.copyFile(layoutFile, backupLayoutFile);
+            } catch(IOException e) {
+                System.err.println("NetworkViewer.saveNodeLayout() - IOException encountered attempting to copyFile: " + 
+                		           e.getMessage());
+            }
 
-			Point2D savedPosition = layout.getPosition(node);
-			if (savedPosition != null) {
-				double x = savedPosition.getX();
-				double y = savedPosition.getY();
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(backupLayoutFile));
+                String line = null;
 
-				if (!enableElasticMode) {
-					node.animateToPositionScaleRotation(x, y, 1, 0, 700);
-				} else {
-					node.setOffset(x, y);
-				}
+                while((line = reader.readLine()) != null) {
+                    if (line.length() > 0 && line.charAt(0) != '#') {
+                        newfile.append(line + "\n");
+                    }
+                }
+                reader.close();
+            } catch(IOException e) {
+                System.err.println("NetworkViewer.saveNodeLayout() - IOException encountered attempting to create BufferedReader: " +
+                		           e.getMessage());
+            }
+        }
 
-				if (x < startX) {
-					startX = x;
-				}
-				if (x + node.getWidth() > endX) {
-					endX = x + node.getWidth();
-				}
+        newfile.append("##############################\n");
+        newfile.append("### Nengo Workspace layout ###\n");
+        newfile.append("##############################\n");
+        newfile.append("# elasticmode=" +
+                Boolean.toString(getGround().isElasticMode()) + "\n");
+        newfile.append("# viewbounds=" +
+                getSky().getViewBounds().toString() + "\n");
+        for (UINeoNode object : getUINodes()) {
+            newfile.append("# " + object.getFullName() + "=" +
+                    object.getOffset().toString() + "\n");
+        }
 
-				if (y < startY) {
-					startY = y;
-				}
-				if (y + node.getHeight() > endY) {
-					endY = y + node.getHeight();
-				}
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(layoutFile));
 
-				foundSavedPosition = true;
-			}
+            bw.write(newfile.toString());
+            bw.close();
+        } catch (IOException e) {
+            System.err.println("NetworkViewer.saveNodeLayout() - IOException encountered attempting to write to file: " + e.getMessage());
+        }
+    }
 
-		}
+    public void updateSimulatorProbes() {
+        /*
+         * Construct probes
+         */
+        Probe[] probesArray = getModel().getSimulator().getProbes();
 
-		if (foundSavedPosition) {
-			PBounds fullBounds = new PBounds(startX, startY, endX - startX, endY - startY);
-			zoomToBounds(fullBounds, 700);
-		}
+        /*
+         * Hashset of probes
+         */
+        HashSet<Probe> probeToAdd = new HashSet<Probe>(probesArray.length);
+        for (Probe probe : probesArray) {
+            probeToAdd.add(probe);
+        }
 
-		if (enableElasticMode) {
-			getGround().setElasticEnabled(true);
-		}
+        /*
+         * Get current probes in UI
+         */
+        LinkedList<UIStateProbe> probesToDestroy = new LinkedList<UIStateProbe>();
+        for (UINeoNode nodeUI : getUINodes()) {
+            for (UIProbe probeUI : nodeUI.getProbes()) {
+                if (probeUI instanceof UIStateProbe) {
+                    UIStateProbe stateProbe = (UIStateProbe) probeUI;
+                    if (probeToAdd.contains(stateProbe.getModel())) {
+                        probeToAdd.remove(stateProbe.getModel());
+                    } else {
+                        probesToDestroy.add(stateProbe);
 
-		return true;
-	}
+                    }
+                }
+            }
+        }
 
-	/**
-	 * Saves the current layout as the default
-	 */
-	public void saveLayoutAsDefault() {
-		saveNodeLayout(NetworkViewer.DEFAULT_NODE_LAYOUT_NAME);
-	}
+        /*
+         * Remove probes
+         */
+        for (UIStateProbe probeUI : probesToDestroy) {
+            probeUI.destroy();
+        }
 
-	/**
-	 * @param name
-	 *            Name given to the saved layout
-	 */
-	public void saveNodeLayout(String name) {
+        /*
+         * Add probes
+         */
+        for (Probe probe : probeToAdd) {
+            Probeable target = probe.getTarget();
 
-		NetworkViewerConfig layouts = getConfig();
-		if (layouts != null) {
-			NodeLayout nodeLayout = new NodeLayout(name, this, getGround().isElasticMode());
+            if (!(target instanceof Node)) {
+                UserMessages.showError("Unsupported target type for probe");
+            } else {
 
-			layouts.addLayout(nodeLayout);
-		} else {
-			UserMessages.showError("Could not save node layout");
-		}
-	}
+                if (!probe.isInEnsemble()) {
 
-	public void updateSimulatorProbes() {
-		/*
-		 * Construct probes
-		 */
-		Probe[] probesArray = getModel().getSimulator().getProbes();
+                    Node node = (Node) target;
 
-		/*
-		 * Hashset of probes
-		 */
-		HashSet<Probe> probeToAdd = new HashSet<Probe>(probesArray.length);
-		for (Probe probe : probesArray) {
-			probeToAdd.add(probe);
-		}
+                    UINeoNode nodeUI = getUINode(node);
+                    if (nodeUI != null) {
+                        nodeUI.showProbe(probe);
+                    } else {
+                        Util.debugMsg("There is a dangling probe in the Simulator");
+                    }
+                }
+            }
+        }
 
-		/*
-		 * Get current probes in UI
-		 */
-		LinkedList<UIStateProbe> probesToDestroy = new LinkedList<UIStateProbe>();
-		for (UINeoNode nodeUI : getUINodes()) {
-			for (UIProbe probeUI : nodeUI.getProbes()) {
-				if (probeUI instanceof UIStateProbe) {
-					UIStateProbe stateProbe = (UIStateProbe) probeUI;
-					if (probeToAdd.contains(stateProbe.getModel())) {
-						probeToAdd.remove(stateProbe.getModel());
-					} else {
-						probesToDestroy.add(stateProbe);
+    }
 
-					}
-				}
-			}
-		}
+    /**
+     * Action to restore a layout
+     * 
+     * @author Shu Wu
+     */
+    class RestoreLayout extends StandardAction {
+        private static final long serialVersionUID = 1L;
 
-		/*
-		 * Remove probes
-		 */
-		for (UIStateProbe probeUI : probesToDestroy) {
-			probeUI.destroy();
-		}
+        String layoutName;
 
-		/*
-		 * Add probes
-		 */
-		for (Probe probe : probeToAdd) {
-			Probeable target = probe.getTarget();
+        public RestoreLayout(String name) {
+            super("Restore layout: " + name, name);
+            this.layoutName = name;
+        }
 
-			if (!(target instanceof Node)) {
-				UserMessages.showError("Unsupported target type for probe");
-			} else {
+        @Override
+        protected void action() throws ActionException {
+            if (!restoreNodeLayout()) {
+                throw new ActionException("Could not restore layout");
+            }
+        }
+    }
 
-				if (!probe.isInEnsemble()) {
+    /**
+     * Action to save a layout
+     * 
+     * @author Shu Wu
+     */
+    class SaveLayout extends StandardAction {
+        private static final long serialVersionUID = 1L;
 
-					Node node = (Node) target;
+        public SaveLayout() {
+            super("Save layout");
+        }
 
-					UINeoNode nodeUI = getUINode(node);
-					if (nodeUI != null) {
-						nodeUI.showProbe(probe);
-					} else {
-						Util.debugMsg("There is a dangling probe in the Simulator");
-					}
-				}
-			}
-		}
+        @Override
+        protected void action() throws ActionException {
+            String name = JOptionPane.showInputDialog(UIEnvironment.getInstance(), "Name");
 
-	}
+            if (name != null) {
+                saveNodeLayout();
+            } else {
+                throw new ActionException("Could not get layout name", false);
+            }
 
-	/**
-	 * Action to delete a layout
-	 * 
-	 * @author Shu Wu
-	 */
-	class DeleteLayout extends StandardAction {
-		private static final long serialVersionUID = 1L;
+        }
 
-		String layoutName;
+    }
 
-		public DeleteLayout(String name) {
-			super("Delete layout: " + name, name);
-			this.layoutName = name;
-		}
+    /**
+     * Action to hide all widgets
+     * 
+     * @author Shu Wu
+     */
+    class SetOTVisiblityAction extends StandardAction {
 
-		@Override
-		protected void action() throws ActionException {
-			deleteNodeLayout(layoutName);
-		}
-	}
+        private static final long serialVersionUID = 1L;
 
-	/**
-	 * Action to restore a layout
-	 * 
-	 * @author Shu Wu
-	 */
-	class RestoreLayout extends StandardAction {
-		private static final long serialVersionUID = 1L;
+        private boolean visible;
 
-		String layoutName;
+        public SetOTVisiblityAction(String actionName, boolean visible) {
+            super(actionName);
+            this.visible = visible;
+        }
 
-		public RestoreLayout(String name) {
-			super("Restore layout: " + name, name);
-			this.layoutName = name;
-		}
+        @Override
+        protected void action() throws ActionException {
+            setOriginsTerminationsVisible(visible);
+        }
 
-		@Override
-		protected void action() throws ActionException {
-			if (!restoreNodeLayout(layoutName)) {
-				throw new ActionException("Could not restore layout");
-			}
-		}
-	}
+    }
 
-	/**
-	 * Action to save a layout
-	 * 
-	 * @author Shu Wu
-	 */
-	class SaveLayout extends StandardAction {
-		private static final long serialVersionUID = 1L;
+    public Node getNodeModel(String name) {
+        try {
+            return getModel().getNode(name);
+        } catch (StructuralException e) {
+            // Node does not exist
+            return null;
+        }
+    }
 
-		public SaveLayout(String description) {
-			super("Save layout", description);
-		}
+    public UINeoNode addNodeModel(Node node) throws ContainerException {
+        return addNodeModel(node, null, null);
+    }
 
-		@Override
-		protected void action() throws ActionException {
-			String name = JOptionPane.showInputDialog(UIEnvironment.getInstance(), "Name");
+    public UINeoNode addNodeModel(Node node, Double posX, Double posY) throws ContainerException {
+        try {
+        	// first, add node to UI
+            UINeoNode nodeUI = UINeoNode.createNodeUI(node);
 
-			if (name != null) {
-				saveNodeLayout(name);
-			} else {
-				throw new ActionException("Could not get layout name", false);
-			}
-
-		}
-
-	}
-
-	/**
-	 * Action to hide all widgets
-	 * 
-	 * @author Shu Wu
-	 */
-	class SetOTVisiblityAction extends StandardAction {
-
-		private static final long serialVersionUID = 1L;
-
-		private boolean visible;
-
-		public SetOTVisiblityAction(String actionName, boolean visible) {
-			super(actionName);
-			this.visible = visible;
-		}
-
-		@Override
-		protected void action() throws ActionException {
-			setOriginsTerminationsVisible(visible);
-		}
-
-	}
-
-	public Node getNodeModel(String name) {
-		try {
-			return getModel().getNode(name);
-		} catch (StructuralException e) {
-			// Node does not exist
-			return null;
-		}
-	}
-
-	public UINeoNode addNodeModel(Node node) throws ContainerException {
-		return addNodeModel(node, null, null);
-	}
-
-	public UINeoNode addNodeModel(Node node, Double posX, Double posY) throws ContainerException {
-		try {
-			getModel().addNode(node);
-
-			UINeoNode nodeUI = UINeoNode.createNodeUI(node);
-
-			if (posX != null && posY != null) {
-				nodeUI.setOffset(posX, posY);
-				addUINode(nodeUI, false, false);
-			} else {
-				addUINode(nodeUI, true, false);
-			}
-			return nodeUI;
-		} catch (StructuralException e) {
-			throw new ContainerException(e.toString());
-		}
-	}
-
+            if (posX != null && posY != null) {
+                nodeUI.setOffset(posX, posY);
+                addUINode(nodeUI, false, false);
+            } else {
+                addUINode(nodeUI, true, false);
+            }
+            
+            // second, add node to model. This must be done second, otherwise
+            // it updates the view and there is a race to add the UI node
+            getModel().addNode(node);
+            
+            return nodeUI;
+        } catch (StructuralException e) {
+            throw new ContainerException(e.toString());
+        }
+    }
 }

@@ -43,20 +43,21 @@ public abstract class RangedConfigParam extends Property {
     private boolean checkRange = false;
 
     private int min, max;
+    
+    public RangedConfigParam(String name) {
+        super(name);
+    }
+    
+    public RangedConfigParam(String name, String description) {
+        super(name, description);
+    }
 
-    /**
-     * @param name TODO
-     * @param defaultValue TODO
-     */
     public RangedConfigParam(String name, Object defaultValue) {
         super(name, defaultValue);
     }
-
-    /**
-     * @param name TODO
-     */
-    public RangedConfigParam(String name) {
-        super(name);
+    
+    public RangedConfigParam(String name, String description, Object defaultValue) {
+    	super(name, description, defaultValue);
     }
 
     /**

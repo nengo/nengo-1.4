@@ -61,6 +61,8 @@ public abstract class ConfigManager {
      * Name of directory where to store saved configuration
      */
     static final String SAVED_CONFIG_DIR = NengoGraphics.USER_FILE_DIR + "/Config";
+    
+    static final String DEV_DIST_DIR = "dist-files/" + NengoGraphics.USER_FILE_DIR + "/Config";
 
     /**
      * Creates a saved objects folder if it isn't already there
@@ -71,6 +73,21 @@ public abstract class ConfigManager {
         File file = new File(SAVED_CONFIG_DIR);
         if (!file.exists()) {
             file.mkdir();
+            
+            // If we are building from source, find the dev config file
+            // directory and copy it to the directory it's expecting to find config files
+            File devConfigDir = new File(DEV_DIST_DIR);
+            if (devConfigDir.exists()) {
+            	File[] devConfigFiles = devConfigDir.listFiles();
+            	for (File devConfigFile : devConfigFiles) {
+            		File newConfigFile = new File(SAVED_CONFIG_DIR + "/" + devConfigFile.getName());
+            		try {
+            			Util.copyFile(devConfigFile, newConfigFile);
+            		} catch (IOException e) {
+            			System.out.println(e.getMessage());
+            		}
+            	}
+            }
         }
         return file;
     }
@@ -398,5 +415,8 @@ class Configureable implements IConfigurable {
     public String getDescription() {
         return description;
     }
+	public String getExtendedDescription() {
+		return null;
+	}
 
 }

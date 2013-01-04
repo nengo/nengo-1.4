@@ -39,8 +39,6 @@ import ca.nengo.ui.models.UINeoNode;
  */
 public class UIDecodedTermination extends UITermination {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final String typeName = "Decoded Termination";
 
 	protected UIDecodedTermination(UINeoNode ensembleProxy, DecodedTermination term) {

@@ -9,3 +9,15 @@
   ('input', 'control', {'x': 60, 'height': 172, 'range': 1.0, 'label': 0, 'limits': 1, 'width': 326, 'limits_w': 0, 'y': 8}),
   ('output', 'value|X', {'x': 2, 'height': 172, 'sel_dim': [0, 1, 2, 3, 4], 'label': 0, 'width': 421, 'autozoom': 0, 'last_maxy': 1.0000000000000007, 'y': 181})],
  {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.0, 'dt': 0, 'show_time': 0.5})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-168.14453243459656,y=129.68862976730054,width=1269.5284552845528,height=785.9999999999999]
+# StrD2 (Network)=Point2D.Double[210.11103076081554, 654.366413768516]
+# StrD1 (Network)=Point2D.Double[272.5126533937655, 254.0622740465399]
+# GPe (Network)=Point2D.Double[516.2490961861595, 632.1940526503432]
+# input (Function Input)=Point2D.Double[-17.489751690212614, 485.1049951626871]
+# STN (Network)=Point2D.Double[237.30627832375296, 451.2527114415212]
+# GPi (Network)=Point2D.Double[722.1844323144308, 449.89862009267404]
+# output (NEFEnsemble)=Point2D.Double[938.952438198319, 476.9804470696074]

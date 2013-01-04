@@ -9,12 +9,12 @@ Storing Information Over Time: Constructing an Integrator
    * Practically speaking, this means that if the input to the network is zero, then its output will stay at whatever value it is currently at.  This makes it the basis of a neural memory system, as a representation can be stored over time.
    * Integrators are also often used in sensorimotor systems, such as eye control
    
-* For an integrator, a neural ensemble needs to connect to itself with a transformation weight of 1, and have an input with a weight of &tau;, which is the same as the synaptic time constant of the neurotransmitter used.
+* For an integrator, a neural ensemble needs to connect to itself with a transformation weight of 1, and have an input with a weight of :math:`\tau`, which is the same as the synaptic time constant of the neurotransmitter used.
 * Create a one-dimensional ensemble called Integrator.  Use 100 neurons and a radius of 1.
-* Add two terminations with synaptic time constants of 0.1s.  Call the first one â€œinputâ€ and give it a weight of 0.1.  Call the second one â€œfeedbackâ€ and give it a weight of 1.
+* Add two terminations with synaptic time constants of 0.1s.  Call the first one ``input`` and give it a weight of 0.1.  Call the second one ``feedback`` and give it a weight of 1.
 * Create a new Function input using a Constant Function with a value of 1.
-* Connect the Function input to the input termination
-* Connect the X origin of the ensemble back to its own feedback termination.
+* Connect the Function input to the ``input`` termination
+* Connect the X origin of the ensemble back to its own ``feedback`` termination.
 
 .. image:: images/p4-101.png
 
@@ -40,11 +40,11 @@ Representation Range
 Complex Input
 --------------
 
-* We can also run the model with a more complex input.  Change the Function input using the following command from the script console (after clicking on it in the black model editing mode interface).  Press Ctrl-P to show the script console::
+* We can also run the model with a more complex input.  Change the Function input using the following command from the script console (after clicking on it in the black model editing mode interface).  Press Ctrl-1 (Command-1 OS X) to show the script console::
 
     that.functions=[ca.nengo.math.impl.PiecewiseConstantFunction([0.2,0.3,0.44,0.54,0.8,0.9],[0,5,0,-10,0,5,0])]
 
-* You can see what this function looks like by right-clicking on it in the editing interface and selecting "Plot".
+* You can see what this function looks like by right-clicking on it in the editing interface and selecting "plot function" (Note: Function index = 0, Start = 0, Increment = 0.001, End = 1).
 
 .. image:: images/p4-5.png
 
@@ -56,7 +56,7 @@ Adjusting Synaptic Time Constants
 ----------------------------------
 
 * You can adjust the accuracy of an integrator by using different neurotransmitters.
-* Change the input termination to have a tau of 0.01 (10ms: GABA) and a transform to be 0.01. Also change the feedback termination to have a tau of 0.01 (but leave its transform at 1).
+* Change the input termination to have a tau of 0.01 (10ms: GABA) and a transform of 0.01 using the inspector. Also change the feedback termination to have a tau of 0.01 (but leave its transform at 1).
 
 .. image:: images/p4-106.png
 
@@ -66,11 +66,9 @@ Adjusting Synaptic Time Constants
    * AMPA: 2-10ms
    * GABA:subscript:`A`: 10-20ms
    * NMDA: 20-150ms
-   * The actual details of these time constants vary across the brain as well.  We are collecting empirical data on these from various sources at http://ctn.uwaterloo.ca/~cnrglab/?q=node/505
-
-* You can also run this example using scripting::
-
-    run demo/integrator.py
+   * The actual details of these time constants vary across the brain as well.  We are collecting empirical data on these from various sources at http://ctnsrv.uwaterloo.ca/cnrglab/node/246
+   
+* You can also run this example using "integrator.py" in the demo directory
 
 
 Controlled Integrator
@@ -114,7 +112,5 @@ Controlled Integrator
 .. image:: images/p4-108.png
 
 
-* You can also run this example using scripting::
-
-    run demo/controlledintegrator.py
+* You can also run this example using "demo/controlledintegrator.py"
 

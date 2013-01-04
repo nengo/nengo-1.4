@@ -49,6 +49,7 @@ import ca.nengo.model.neuron.Neuron;
 import ca.nengo.model.neuron.impl.LIFNeuronFactory;
 import ca.nengo.util.MU;
 import ca.nengo.util.VectorGenerator;
+import ca.nengo.util.VisiblyMutableUtils;
 import ca.nengo.util.impl.RandomHypersphereVG;
 
 /**
@@ -122,14 +123,14 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 	 */
 	public NEFEnsemble make(String name, int n, int dim) throws StructuralException {
 		float[] radii = MU.uniform(1, dim, 1)[0];
-		return doMake(name, n, radii);
+		return doMake(name, n, radii, 0);
 	}
 
 	/**
 	 * @see ca.nengo.model.nef.NEFEnsembleFactory#make(java.lang.String, int, float[])
 	 */
 	public NEFEnsemble make(String name, int n, float[] radii) throws StructuralException {
-		return doMake(name, n, radii);
+		return doMake(name, n, radii, 0);
 	}
 
 	/**
@@ -168,7 +169,7 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
                 }
             }
             if (result == null) {
-                result = doMake(name, n, radii);
+                result = doMake(name, n, radii, 0);
 
                 try {
                     // Set the ensemble's factory to null to allow saving with customized ensemble factories
@@ -180,7 +181,7 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
             }
 		}
         else{
-            result = doMake(name, n, radii);
+            result = doMake(name, n, radii, 0);
         }
 
         // Set the resulting ensemble's factory to this. It must be noted that this can be a good thing or
@@ -220,8 +221,8 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 	}
 
 	//common make(...) implementation
-	private NEFEnsemble doMake(String name, int n, float[] radii) throws StructuralException {
-
+	private NEFEnsemble doMake(String name, int n, float[] radii, int attempts) throws StructuralException {
+		
 		try
 		{
 			int dim = radii.length;
@@ -261,7 +262,11 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 			// a singular gamma matrix can produce a runtime exception.  If this occurs,
 			// call make again.
 			if(re.getMessage() != null && re.getMessage().equals("Matrix is singular.")) {
-                return doMake(name,n,radii);
+				if (attempts<10) {
+					return doMake(name,n,radii,attempts+1);
+				} else {
+					throw new StructuralException("Error creating ensemble: With the given parameters, there is insufficient\nneural activity to construct a decoder (the activity matrix is singular)");
+				}
             } else
 			{
 				System.err.println(re);
@@ -301,6 +306,7 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 	 */
 	protected NEFEnsemble construct(String name, NEFNode[] nodes, float[][] encoders, ApproximatorFactory af, float[][] evalPoints, float[] radii)
 			throws StructuralException {
+		if (!VisiblyMutableUtils.isValidName(name)) throw new StructuralException("name '"+name+"' must not contain '.' or ':'");
 		return new NEFEnsembleImpl(name, nodes, encoders, af, evalPoints, radii);
 	}
 

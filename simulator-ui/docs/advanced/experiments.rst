@@ -61,14 +61,14 @@ to be saved::
     net=nef.Network('Experiment Example')
     input=net.add(Input('input'))                   # create the input node
     output=net.add(Output('output'))                # create the output node
-    A=net.make('A',100,2,radius=1.5)
-    B=net.make('B',50,1)
-    net.connect(input.getOrigin('input'),A)         # connect the input
-    net.connect(B,output.getTermination('save'))    # connect the output
+    net.make('A',100,2,radius=1.5)
+    net.make('B',50,1)
+    net.connect(input.getOrigin('input'),'A')         # connect the input
+    net.connect('B',output.getTermination('save'))    # connect the output
 
     def multiply(x):
         return x[0]*x[1]
-    net.connect(A,B,func=multiply)
+    net.connect('A','B',func=multiply)
 
     net.add_to_nengo()
     
@@ -83,20 +83,20 @@ run faster.  The following commands runs the simulation for 2 seconds (this is 2
 seconds, of course -- the actual time needed to run the simulation is dependent on your
 computer's speed and the complexity of the network)::
 
-    net.network.simulator.run(0,2.0,dt)
+    net.run(2.0)
     
-The three parameters are the start time of the simulation (almost always 0), the end time of the
-simulation (2.0 seconds in this case), and the size of the time step to use (usually 0.001 seconds).
+The parameter indicates how long to run the simulation for, and you can also
+optionally specify the time step (default of dt=0.001).
     
 As an alternative method, you can also run the simulation like this, producing an equivalent result::
 
     t=0
     while t<=2.0:
-        net.network.run(t,t+dt)
+        net.run(0.1)
+        # insert any code you want to run every 0.1 seconds here
         t+=dt
 
-With either approach, the simulation will be automatically run when you run the script.  No visual
-display will be given, but the data will be saved to the ``experiment.csv`` file.
+With either approach, the simulation will be automatically run when you run the script.
 
 With this approach, you can even run a script without using the Nengo user interface at all.  Instead, you
 can run the model from the command line.  Instead of running ``nengo`` (or ``nengo.bat`` on Windows), you

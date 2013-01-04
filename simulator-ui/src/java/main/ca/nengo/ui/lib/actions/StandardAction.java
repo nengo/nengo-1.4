@@ -107,7 +107,7 @@ public abstract class StandardAction implements Serializable {
 	}
 
 	/**
-	 * @return Whether the action succesffully completed
+	 * @return Whether the action successfully completed
 	 */
 	protected boolean isActionCompleted() {
 		return actionCompleted;
@@ -130,7 +130,7 @@ public abstract class StandardAction implements Serializable {
 			try {
 				action();
 			} catch (ThreadDeath e) {
-				NengoGraphics.getInstance().getProgressIndicator().setEnabled(false);
+				NengoGraphics.getInstance().getProgressIndicator().stop();
 				UserMessages.showWarning("Interrupted action: Thread was forced to quit.");
 			}
 			postAction();

@@ -46,8 +46,6 @@ import ca.nengo.util.Probe;
  */
 public class EnsembleViewer extends NodeViewer {
 
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * @param ensembleUI
 	 *            Parent Ensemble UI Wrapper

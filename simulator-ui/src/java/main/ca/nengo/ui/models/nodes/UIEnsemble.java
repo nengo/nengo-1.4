@@ -42,8 +42,6 @@ import ca.nengo.ui.models.viewers.NodeViewer;
  */
 public class UIEnsemble extends UINodeViewable {
 
-	private static final long serialVersionUID = 1L;
-
 	private UISpikeProbe spikeCollector;
 
 	public UIEnsemble(Ensemble model) {
@@ -103,6 +101,12 @@ public class UIEnsemble extends UINodeViewable {
 	}
 
 	@Override
+	public int getDimensionality() {
+		// Ensembles are not guaranteed to be NEFEnsembles, and may not have dimensionality
+		return -1;
+	}
+	
+	@Override
 	public String getTypeName() {
 
 		return "Ensemble";
@@ -116,7 +120,7 @@ public class UIEnsemble extends UINodeViewable {
 	}
 
 	@Override
-	public void modelUpdated() {
+	protected void modelUpdated() {
 		super.modelUpdated();
 		if (getModel().isCollectingSpikes()) {
 			collectSpikes(true);

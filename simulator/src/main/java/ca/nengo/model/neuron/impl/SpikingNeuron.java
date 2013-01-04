@@ -28,10 +28,12 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 package ca.nengo.model.neuron.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
 import ca.nengo.model.InstantaneousOutput;
+import ca.nengo.model.Node;
 import ca.nengo.model.Noise;
 import ca.nengo.model.Origin;
 import ca.nengo.model.Probeable;
@@ -47,6 +49,7 @@ import ca.nengo.model.nef.NEFNode;
 import ca.nengo.model.neuron.Neuron;
 import ca.nengo.model.neuron.SpikeGenerator;
 import ca.nengo.model.neuron.SynapticIntegrator;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.TimeSeries1D;
 import ca.nengo.util.VisiblyMutable;
@@ -401,5 +404,11 @@ public class SpikingNeuron implements Neuron, Probeable, NEFNode {
 		return myNoise;
 	}
 
+	public Node[] getChildren() {
+		return new Node[0];
+	}
 
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
+		return "";
+	}
 }

@@ -1,6 +1,6 @@
-from spa import *
+from spa import *       #Import SPA related packages
 
-class Rules:
+class Rules:            #Define mappings for BG and Thal
     def start(vision='LETTER'):
         set(state=vision)
     def A(state='A'):
@@ -14,19 +14,17 @@ class Rules:
     def E(state='E'):
         set(state='A')
     
+class Routing_Clean_All(SPA):     #Extend the imported SPA class
+    dimensions=16        #Dimensions in SPs
+    
+    state=Buffer()       #Create a working memory/cortical element
+    vision=Buffer(feedback=0)#Create a cortical element with no feedback
+    BG=BasalGanglia(Rules()) #Set rules defined above
+    thal=Thalamus(BG)        #Set thalamus with rules
 
+    input=Input(10, vision='0.8*LETTER+D') #Define the starting input
 
-class Routing(SPA):
-    dimensions=16
-
-    state=Buffer()
-    vision=Buffer(feedback=0)
-    BG=BasalGanglia(Rules)
-    thal=Thalamus(BG)
-
-    input=Input(10, vision='0.8*LETTER+D')
-
-model=Routing()
+model=Routing_Clean_All()
 
 # Create the clean-up memory.
 import hrr
@@ -35,13 +33,13 @@ pd = [] # list of preferred direction vectors
 vsize = len(vocab.keys) # vocabulary size
 for item in vocab.keys:
     pd.append(vocab[item].v.tolist())
-cleanup = model.net.make('cleanup', neurons=300, dimensions=vsize, encoders=eye(vsize))
-model.net.connect(model.state.net.network.getOrigin('state'), cleanup, transform=pd)
+model.net.make('cleanup', neurons=300, dimensions=vsize, encoders=eye(vsize))
+model.net.connect(model.state.net.network.getOrigin('state'), 'cleanup', transform=pd)
 
 import nef
 # Record data.
 log=nef.Log(model.net,filename='NengoDemoOutput.csv')
 log.add('cleanup')
-log.add('state')
+log.add('state', origin='state')
 log.add_spikes('cleanup',name='cleanup_spikes')
-log.add_vocab('state_vocab',vocab)
+log.add_vocab('state',vocab)

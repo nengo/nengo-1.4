@@ -1,12 +1,23 @@
-({'height': 600, 'x': 112, 'width': 950, 'state': 0, 'y': 65},
- [('input B', None, {'x': 166, 'height': 33, 'label': 0, 'width': 83, 'y': 235}),
-  ('input A', None, {'x': 168, 'height': 33, 'label': 0, 'width': 83, 'y': 169}),
-  ('D', None, {'x': 610, 'height': 33, 'label': 0, 'width': 25, 'y': 213}),
-  ('C', None, {'x': 417, 'height': 33, 'label': 0, 'width': 24, 'y': 211}),
-  ('B', None, {'x': 335, 'height': 33, 'label': 0, 'width': 24, 'y': 237}),
-  ('A', None, {'x': 335, 'height': 33, 'label': 0, 'width': 24, 'y': 174}),
-  ('input B', 'control', {'x': 72, 'height': 200, 'range': 1.0, 'label': 1, 'limits': 1, 'width': 200, 'limits_w': 0, 'y': 277}),
-  ('input A', 'control', {'x': 42, 'height': 200, 'range': 1.0, 'label': 1, 'limits': 1, 'width': 120, 'limits_w': 0, 'y': 6}),
-  ('A', 'XY plot|X', {'width': 145, 'autohide': 1, 'last_maxy': 1.0000000000000007, 'sel_dim': [0, 1], 'y': 23, 'label': 1, 'x': 274, 'height': 145, 'autozoom': 1}),
-  ('D', 'XY plot|X', {'width': 200, 'autohide': 1, 'last_maxy': 1.0, 'sel_dim': [0, 1], 'y': 121, 'label': 1, 'x': 672, 'height': 200, 'autozoom': 1})],
- {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+({'state': 0, 'height': 600, 'width': 950, 'x': 112, 'y': 65},
+ [(u'input B', None, {'label': 0, 'height': 32, 'width': 72, 'x': 166, 'y': 235}),
+  (u'input A', None, {'label': 0, 'height': 32, 'width': 72, 'x': 168, 'y': 169}),
+  (u'D', None, {'label': 0, 'height': 32, 'width': 24, 'x': 610, 'y': 200}),
+  (u'C', None, {'label': 0, 'height': 32, 'width': 24, 'x': 417, 'y': 200}),
+  (u'B', None, {'label': 0, 'height': 32, 'width': 23, 'x': 335, 'y': 235}),
+  (u'A', None, {'label': 0, 'height': 32, 'width': 23, 'x': 335, 'y': 169}),
+  (u'input B', 'control', {'label': 1, 'range': 1.0, 'limits_w': 0, 'limits': 1, 'height': 200, 'width': 200, 'x': 72, 'y': 277}),
+  (u'input A', 'control', {'label': 1, 'range': 1.0, 'limits_w': 0, 'limits': 1, 'height': 200, 'width': 120, 'x': 42, 'y': 6}),
+  (u'A', 'XY plot|X', {'label': 1, 'sel_dim': [0, 1], 'last_maxy': 1.0, 'height': 145, 'width': 145, 'x': 274, 'autohide': 1, 'autozoom': 1, 'y': 23}),
+  (u'D', 'XY plot|X', {'label': 1, 'sel_dim': [0, 1], 'last_maxy': 1.0, 'height': 200, 'width': 200, 'x': 672, 'autohide': 1, 'autozoom': 1, 'y': 121})],
+ {'dt': 0, 'show_time': 0.5, 'sim_spd': 4, 'filter': 0.03, 'rcd_time': 4.0}) 
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=53.8167332250898,y=233.33334350585932,width=974.8055407128683,height=603.528933763504]
+# A (Network)=Point2D.Double[357.3707816444024, 356.8250511588398]
+# C (Network)=Point2D.Double[578.1655223056692, 426.178670652502]
+# input A (Function Input)=Point2D.Double[172.96683714035288, 383.85821401848716]
+# B (Network)=Point2D.Double[350.09262241295903, 554.7973315483531]
+# D (Network)=Point2D.Double[822.8742147273939, 453.2118335121489]
+# input B (Function Input)=Point2D.Double[169.84762604116295, 591.1881277055703]

@@ -24,14 +24,22 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.util;
 
+import java.awt.geom.Point2D;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import ca.nengo.model.Node;
+import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 
 public class NengoClipboard {
 
-	private Node selectedObj;
+	private ArrayList<Node> selectedObjs = null;
+	private ArrayList<Point2D> objectOffsets = null;
+	private WorldImpl sourceWorld = null;
+	
+	///////////////////////////////////////////////////////////////////////////
+	/// Listeners
 
 	public static interface ClipboardListener {
 		public void clipboardChanged();
@@ -49,37 +57,68 @@ public class NengoClipboard {
 		} else {
 			throw new InvalidParameterException();
 		}
-
 	}
-
-	public void setContents(Node node) {
-		selectedObj = node;
-		fireChanged();
-	}
-
+	
 	private void fireChanged() {
 		for (ClipboardListener listener : listeners) {
 			listener.clipboardChanged();
 		}
 	}
 
-	public Node getContents() {
-		if (selectedObj != null) {
-			Node currentObj = selectedObj;
-
-			/*
-			 * If the object supports cloning, use it to make another model
-			 */
-			try {
-				selectedObj = selectedObj.clone();
-			} catch (CloneNotSupportedException e) {
-				selectedObj = null;
-			}
-
-			return currentObj;
+	///////////////////////////////////////////////////////////////////////////
+	/// Accessors and mutators
+	
+	public boolean hasContents() {
+		return (selectedObjs != null && selectedObjs.size() > 0); 
+	}
+	
+	public ArrayList<String> getContentsNames() {
+		if (hasContents()) {
+			ArrayList<String> result = new ArrayList<String>(selectedObjs.size());
+			for (Node obj : selectedObjs)
+				result.add(obj.getName());
+			return result;
 		} else {
 			return null;
 		}
 	}
 
+	public ArrayList<Node> getContents() {
+		if (hasContents()) {
+			ArrayList<Node> clonedObjects = new ArrayList<Node>();
+			for (Node curObj : selectedObjs) {
+				try {
+					// If the object supports cloning, use it to make another model
+					curObj = curObj.clone();
+					
+					clonedObjects.add(curObj);
+				} catch (CloneNotSupportedException e) {
+					curObj = null;
+				}
+			}
+			
+			return clonedObjects;
+		} else {
+			return null;
+		}
+	}
+
+	public ArrayList<Point2D> getOffsets() {
+		return objectOffsets;
+	}
+
+	public WorldImpl getSourceWorld() {
+		return sourceWorld;
+	}
+	
+	public void setContents(ArrayList<Node> nodes, ArrayList<Point2D> objOffsets) {
+		setContents(nodes, objOffsets, null);
+	}
+	
+	public void setContents(ArrayList<Node> nodes, ArrayList<Point2D> objOffsets, WorldImpl srcWorld) {
+		selectedObjs = nodes;
+		objectOffsets = objOffsets;
+		sourceWorld = srcWorld;
+		fireChanged();
+	}
 }

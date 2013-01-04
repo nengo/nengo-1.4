@@ -2,10 +2,9 @@ package ca.nengo.ui.lib.world.handlers;
 
 import java.awt.event.KeyEvent;
 
-import ca.nengo.ui.lib.AppFrame;
+import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.world.Destroyable;
-import ca.nengo.ui.lib.world.Search.SearchInputHandler;
 import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import edu.umd.cs.piccolo.event.PBasicInputEventHandler;
 import edu.umd.cs.piccolo.event.PInputEvent;
@@ -16,42 +15,24 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  * @author Shu Wu
  */
 public class KeyboardHandler extends PBasicInputEventHandler implements Destroyable {
-	private boolean searchEnabled = false;
-
-	private final SearchInputHandler searchHandler;
 
 	public KeyboardHandler(WorldImpl world) {
 		super();
-		this.searchHandler = new SearchInputHandler(world);
 	}
 
 	@Override
 	public void keyPressed(PInputEvent event) {
-		// control down
-		if ((event.getModifiers() & AppFrame.MENU_SHORTCUT_KEY_MASK) != 0) {
-			if (event.getKeyCode() == KeyEvent.VK_F) {
-				searchEnabled = !isSearchEnabled();
-
-				if (searchEnabled) {
-					searchHandler.beginSearch();
-				} else {
-					searchHandler.finishSearch();
-				}
-			}
-
-		}
-		// shift down
-		else if (event.isShiftDown()) {
+		if (NengoGraphics.getInstance().isScriptConsoleVisible()
+				&& !event.isControlDown() && !event.isMetaDown()
+				&& event.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+			// letter key press, package as KeyEvent and pass to ScriptConsole
+			KeyEvent e = new KeyEvent(NengoGraphics.getInstance(), 0, System.currentTimeMillis(), 
+									  event.getModifiers(), event.getKeyCode(), event.getKeyChar() );
+			NengoGraphics.getInstance().getScriptConsole().passKeyEvent( e );
+		} else if (event.isShiftDown()) {
+			// shift down
 			UIEnvironment.getInstance().getUniverse().setSelectionMode(true);
-
-		} else if (searchEnabled && searchHandler.isSearching()) {
-			searchHandler.keyPressed(event.getKeyCode());
-
 		}
-	}
-
-	private boolean isSearchEnabled() {
-		return searchEnabled && searchHandler.isSearching();
 	}
 
 	@Override
@@ -63,22 +44,11 @@ public class KeyboardHandler extends PBasicInputEventHandler implements Destroya
 	}
 
 	@Override
-	public void keyTyped(PInputEvent event) {
-		if (searchEnabled) {
-			searchHandler.keyTyped(event.getKeyChar());
-		}
+	public void mousePressed(PInputEvent event) {
+		super.mousePressed(event);
 	}
 
 	public void destroy() {
-		searchHandler.destroy();
-	}
-
-	@Override
-	public void mousePressed(PInputEvent event) {
-		super.mousePressed(event);
-		/*
-		 * Stop the search if the user clicks to do something else
-		 */
-		searchHandler.finishSearch();
+		//do nothing
 	}
 }

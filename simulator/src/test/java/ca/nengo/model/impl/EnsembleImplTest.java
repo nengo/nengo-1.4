@@ -4,6 +4,7 @@
 package ca.nengo.model.impl;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import ca.nengo.model.Origin;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.util.MU;
+import ca.nengo.util.ScriptGenException;
 
 /**
  * Unit tests for EnsembleImpl.
@@ -105,6 +107,21 @@ public class EnsembleImplTest extends TestCase {
 
 		@Override
 		public void reset(boolean randomize) {}
+
+		public Node[] getChildren() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public MockExpandableNode clone() throws CloneNotSupportedException {
+			return (MockExpandableNode) super.clone();
+		}
 
 	}
 

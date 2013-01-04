@@ -1,8 +1,12 @@
 package ca.nengo.ui.util;
 
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JButton;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.python.core.PyException;
 import org.python.core.PyFrame;
@@ -14,9 +18,11 @@ import org.python.core.Py;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
+import java.awt.Insets;
 
 import ca.nengo.sim.SimulatorEvent;
 import ca.nengo.sim.SimulatorListener;
+import ca.nengo.ui.NengoGraphics;
 
 
 public class ProgressIndicator extends JPanel implements ActionListener, SimulatorListener {
@@ -24,11 +30,19 @@ public class ProgressIndicator extends JPanel implements ActionListener, Simulat
 	
 	JProgressBar bar;
 	JButton stop;
+	
+	String text;
 
 	ThreadState pythonThread=null;
 	Thread javaThread=null;
-	boolean interruptFlag=false;
+	
+	Timer timer=null;
+	long timerStart;
+
 	boolean isRunning=false;
+	boolean interruptFlag;
+	
+	int percentage=-1;
 	
 
 	public ProgressIndicator() {
@@ -37,30 +51,96 @@ public class ProgressIndicator extends JPanel implements ActionListener, Simulat
 		bar=new JProgressBar(0,100);
 		bar.setStringPainted(true);
 		bar.setString("");
+		bar.setIndeterminate(true);				
 		add(bar);
 		
-		stop=new JButton("stop");
+		stop=new JButton();
+		stop.setMargin(new Insets(0,0,0,0));
+		stop.setIcon(new ImageIcon("python/images/stop.png"));
 		add(stop,BorderLayout.EAST);
 		stop.addActionListener(this);
 
-		setEnabled(false);
+		setVisible(false);
 	}
+	
+	void update() {
+		if (!isRunning) {
+			timer.cancel();
+			return;
+		}
+		if (!this.isVisible()) this.setVisible(true);
+		
+		updateBarString();
+		
+	}
+	
+	void updateBarString() {
+		String bar=this.text;
+		if (isRunning) {
+			long delta=(System.currentTimeMillis()-timerStart)/1000;
+			bar+=" ";
+			if (delta>60*60) {
+				
+				bar+=String.format("%02d:", delta/(60*60));
+			}
+			bar+=String.format("%02d:%02d", (delta%(60*60))/60,delta%60);
+		}		
+		if (percentage>=0) {
+			bar+=String.format(" (%02d)%%", percentage);
+		}
+		if (interruptFlag) {
+			bar="[Attempting to stop] "+bar;
+		}
+		this.bar.setString(bar);
+	}
+	
+	public void start(String text) {
+		if (isRunning) return;
+		
+		
+		timerStart=System.currentTimeMillis();
+		this.text=text;
+		this.isRunning=true;
+		timer=new Timer();
+		timer.schedule(
+		        new TimerTask() {
+					@Override
+		            public void run() {
+						update();
+		            }
+		        }, 
+		        1000,1000);		
+	}
+	
+	public void stop() {
+		if (!isRunning) return;
+		this.setVisible(false);
+		isRunning=false;
+		pythonThread=null;	
+		javaThread=null;
+		bar.setIndeterminate(true);		
+		percentage=-1;
+		
+		// TODO: figure out why this needs a 100ms delay before scrolling to the bottom
+		//        (without this delay, the console ends up a few lines above the bottom)
+		new Timer().schedule(
+		        new TimerTask() {
+					@Override
+		            public void run() {
+		        		NengoGraphics.getInstance().getScriptConsole().scrollToBottom();
+		            }
+		        }, 
+		        100 
+		);
+		
+	}
+	
+	
 	
 	public void setText(String text) {
-		bar.setString(text);
+		this.text=text;
 	}
 	
-	public void setEnabled(boolean enabled) {
-		setVisible(enabled);
-		isRunning=enabled;
-
-		if (enabled) {
-			pythonThread=null;	
-			javaThread=null;
-			interruptFlag=false;
-			bar.setIndeterminate(true);
-		}
-	}
 	
 	public void setThread() {
 		pythonThread=Py.getThreadState();
@@ -79,14 +159,16 @@ public class ProgressIndicator extends JPanel implements ActionListener, Simulat
 	}
 	
 	public void interrupt() {
-		bar.setString("Attempting to quit (will force quit in 3 seconds)");
+		
 		
 		interruptFlag=true;
+		updateBarString();
 		if (pythonThread!=null) interruptViaPython();
 		
-		new java.util.Timer().schedule(
-		        new java.util.TimerTask() {
-		            @Override
+		new Timer().schedule(
+		        new TimerTask() {
+		            @SuppressWarnings("deprecation")
+					@Override
 		            public void run() {
 		            	if (isRunning)
 		            		javaThread.stop();
@@ -94,6 +176,7 @@ public class ProgressIndicator extends JPanel implements ActionListener, Simulat
 		        }, 
 		        3000 
 		);
+		
 	}
 	
 	public void actionPerformed(ActionEvent e) {
@@ -101,18 +184,22 @@ public class ProgressIndicator extends JPanel implements ActionListener, Simulat
 	}
 
 	public void processEvent(SimulatorEvent event) {
-		int value=(int)(100*event.getProgress());
-		if (value!=bar.getValue()) {
-			bar.setString("Simulation progress: "+value+"%");
+		if (!isRunning) return;
+		
+		percentage=(int)(100*event.getProgress());
+		
+		if (percentage!=bar.getValue()) {
 			bar.setIndeterminate(false);
 			bar.setMaximum(100);
-			bar.setValue(value);
+			bar.setValue(percentage);
 		}
+		
 		if (interruptFlag) event.setInterrupt(true);
 	}
 	
 
 }
+
 
 
 class ScriptInterruptException extends RuntimeException {

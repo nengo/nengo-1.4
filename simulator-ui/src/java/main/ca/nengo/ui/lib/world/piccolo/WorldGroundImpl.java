@@ -28,8 +28,6 @@ import edu.umd.cs.piccolo.PNode;
  */
 public class WorldGroundImpl extends WorldLayerImpl implements WorldLayer {
 
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * Adds a little pizzaz when adding new objects
 	 * 

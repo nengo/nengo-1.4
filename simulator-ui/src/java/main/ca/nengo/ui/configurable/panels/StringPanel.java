@@ -26,56 +26,34 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.configurable.panels;
 
-import javax.swing.JTextField;
-
 import ca.nengo.ui.configurable.Property;
-import ca.nengo.ui.configurable.PropertyInputPanel;
 
 /**
  * Input Panel for Strings
  * 
  * @author Shu Wu
  */
-public class StringPanel extends PropertyInputPanel {
+public class StringPanel extends PropertyTextPanel {
 
-    private JTextField tf;
+	private static int COLUMNS = 10;
 
-    /**
-     * @param property TODO
-     */
     public StringPanel(Property property) {
-        super(property);
-        initPanel();
+        super(property, COLUMNS);
+        invalidFormatMessage = "Invalid text format";
     }
 
     @Override
     public Object getValue() {
-        return tf.getText();
-
+        return getText();
     }
-
-    private void initPanel() {
-        tf = new JTextField(10);
-        add(tf);
-    }
-
+    
     @Override
-    public boolean isValueSet() {
-
-        String text = (String) getValue();
-
-        if (text != null && text.compareTo("") != 0) {
-            return true;
+    protected TextError checkValue(String text) {
+        if (text == null || text.equals("")) {
+        	return TextError.ValueNotSet;
         } else {
-            return false;
+            return TextError.NoError;
         }
-
-    }
-
-    @Override
-    public void setValue(Object value) {
-        tf.setText((String) value);
-
     }
 
 }

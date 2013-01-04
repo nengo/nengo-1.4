@@ -38,8 +38,6 @@ import ca.nengo.ui.lib.world.piccolo.primitives.Text;
  */
 public class ModelIcon extends WorldObjectImpl implements Listener {
 
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * The inner icon node which contains the actual icon representation
 	 */

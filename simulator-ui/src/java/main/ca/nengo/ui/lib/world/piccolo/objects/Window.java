@@ -41,8 +41,6 @@ public class Window extends WorldObjectImpl implements Interactable {
 
 	private static final int MENU_BAR_HEIGHT = 27;
 
-	private static final long serialVersionUID = 1L;
-
 	public static final WindowState WINDOW_STATE_DEFAULT = WindowState.NORMAL;
 
 	private final MenuBar menubar;
@@ -317,7 +315,6 @@ public class Window extends WorldObjectImpl implements Interactable {
 
 class MenuBar extends WorldObjectImpl implements PInputEventListener {
 
-	private static final long serialVersionUID = 1L;
 	private static final int BUTTON_SIZE = 26;
 
 	private WorldObject buttonHolder;

@@ -1,14 +1,23 @@
-({'x': 70, 'height': 538, 'width': 839, 'state': 0, 'y': 35},
- [('LIP Threshold', None, {'height': 32, 'x': 613, 'label': 0, 'width': 134, 'y': 34}),
-  ('LIP', None, {'height': 32, 'x': 465, 'label': 0, 'width': 40, 'y': 35}),
-  ('MT', None, {'height': 32, 'x': 255, 'label': 0, 'width': 39, 'y': 33}),
-  ('input', None, {'height': 32, 'x': 65, 'label': 0, 'width': 53, 'y': 33}),
-  ('MT', 'spike raster', {'height': 144, 'x': 167, 'label': 1, 'width': 216, 'sample': 3, 'y': 262}),
-  ('input', 'control', {'height': 161, 'x': 39, 'range': 1.0, 'limits': 1, 'label': 1, 'width': 91, 'limits_w': 0, 'y': 251}),
-  ('input', 'XY plot|origin', {'width': 131, 'autohide': 1, 'last_maxy': 1.0, 'sel_dim': [0, 1], 'y': 99, 'label': 1, 'x': 22, 'autozoom': 1, 'height': 131}),
-  ('LIP', 'XY plot|X', {'width': 144, 'autohide': 1, 'last_maxy': 1.0, 'sel_dim': [0, 1], 'y': 93, 'label': 1, 'x': 413, 'autozoom': 1, 'height': 144}),
-  ('LIP', 'spike raster', {'height': 143, 'x': 378, 'label': 1, 'width': 216, 'sample': 10, 'y': 262}),
-  ('LIP Threshold', 'spike raster', {'height': 137, 'x': 583, 'label': 1, 'width': 210, 'sample': 2, 'y': 266}),
-  ('MT', 'value|X', {'height': 130, 'x': 177, 'sel_dim': [0, 1], 'label': 1, 'autozoom': 0, 'width': 195, 'last_maxy': 1.0000000000000007, 'y': 107}),
-  ('LIP Threshold', 'preferred directions', {'height': 145, 'x': 610, 'label': 1, 'width': 145, 'y': 96})],
- {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.019999999999999997, 'dt': 0, 'show_time': 0.5})
+({'state': 0, 'height': 538, 'width': 839, 'x': 70, 'y': 35},
+ [(u'LIP', None, {'label': 0, 'height': 32, 'width': 40, 'x': 465, 'y': 35}),
+  (u'MT', None, {'label': 0, 'height': 32, 'width': 39, 'x': 255, 'y': 33}),
+  (u'input', None, {'label': 0, 'height': 32, 'width': 53, 'x': 65, 'y': 33}),
+  (u'MT', 'spike raster', {'label': 1, 'sample': 3, 'height': 144, 'width': 216, 'x': 167, 'y': 262}),
+  (u'input', 'control', {'label': 1, 'range': 1.0, 'limits_w': 0, 'limits': 1, 'height': 161, 'width': 91, 'x': 39, 'y': 251}),
+  (u'input', 'XY plot|origin', {'label': 1, 'sel_dim': [0, 1], 'last_maxy': 1.0, 'height': 131, 'width': 131, 'x': 22, 'autohide': 1, 'autozoom': 1, 'y': 99}),
+  (u'LIP', 'XY plot|X', {'label': 1, 'sel_dim': [0, 1], 'last_maxy': 1.0, 'height': 144, 'width': 144, 'x': 413, 'autohide': 1, 'autozoom': 1, 'y': 93}),
+  (u'LIP', 'spike raster', {'label': 1, 'sample': 10, 'height': 143, 'width': 216, 'x': 378, 'y': 262}),
+  (u'MT', 'value|X', {'label': 1, 'sel_dim': [0, 1], 'last_maxy': 1.0000000000000007, 'height': 130, 'width': 195, 'x': 177, 'fixed_y': None, 'autozoom': 0, 'y': 107}),
+  (u'output', None, {'label': False, 'height': 32, 'width': 66, 'x': 648, 'y': 33}),
+  (u'output', 'preferred directions', {'label': True, 'height': 152, 'width': 146, 'x': 622, 'y': 90}),
+  (u'output', 'spike raster', {'label': True, 'sample': 4, 'height': 144, 'width': 218, 'x': 591, 'y': 261})],
+ {'dt': 0, 'show_time': 0.5, 'sim_spd': 4, 'filter': 0.019999999999999997, 'rcd_time': 4.0})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=93.61258182989769,y=267.3723863943311,width=855.5034899711608,height=529.6657513412052]
+# output (NEFEnsemble)=Point2D.Double[773.5378390095766, 490.8751168998539]
+# MT (NEFEnsemble)=Point2D.Double[394.5250701399124, 490.875116899854]
+# LIP (NEFEnsemble)=Point2D.Double[568.9753974595033, 481.75023379970776]
+# input (Function Input)=Point2D.Double[200.0, 500.0]

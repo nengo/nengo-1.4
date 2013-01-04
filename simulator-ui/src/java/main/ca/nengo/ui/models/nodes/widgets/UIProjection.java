@@ -38,8 +38,6 @@ import ca.nengo.ui.models.UINeoNode;
  */
 public class UIProjection extends LineConnector {
 
-	private static final long serialVersionUID = 1L;
-
 	public UIProjection(UIProjectionWell well) {
 		super(well);
 	}
@@ -58,7 +56,7 @@ public class UIProjection extends LineConnector {
 			 */
 			UINeoNode nodeParent = getOriginUI().getNodeParent();
 			getEdge().setLineShape(PXEdge.EdgeShape.UPWARD_ARC);
-			getEdge().setMinArcRadius(nodeParent.localToParent(nodeParent.getBounds()).getWidth());
+			getEdge().setMinArcRadius(nodeParent.getBounds().getWidth());
 			setPointerVisible(false);
 		} else {
 			getEdge().setLineShape(PXEdge.EdgeShape.STRAIGHT);

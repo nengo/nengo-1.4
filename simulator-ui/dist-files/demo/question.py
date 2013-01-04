@@ -14,59 +14,97 @@ random.seed(seed)
 vocab=hrr.Vocabulary(D,max_similarity=0.1)
 
 net=nef.Network('Question Answering') #Create the network object
-A=net.make('A',1,D,mode='direct') #Make some pseudo populations (so they 
+
+net.make('A',1,D,mode='direct') #Make some pseudo populations (so they 
                                   #run well on less powerful machines): 
                                   #1 neuron, 16 dimensions, direct mode
-B=net.make('B',1,D,mode='direct')
-C=net.make_array('C',N,D/subdim,dimensions=subdim,quick=True,radius=1.0/math.sqrt(D),storage_code='%d') #Make a real population, with 100 neurons per 
+net.make('B',1,D,mode='direct')
+net.make_array('C',N,D/subdim,dimensions=subdim,quick=True,radius=1.0/math.sqrt(D)) 
+                           #Make a real population, with 100 neurons per 
                            #array element and D/subdim elements in the array
                            #each with subdim dimensions, set the radius as
                            #appropriate for multiplying things of this 
                            #dimension
-E=net.make('E',1,D,mode='direct')
-F=net.make('F',1,D,mode='direct')
+net.make('E',1,D,mode='direct')
+net.make('F',1,D,mode='direct')
 
-conv1=nef.convolution.make_convolution(net,'*',A,B,C,N,
+conv1=nef.convolution.make_convolution(net,'*','A','B','C',N,
     quick=True) #Make a convolution network using the construct populations
-conv2=nef.convolution.make_convolution(net,'/',C,E,F,N,
+conv2=nef.convolution.make_convolution(net,'/','C','E','F',N,
     invert_second=True,quick=True) #Make a 'correlation' network (by using
                                    #convolution, but inverting the second 
                                    #input)
 
-CIRCLE=vocab.parse('CIRCLE') #Add elements to the vocabulary to use
-BLUE=vocab.parse('BLUE')
-RED=vocab.parse('RED')
-SQUARE=vocab.parse('SQUARE')
+CIRCLE=vocab.parse('CIRCLE').v #Add elements to the vocabulary to use
+BLUE=vocab.parse('BLUE').v
+RED=vocab.parse('RED').v
+SQUARE=vocab.parse('SQUARE').v
 ZERO=[0]*D
 
-class Input(nef.SimpleNode): #Make a simple node to generate 
-                             #interesting input for the network
-  def origin_A(self):
-    t=(self.t_start)%1.0
-    if 0<t<0.5: return RED.v
-    if 0.5<t<1: return BLUE.v
-    return ZERO
-  def origin_B(self):
-    t=(self.t_start)%1.0
-    if 0.0<t<0.5: return CIRCLE.v
-    if 0.5<t<1: return SQUARE.v
-    return ZERO
-  def origin_E(self):
-    t=(self.t_start)%1.0
-    if 0.2<t<0.35: return CIRCLE.v
-    if 0.35<t<0.5: return RED.v
-    if 0.7<t<0.85: return SQUARE.v
-    if 0.85<t<1: return BLUE.v
-    return ZERO
+# Create the inputs
+inputA={}
+inputA[0.0]=RED
+inputA[0.5]=BLUE
+inputA[1.0]=RED
+inputA[1.5]=BLUE
+inputA[2.0]=RED
+inputA[2.5]=BLUE
+inputA[3.0]=RED
+inputA[3.5]=BLUE
+inputA[4.0]=RED
+inputA[4.5]=BLUE
+net.make_input('inputA',inputA)
+net.connect('inputA','A')
+
+inputB={}
+inputB[0.0]=CIRCLE
+inputB[0.5]=SQUARE
+inputB[1.0]=CIRCLE
+inputB[1.5]=SQUARE
+inputB[2.0]=CIRCLE
+inputB[2.5]=SQUARE
+inputB[3.0]=CIRCLE
+inputB[3.5]=SQUARE
+inputB[4.0]=CIRCLE
+inputB[4.5]=SQUARE
+net.make_input('inputB',inputB)
+net.connect('inputB','B')
 
 
+inputE={}
+inputE[0.0]=ZERO
+inputE[0.2]=CIRCLE
+inputE[0.35]=RED
+inputE[0.5]=ZERO
+inputE[0.7]=SQUARE
+inputE[0.85]=BLUE
+inputE[1.0]=ZERO
+inputE[1.2]=CIRCLE
+inputE[1.35]=RED
+inputE[1.5]=ZERO
+inputE[1.7]=SQUARE
+inputE[1.85]=BLUE
+inputE[2.0]=ZERO
+inputE[2.2]=CIRCLE
+inputE[2.35]=RED
+inputE[2.5]=ZERO
+inputE[2.7]=SQUARE
+inputE[2.85]=BLUE
+inputE[3.0]=ZERO
+inputE[3.2]=CIRCLE
+inputE[3.35]=RED
+inputE[3.5]=ZERO
+inputE[3.7]=SQUARE
+inputE[3.85]=BLUE
+inputE[4.0]=ZERO
+inputE[4.2]=CIRCLE
+inputE[4.35]=RED
+inputE[4.5]=ZERO
+inputE[4.7]=SQUARE
+inputE[4.85]=BLUE
 
-input=Input('input')
-net.add(input)
-net.connect(input.getOrigin('A'),A) #Connect the origins in the simple node 
-                                    #to the populations they are input to
-net.connect(input.getOrigin('B'),B)
-net.connect(input.getOrigin('E'),E)
+net.make_input('inputE',inputE)
+net.connect('inputE','E')
 
 
 net.add_to_nengo()

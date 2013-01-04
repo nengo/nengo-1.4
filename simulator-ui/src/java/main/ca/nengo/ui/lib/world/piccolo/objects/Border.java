@@ -14,8 +14,6 @@ import ca.nengo.ui.lib.world.piccolo.primitives.Path;
  */
 public class Border extends WorldObjectImpl implements Listener {
 
-	private static final long serialVersionUID = 1L;
-
 	private Color myColor;
 	private Path myFrame;
 	private WorldObjectImpl myTarget;

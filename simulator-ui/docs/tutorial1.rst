@@ -22,7 +22,7 @@ Creating Networks
 
 * When creating an NEF model, the first step is to create a Network.  This will contain all of the neural ensembles and any needed inputs to the system.
  
-   * File->New Network
+   * File->New Network (or drag a network from the sidebar)
    * Give the network a name
 
 .. image:: images/p1-2.png
@@ -33,9 +33,7 @@ Creating an Ensemble
 ---------------------
 
 * Ensembles must be placed inside networks in order to be used
-* Right-click inside a network
-
-   * Create New->NEF Ensemble
+* Drag an ensemble from the sidebar and drop it in the network
 
 .. image:: images/p1-3.png
 
@@ -56,7 +54,7 @@ Creating an Ensemble
   * Max rate (the maximum firing rate for the neurons; each neuron will have a maximum firing rate chosen from a uniform distribution between low and high)
   * Intercept (the range of possible x-intercepts on the tuning curve graph; normally set to -1 and 1)
   
-* Because there are many parameters to set and we often choose similar values, Nengo will remember your previous settings.  Also, you can save templates by setting up the parameters as you like them and clicking on New in the Templates box.  You will then be able to go back to these settings by choosing the template from the drop-down box.
+* Because there are many parameters to set and we often choose similar values, Nengo will remember your previous settings.  [Deprecated: Also, you can save templates by setting up the parameters as you like them and clicking on New in the Templates box.  You will then be able to go back to these settings by choosing the template from the drop-down box.]
 
 .. image:: images/p1-5.png
 
@@ -92,7 +90,7 @@ Adjusting an Ensemble
 ------------------------
 
 * After an ensemble is created, we can inspect and modify many of its parameters
-* Right-click on an ensemble and select Configure
+* Right-click on an ensemble and select Inspector (or select the ensemble and click the magnifying glass in the top right)
 
 .. image:: images/p1-8.png
 
@@ -105,7 +103,7 @@ The Script Console
 
 * Nengo also allows users to interact with the model via a scripting interface using the Python language.  This can be useful for writing scripts to create components of models that you use often.
 * You can also use it to inspect and modify various aspects of the model.
-* Press Ctrl-P or choose View->Toggle Script Console to show the script interface
+* Press Ctrl-1 (Command-1 OS X) or choose View->Toggle Script Console to show the script interface
 
    * The full flexibility of the Python programming language is available in this console.  It interfaces to the underlying Java code of the simulation using Jython, making all Java methods available.
    
@@ -116,6 +114,6 @@ The Script Console
    * type ``print that.neurons``
    * type ``that.neurons=50``
    
-* You can also run scripts by typing ``run [scriptname.py]``
+* You can also run scripts by typing ``run [scriptname.py]`` or by opening the script using File->Open or by clicking the folder in the top left.
 
 

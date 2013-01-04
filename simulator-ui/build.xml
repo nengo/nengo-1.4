@@ -7,7 +7,6 @@
         <pathelement location="${dir.simulator}/${dest.build}"/>
     	<fileset dir="${dir.simulator}/${src.lib}">
     		<include name="*.jar"/>
-    		<exclude name="analysis/**"/>
     	</fileset>
 	</path>
     <path id="classpath.simulator-ui">
@@ -15,7 +14,6 @@
     	<pathelement location="${dest.build}"/>
     	<fileset dir="${src.lib}">
     		<include name="*.jar"/>
-    		<exclude name="analysis/**"/>
     	</fileset>
     </path>
 	
@@ -38,6 +36,10 @@
     <target name="build-simulator">
         <ant dir="${dir.simulator}" inheritAll="false" target="build" />
     </target>
+	
+	<target name="test-simulator">
+	    <ant dir="${dir.simulator}" inheritAll="false" target="test" />
+	</target>
 	
 	<target name="javadoc-simulator">
 	    <ant dir="${dir.simulator}" inheritAll="false" target="javadoc" />
@@ -70,71 +72,19 @@
 		<exec executable="make" dir="${src.sphinx}">
 			<arg value="latex"/>
 		</exec>
-		<exec executable="make" dir="${dest.artifacts.sphinx}/latex">
-			<arg value="LATEXOPTS='--interaction=nonstopmode'"/>
-		</exec>
+        <exec executable="make" dir="${dest.artifacts.sphinx}/latex">
+            <arg value="LATEXOPTS='--interaction=nonstopmode'"/>
+        </exec>
 	</target>
 	
-	<target description="Run the FindBugs code analysis tool."
-		depends="init,build" name="findbugs">
-		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
-			classpath="${analysis.findbugs}/lib/findbugs-ant.jar"/>
-		<mkdir dir="${dest.artifacts.analysis}"/>
-		
-		<findbugs home="${analysis.findbugs}" output="xml:withMessages"
-				reportLevel="low" effort="max" jvmargs="-Xms100m -Xmx800m"
-				outputFile="${dest.artifacts.analysis}/findbugs.xml">
-	    	<sourcePath path="${src.main}"/>
-	    	<class location="${dest.build}"/>
-			<auxClasspath refid="classpath.simulator-ui"/>
-	    </findbugs>
-	</target>
-	
-	<target description="Run the Copy-Paste Detector code analysis tool." name="cpd">
-		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask"
-			classpath="${analysis.pmd}/lib/pmd-4.2.5.jar"/>
-		<mkdir dir="${dest.artifacts.analysis}"/>
-		<cpd minimumTokenCount="100" format="xml"
-			outputFile="${dest.artifacts.analysis}/cpd.xml">
-		    <fileset dir="${src.main}">
-		        <include name="**/*.java"/>
-		    </fileset>
-		</cpd>
-	</target>
-	
-	<target description="Run the PMD code analysis tool." name="pmd">
-		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"
-			classpath="${analysis.pmd}/lib/pmd-4.2.5.jar"/>
-		<mkdir dir="${dest.artifacts.analysis}"/>
-		<pmd rulesetfiles="basic,braces,clone,codesize,controversial,coupling,design,finalizers,imports,logging-java,naming,optimizations,strictexception,strings,sunsecure,typeresolution,unusedcode">
-			<formatter type="xml" toFile="${dest.artifacts.analysis}/pmd.xml"/>
-			<fileset dir="${src.main}">
-				<include name="**/*.java"/>
-			</fileset>
-	    </pmd>
-	</target>
-	
-	<target description="Run the CheckStyle analysis tool." name="checkstyle">
-		<taskdef resource="checkstyletask.properties"
-			classpath="${analysis.checkstyle}/checkstyle-all-5.1.jar"/>
-		<mkdir dir="${dest.artifacts.analysis}"/>
-		
-		<checkstyle config="${analysis.checkstyle}/sun_checks.xml" failOnViolation="false">
-			<formatter type="xml" tofile="${dest.artifacts.analysis}/checkstyle.xml"/>
-			<fileset dir="${src.main}">
-				<include name="**/*.java"/>
-			</fileset>
-		</checkstyle>
-	</target>
-	
-	<target description="Generate all artifacts: javadoc, FindBugs, CPD, PMD, CheckStyle, and Sphinx." name="all"
-		depends="javadoc,sphinx,findbugs,cpd,pmd,checkstyle" />
+	<target description="Generate all artifacts: javadoc and sphinx." name="all"
+		depends="javadoc,sphinx" />
 	
 	<target description="Create a distribution folder. Requires that git is installed and working."
-		depends="build,javadoc-simulator" name="dist">
+		depends="clean,build,test-simulator,javadoc-simulator" name="dist">
     	<exec executable="git" spawn="false" dir="${basedir}" outputproperty="buildhash">
-        <arg line="rev-parse --short HEAD"/>
-      </exec>
+    	    <arg line="rev-parse --short HEAD"/>
+    	</exec>
 		<property name="dist.dir" value="../nengo-${buildhash}"/>
 		<copy includeemptydirs="false" todir="${dest.build}">
 	        <fileset dir="${dir.simulator}/${dest.build}">
@@ -142,11 +92,14 @@
 	            <exclude name="**/*.java"/>
 	        </fileset>
 	    </copy>
-		<delete dir="${dist.dir}"/>
+		<delete includeEmptyDirs="true" removeNotFollowedSymlinks="true" quiet="true">
+		    <fileset dir="${dist.dir}" erroronmissingdir="false"
+		    	followsymlinks="false" defaultexcludes="false" />
+	    </delete>
 		<mkdir dir="${dist.dir}"/>
 		<jar destfile="${dist.dir}/nengo-${buildhash}.jar" basedir="${dest.build}">
 	    	<manifest>
-		    	<attribute name="Main-Class" value="ca.nengo.ui.NengoGraphics" />
+		    	<attribute name="Main-Class" value="ca.nengo.ui.NengoLauncher" />
 			  	<attribute name="Built-By" value="${user.name}"/>
 			  	<attribute name="Implementation-Vendor" value="Centre for Theoretical Neuroscience @ UWaterloo"/>
 			  	<attribute name="Implementation-Title" value="Nengo Graphical Simulator"/>
@@ -168,15 +121,13 @@
 				<include name="images/**"/>
 				<include name="python/**"/>
 				<include name="${src.lib}/**"/>
-				<exclude name="${src.lib.analysis}/**"/>
 			</fileset>
 			<fileset dir="${dir.simulator}">
 				<include name="${src.lib}/**"/>
-				<exclude name="${src.lib.analysis}/**"/>
 			</fileset>
 			<fileset dir="${src.dist}"/>
 		</copy>
-	
+		
 		<replace dir="${dist.dir}" token="BUILDNUMBER" value="${buildhash}">
 			<include name="nengo"/>
             <include name="nengo-cl"/>
@@ -185,6 +136,45 @@
 			<include name="lib/build/launch-nengo.xml"/>
             <include name="lib/build/launch-nengo-cl.xml"/>
 		</replace>
+		
+        <!-- Get a list of all libraries -->
+        <fileset dir="${dist.dir}" id="distlibs">
+            <include name="${src.lib}/*.jar"/>
+        </fileset>
+    
+        <pathconvert targetos="unix" property="libs.unix" refid="distlibs">
+            <chainedmapper>
+            	<flattenmapper />
+            	<globmapper from="*" to="lib/*"/>
+            </chainedmapper>
+        </pathconvert>
+		<replace dir="${dist.dir}" token="LIBS" value="${libs.unix}">
+		    <include name="nengo"/>
+		    <include name="nengo-cl"/>
+	    </replace>
+
+        <pathconvert targetos="windows" property="libs.windows" refid="distlibs">
+            <chainedmapper>
+                <flattenmapper />
+                <globmapper from="*" to="lib/*"/>
+            </chainedmapper>
+        </pathconvert>
+		<replace dir="${dist.dir}" token="LIBS" value="${libs.windows}">
+		    <include name="nengo.bat"/>
+		    <include name="nengo-cl.bat"/>
+		</replace>
+
+		<pathconvert pathsep="\n" property="libs.xml" refid="distlibs">
+            <chainedmapper>
+                <flattenmapper />
+                <globmapper from="*" to="lib/*"/>
+                <globmapper from="*" to="    &lt;cp&gt;*&lt;/cp&gt;"/>
+            </chainedmapper>
+        </pathconvert>
+        <replace dir="${dist.dir}" token="LIBS" value="${libs.xml}">
+            <include name="lib/build/launch-nengo.xml"/>
+            <include name="lib/build/launch-nengo-cl.xml"/>
+        </replace>
 
         <taskdef name="launch4j"
             classname="net.sf.launch4j.ant.Launch4jTask"

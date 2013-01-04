@@ -30,6 +30,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -38,9 +39,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Vector;
 
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import ca.nengo.io.FileManager;
@@ -50,6 +48,7 @@ import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.Probeable;
 import ca.nengo.model.SimulationException;
+import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.FunctionInput;
@@ -61,16 +60,16 @@ import ca.nengo.ui.actions.AddProbeAction;
 import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
-import ca.nengo.ui.actions.SaveNodeAction;
+import ca.nengo.ui.actions.DefaultModeAction;
+import ca.nengo.ui.actions.DirectModeAction;
+import ca.nengo.ui.actions.RateModeAction;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.UserDialogs;
 import ca.nengo.ui.lib.actions.ActionException;
-import ca.nengo.ui.lib.actions.ReversableAction;
 import ca.nengo.ui.lib.actions.StandardAction;
 import ca.nengo.ui.lib.actions.UserCancelledException;
 import ca.nengo.ui.lib.objects.activities.TransientStatusMessage;
 import ca.nengo.ui.lib.objects.models.ModelObject;
-import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.Util;
 import ca.nengo.ui.lib.util.menus.AbstractMenuBuilder;
@@ -115,13 +114,9 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 		UINeoNode nodeUI = null;
 		if (node instanceof Network) {
 			nodeUI = new UINetwork((Network) node);
-			nodeUI.showAllTerminations();
-			nodeUI.showAllOrigins();
 		} else if (node instanceof Ensemble) {
 			if (node instanceof NEFEnsemble) {
 				nodeUI = new UINEFEnsemble((NEFEnsemble) node);
-				nodeUI.showAllTerminations();
-				nodeUI.showAllDecodedOrigins();
 			} else {
 				nodeUI = new UIEnsemble((Ensemble) node);
 			}
@@ -238,17 +233,40 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	protected void constructMenu(PopupMenuBuilder menu) {
 		super.constructMenu(menu);
 
-		menu.addAction(new CopyAction("Copy", this));
-		menu.addAction(new CutAction("Cut", this));
+		Collection<UINeoNode> arrayOfMe = new ArrayList<UINeoNode>();
+		arrayOfMe.add(this);
+		
+		menu.addAction(new CopyAction("Copy", arrayOfMe));
+		menu.addAction(new CutAction("Cut", arrayOfMe));
 
-		menu.addSection("File");
-		menu.addAction(new SaveNodeAction(this));
-		menu.addAction(new RenameNodeAction("Rename"));
+		SimulationMode mode = ((UINeoNode) arrayOfMe.toArray()[0]).getModel().getMode();
+
+		int selected = -1;
+		if (mode == SimulationMode.DEFAULT) {
+			selected = 0;
+		} else if (mode == SimulationMode.RATE) {
+			selected = 1;
+		} else if (mode == SimulationMode.DIRECT) {
+			selected = 2;
+		}
+		
+		if (selected >= 0) {
+			AbstractMenuBuilder modeMenu = menu.addSubMenu("Mode");
+			modeMenu.addActionsRadio(new StandardAction[]{
+					new DefaultModeAction("Spiking", arrayOfMe),
+					new RateModeAction("Rate", arrayOfMe),
+					new DirectModeAction("Direct", arrayOfMe)
+				}, selected);
+		}
+
+//		menu.addSection("File");
+//		menu.addAction(new SaveNodeAction(this));
+//		menu.addAction(new RenameNodeAction("Rename"));
 
 		menu.addSection("View");
-		AbstractMenuBuilder docMenu = menu.addSubMenu("Documentation");
-		docMenu.addAction(new SetDocumentationAction("Set"));
-		docMenu.addAction(new ViewDocumentationAction("View"));
+//		AbstractMenuBuilder docMenu = menu.addSubMenu("Documentation");
+//		docMenu.addAction(new SetDocumentationAction("Set"));
+//		docMenu.addAction(new ViewDocumentationAction("View"));
 		constructViewMenu(menu);
 
 		menu.addSection("Data Collection");
@@ -336,16 +354,36 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 					if (!modelTerminationSet.contains(model)) {
 						wo.destroy();
 						this.showPopupMessage("Termination removed: " + wo.getName());
+					} else {
+						modelTerminationSet.remove(model);
 					}
 				}
 				if (wo instanceof Origin) {
 					if (!modelOriginSet.contains(model)) {
 						wo.destroy();
 						this.showPopupMessage("Origin removed: " + wo.getName());
+					} else {
+						modelOriginSet.remove(model);
 					}
 				}
 			}
 
+		}
+		
+		// Ensure that any new origins and terminations are shown
+		for (Termination term:modelTerminationSet) {
+			this.showTermination(term.getName());
+		}
+		for (Origin origin:modelOriginSet) {
+			String name=origin.getName();
+			
+			// don't automatically show these two origins for NEFEnsembles
+			if (this instanceof UINEFEnsemble) {
+				if (name.equals("AXON") || name.equals("current")) {
+					continue;				
+				}
+			}
+			this.showOrigin(origin.getName());
 		}
 	}
 
@@ -447,42 +485,33 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	 * @see
 	 * ca.shu.ui.lib.world.DroppableX#droppedOnTargets(java.util.Collection)
 	 */
-	public void droppedOnTargets(Collection<WorldObject> targets) {
+	public void droppedOnTargets(Collection<WorldObject> targets) throws UserCancelledException {
+		// look through all containers, move to the first NodeContainer we find
 		for (WorldObject wo : targets) {
-			/*
-			 * Move to new container
-			 */
 			if (wo instanceof NodeContainer) {
 				NodeContainer nodeContainer = (NodeContainer) wo;
 
 				try {
+					CreateModelAction.ensureNonConflictingName(getModel(), nodeContainer); // throws UserCancelledException
+					
 					Node node;
 					try {
 						node = getModel().clone();
-					}
-					catch (CloneNotSupportedException e) {
+					} catch (CloneNotSupportedException e) {
 						throw new ContainerException("Could not clone node: " + e.getMessage());
 					}
 					Point2D newPosition = localToGlobal(new Point2D.Double(0, 0));
 					newPosition = wo.globalToLocal(newPosition);
 					newPosition = nodeContainer.localToView(newPosition);
 
-					/*
-					 * This removes the node from its parent and externalities
-					 */
+					// destroy the old model
 					destroyModel();
+					
+					// add the new model
+					nodeContainer.addNodeModel(node,
+							newPosition.getX(),
+							newPosition.getY());
 
-					/*
-					 * Adds node
-					 */
-					try {
-						CreateModelAction.ensureNonConflictingName(node, nodeContainer);
-						nodeContainer.addNodeModel(node,
-								newPosition.getX(),
-								newPosition.getY());
-					} catch (UserCancelledException e) {
-						e.defaultHandleBehavior();
-					}
 				} catch (ContainerException e) {
 					UserMessages.showWarning("Could not drop into container: " + e.getMessage());
 				}
@@ -690,6 +719,13 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 
 		fm.save(this.getModel(), file);
 		new TransientStatusMessage(this.getFullName() + " was saved to " + file.toString(), 2500);
+	}
+	
+	public void generateScript(File file) throws IOException {
+		FileManager fm = new FileManager();
+
+		fm.generate(this.getModel(), file.toString());
+		new TransientStatusMessage(this.getFullName() + " generated script " + file.toString(), 2500);
 	}
 
 	@Override
@@ -908,7 +944,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	 *
 	 * @author Shu Wu
 	 */
-	class SetDocumentationAction extends ReversableAction {
+	/*class SetDocumentationAction extends ReversableAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -954,7 +990,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 			getModel().setDocumentation(prevDoc);
 			showPopupMessage("Documentation changed");
 		}
-	}
+	}*/
 
 	/**
 	 * Action for showing all origins and terminations
@@ -1023,7 +1059,7 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 	 *
 	 * @author Shu Wu
 	 */
-	class ViewDocumentationAction extends StandardAction {
+	/*class ViewDocumentationAction extends StandardAction {
 
 		private static final long serialVersionUID = 1L;
 
@@ -1038,5 +1074,5 @@ public abstract class UINeoNode extends UINeoModel implements DroppableX {
 					getModel().getDocumentation());
 		}
 
-	}
+	}*/
 }

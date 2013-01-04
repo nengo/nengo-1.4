@@ -33,9 +33,9 @@ must be installed. The most recent version of Java can be found at
 There are two ways to use Nengo: through its graphical interface, or from the
 command-line.
 
-=====================
-=GRAPHICAL INTERFACE=
-=====================
+                       =====================
+                       =GRAPHICAL INTERFACE=
+                       =====================
 
 Nengo has a graphical user interface built using Java's Swing API and the
 Piccolo graphical framework.
@@ -48,9 +48,9 @@ run nengo.bat
 (Linux, Mac OS X)
 run nengo
 
-==============
-=COMMAND-LINE=
-==============
+                       ==============
+                       =COMMAND-LINE=
+                       ==============
 
 Advanced users, or those running Nengo in restricted environments, can use a
 command-line environment through which to run simulations.

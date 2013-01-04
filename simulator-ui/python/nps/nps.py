@@ -219,7 +219,7 @@ class NPS:
             input.append(dp)
 
             
-        basalganglia.make_basal_ganglia(net,input,prod,D,N=neurons_bg,input_transform=transform,output_weight=bg_output_weight,noise=noise,radius=bg_radius,same_neurons=bg_same_neurons)
+        basalganglia.make_basal_ganglia(net,input,prod,D,neurons=neurons_bg,input_transform=transform,output_weight=bg_output_weight,noise=noise,radius=bg_radius,same_neurons=bg_same_neurons)
         
         for k in productions.get_same_buffers():
             a,b=k.split('_sameas_',1)

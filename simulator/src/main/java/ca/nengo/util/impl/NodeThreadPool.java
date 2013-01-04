@@ -10,6 +10,7 @@ import java.util.List;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Projection;
+import ca.nengo.model.impl.NetworkArrayImpl;
 import ca.nengo.util.TaskSpawner;
 import ca.nengo.util.ThreadTask;
 
@@ -36,6 +37,7 @@ public class NodeThreadPool {
     protected ThreadTask[] myTasks;
 
 	protected volatile int numThreadsComplete;
+	protected volatile int numThreadsWaiting;
 
 	protected volatile boolean threadsRunning;
 	protected volatile boolean runFinished;
@@ -46,7 +48,7 @@ public class NodeThreadPool {
 	protected long myRunStartTime;
 	protected double myAverageTimePerStep;
 	protected int myNumSteps;
-
+	
 	public static int getNumJavaThreads(){
 		return myNumJavaThreads;
 	}
@@ -128,6 +130,8 @@ public class NodeThreadPool {
 		
 		threadsRunning = false;
 		runFinished = false;
+		numThreadsWaiting = 0;
+		numThreadsComplete = 0;
 		
 		boolean useGPU = NEFGPUInterface.getUseGPU();
 		
@@ -136,6 +140,7 @@ public class NodeThreadPool {
 	    }else{
 	    	myNumThreads = myNumJavaThreads;
 	    }
+		
 		
 		myThreads = new NodeThread[myNumThreads];
 		
@@ -260,11 +265,13 @@ public class NodeThreadPool {
 	 */
 	private void startThreads() throws InterruptedException {
 		synchronized(myLock){
+			
 			numThreadsComplete = 0;
 			threadsRunning = true;
-
-			myLock.notifyAll();
-			myLock.wait();
+			myLock.notifyAll();  //release all the threads from the threadWait() loop
+			
+			while(threadsRunning || numThreadsWaiting < myThreads.length) 
+				myLock.wait();  //we don't want the stepthread to be able to continue (and start threads) until all the threads are waiting to be started
 		}
 	}
 
@@ -276,6 +283,10 @@ public class NodeThreadPool {
 	 */
 	public void threadWait() throws InterruptedException{
 		synchronized(myLock){
+			numThreadsWaiting++;
+			if(numThreadsWaiting == myThreads.length)
+				myLock.notifyAll(); //all the threads are done the step and in a waiting state, so free the stepthread
+			
 			while(!threadsRunning) {
                 myLock.wait();
             }
@@ -288,17 +299,21 @@ public class NodeThreadPool {
 	 * @author Eric Crawford
 	 */
 	public void threadFinished() throws InterruptedException{
+		
 		synchronized(myLock){
 			numThreadsComplete++;
 
 			if(numThreadsComplete == myThreads.length){
 				threadsRunning = false;
-				myLock.notifyAll();
+				numThreadsWaiting=0;
+				myLock.notifyAll(); //this is to move the threads into the threadwait loop
 			}
-
-			myLock.wait();
-
-			threadWait();
+			else{
+				while(threadsRunning) //threads wait here when they are finished, but others are still running (i.e. wait here until end of one step)
+					myLock.wait();
+			}
+	
+			threadWait(); //threads wait here when they're all finished (i.e. wait here between steps)
 		}
 	}
 
@@ -311,7 +326,6 @@ public class NodeThreadPool {
 	public void kill(){
 		synchronized(myLock)
 		{
-			threadsRunning = true;
 			runFinished = true;
 
 			for(int i = 0; i < myThreads.length; i++){
@@ -365,7 +379,7 @@ public class NodeThreadPool {
             if((workingNode.getClass().getCanonicalName().contains("CCMModelNetwork"))){
             	isNetwork = false;
             }
-            else if(workingNode.getClass().getCanonicalName() == "org.python.proxies.nef.array$NetworkArray$6")
+            else if(workingNode instanceof NetworkArrayImpl)
             {
             	if(breakDownNetworkArrays){
             		isNetwork = true;

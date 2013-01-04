@@ -20,7 +20,7 @@ from com.bulletphysics.dynamics import *
 from com.bulletphysics.dynamics.constraintsolver import *
 from com.bulletphysics.dynamics.vehicle import *
 from com.bulletphysics.linearmath import *
-from javax.vecmath import *
+from javax.vecmath import Vector3f, Matrix4f
 
 import ccm
 

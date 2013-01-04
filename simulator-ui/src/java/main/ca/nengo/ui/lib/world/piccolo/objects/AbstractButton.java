@@ -17,8 +17,6 @@ import edu.umd.cs.piccolo.event.PInputEvent;
  */
 public abstract class AbstractButton extends WorldObjectImpl {
 
-	private static final long serialVersionUID = 1L;
-
 	private Color defaultColor = NengoStyle.COLOR_BUTTON_BACKGROUND;
 
 	private Color highlightColor = NengoStyle.COLOR_BUTTON_HIGHLIGHT;

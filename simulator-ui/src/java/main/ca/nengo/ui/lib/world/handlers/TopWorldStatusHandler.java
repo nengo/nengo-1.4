@@ -25,9 +25,7 @@ public class TopWorldStatusHandler extends AbstractStatusHandler {
 	protected String getStatusMessage(PInputEvent event) {
 		NumberFormat formatter = NumberFormat.getNumberInstance();
 		formatter.setMaximumFractionDigits(2);
-		return "Top Window - Mouse X: "
-				+ formatter.format(event.getPosition().getX()) + " Y: "
-				+ formatter.format(event.getPosition().getY());
+		return "Top Window";
 	}
 
 }

@@ -8,6 +8,8 @@ from ca.nengo.util import *
 from ca.nengo.util.impl import NodeThreadPool, NEFGPUInterface
 from ca.nengo.sim.impl import LocalSimulator
 
+from java.lang import System
+
 class Simulator:
     def __init__(self,network):
         self.nodes=[]
@@ -38,7 +40,12 @@ class Simulator:
     def reset(self,randomize=False):
         for n in self.nodes: n.reset(randomize)
 
+        # Force java garbage collection to free (hopefully) unused memory
+        System.gc()
+
+
     def step(self,start,end):
+        self.network.fireStepListeners(start)
         if self.thread_pool is not None:
             self.thread_pool.step(start,end)
         else:    

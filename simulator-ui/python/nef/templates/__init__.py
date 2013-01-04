@@ -1,4 +1,5 @@
 import integrator
+import oscillator
 import basalganglia
 import basalganglia_rule
 import linear_system
@@ -7,10 +8,12 @@ import networkarray
 import gate
 import learned_termination
 import thalamus
+import interneuron
 
 templates=[
     networkarray,
     integrator,
+    oscillator,
     linear_system,
     binding,
     basalganglia,
@@ -18,4 +21,5 @@ templates=[
     thalamus,
     gate,
     learned_termination,
+    interneuron,
     ]

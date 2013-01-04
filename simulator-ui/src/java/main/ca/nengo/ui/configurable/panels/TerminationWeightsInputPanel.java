@@ -200,9 +200,13 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
 
     @Override
     public boolean isValueSet() {
+        if (!isDimensionsSet()) {
+            return false;
+        }
+
         if (matrix != null && matrix[0].length == getDimensions()) {
             return true;
-        } else if (isDimensionsSet() && getFromSize()==getToSize()){
+        } else if (getFromSize() == getToSize()){
             matrix = new float[getFromSize()][getToSize()];
             for (int i=0; i<getFromSize(); i++) {
                 for (int j=0; j<getFromSize(); j++) {
@@ -215,7 +219,7 @@ public class TerminationWeightsInputPanel extends PropertyInputPanel {
             }
             return true; // default to identity matrix when applicable, if not already set
         }
-        setStatusMsg("matrix not set");
+        setStatusMsg("Matrix not set");
         return false;
     }
 

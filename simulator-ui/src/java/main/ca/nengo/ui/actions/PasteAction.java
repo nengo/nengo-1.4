@@ -24,12 +24,17 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.actions;
 
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+
 import ca.nengo.model.Node;
 import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.NodeContainer.ContainerException;
+import ca.nengo.ui.util.NengoClipboard;
 
 /**
  * TODO
@@ -41,29 +46,61 @@ public class PasteAction extends StandardAction {
     private static final long serialVersionUID = 1L;
 
     private NodeContainer nodeContainer;
+    
+    private Double posX = null;
+    private Double posY = null;
+    
+    private boolean isFromTopMenu = false;
 
     /**
      * @param description TODO
      * @param nodeContainer TODO
      */
-    public PasteAction(String description, NodeContainer nodeContainer) {
+    public PasteAction(String description, NodeContainer nodeContainer, boolean fromTopMenu) {
         super(description);
-
+        isFromTopMenu = fromTopMenu;
         this.nodeContainer = nodeContainer;
     }
 
     @Override
     protected void action() throws ActionException {
-        Node node = NengoGraphics.getInstance().getClipboard().getContents();
-        if (node != null) {
-            try {
-                CreateModelAction.ensureNonConflictingName(node, nodeContainer);
-                nodeContainer.addNodeModel(node);
-            } catch (ContainerException e) {
-                throw new ActionException(e);
-            }
+    	NengoClipboard clipboard = NengoGraphics.getInstance().getClipboard();
+        if (clipboard.hasContents()) {
+			ArrayList<Node> nodes = clipboard.getContents();
+			ArrayList<Point2D> offsets = clipboard.getOffsets();
+			WorldImpl clipboardSrcWorld = clipboard.getSourceWorld();
+        	
+        	for (int i = 0; i < nodes.size(); i++) {
+        		Node node = nodes.get(i);
+        		try {
+        			CreateModelAction.ensureNonConflictingName(node, nodeContainer);
+        			if (posX == null || posY == null) {
+        				nodeContainer.addNodeModel(node, posX, posY);
+        			} else {
+        				nodeContainer.addNodeModel(node, posX + offsets.get(i).getX(), posY + offsets.get(i).getY());
+        			}
+        		} catch (ContainerException e) {
+        			// Did the attempt to paste to the mouse location fail?
+        			// If so, try to paste into the network that the clipboard contents came from
+        			if (isFromTopMenu) {
+        				try {
+        					CreateModelAction.ensureNonConflictingName(node, ((NodeContainer)clipboardSrcWorld));
+        					((NodeContainer)clipboardSrcWorld).addNodeModel(node);
+        				} catch (ContainerException ex) {
+        					throw new ActionException(ex);
+        				}
+        			} else {
+        				throw new ActionException(e);
+        			}
+        		}
+        	}
         } else {
             throw new ActionException("Clipboard is empty");
         }
+    }
+    
+    public void setPosition(Double x, Double y) {
+        posX = x;
+        posY = y;
     }
 }

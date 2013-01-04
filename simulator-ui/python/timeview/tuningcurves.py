@@ -16,36 +16,38 @@ class TuningCurveWatch:
         return isinstance(obj,NEFEnsemble) and obj.dimension<=2
     def views(self,obj):
         pts=100
-        encoders=obj.getEncoders()
-        x=[-1+i/float(pts) for i in range(pts*2+1)]
 
-        mode=obj.mode
-        obj.setMode(SimulationMode.CONSTANT_RATE)
-        noises=[nn.noise for nn in obj.nodes]
-        for nn in obj.nodes:
-            nn.noise=None
-        data=[]
+        def makedata(obj=obj,pts=pts):
+            encoders=obj.getEncoders()
+            x=[-1+i/float(pts) for i in range(pts*2+1)]
 
-        for xx in x:
-            rate=[]
-            for i,n in enumerate(obj.nodes):
-                if obj.dimension==1:
-                    input=xx*encoders[i][0]
-                elif obj.dimension==2:
-                    theta=xx*math.pi
-                    input=math.sin(theta)*encoders[i][0]+math.cos(theta)*encoders[i][1]
-                n.radialInput=input    
-                n.reset(False)
-                n.run(0,0)
-                output=n.getOrigin('AXON').getValues().getValues()[0]
-                rate.append(output)
-            data.append(rate)
+            mode=obj.mode
+            obj.setMode(SimulationMode.CONSTANT_RATE)
+            noises=[nn.noise for nn in obj.nodes]
+            for nn in obj.nodes:
+                nn.noise=None
+            data=[]
 
-            
+            for xx in x:
+                rate=[]
+                for i,n in enumerate(obj.nodes):
+                    if obj.dimension==1:
+                        input=xx*encoders[i][0]
+                    elif obj.dimension==2:
+                        theta=xx*math.pi
+                        input=math.sin(theta)*encoders[i][0]+math.cos(theta)*encoders[i][1]
+                    n.radialInput=input    
+                    n.run(0,0)
+                    output=n.getOrigin('AXON').getValues().getValues()[0]
+                    rate.append(output)
+                    n.reset(False)
+                data.append(rate)
 
-        obj.setMode(mode)
-        for i,nn in enumerate(obj.nodes):
-            nn.noise=noises[i]
+            obj.setMode(mode)
+            for i,nn in enumerate(obj.nodes):
+                nn.noise=noises[i]
+
+            return data
 
         labels=dict()
         labels[pts]='0'
@@ -59,7 +61,9 @@ class TuningCurveWatch:
             labels[3*pts/2]='90'
             labels[pts*2]='180'
         
-        return [('tuning curves',Graph,dict(func=None,label=obj.name,data=data,x_labels=labels,show_negative=False))]
+        return [('tuning curves',Graph,
+                 dict(func=None,label=obj.name,data=makedata,x_labels=labels,show_negative=False))]
+
 timeview.view.watches.append(TuningCurveWatch())
 
 

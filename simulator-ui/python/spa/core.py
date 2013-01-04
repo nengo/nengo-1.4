@@ -10,7 +10,7 @@ class SPA:
     align_hrrs=False
     subdimensions=None
     
-    def __init__(self,name=None):
+    def __init__(self,name=None, vocabs=[]):
         if name is None: name=self.__class__.__name__
 
         self.net=nef.Network(name)
@@ -20,6 +20,8 @@ class SPA:
         self.source_modules={}
         self.vocabs={}
         self.default_vocabs={}
+        for v in vocabs:
+            self.default_vocabs[(v.dimensions,not v.randomize)]=v        
         self.params={}
         self.modules={}
 

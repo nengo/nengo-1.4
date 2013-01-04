@@ -40,6 +40,7 @@ import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
 import ca.nengo.math.impl.FixedSignalFunction;
 import ca.nengo.math.impl.WeightedCostApproximator;
+import ca.nengo.model.Ensemble;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Noise;
@@ -52,6 +53,7 @@ import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Units;
 import ca.nengo.model.impl.RealOutputImpl;
+import ca.nengo.model.nef.ExpressModel;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.plasticity.ShortTermPlastic;
 import ca.nengo.util.MU;
@@ -91,6 +93,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	private float[] mySTPHistory;
 	private float myTime;
 	private boolean myRequiredOnCPU;
+	private ExpressModel myExpressModel;
 
 	/**
 	 * With this constructor, decoding vectors are generated using default settings.
@@ -196,8 +199,22 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		myIntegrator = new EulerIntegrator(.001f);
 		
 		reset(false);
-		}
+	}
 
+	/**
+	 * @return Simplified model of deviations from DIRECT mode that are associated with spiking simulations
+	 */
+	public ExpressModel getExpressModel() {
+		return myExpressModel;
+	}
+	
+	/**
+	 * @param em Simplified model of deviations from DIRECT mode that are associated with spiking simulations
+	 */
+	public void setExpressModel(ExpressModel em) {
+		myExpressModel = em;
+	}
+	
 	/**
 	 * @see ca.nengo.config.Configurable#getConfiguration()
 	 */
@@ -439,6 +456,17 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 			for (int i = 0; i < values.length; i++) {
 				values[i] = myFunctions[i].map(state);
 			}
+		} else if (myMode == SimulationMode.EXPRESS) {
+			for (int i = 0; i < values.length; i++) {
+				values[i] = myFunctions[i].map(state);
+			}
+			
+			//create default ExpressModel if necessary ...
+			if (myExpressModel == null) {
+				myExpressModel = new DefaultExpressModel(this);
+			}
+			
+			values = myExpressModel.getOutput(startTime, state, values);
 		} else {
 			for (int i = 0; i < myNodes.length; i++) {
 				try {
@@ -463,7 +491,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 				}
 			}
 		}
-
+		
 		if (myNoise != null) {
 			for (int i = 0; i < values.length; i++) {
 				values[i] = myNoises[i].getValue(startTime, endTime, values[i]);
@@ -539,7 +567,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	}
 
 	@Override
-	public Origin clone() throws CloneNotSupportedException {
+	public DecodedOrigin clone() throws CloneNotSupportedException {
 		Function[] functions = new Function[myFunctions.length];
 		for (int i = 0; i < functions.length; i++) {
 			functions[i] = myFunctions[i].clone();
@@ -555,6 +583,10 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 		} catch (StructuralException e) {
 			throw new CloneNotSupportedException("Error trying to clone: " + e.getMessage());
 		}
+	}
+	
+	public DecodedOrigin clone(Ensemble e) throws CloneNotSupportedException {
+		return this.clone();
 	}
 
 	/**

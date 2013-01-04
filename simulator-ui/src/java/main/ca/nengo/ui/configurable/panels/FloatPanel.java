@@ -26,63 +26,36 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.configurable.panels;
 
-import javax.swing.JTextField;
-
 import ca.nengo.ui.configurable.Property;
-import ca.nengo.ui.configurable.PropertyInputPanel;
 
 /**
  * Input panel for entering floating point numbers
  * 
  * @author Shu Wu
  */
-public class FloatPanel extends PropertyInputPanel {
+public class FloatPanel extends PropertyTextPanel {
+	
+	private static int COLUMNS = 10;
 
-    /**
-     * Text field component
-     */
-    private JTextField tf;
-
-    /**
-     * @param property TODO
-     */
     public FloatPanel(Property property) {
-        super(property);
-
-        tf = new JTextField(10);
-        add(tf);
+        super(property, COLUMNS);
     }
 
     @Override
     public Object getValue() {
-
-        Float floatValue = new Float(tf.getText());
+        Float floatValue = new Float(getText());
         return floatValue.floatValue();
-
     }
 
     @Override
-    public boolean isValueSet() {
-        String textValue = tf.getText();
-
-        if (textValue == null || textValue.compareTo("") == 0) {
-            return false;
+    protected TextError checkValue(String textValue) {
+        if (textValue == null || textValue.equals("")) {
+        	return TextError.ValueNotSet;
+        } else if (!textValue.matches("\\s*-??[0-9]*[.]??[0-9]*([eE][-|\\+]??[0-9]+)??\\s*")) {
+        	return TextError.InvalidFormat;
+        } else {
+        	return TextError.NoError;
         }
-
-        try {
-            getValue();
-
-        } catch (NumberFormatException e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public void setValue(Object value) {
-        tf.setText(value.toString());
-
     }
 
 }

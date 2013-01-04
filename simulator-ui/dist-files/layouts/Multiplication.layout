@@ -1,8 +1,8 @@
 ({'x': 1, 'height': 595, 'width': 864, 'state': 0, 'y': 22},
  [('D', None, {'height': 32, 'x': 513, 'label': 0, 'width': 24, 'y': 187}),
   ('A', None, {'height': 32, 'x': 227, 'label': 0, 'width': 23, 'y': 128}),
-  ('inputA', None, {'height': 32, 'x': 134, 'label': 0, 'width': 66, 'y': 127}),
-  ('inputB', None, {'height': 32, 'x': 135, 'label': 0, 'width': 66, 'y': 259}),
+  ('input A', None, {'height': 32, 'x': 134, 'label': 0, 'width': 66, 'y': 127}),
+  ('input B', None, {'height': 32, 'x': 135, 'label': 0, 'width': 66, 'y': 259}),
   ('Combined', None, {'height': 32, 'x': 271, 'label': 0, 'width': 100, 'y': 188}),
   ('B', None, {'height': 32, 'x': 228, 'label': 0, 'width': 23, 'y': 258}),
   ('A', 'value|X', {'height': 106, 'x': 148, 'sel_dim': [0], 'label': 0, 'autozoom': 0, 'width': 175, 'last_maxy': 10.000000000000007, 'y': 14}),
@@ -10,6 +10,17 @@
   ('D', 'voltage grid', {'height': 185, 'x': 546, 'auto_improve': 0, 'label': 0, 'width': 200, 'rows': None, 'y': 36}),
   ('D', 'value|X', {'height': 190, 'x': 468, 'sel_dim': [0], 'label': 0, 'autozoom': 0, 'width': 300, 'last_maxy': 50.000000000000036, 'y': 245}),
   ('B', 'value|X', {'height': 107, 'x': 153, 'sel_dim': [0], 'label': 0, 'autozoom': 0, 'width': 176, 'last_maxy': 5.0000000000000036, 'y': 292}),
-  ('inputA', 'control', {'height': 200, 'x': 51, 'range': 8.0, 'limits': 1, 'label': 1, 'width': 80, 'limits_w': 0, 'y': 38}),
-  ('inputB', 'control', {'height': 200, 'x': 49, 'range': 8.0, 'limits': 1, 'label': 1, 'width': 80, 'limits_w': 0, 'y': 269})],
+  ('input A', 'control', {'height': 200, 'x': 51, 'range': 8.0, 'limits': 1, 'label': 1, 'width': 80, 'limits_w': 0, 'y': 38}),
+  ('input B', 'control', {'height': 200, 'x': 49, 'range': 8.0, 'limits': 1, 'label': 1, 'width': 80, 'limits_w': 0, 'y': 269})],
  {'sim_spd': 4, 'rcd_time': 4.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.5})
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=51.19971359695711,y=245.50645590423315,width=951.075210710851,height=588.8368334770203]
+# input A (Function Input)=Point2D.Double[202.02885206639564, 348.5497340038267]
+# A (NEFEnsemble)=Point2D.Double[380.7259053692415, 338.4054736718485]
+# B (NEFEnsemble)=Point2D.Double[368.55279297086764, 655.5080006465431]
+# Combined (NEFEnsemble)=Point2D.Double[600.0, 500.0]
+# input B (Function Input)=Point2D.Double[200.0, 666.6666870117188]
+# D (NEFEnsemble)=Point2D.Double[802.0288520663955, 487.8268876016263]

@@ -1,10 +1,11 @@
-from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput
+from ca.nengo.model.impl import NetworkImpl, NoiseFactory, FunctionInput, NetworkArrayImpl
 from ca.nengo.model import SimulationMode, Origin, Units, Termination, Network
 from ca.nengo.model.nef.impl import NEFEnsembleFactoryImpl
 from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model.neuron.impl import LIFNeuronFactory
 from ca.nengo.model.plasticity.impl import PESTermination, PreLearnTermination, STDPTermination, PlasticEnsembleImpl
 from ca.nengo.util import MU
+from ca.nengo.util.impl import FixedVectorGenerator
 from ca.nengo.math.impl import IndicatorPDF,ConstantFunction,PiecewiseConstantFunction,GradientDescentApproximator,FourierFunction
 from ca.nengo.math import Function,PDFTools
 from ca.nengo.model import StructuralException
@@ -12,10 +13,12 @@ from ca.nengo.io import FileManager
 import java
 import warnings
 
+from java.util import ArrayList
+from java.util import HashMap
+
 import pdfs
 import generators
 import functions
-import array
 import random
 import inspect
 import log
@@ -69,6 +72,11 @@ class Network:
         if seed is not None:
             self.random=random.Random()
             self.random.seed(seed)
+            PDFTools.setSeed(seed)    
+            random.seed(seed)
+            
+        self.alias={}    
+            
         
     def make(self,name,neurons,dimensions,
                   tau_rc=0.02,tau_ref=0.002,
@@ -93,7 +101,7 @@ class Network:
                                or a list of maximum rate values to use
         :type max_rate:          tuple or list                       
         :param intercept:     normalized range for uniform selection of tuning curve x-intercept (as 2-tuple)
-                               or a list of intercept values to use                          
+                               or a list of intercept values to use  (intercepts are defined with respect to encoders, so an encoder of -1 and intercept of .3 will result in a neuron only active below -.3)                        
         :type intercept:          tuple or list                       
         :param float radius:        representational range        
         :param list encoders:      list of encoder vectors to use (if None, uniform distribution around unit sphere).
@@ -177,9 +185,12 @@ class Network:
             else:
                 it=pdfs.ListPDF(intercept)
             ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc,tauRef=tau_ref,maxRate=mr,intercept=it)
+        # Check if encoder dimensions match ensemble dimensions
         if encoders is not None:
+            if len(encoders[0]) != dimensions:
+                raise Exception('Encoder dimensions (%d) must match specified ensemble dimensions (%d)' % (len(encoders[0]), dimensions))
             try:
-                ef.encoderFactory=generators.FixedVectorGenerator(encoders)
+                ef.encoderFactory = FixedVectorGenerator(encoders)
             except:
                 raise Exception('encoders must be a matrix where each row is a non-zero preferred direction vector')
         if decoder_sign is not None:
@@ -190,11 +201,16 @@ class Network:
         else:        
             ef.approximatorFactory.noise=decoder_noise
         if eval_points is not None:
+            if len(eval_points[0]) != dimensions:
+                raise Exception('Dimensions of evaluation points (%d) must match specified ensemble dimensions (%d)' %
+                                (len(eval_points[0]), dimensions))
             ef.evalPointFactory=generators.FixedEvalPointGenerator(eval_points)
         if isinstance(radius,list):
             r=radius
         else:
             r=[radius]*dimensions
+
+        parent,name=self._parse_name(name)
 
         n=ef.make(name,neurons,r,storage_name,False)
         if noise is not None:
@@ -205,8 +221,22 @@ class Network:
             n.mode=SimulationMode.RATE
         elif mode=='direct' or mode==SimulationMode.DIRECT:
             n.mode=SimulationMode.DIRECT
-        if add_to_network: self.network.addNode(n)
+        if add_to_network: parent.addNode(n)
         return n
+    
+    def _parse_name(self,name):
+        """ Split name by delimiter '.'.
+        
+        Returns immediate parent (object) and last term (string).
+        """
+        parent=self.network
+        while '.' in name:
+            node,name=name.split('.',1)
+            try:
+                parent=parent.getNode(node)
+            except:
+                raise AttributeError('Could not find parent node for "%s"'%name)
+        return parent,name                
 
     def make_array(self,name,neurons,length,dimensions=1,**args):
         """Create and return an array of ensembles.  This acts like a high-dimensional ensemble,
@@ -241,12 +271,19 @@ class Network:
         If the *encoders* parameter is used, you can provide either the standard
         array of encoders (e.g. ``[[1],[-1]]``) or a list of sets of encoders for
         each ensemble (e.g. ``[[[1]],[[-1]]]``).
+        
+        If the *dimensions* parameter is used, each ensemble represents the specified number of 
+        dimensions (default value is 1 dimension per ensemble). For example, if length=5 and 
+        dimensions=2, then a total of 10 dimensions are represented by the network array. 
+        The index number of the first ensemble's first dimension is 0, the index of the first 
+        ensemble's second dimension is 1, the index of the second ensemble's first dimension is 
+        2, and so on.
 
         :param string name:           name of the ensemble array (must be unique)
         :param integer neurons:       number of neurons in each ensemble
         :param integer length:        number of ensembles in the array
         :param integer dimensions:    number of dimensions each ensemble represents       
-        :returns: the newly created :class:`nef.array.NetworkArray`
+        :returns: the newly created :class:`ca.nengo.model.impl.NetworkArrayImpl`
         """
         nodes=[]
         storage_code=args.get('storage_code','')
@@ -257,9 +294,54 @@ class Network:
                 args['encoders']=encoders[i%len(encoders)]
             n=self.make('%d'%i,neurons,dimensions,add_to_network=False,**args)
             nodes.append(n)
-        ensemble=array.NetworkArray(name,nodes)
-        self.network.addNode(ensemble)
+
+        parent,name=self._parse_name(name)    
+        ensemble=NetworkArrayImpl(name,nodes)
+        parent.addNode(ensemble)
         ensemble.mode=ensemble.nodes[0].mode
+
+        #for script gen            
+        if self.network.getMetaData("NetworkArray") == None:
+            self.network.setMetaData("NetworkArray", HashMap())
+        arrays = self.network.getMetaData("NetworkArray")
+
+        radius=args.get('radius',None)
+        max_rate=args.get('max_rate',None)
+        intercept=args.get('intercept',None)
+        quick=args.get('quick',None)
+
+        narr=HashMap(10)
+        narr.put("name", name)
+        narr.put("neurons", neurons)
+        narr.put("length", length)
+        narr.put("dimensions", dimensions)
+
+        if radius:
+          narr.put("radius", radius)
+
+        if max_rate:
+          narr.put("rLow", max_rate[0])
+          narr.put("rHigh", max_rate[1])
+        
+        if intercept:
+          narr.put("iLow", intercept[0])
+          narr.put("iHigh", intercept[1])
+        
+        if quick:
+          narr.put("useQuick", quick)
+        
+        if encoders:
+          narr.put("encoders", str(encoders))
+
+        arrays.put(name, narr)
+
+        if self.network.getMetaData("templates") == None:
+            self.network.setMetaData("templates", ArrayList())
+        templates = self.network.getMetaData("templates")
+        templates.add(name)
+
+
+
         return ensemble
 
     def make_input(self,name,values,zero_after_time=None):
@@ -288,8 +370,8 @@ class Network:
         
         if isinstance(values,basestring) or (hasattr(values,'items') and callable(values.items)):
             values=functions.Interpolator(values)
-        
-        if callable(values):
+            funcs=values.create_function_list()
+        elif callable(values):
             d=values(0)
             if isinstance(d,(tuple,list)):
                 for i in range(len(d)):
@@ -300,13 +382,17 @@ class Network:
             for v in values:
                 if callable(v):
                     f=functions.PythonFunction(v,time=True)
+                elif isinstance(v, Function):
+                    f=v
                 elif zero_after_time is None:
                     f=ConstantFunction(1,v)
                 else:
                     f=PiecewiseConstantFunction([zero_after_time],[v,0])
                 funcs.append(f)
+                
+        parent,name=self._parse_name(name)        
         input=FunctionInput(name,funcs,Units.UNK)
-        self.network.addNode(input)
+        parent.addNode(input)
         return input
         
     def make_fourier_input(self,name,dimensions=None,base=1,high=10,power=0.5,seed=None):
@@ -351,15 +437,30 @@ class Network:
             if s is None: s=random.randint(0,0x7ffffff)
             f=FourierFunction(base[i%len(base)],high[i%len(high)],power[i%len(power)],s)
             funcs.append(f)
+            
+        parent,name=self._parse_name(name)    
         input=FunctionInput(name,funcs,Units.UNK)
-        self.network.addNode(input)
+        parent.addNode(input)
         return input
                     
             
-                
-            
-            
-
+    def make_subnetwork(self,name):
+        """Create and return a subnetwork.  Subnetworks are just Network objects that are
+        inside other Networks, and are useful for keeping a model organized.
+        
+        :param string name: name of created node
+        :returns: the created Network       
+        """
+        
+        parent,name=self._parse_name(name)
+        network=NetworkImpl()
+        network.name=name
+        parent.addNode(network)
+        if self.seed is None:
+            seed = None
+        else:
+            seed = self.random.randrange(0x7fffffff)
+        return Network(network, seed=seed, fixed_seed=self.fixed_seed)
 
     def _parse_pre(self,pre,func,origin_name):
         if isinstance(pre,Origin):
@@ -386,8 +487,8 @@ class Network:
                     except StructuralException:
                         origin=None
                     if origin is None:
-                        if isinstance(pre,array.NetworkArray):
-                            dim=pre._nodes[0].dimension
+                        if isinstance(pre,NetworkArrayImpl):
+                            dim=pre.nodes[0].dimension
                         else:
                             dim=pre.dimension
 
@@ -440,16 +541,30 @@ class Network:
             t[post][pre]=weight
         return t
 
-    def connect(self,pre,post,
+    def _get_nodes(self, name, delim='.'):
+        node = self.network
+        nodes = []
+        for n in name.split(delim):
+            try: 
+                node = node.getNode(n)
+                nodes.append(node)
+            except:
+                raise AttributeError('Could not find node called "%s"'%name)
+        return nodes
+
+    def _get_node(self, name, delim='.'):
+        return self._get_nodes(name, delim)[-1]
+
+    def connect(self, pre, post,
                 transform=None,weight=1,index_pre=None,index_post=None,
                 pstc=0.01,func=None,weight_func=None,expose_weights=False,origin_name=None,
-                modulatory=False,plastic_array=False,create_projection=True):
+                modulatory=False,plastic_array=False,create_projection=True, encoders=None):
         """Connect two nodes in the network.
 
         *pre* and *post* can be strings giving the names of the nodes, or they
         can be the nodes themselves (FunctionInputs and NEFEnsembles are
         supported).  They can also be actual Origins or Terminations, or any
-        combinaton of the above. If *post* is set to an integer or None, an origin
+        combination of the above. If *post* is set to an integer or None, an origin
         will be created on the *pre* population, but no other action will be taken.
 
         pstc is the post-synaptic time constant of the new Termination
@@ -501,7 +616,7 @@ class Network:
         :param transform: The linear transfom matrix to apply across the connection.
                           If *transform* is T and *pre* represents ``x``, then the connection
                           will cause *post* to represent ``Tx``.  Should be an N by M array,
-                          where N is the dimensionality of *pre* and M is the dimensionality of *post*,
+                          where N is the dimensionality of *post* and M is the dimensionality of *pre*,
                           but a 1-dimensional array can be given if either N or M is 1.
         :type transform: array of floats                              
         :param float pstc: post-synaptic time constant for the neurotransmitter/receptor implementing
@@ -563,10 +678,31 @@ class Network:
         :returns: the created Projection, or ``(origin,termination)`` if *create_projection* is False.                                          
         """
 
-        if isinstance(pre,basestring):
-            pre=self.network.getNode(pre)
-        if isinstance(post,basestring):
-            post=self.network.getNode(post)
+        pre_nodes = None
+        post_nodes = None
+
+        if isinstance(pre, basestring):
+            pre=self.alias.get(pre, pre) # handle aliased names
+
+            pre_nodes = self._get_nodes(pre)
+            pre = pre_nodes[-1]
+        elif isinstance(pre,Origin):
+            if create_projection and pre.node not in self.network.nodes:
+                raise Exception('Cannot connect directly from an Origin that is not in this network')
+        else:
+            if pre is not None and create_projection and pre not in self.network.nodes:
+                raise Exception('Cannot connect directly from a Node that is not in this network')
+                
+        if isinstance(post, basestring):
+            post=self.alias.get(post, post) # handle aliased names
+            post_nodes = self._get_nodes(post)
+            post = post_nodes[-1]
+        elif isinstance(post,Termination):
+            if create_projection and post.node not in self.network.nodes:
+                raise Exception('Cannot connect directly to a Termination that is not in this network')
+        else:
+            if post is not None and create_projection and post not in self.network.nodes:
+                raise Exception('Cannot connect directly to a Node that is not in this network')
 
         # Check if pre and post are set if projection is to be created
         if( create_projection ):
@@ -578,21 +714,42 @@ class Network:
             if( len( msg_str ) > 0 ):
                 raise Exception("nef_core.connect create_projection - " + msg_str)
 
-        # determine the origin and its dimensions
+        # determine the origin and its dimensions (builds if necessary)
         origin=self._parse_pre(pre,func,origin_name)
         dim_pre=origin.dimensions
-
+        
+       
         # check for the special case of being given a pre-existing termination
-        if isinstance(post,Termination):
-            self.network.addProjection(origin,post)
-            return
+        if isinstance(post,Termination) or encoders!=None:
+            if transform is not None: raise Exception('transform cannot be specified when connecting to an existing termination')
+            if index_pre is not None: raise Exception('index_pre cannot be specified when connecting to an existing termination')
+            if index_post is not None: raise Exception('index_post cannot be specified when connecting to an existing termination')
+            if weight_func is not None: raise Exception('weight_func cannot be specified when connecting to an existing termination')
+            if weight!=1: raise Exception('weight cannot be specified when connecting to an existing termination')
+            if expose_weights: raise Exception('expose_weights cannot be specified when connecting to an existing termination')
+            if encoders is None and modulatory: raise Exception('modulatory cannot be specified when connecting to an existing termination')
+            if encoders is None and pstc!=0.01: raise Exception('pstc cannot be specified when connecting to an existing termination')
 
+            if encoders!=None:
+                if isinstance(encoders, (float, int)): encoders=[[encoders]]*post.neurons
+                post.addTermination(pre.name, encoders, pstc, modulatory)
+                post=post.getTermination(pre.name)
+            
+            if create_projection:
+                self.network.addProjection(origin,post)
+            return
+                
+
+            
         if isinstance(post, int):
             dim_post=post
         elif post is None:
             dim_post = 1
         else:
             dim_post=post.dimension
+
+            
+
 
         if transform is None:
             transform=self.compute_transform(dim_pre,dim_post,weight,index_pre,index_post)
@@ -609,13 +766,18 @@ class Network:
         if plastic_array:
             suffix = ''
             attempts = 1
+            class MyWeightFunc(NetworkArrayImpl.WeightFunc):
+                def __init__(self, func):
+                    self.func = func
+                def call(self, weights):
+                    return self.func(weights)
             while attempts < 100:
                 try:
                     if hasattr(origin,'decoders'):
-                        term = post.addPlasticTermination(pre.name + suffix,transform,pstc,origin.decoders,weight_func)
+                        term = post.addPlasticTermination(pre.name + suffix,transform,pstc,origin.decoders,MyWeightFunc(weight_func))
                     else:
                         term = post.addPlasticTermination(pre.name + suffix,transform,pstc,
-                                                          [[0.0]*pre.dimension]*pre.neurons,weight_func)
+                                                          [[0.0]*pre.dimension]*pre.neurons,MyWeightFunc(weight_func))
                     break
                 except StructuralException,e:
                     exception = e
@@ -633,6 +795,9 @@ class Network:
             while hasattr(orig,'getWrappedOrigin'): orig=orig.getWrappedOrigin()
             decoder=orig.getDecoders()
             encoder=post.getEncoders()
+            
+            # scale by radius
+            encoder=MU.prod(encoder,1.0/post.getRadii()[0])
 
             a,va,k,d=inspect.getargspec(weight_func)
             if len(a)==1:            
@@ -645,14 +810,17 @@ class Network:
 
             term=post.addTermination(pre.name,w,pstc,False)
             
-            if isinstance(pre,array.NetworkArray):
+            if isinstance(pre,NetworkArrayImpl):
                 try:
                    pre.getOrigin('AXON')
                 except:    
                    pre.createEnsembleOrigin('AXON')
             
             if not create_projection: return pre.getOrigin('AXON'),term
-            self.network.addProjection(pre.getOrigin('AXON'),term)
+            
+            origin=pre.getOrigin('AXON')            
+            return self._connect_and_expose(origin,pre_nodes,term,post_nodes)
+            
         elif (post is not None) and (not isinstance(post, int)):
             suffix=''
             attempts=1
@@ -670,7 +838,39 @@ class Network:
 
             if post is None or isinstance(post, int): return origin
             if not create_projection: return origin,term
-            return self.network.addProjection(origin,term)
+            
+            return self._connect_and_expose(origin,pre_nodes,term,post_nodes)
+        else:
+            pass  # -- origin / termination has been created, work complete.
+            
+    def _connect_and_expose(self,origin,pre_nodes,term,post_nodes):
+        
+        # helper function for exposing to the desired level
+        def _expose_toplevel(o, nodes, expose_attr):
+            # -- if nodes looks like ['A', 'B', 'C']
+            #    then we want B.expose, then A.expose
+            for parent_node in reversed(nodes[:-1]):
+                name_in_parent = '%s.%s' % (
+                    o.node.name, o.getName())
+                expose_fn = getattr(parent_node, 'expose%s'%expose_attr)
+                expose_fn(o, name_in_parent)
+                o = getattr(parent_node,'get%s'%expose_attr)(name_in_parent)
+                assert o
+            return o
+    
+        projection_network=self.network
+        if pre_nodes is not None and post_nodes is not None:
+            while len(pre_nodes)>1 and len(post_nodes)>1 and pre_nodes[0]==post_nodes[0]:
+                projection_network=pre_nodes[0]
+                del pre_nodes[0]
+                del post_nodes[0]
+        if pre_nodes is not None:
+            origin = _expose_toplevel(origin, pre_nodes, 'Origin')
+        if post_nodes is not None:    
+            term = _expose_toplevel(term, post_nodes, 'Termination')
+        return projection_network.addProjection(origin,term)
+    
+                
     
     def learn(self,post,learn_term,mod_term,rate=5e-7,**kwargs):
         """Apply a learning rule to a termination of the *post* ensemble.
@@ -782,7 +982,7 @@ class Network:
             print 'Unknown type of learning termination:',learn_term    
 
     def learn_array(self,array,learn_term,mod_term,rate=5e-7,**kwargs):
-        """Apply a learning rule to a termination of a :class:`nef.array.NetworkArray` (an array of
+        """Apply a learning rule to a termination of a :class:`ca.nengo.model.impl.NetworkArrayImpl` (an array of
         ensembles, created using :func:`nef.Network.make_array()`).
         
         See :func:`nef.Network.learn()` for parameters.
@@ -887,6 +1087,21 @@ class Network:
         self.network.addNode(node)
         return node
 
+
+    def remove(self,node):
+        """Remove nodes from a network. Either the node object or the node name can
+        be used as a parameter to this function
+                  
+        :param node: the node or name of the node to be removed
+        :returns: node removed
+        """
+        if( not isinstance(node, str) ):
+            node = node.name
+        return_node = self.network.getNode(node)
+        self.network.removeNode(node)
+        return node
+
+
     def get(self,name,default=Exception,require_origin=False):
         """Return the node with the given *name* from the network
         """
@@ -895,8 +1110,14 @@ class Network:
         node=self.network
         while '.' in name:
             n,name=name.split('.',1)
-            node=node.getNode(n)
-        try:    
+            try:
+                node=node.getNode(n)
+            except:
+                if default is Exception:
+                    raise Exception('Could not find node:',original_name)
+                else:                            
+                    return default
+        try:
             node=node.getNode(name)
         except:
             try:
@@ -922,6 +1143,18 @@ class Network:
                     else:
                         return default    
         return node
+        
+    def set_alias(self, alias, node):
+        """Adds a named shortcut to an existing node within this network to be
+        used to simplify connect() calls.
+        
+        For example, you can do::
+        
+            net.set_alias('vision','A.B.C.D.E')
+            net.set_alias('motor','W.X.Y.Z')
+            net.connect('vision','motor')            
+        """    
+        self.alias[alias]=node
 
     def releaseMemory(self):
         """Attempt to release extra memory used by the Network.  Call only after all
@@ -963,9 +1196,9 @@ class Network:
             ng=ca.nengo.ui.NengoGraphics.getInstance()
         except:
             pass        
-        if ng is not None and run_time==0.0: self.network.simulator.addSimulatorListener(ng.progressIndicator)
+        if ng is not None and self.run_time==0.0: self.network.simulator.addSimulatorListener(ng.progressIndicator)
         self.network.simulator.run(self.run_time,self.run_time+time,dt)
-        if ng is not None and run_time==0.0: self.network.simulator.removeSimulatorListener(ng.progressIndicator)
+        if ng is not None and self.run_time==0.0: self.network.simulator.removeSimulatorListener(ng.progressIndicator)
         self.run_time=self.run_time+time
         
     def reset(self):
@@ -1023,7 +1256,8 @@ class Network:
         :param float maxy: maximum y value to plot
         """                               
         import timeview
-        timeview.funcrep1d.define(node,basis,label=label,origin=origin,minx=minx,maxx=maxx,miny=miny,maxy=maxy)
+        timeview.funcrep1d.FuncRepWatchCache.define(node,basis,label=label,origin=origin,minx=minx,maxx=maxx,miny=miny,maxy=maxy)
+
 
 def test():
     net=Network('Test')

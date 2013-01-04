@@ -2,12 +2,17 @@ title='Learned Termination'
 label='Learned\nTermination'
 icon='learn.png'
 
+description="""<html>This template introduces error-modulated learning into a pre-existing connection in the network. The presynaptic side is 'pre' and the postsynaptic side is 'post'. The error signal must be computed in the added error ensemble, and is usually a gradient.</html>"""
+
 params=[
-    ('errName','Name of (new) error ensemble',str),
-    ('N_err', 'Number of neurons in error ensemble',int),
-    ('preName','Name of pre ensemble',str),
-    ('postName','Name of post ensemble',str),
-    ('rate','Learning rate',float)
+    ('errName','Name of (new) error ensemble',str,
+      "Provides modulatory input to the post ensemble, "
+      "modifying its connection from the pre ensemble."
+      "<br />Automatically created."),
+    ('N_err', 'Number of neurons in error ensemble',int, 'Set the number of neurons in the error ensemble'),
+    ('preName','Name of pre ensemble',str, 'Select the name of the pre ensemble (this ensemble must already exist)'),
+    ('postName','Name of post ensemble',str,'Select the name of the post ensemble (this ensemble must already exist)'),
+    ('rate','Learning rate',float, 'Set the learning rate')
     ]
 
 def test_params(net,p):
@@ -31,7 +36,8 @@ import random
 from ca.nengo.model.plasticity.impl import STDPTermination, PlasticEnsembleImpl
 import nef
 import numeric
-    
+from java.util import ArrayList
+from java.util import HashMap
 def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-7):
 
     # get pre and post ensembles from their names
@@ -71,4 +77,28 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
 
     # Set learning rule on the non-decoded termination
     net.learn(post,prename,modname,rate=rate)
+
+    if net.network.getMetaData("learnedterm") == None:
+        net.network.setMetaData("learnedterm", HashMap())
+    learnedterms = net.network.getMetaData("learnedterm")
+
+    learnedterm=HashMap(5)
+    learnedterm.put("errName", errName)
+    learnedterm.put("N_err", N_err)
+    learnedterm.put("preName", preName)
+    learnedterm.put("postName", postName)
+    learnedterm.put("rate", rate)
+
+    learnedterms.put(errName, learnedterm)
+
+    if net.network.getMetaData("templates") == None:
+        net.network.setMetaData("templates", ArrayList())
+    templates = net.network.getMetaData("templates")
+    templates.add(errName)
+
+    if net.network.getMetaData("templateProjections") == None:
+        net.network.setMetaData("templateProjections", HashMap())
+    templateproj = net.network.getMetaData("templateProjections")
+    templateproj.put(errName, postName)
+    templateproj.put(preName, postName)
     

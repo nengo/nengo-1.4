@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.lang.StringBuilder;
 
 import ca.nengo.dynamics.DynamicalSystem;
 import ca.nengo.dynamics.Integrator;
@@ -41,6 +42,7 @@ import ca.nengo.dynamics.impl.SimpleLTISystem;
 import ca.nengo.math.ApproximatorFactory;
 import ca.nengo.math.Function;
 import ca.nengo.math.LinearApproximator;
+import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.math.impl.WeightedCostApproximator;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
@@ -56,6 +58,7 @@ import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.nef.NEFEnsembleFactory;
 import ca.nengo.model.nef.NEFNode;
 import ca.nengo.model.neuron.Neuron;
+import ca.nengo.model.neuron.impl.LIFNeuronFactory;
 import ca.nengo.model.neuron.impl.LIFSpikeGenerator;
 import ca.nengo.model.neuron.impl.SpikeGeneratorOrigin;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
@@ -63,10 +66,10 @@ import ca.nengo.model.plasticity.impl.PESTermination;
 import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
 import ca.nengo.model.plasticity.impl.PreLearnTermination;
 import ca.nengo.util.MU;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.impl.LearningTask;
 import ca.nengo.util.impl.TimeSeriesImpl;
-
 /**
  * Default implementation of NEFEnsemble.
  *
@@ -241,6 +244,14 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 					}
 
 					origin.rebuildDecoder(myDecodingApproximators.get(nodeOrigin));
+				}
+				
+				if (origin.getExpressModel() != null) {
+					try {
+						origin.getExpressModel().update();
+					} catch (SimulationException e) {
+						throw new StructuralException("Can't update ExpressModel for radius change", e);
+					}
 				}
 			}
 		}
@@ -798,7 +809,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 				}
 
-				if ( getMode().equals(SimulationMode.DIRECT) ) {
+				if ( getMode().equals(SimulationMode.DIRECT) || getMode().equals(SimulationMode.EXPRESS)) {
 					//run ensemble dynamics if they exist (e.g. to model adaptation)
 					if (myDirectModeDynamics != null) {
 						TimeSeries dynamicsInput = new TimeSeriesImpl(new float[]{startTime, endTime},
@@ -996,8 +1007,40 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		return p;
 	}
 
+    @Override
+    public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
+        StringBuilder py = new StringBuilder(String.format("%s.make('%s', %d, %d", 
+                    scriptData.get("netName"), 
+                    getName(), 
+                    getNodes().length, 
+                    myDimension));
+
+        NodeFactory nodeFactory = myEnsembleFactory.getNodeFactory();
+        if (nodeFactory instanceof LIFNeuronFactory) {
+            LIFNeuronFactory neuronFactory = (LIFNeuronFactory)nodeFactory;
+
+            if (!(neuronFactory.getMaxRate() instanceof IndicatorPDF) ||
+                !(neuronFactory.getIntercept() instanceof IndicatorPDF)) {
+                throw new ScriptGenException("Max Rate or Intercept for LIF Neuron Factory not specified as a uniform range");
+            }
+
+            py.append(String.format(", tau_rc=%.3f, tau_ref=%.3f, max_rate=(%.1f, %.1f), intercept=(%.1f, %.1f)", 
+                        neuronFactory.getTauRC(), 
+                        neuronFactory.getTauRef(), 
+                        ((IndicatorPDF)neuronFactory.getMaxRate()).getLow(), 
+                        ((IndicatorPDF)neuronFactory.getMaxRate()).getHigh(), 
+                        ((IndicatorPDF)neuronFactory.getIntercept()).getLow(), 
+                        ((IndicatorPDF)neuronFactory.getIntercept()).getHigh()));
+        } else {
+            throw new ScriptGenException("Neuron Factory not supported. Only LIF Neuron Factory is supported");
+        }
+
+        py.append(String.format(", radius=%.2f)\n", myRadii[0]));
+        return py.toString();
+    }
+
 	@Override
-    public NEFEnsemble clone() throws CloneNotSupportedException {
+    public NEFEnsembleImpl clone() throws CloneNotSupportedException {
 		NEFEnsembleImpl result = (NEFEnsembleImpl) super.clone();
 
 		result.myEncoders = MU.clone(myEncoders);
@@ -1031,7 +1074,6 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	public void setNeurons(int count) throws StructuralException {
 	    setNodeCount(count);
 	}
-
 
 	/**
 	 * @return number of neurons

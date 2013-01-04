@@ -42,8 +42,6 @@ public class ProbeIcon extends ModelIcon {
 
 	public static Color DEFAULT_COLOR = NengoStyle.COLOR_LIGHT_PURPLE;
 
-	private static final long serialVersionUID = 1L;
-
 	public ProbeIcon(ModelObject parent) {
 		super(parent, new WorldObjectImpl(new Triangle()));
 

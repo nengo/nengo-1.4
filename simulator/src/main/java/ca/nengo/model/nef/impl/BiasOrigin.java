@@ -88,7 +88,7 @@ public class BiasOrigin extends DecodedOrigin {
 				new Function[]{new ConstantFunction(ensemble.getDimension(), 0f)},
 				getUniformBiasDecoders(constantOutputs, excitatory));
 
-		myInterneurons = createInterneurons(name + ":interneurons", numInterneurons, excitatory);
+		myInterneurons = createInterneurons(name + " interneurons", numInterneurons, excitatory);
 		myConstantOutputs = constantOutputs;
 	}
 

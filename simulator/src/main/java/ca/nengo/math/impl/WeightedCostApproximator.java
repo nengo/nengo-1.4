@@ -116,7 +116,10 @@ public class WeightedCostApproximator implements LinearApproximator {
 	}
 
 	private static native boolean hasGPU();
+	
+	@SuppressWarnings("unused")
 	private static native float[][] nativePseudoInverse(float[][] java_matrix, float minSV, int numSV);
+	@SuppressWarnings("unused")
 	private static native float[][] nativeFindGamma(float[][] noisyValues);
 
 	// the above two functions combined into one to minimize GPU-CPU communication
@@ -295,6 +298,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 		return SD;
 	}
 	
+	@SuppressWarnings("unused")
 	private float addNoise(float[][][] values, float noise) {
 		float maxValue = 0f;
 		for (float[][] row : values) {

@@ -113,7 +113,6 @@ public class CDecodedOrigin extends ProjectionConstructor {
  * @author Shu Wu
  */
 class OriginInputPanel extends PropertyInputPanel {
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Selector of the Node Origin
@@ -167,8 +166,8 @@ class OriginSelector extends Property {
 	private static final long serialVersionUID = 1L;
 	String[] origins;
 
-	public OriginSelector(String name, String[] originNames) {
-		super(name);
+	public OriginSelector(String name, String description, String[] originNames) {
+		super(name, description);
 		this.origins = originNames;
 	}
 

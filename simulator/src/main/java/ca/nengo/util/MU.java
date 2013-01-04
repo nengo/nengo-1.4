@@ -124,7 +124,7 @@ public class MU {
 		
 		for (int i = 0; i < length; i++) {
 			for (int j = 0; j < src[0].length; j++) {
-			dest[i+destRowPos][j+destColPos]=src[i][j];	
+				dest[i+destRowPos][j+destColPos]=src[i][j];	
 			}
 		}
 		return;
@@ -159,6 +159,38 @@ public class MU {
 		
 		return result;
 	}
+
+	/**
+	 * @param matrix Matrix to copy from
+	 * @param startRow Row in matrix from which to start copying
+	 * @param startCol Col in matrix from which to start copying 
+	 * @param lengthRow Number of rows to copy (set to a negative number to copy all the way to the end)
+	 * @param lengthCol Number of cols to copy (set to a negative number to copy all the way to the end)
+	 * @return Values copied from source vector
+	 */
+	public static float[][] copy(float[][] matrix, int startRow, int startCol, int lengthRow, int lengthCol) {
+		int srcRows = matrix.length;
+		int srcCols = matrix[0].length;
+		
+		if (lengthRow < 0)
+			lengthRow = srcRows - startRow;
+		
+		if (lengthCol < 0)
+			lengthCol = srcCols - startCol;
+		
+		assert startRow + lengthRow <= srcRows && startCol + lengthCol <= srcCols; 
+		
+		float[][] result = new float[lengthRow][lengthCol];
+		
+		for (int i = 0; i < lengthRow; i++) {
+			for (int j = 0; j < lengthCol; j++){
+				result[i][j] = matrix[i + startRow][j + startCol];
+			}
+		}
+		
+		return result;
+	}
+	
 	
 	/**
 	 * @param X Any vector

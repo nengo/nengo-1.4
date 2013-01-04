@@ -1,6 +1,14 @@
 *.class
 *.pyc
 *.pkc
+.DS_Store
 nengo-*
 nengo-latest.zip
 NengoModels
+
+.metadata/*
+simulator-ui/commandhistory.dat
+
+simulator-ui/quick/*
+
+simulator-ui/python/timeview/layout.db.bak

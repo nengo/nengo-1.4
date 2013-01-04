@@ -1,8 +1,5 @@
-///*
-// * Created on 29-May-07
-// */
 //package ca.nengo.model.plasticity.impl;
-//
+
 //import ca.nengo.TestUtil;
 //import ca.nengo.math.Function;
 //import ca.nengo.math.impl.AbstractFunction;

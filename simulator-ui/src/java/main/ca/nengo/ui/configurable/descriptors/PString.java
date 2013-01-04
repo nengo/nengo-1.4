@@ -39,18 +39,10 @@ public class PString extends Property {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @param name TODO
-     */
     public PString(String name) {
         super(name);
     }
 
-    /**
-     * @param name TODO
-     * @param description TODO
-     * @param defaultValue TODO
-     */
     public PString(String name, String description, String defaultValue) {
         super(name, description, defaultValue);
     }

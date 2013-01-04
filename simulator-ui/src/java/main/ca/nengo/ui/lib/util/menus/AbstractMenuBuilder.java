@@ -20,6 +20,8 @@ public abstract class AbstractMenuBuilder {
 	}
 
 	public abstract void addAction(StandardAction action);
+	
+	public abstract void addActionsRadio(StandardAction[] actions, int selected);
 
 	public abstract void addLabel(String msg);
 

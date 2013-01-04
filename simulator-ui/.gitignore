@@ -1,7 +1,9 @@
 .ant_targets
+.pydevproject
 artifacts
 bin
 layouts
 nengo.log
 UIFiles
 User.config
+external

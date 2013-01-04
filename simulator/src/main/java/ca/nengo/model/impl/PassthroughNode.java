@@ -50,6 +50,7 @@ import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
 import ca.nengo.util.MU;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
 
@@ -405,12 +406,26 @@ public class PassthroughNode implements Node {
 		}
 
 		@Override
-		public Termination clone() throws CloneNotSupportedException {
-			PassthroughTermination result = new PassthroughTermination(myNode, myName, myDimension, MU.clone(myTransform));
+		public PassthroughTermination clone() throws CloneNotSupportedException {
+			return this.clone(myNode);
+		}
+		
+		public PassthroughTermination clone(Node node) throws CloneNotSupportedException {
+			PassthroughTermination result = (PassthroughTermination) super.clone();
+			result.myNode = node;
 			result.myValues = myValues.clone();
+			result.myTransform = MU.clone(myTransform);
 			return result;
 		}
 
+	}
+
+	public Node[] getChildren() {
+		return new Node[0];
+	}
+
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
+		return "";
 	}
 
 }

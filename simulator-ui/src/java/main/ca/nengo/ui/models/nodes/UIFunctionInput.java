@@ -41,7 +41,6 @@ import ca.nengo.ui.models.tooltips.TooltipBuilder;
 public class UIFunctionInput extends UINeoNode {
 
 	public static final String typeName = "Function Input";
-	private static final long serialVersionUID = 1L;
 
 	public UIFunctionInput(FunctionInput model) {
 		super(model);

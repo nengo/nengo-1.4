@@ -68,10 +68,25 @@ public class CreateModelAction extends ReversableAction {
      */
     public static void ensureNonConflictingName(Node node, NodeContainer container)
             throws UserCancelledException {
-        String originalName = node.getName();
         String newName = node.getName();
         int i = 0;
 
+        // Check if the name itself is valid
+        while (true) {
+	        try {
+	            node.setName(newName);
+	            break;
+	        } catch (StructuralException e) {
+	            newName = JOptionPane.showInputDialog(UIEnvironment.getInstance(),
+	                    "Names cannot contain '.' or ':', please enter a new name", newName);
+	            if (newName == null || newName.equals("")) {
+	                throw new UserCancelledException();
+	            }
+	        }
+        }
+        String originalName = node.getName();
+        
+        
         while (container.getNodeModel(newName) != null) {
             // Avoid duplicate names
             while (container.getNodeModel(newName) != null) {
@@ -135,7 +150,9 @@ public class CreateModelAction extends ReversableAction {
         try {
 
             Object model = ModelFactory.constructModel(constructable);
-            if (model instanceof Node) {
+            if (model == null) {
+            	throw new ActionException("No model was created");
+            } else if (model instanceof Node) {
                 final Node node = (Node) model;
 
                 SwingUtilities.invokeAndWait(new Runnable() {

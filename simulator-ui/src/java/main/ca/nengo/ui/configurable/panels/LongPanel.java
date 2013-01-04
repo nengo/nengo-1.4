@@ -26,9 +26,6 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.configurable.panels;
 
-import javax.swing.JTextField;
-
-import ca.nengo.ui.configurable.PropertyInputPanel;
 import ca.nengo.ui.configurable.descriptors.PLong;
 
 /**
@@ -36,16 +33,12 @@ import ca.nengo.ui.configurable.descriptors.PLong;
  * 
  * @author Shu Wu
  */
-public class LongPanel extends PropertyInputPanel {
+public class LongPanel extends PropertyTextPanel {
 
-    private JTextField tf;
+	private static int COLUMNS = 10;
 
-    /**
-     * @param property TODO
-     */
     public LongPanel(PLong property) {
-        super(property);
-        initPanel();
+        super(property, COLUMNS);
     }
 
     @Override
@@ -55,23 +48,14 @@ public class LongPanel extends PropertyInputPanel {
 
     @Override
     public Long getValue() {
-
-        Long longValue = new Long(tf.getText());
+        Long longValue = new Long(getText());
         return longValue;
-
-    }
-
-    private void initPanel() {
-        tf = new JTextField(10);
-        add(tf);
     }
 
     @Override
-    public boolean isValueSet() {
-        String textValue = tf.getText();
-
+    protected TextError checkValue(String textValue) {
         if (textValue == null || textValue.compareTo("") == 0) {
-            return false;
+            return TextError.ValueNotSet;
         }
 
         try {
@@ -80,21 +64,15 @@ public class LongPanel extends PropertyInputPanel {
             if (getDescriptor().isCheckRange()) {
                 if (value > getDescriptor().getMax()
                         || value < getDescriptor().getMin()) {
-                    return false;
+                    return TextError.InvalidFormat;
                 }
             }
 
         } catch (NumberFormatException e) {
-            return false;
+        	return TextError.InvalidFormat;
         }
 
-        return true;
-    }
-
-    @Override
-    public void setValue(Object value) {
-        tf.setText(value.toString());
-
+        return TextError.NoError;
     }
 
 }

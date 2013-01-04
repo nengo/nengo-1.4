@@ -163,6 +163,9 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		for (Node myNode : myNodes) {
 			myNode.setMode(mode);
 		}
+		
+		// Added for issue #310: Setting mode can now be a visible change
+		fireVisibleChangeEvent();
 	}
 
 
@@ -578,29 +581,42 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	@Override
     public Ensemble clone() throws CloneNotSupportedException {
 		AbstractEnsemble result = (AbstractEnsemble) super.clone();
+		
+		/////////////////////////////////////////////////////////////
+		// undo unintentional object.clone() side effects
+		result.myListeners = new ArrayList<Listener>(3);
 
+		/////////////////////////////////////////////////////////////
+		// manually clone all the necessary sub-components
+		
 		Node[] oldNodes = getNodes();
 		Node[] nodes = oldNodes.clone(); //use clone rather than new Node[] to retain array type, e.g. NEFNode[]
 		for (int i = 0; i < nodes.length; i++) {
 			nodes[i] = oldNodes[i].clone();
 		}
 		result.myNodes = nodes;
-
-		result.myOrigins = new LinkedHashMap<String, Origin>(10);
+		result.myStateNames = findStateNames(nodes);
+		
+		result.myOrigins = new LinkedHashMap<String, Origin>(myOrigins.size());
 		for (Origin origin : myOrigins.values()) {
-			result.myOrigins.put(origin.getName(), origin.clone());
+			result.myOrigins.put(origin.getName(), origin.clone(result));
 		}
 		
-		
-		result.myTerminations = new LinkedHashMap<String, EnsembleTermination>(10);
-		for (Termination termination : myTerminations.values()) {
-			result.myTerminations.put(termination.getName(), (EnsembleTermination) termination.clone());
+		result.myTerminations = new LinkedHashMap<String, EnsembleTermination>(myTerminations.size());
+		for (EnsembleTermination termination : myTerminations.values()) {
+			result.myTerminations.put(termination.getName(), termination.clone(result));
 		}
-
+		
 		if (mySpikePattern != null) {
             result.mySpikePattern = (SpikePatternImpl) mySpikePattern.clone();
         }
-
+		
+		// Currently, stateNames is never modified, and therefore does not need to be cloned
+//		result.myStateNames = new LinkedHashMap<String, List<Integer>>(myStateNames.size());
+//		for (String key : myStateNames.keySet()) {
+//			result.myStateNames.put(key, new ArrayList<Integer>(myStateNames.get(key)));
+//		}
+		
 		return result;
 	}
 }

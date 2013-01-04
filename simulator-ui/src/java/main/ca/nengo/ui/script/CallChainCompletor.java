@@ -39,18 +39,14 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.python.core.PyClass;
-import org.python.core.PyFunction;
-import org.python.core.PyInstance;
 //import org.python.core.PyJavaClass;
 //import org.python.core.PyJavaInstance;
 import org.python.core.PyJavaType;
 import org.python.core.PyList;
-import org.python.core.PyMethod;
 import org.python.core.PyObject;
 import org.python.core.PyObjectDerived;
 import org.python.core.PyString;
 import org.python.core.PyStringMap;
-import org.python.core.PyTableCode;
 import org.python.util.PythonInterpreter;
 
 import ca.nengo.config.JavaSourceParser;
@@ -206,16 +202,16 @@ public class CallChainCompletor extends CommandCompletor {
 		return result;
 	}
 	
-	private static String getClassDocs(String className) {
-		String result = null;
-		try {
-			Class<?> c = Class.forName(className);
-			result = JavaSourceParser.getDocs(c);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return (result == null) ? "" : result;
-	}
+//	private static String getClassDocs(String className) {
+//		String result = null;
+//		try {
+//			Class<?> c = Class.forName(className);
+//			result = JavaSourceParser.getDocs(c);
+//		} catch (ClassNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//		return (result == null) ? "" : result;
+//	}
 	
 	/**
 	 * @param base A variable name in the interpreter. For variables that wrap 

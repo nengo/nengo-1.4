@@ -32,6 +32,7 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -40,10 +41,14 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.text.MutableAttributeSet;
 
+import ca.nengo.ui.NengoGraphics;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.Property;
@@ -149,19 +154,23 @@ public class ConfigDialog extends JDialog {
         buttonsPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 5, 5));
 
         JButton addToWorldButton = new JButton("Ok");
-        addToWorldButton.addActionListener(new ActionListener() {
+        ActionListener okActionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 okAction();
             }
-        });
+        };
+        addToWorldButton.addActionListener(okActionListener);
+        addToWorldButton.registerKeyboardAction(okActionListener, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         buttonsPanel.add(addToWorldButton);
 
         JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(new ActionListener() {
+        ActionListener cancelActionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 cancelAction();
             }
-        });
+        };
+        cancelButton.addActionListener(cancelActionListener);
+        cancelButton.registerKeyboardAction(cancelActionListener, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         buttonsPanel.add(cancelButton);
 
         advancedButton = new JButton("Advanced");
@@ -296,8 +305,15 @@ public class ConfigDialog extends JDialog {
                         try {
                             completeConfiguration();
                         } catch (ConfigException e) {
-                            configException = e;
-
+                            configException = e;                            
+                        } catch (RuntimeException e) {
+                        	Throwable cause=e;
+                        	while (cause.getCause()!=null) cause=cause.getCause();
+                        	configException = new ConfigException(cause.getMessage());
+                        }
+                        
+                        if (configException!=null) {
+                        	JOptionPane.showMessageDialog(NengoGraphics.getInstance(), configException.getMessage());
                         }
 
                         myConfigManager.dialogConfigurationFinished(configException);
@@ -364,9 +380,7 @@ public class ConfigDialog extends JDialog {
      * Initializes the dialog contents top
      */
     protected void initPanelTop(JPanel panel) {
-        /*
-         * Used by subclasses to add elements to the panel
-         */
+         //Used by subclasses to add elements to the panel
     }
 
     /**

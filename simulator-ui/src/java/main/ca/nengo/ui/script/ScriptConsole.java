@@ -38,6 +38,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import javax.swing.Action;
@@ -55,13 +56,8 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
 import org.apache.log4j.Logger;
+import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
-import org.python.core.PyFrame;
-import org.python.core.PyException;
-import org.python.core.PyObject;
-import org.python.core.ThreadState;
-import org.python.core.Py;
-import org.python.core.TraceFunction;
 
 
 import ca.nengo.config.JavaSourceParser;
@@ -101,6 +97,7 @@ public class ScriptConsole extends JPanel {
 	private PythonInterpreter myInterpreter;
 	private JEditorPane myDisplayArea;
 	private JTextArea myCommandField;
+	private JScrollPane myDisplayScroll;
 	private HistoryCompletor myHistoryCompletor;
 	private CallChainCompletor myCallChainCompletor;
 	private boolean myInCallChainCompletionMode;
@@ -114,6 +111,7 @@ public class ScriptConsole extends JPanel {
 	private int myDefaultDismissDelay;
 	private long myLastHelpTime = 0;
 	private Action myHideTip;
+	private ArrayList<String> myAddedVariables;
 
 	/**
 	 * @param interpreter
@@ -126,22 +124,25 @@ public class ScriptConsole extends JPanel {
 		myDisplayArea = new JEditorPane("text/html", "");
 		myDisplayArea.setEditable(false);
 		myDisplayArea.setMargin(new Insets(5, 5, 5, 5));
+		
+		// add a listener, so that keys typed when displayArea has focus can pass to commandField
+		myDisplayArea.addKeyListener(new CommandKeyListener(this));
 
 		myCommandField = new JTextArea();
 		ToolTipManager.sharedInstance().registerComponent(myCommandField);
 
 		setLayout(new BorderLayout());
-		JScrollPane displayScroll = new JScrollPane(myDisplayArea);
+		myDisplayScroll = new JScrollPane(myDisplayArea);
 
 		seperator = new JSeparator(JSeparator.HORIZONTAL);
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
-		panel.add(displayScroll, BorderLayout.CENTER);
+		panel.add(myDisplayScroll, BorderLayout.CENTER);
 		panel.add(seperator, BorderLayout.SOUTH);
 
 		add(panel, BorderLayout.CENTER);
 		add(myCommandField, BorderLayout.SOUTH);
-		displayScroll.setBorder(null);
+		myDisplayScroll.setBorder(null);
 
 		myCommandField.addKeyListener(new CommandKeyListener(this));
 		myCommandField.setFocusTraversalKeysEnabled(false);
@@ -153,6 +154,7 @@ public class ScriptConsole extends JPanel {
 		myInCallChainCompletionMode = false;
 		myTypedText = "";
 		myTypedCaretPosition = 0;
+		myAddedVariables = new ArrayList<String>();
 
 		interpreter.setOut(new ConsoleOutputWriter(this));
 		
@@ -210,6 +212,7 @@ public class ScriptConsole extends JPanel {
 	 */
 	public void addVariable(String name, Object variable) {
 		myInterpreter.set(makePythonName(name), variable);
+		myAddedVariables.add(makePythonName(name));
 	}
 
 	/**
@@ -221,6 +224,36 @@ public class ScriptConsole extends JPanel {
 		if (myInterpreter.get(name) != null) {
 			myInterpreter.exec("del " + name);
 		}
+	}
+	
+	/**
+	 * Returns names of all variables in the local workspace.
+	 */
+	public String[] getVariables() {
+		PyStringMap dict = (PyStringMap)myInterpreter.getLocals();
+		return (String[])dict.keys().toArray(new String[0]);
+	}
+	
+	/**
+	 * Reset the script console back to initial conditions (remove all modules and variables
+	 * added within the interpreter).
+	 */
+	public void reset(boolean clearModules) {
+		if(clearModules) {
+			//remove modules
+			myInterpreter.exec("sys.modules.clear()");
+		}
+		
+		//remove variables
+		String[] vars = getVariables();
+		for(String v : vars) {
+			if(!myAddedVariables.contains(v) && !v.startsWith("__")) //keep any variables that were added manually or special vars
+				removeVariable(v);
+		}
+		
+		//re-add init variables
+		myInterpreter.execfile("python/startup_ui.py");
+
 	}
 
 	private static String makePythonName(String name) {
@@ -286,9 +319,16 @@ public class ScriptConsole extends JPanel {
 			myDisplayArea.setCaretPosition(myDisplayArea.getDocument().getLength()); // scroll
 			// to
 			// end
+			scrollToBottom();
 		} catch (BadLocationException e) {
 			ourLogger.warn("Scrolling problem", e);
 		}
+	}
+	
+	public void scrollToBottom() {
+		myDisplayScroll.getVerticalScrollBar().setValue(myDisplayScroll.getVerticalScrollBar().getMaximum());
+		//myDisplayArea.setCaretPosition(myDisplayArea.getDocument().getLength());		
+		//myDisplayArea.scrollRectToVisible(new Rectangle(0,myDisplayArea.getHeight(),0,myDisplayArea.getHeight()));
 	}
 
 	/**
@@ -365,7 +405,7 @@ public class ScriptConsole extends JPanel {
 
             @Override
             protected void action() throws ActionException {
-            	NengoGraphics.getInstance().getProgressIndicator().setText(initText.trim());
+            	NengoGraphics.getInstance().getProgressIndicator().start(initText.trim());
             	myCommandField.setEnabled(false);
                 try {
         			if (initText.startsWith("run ")) {
@@ -373,7 +413,11 @@ public class ScriptConsole extends JPanel {
         				myInterpreter.execfile(initText.substring(4).trim());
         			} else if (initText.startsWith("help ")) {
         				appendText(JavaSourceParser.removeTags(getHelp(initText.substring(5).trim())), HELP_STYLE);
-        				appendText("\n","root");
+        				appendText("\n","root");   
+        			} else if (initText.equals("clear")) {
+        				myDisplayArea.setText("");
+        			} else if (initText.equals("reset")) {
+        				reset(true);
         			} else {
         				myInterpreter.exec(initText);
         			}
@@ -539,7 +583,14 @@ public class ScriptConsole extends JPanel {
 		return command.substring(start);
 	}
 
-
+	public void passKeyEvent( KeyEvent e ) {
+		KeyListener[] kl = myCommandField.getKeyListeners();
+		for( KeyListener listener : kl ) {
+			if (listener instanceof CommandKeyListener) {
+				((CommandKeyListener)listener).keyPressed(e);
+			}
+		}
+	}
 
 	private class CommandKeyListener implements KeyListener {
 
@@ -552,31 +603,43 @@ public class ScriptConsole extends JPanel {
 		public void keyPressed(KeyEvent e) {
 			try {
 				int code = e.getKeyCode();
-				if (code == 27 && myConsole.getInCallChainCompletionMode()) { // escape
+				if (code == KeyEvent.VK_ESCAPE && myConsole.getInCallChainCompletionMode()) { // escape
 					myConsole.revertToTypedText();
 					myConsole.setInCallChainCompletionMode(false);
-				} else if (code == 27) {
+				} else if (code == KeyEvent.VK_ESCAPE) {
 					myConsole.clearCommand();
-				} else if (code == 9 && e.isShiftDown()) { // shift-tab
+				} else if (code == KeyEvent.VK_TAB && e.isShiftDown()) { // shift-tab
 					myCommandField.append("\t");
-				} else if (code == 9) { // tab
+				} else if (code == KeyEvent.VK_TAB) { // tab
 					myConsole.setInCallChainCompletionMode(true);
 					e.consume();
-				} else if (code == 38) { // up arrow
+				} else if (code == KeyEvent.VK_UP) { // up arrow
 					myConsole.completorUp();
 					e.consume();
-				} else if (code == 40) { // down arrow
+				} else if (code == KeyEvent.VK_DOWN) { // down arrow
 					myConsole.completorDown();
 					e.consume();
-				} else if (code == 17) { //CTRL
+				} else if (code == KeyEvent.VK_CONTROL) {
 					myConsole.showToolTip();
-				} else if (code == 10 && e.isShiftDown()) { //shift-enter
+				} else if (code == KeyEvent.VK_ENTER && e.isShiftDown()) { //shift-enter
 					//allow a new line to be entered
 					myCommandField.append("\n");
-				} else if (code == 10) { //enter.  execute code.
+				} else if (code == KeyEvent.VK_ENTER) { //enter.  execute code.
 					e.consume();
 					myConsole.enterCommand(myCommandField.getText());
 				} else {
+					if (!myConsole.myCommandField.hasFocus() && e.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+						// a typing event is coming from far away (the command field doesn't have focus)
+						// so manually append the typed character
+						String curtext = myConsole.myCommandField.getText();
+						if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+							myConsole.myCommandField.setText( curtext.substring(0,curtext.length()-1) );
+						else if (e.getKeyCode() != KeyEvent.VK_DELETE)
+							myConsole.myCommandField.setText( myConsole.myCommandField.getText() + e.getKeyChar() );
+						
+						myConsole.myCommandField.requestFocus();
+					}
+					
 					myConsole.setInCallChainCompletionMode(false);
 				}
 			} catch (RuntimeException ex) {

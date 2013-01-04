@@ -1,7 +1,6 @@
 D=20
 N_input=300
 N_conv=70
-mySeed=7
 
 import nef
 import nef.convolution
@@ -11,49 +10,87 @@ import random
 
 vocab=hrr.Vocabulary(D,max_similarity=0.1)
 
-net=nef.Network('Question Answering (pre-built)', seed=mySeed)
-A=net.make('A',N_input,D)
-B=net.make('B',N_input,D)
-C=net.make('C',N_input,D)
-ens_D=net.make('D',N_input,D)
-E=net.make('E',N_input,D)
+net=nef.Network('Question Answering (pre-built)',seed=7)
+net.make('A',N_input,D)
+net.make('B',N_input,D)
+net.make('C',N_input,D)
+net.make('D',N_input,D)
+net.make('E',N_input,D)
 
-nef.convolution.make_convolution(net, 'Bind', A, B, ens_D, N_conv, quick=True, invert_first=False, invert_second=False)
-nef.convolution.make_convolution(net, 'Unbind', C, ens_D, E, N_conv, quick=True, invert_first=True, invert_second=False)
+nef.convolution.make_convolution(net, 'Bind', 'A', 'B', 'D', N_conv, invert_first=False, invert_second=False)
+nef.convolution.make_convolution(net, 'Unbind', 'C', 'D', 'E', N_conv, invert_first=True, invert_second=False)
 
-CIRCLE=vocab.parse('CIRCLE')
-BLUE=vocab.parse('BLUE')
-RED=vocab.parse('RED')
-SQUARE=vocab.parse('SQUARE')
+CIRCLE=vocab.parse('CIRCLE').v
+BLUE=vocab.parse('BLUE').v
+RED=vocab.parse('RED').v
+SQUARE=vocab.parse('SQUARE').v
 ZERO=[0]*D
 
-class Input(nef.SimpleNode):
-  def origin_A(self):
-    t=(self.t_start)%1.0
-    if 0<t<0.5: return RED.v
-    if 0.5<t<1: return BLUE.v
-    return ZERO
-  def origin_B(self):
-    t=(self.t_start)%1.0
-    if 0.0<t<0.5: return CIRCLE.v
-    if 0.5<t<1: return SQUARE.v
-    return ZERO
-  def origin_C(self):
-    t=(self.t_start)%1.0
-    if 0.2<t<0.35: return CIRCLE.v
-    if 0.35<t<0.5: return RED.v
-    if 0.7<t<0.85: return SQUARE.v
-    if 0.85<t<1: return BLUE.v
-    return ZERO
+
+# Create the inputs
+inputA={}
+inputA[0.0]=RED
+inputA[0.5]=BLUE
+inputA[1.0]=RED
+inputA[1.5]=BLUE
+inputA[2.0]=RED
+inputA[2.5]=BLUE
+inputA[3.0]=RED
+inputA[3.5]=BLUE
+inputA[4.0]=RED
+inputA[4.5]=BLUE
+net.make_input('inputA',inputA)
+net.connect('inputA','A')
+
+inputB={}
+inputB[0.0]=CIRCLE
+inputB[0.5]=SQUARE
+inputB[1.0]=CIRCLE
+inputB[1.5]=SQUARE
+inputB[2.0]=CIRCLE
+inputB[2.5]=SQUARE
+inputB[3.0]=CIRCLE
+inputB[3.5]=SQUARE
+inputB[4.0]=CIRCLE
+inputB[4.5]=SQUARE
+net.make_input('inputB',inputB)
+net.connect('inputB','B')
 
 
+inputC={}
+inputC[0.0]=ZERO
+inputC[0.2]=CIRCLE
+inputC[0.35]=RED
+inputC[0.5]=ZERO
+inputC[0.7]=SQUARE
+inputC[0.85]=BLUE
+inputC[1.0]=ZERO
+inputC[1.2]=CIRCLE
+inputC[1.35]=RED
+inputC[1.5]=ZERO
+inputC[1.7]=SQUARE
+inputC[1.85]=BLUE
+inputC[2.0]=ZERO
+inputC[2.2]=CIRCLE
+inputC[2.35]=RED
+inputC[2.5]=ZERO
+inputC[2.7]=SQUARE
+inputC[2.85]=BLUE
+inputC[3.0]=ZERO
+inputC[3.2]=CIRCLE
+inputC[3.35]=RED
+inputC[3.5]=ZERO
+inputC[3.7]=SQUARE
+inputC[3.85]=BLUE
+inputC[4.0]=ZERO
+inputC[4.2]=CIRCLE
+inputC[4.35]=RED
+inputC[4.5]=ZERO
+inputC[4.7]=SQUARE
+inputC[4.85]=BLUE
 
-input=Input('input')
-net.add(input)
-net.connect(input.getOrigin('A'),A)
-net.connect(input.getOrigin('B'),B)
-net.connect(input.getOrigin('C'),C)
-
+net.make_input('inputC',inputC)
+net.connect('inputC','C')
 
 net.add_to_nengo()
 

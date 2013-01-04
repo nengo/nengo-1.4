@@ -36,6 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import ca.nengo.math.Function;
+import ca.nengo.math.impl.ConstantFunction;
 import ca.nengo.ui.configurable.ConfigException;
 import ca.nengo.ui.configurable.ConfigResult;
 import ca.nengo.ui.configurable.ConfigSchema;
@@ -168,10 +169,22 @@ public class FunctionArrayPanel extends PropertyInputPanel {
 
     @Override
     public boolean isValueSet() {
+    	if (!isOutputDimensionsSet()) {
+    		return false;
+    	}
+    	
         if (myFunctionsWr != null && (myFunctionsWr.length == getOutputDimension())) {
             return true;
         } else {
             setStatusMsg("Functions not set");
+        }
+        
+        if (myFunctionsWr == null || myFunctionsWr.length != getOutputDimension()) {
+            myFunctionsWr = new Function[getOutputDimension()];
+            for (int i=0; i<getOutputDimension(); i++) {
+                myFunctionsWr[i] = new ConstantFunction(inputDimension, 0.0f);
+            }
+            return true;
         }
 
         return false;
@@ -352,5 +365,9 @@ class ConfigurableFunctionArray implements IConfigurable {
     public String getDescription() {
         return getTypeName();
     }
+	public String getExtendedDescription() {
+		return null;
+	}
+    
 
 }

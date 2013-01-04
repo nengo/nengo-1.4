@@ -23,8 +23,6 @@ import edu.umd.cs.piccolo.event.PZoomEventHandler;
  */
 public class WorldSkyImpl extends WorldLayerImpl implements WorldSky {
 
-	private static final long serialVersionUID = -7467076877836999849L;
-
 	private PXCamera myCamera;
 
 	/**

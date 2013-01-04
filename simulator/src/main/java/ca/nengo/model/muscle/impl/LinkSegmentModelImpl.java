@@ -35,6 +35,7 @@ import java.util.Properties;
 
 import ca.nengo.dynamics.DynamicalSystem;
 import ca.nengo.math.Function;
+import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
@@ -44,6 +45,7 @@ import ca.nengo.model.Units;
 import ca.nengo.model.muscle.LinkSegmentModel;
 import ca.nengo.model.muscle.SkeletalMuscle;
 import ca.nengo.util.MU;
+import ca.nengo.util.ScriptGenException;
 import ca.nengo.util.TimeSeries;
 import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
@@ -319,6 +321,14 @@ public class LinkSegmentModelImpl implements LinkSegmentModel {
 
 		result.myStates = (Properties) myStates.clone();
 		return result;
+	}
+
+	public Node[] getChildren() {
+		return new Node[0];
+	}
+
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
+		return "";
 	}
 
 }

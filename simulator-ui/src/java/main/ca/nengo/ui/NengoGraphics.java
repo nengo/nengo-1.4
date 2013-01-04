@@ -27,22 +27,31 @@ package ca.nengo.ui;
 //import java.awt.Color;
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import org.python.util.PythonInterpreter;
+import org.simplericity.macify.eawt.Application;
 
 import ca.nengo.config.ConfigUtil;
 import ca.nengo.config.JavaSourceParser;
@@ -50,12 +59,16 @@ import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.Termination;
+import ca.nengo.ui.actions.ClearAllAction;
 import ca.nengo.ui.actions.CopyAction;
 import ca.nengo.ui.actions.CreateModelAction;
 import ca.nengo.ui.actions.CutAction;
+import ca.nengo.ui.actions.GeneratePDFAction;
+import ca.nengo.ui.actions.GeneratePythonScriptAction;
 import ca.nengo.ui.actions.OpenNeoFileAction;
 import ca.nengo.ui.actions.PasteAction;
 import ca.nengo.ui.actions.RemoveModelAction;
+import ca.nengo.ui.actions.RunInteractivePlotsAction;
 import ca.nengo.ui.actions.RunSimulatorAction;
 import ca.nengo.ui.actions.SaveNodeAction;
 import ca.nengo.ui.dataList.DataListView;
@@ -66,8 +79,9 @@ import ca.nengo.ui.lib.Style.NengoStyle;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.DisabledAction;
 import ca.nengo.ui.lib.actions.DragAction;
-import ca.nengo.ui.lib.actions.SetSplitPaneVisibleAction;
 import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.actions.UserCancelledException;
+import ca.nengo.ui.lib.actions.ZoomToFitAction;
 import ca.nengo.ui.lib.misc.ShortcutKey;
 import ca.nengo.ui.lib.objects.models.ModelObject;
 import ca.nengo.ui.lib.util.UIEnvironment;
@@ -77,22 +91,24 @@ import ca.nengo.ui.lib.util.menus.MenuBuilder;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.lib.world.WorldObject.Property;
 import ca.nengo.ui.lib.world.elastic.ElasticWorld;
+import ca.nengo.ui.lib.world.handlers.MouseHandler;
 import ca.nengo.ui.lib.world.handlers.SelectionHandler;
-import ca.nengo.ui.lib.world.piccolo.objects.SelectionBorder;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
 import ca.nengo.ui.lib.world.piccolo.primitives.Universe;
 import ca.nengo.ui.models.NodeContainer;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.constructors.CNetwork;
 import ca.nengo.ui.models.nodes.UINetwork;
+import ca.nengo.ui.models.nodes.widgets.UIProbe;
+import ca.nengo.ui.models.nodes.widgets.UIProjection;
+import ca.nengo.ui.models.nodes.widgets.Widget;
 import ca.nengo.ui.script.ScriptConsole;
-import ca.nengo.ui.script.ScriptEditor;
 import ca.nengo.ui.util.NengoClipboard;
 import ca.nengo.ui.util.NengoConfigManager;
 import ca.nengo.ui.util.NengoConfigManager.UserProperties;
 import ca.nengo.ui.util.NeoFileChooser;
-import ca.nengo.ui.util.ScriptWorldWrapper;
 import ca.nengo.ui.util.ProgressIndicator;
+import ca.nengo.ui.util.ScriptWorldWrapper;
 import ca.nengo.ui.world.NengoWorld;
 import ca.nengo.util.Environment;
 
@@ -110,7 +126,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     /**
      * Nengo version number, no real rhyme or reason to it
      */
-    public static final double VERSION = 1.3;
+    public static final double VERSION = 1.4;
 
     /**
      * String used in the UI to identify Nengo
@@ -120,14 +136,17 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     /**
      * Description of Nengo to be shown in the "About" Dialog box
      */
-    public static final String ABOUT = "<H3>"
-            + APP_NAME
-            + "</H3>"
-            + "<p>(c) Copyright Bryan Tripp & Centre for Theoretical Neuroscience (ctn.uwaterloo.ca) 2006-2009.<BR><BR>"
-            + "User Interface by Shu Wu (shuwu83@gmail.com) <BR><BR>"
-            + "This product contains several open-source libraries (copyright their respective authors). "
-            + "For more information, consult lib/library-licenses.txt in the installation directory.<BR> "
-            + "This product includes software developed by The Apache Software Foundation (http://www.apache.org/).</p>";
+    public static final String ABOUT =
+            "<H3>" + APP_NAME + "</H3>"
+                    + "<a href=http://www.nengo.ca>www.nengo.ca</a>"
+                    + "<p>&copy; Centre for Theoretical Neuroscience (ctn.uwaterloo.ca) 2006-2012</p>"
+                    + "<b>Contributors:</b> Bryan&nbsp;Tripp, Shu&nbsp;Wu, Chris&nbsp;Eliasmith, Terry&nbsp;Stewart, James&nbsp;Bergstra, "
+                    + "Trevor&nbsp;Bekolay, Dan&nbsp;Rasmussen, Xuan&nbsp;Choo, Travis&nbsp;DeWolf, "
+                    + "Yan&nbsp;Wu, Eric&nbsp;Crawford, Eric&nbsp;Hunsberger, Carter&nbsp;Kolbeck, "
+                    + "Jonathan&nbsp;Lai, Oliver&nbsp;Trujillo, Peter&nbsp;Blouw, Pete&nbsp;Suma, Patrick&nbsp;Ji, Jeff&nbsp;Orchard</p>"
+                    + "<p>This product contains several open-source libraries (copyright their respective authors). "
+                    + "For more information, consult <tt>lib/library-licenses.txt</tt> in the installation directory.</p>"
+                    + "<p>This product includes software developed by The Apache Software Foundation (http://www.apache.org/).</p>";
 
     /**
      * Use the configure panel in the right side? Otherwise it's a pop-up.
@@ -154,26 +173,21 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         return (NengoGraphics) UIEnvironment.getInstance();
     }
 
-    /**
-     * Runs NengoGraphics with a default name
-     * 
-     * @param args
-     */
-    public static void main(String[] args) {
-        new NengoGraphics();
-    }
-
     private NengoClipboard clipboard;
-    private ConfigurationPane configPane;
-    private AuxillarySplitPane dataViewerPane;
-    private SelectionBorder objectSelectedBorder;
     private PythonInterpreter pythonInterpreter;
     private ScriptConsole scriptConsole;
-    private AuxillarySplitPane scriptConsolePane;
-    private WorldObject selectedObj;
     private DataListView dataListViewer;
+    private JScrollPane templateViewer;
+    private JPanel templatePanel;
+    private JToolBar toolbarPanel;
+
+    private AuxillarySplitPane toolbarPane;
+    private AuxillarySplitPane templatePane;
+    private ConfigurationPane configPane;
+    private AuxillarySplitPane dataViewerPane;
+    private AuxillarySplitPane scriptConsolePane;
     private ArrayList<AuxillarySplitPane> splitPanes;
-    
+
     private ProgressIndicator progressIndicator;
 
     /**
@@ -184,11 +198,39 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
         // Setup icon
         try {
-            Image image = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/spikepattern-black.png"));
+            Image image = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/nengologo256.png"));
             setIconImage(image);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
+    }
+
+    public void setApplication(Application application) {
+        application.addApplicationListener(this);
+        application.setEnabledPreferencesMenu(false);
+        BufferedImage icon = new BufferedImage(256,256,BufferedImage.TYPE_INT_ARGB);
+        try {
+            icon = ImageIO.read(getClass().getClassLoader().getResource("ca/nengo/ui/nengologo256.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        application.setApplicationIconImage(icon);
+    }
+
+    /**
+     * template.py calls this function to provide a template bar
+     */
+    public void setTemplatePanel(JPanel panel) {
+        templatePanel = panel;
+    }
+
+    /**
+     * toolbar.py calls this function to provide a toolbar
+     */
+    public void setToolbar(JToolBar bar) {
+        toolbarPanel = bar;
     }
 
     /**
@@ -211,29 +253,170 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         return nodeContainer;
     }
 
-    private void initScriptConsole() {
-        scriptConsole.addVariable("world", new ScriptWorldWrapper(this));
+    @Override
+    protected void initialize() {
+        clipboard = new NengoClipboard();
+        clipboard.addClipboardListener(new NengoClipboard.ClipboardListener() {
 
-        /*
-         * Add listeners
-         */
+            public void clipboardChanged() {
+                updateEditMenu();
+            }
+
+        });
+
         SelectionHandler.addSelectionListener(new SelectionHandler.SelectionListener() {
-
-            public void objectFocused(WorldObject obj) {
-                objectSelected(obj);
+            public void selectionChanged(Collection<WorldObject> objs) {
+                updateEditMenu();
+                updateRunMenu();
+                updateScriptConsole();
+                updateConfigurationPane();
             }
         });
 
+        super.initialize();
+
+        //UIEnvironment.setDebugEnabled(true);
+
+        initializeSimulatorSourceFiles();
+
+        if (FileChooser == null) {
+            FileChooser = new NeoFileChooser();
+        }
+
+        /// Set up Environment variables
+        Environment.setUserInterface(true);
+
+        /// Attach listeners for Script Console
+        initScriptConsole();
+
+        /// Register plugin classes
+        //		registerPlugins();
+
+        setExtendedState(NengoConfigManager.getUserInteger(UserProperties.NengoWindowExtendedState,
+                JFrame.MAXIMIZED_BOTH));
+    }
+
+    @Override
+    protected void initLayout(Universe canvas) {
+        try {
+            //Tell the UIManager to use the platform look and feel
+            String laf = UIManager.getSystemLookAndFeelClassName();
+            if (laf.equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")) {
+                laf = "javax.swing.plaf.metal.MetalLookAndFeel";
+                File desktopfile = new File(System.getProperty("user.home") +
+                        "/.local/share/applications/nengo.desktop");
+                if (!desktopfile.exists()) {
+                    File defaultdesktop = new File(getClass().getClassLoader().
+                            getResource("ca/nengo/ui/nengo.desktop").getPath());
+                    Util.copyFile(defaultdesktop, desktopfile);
+                }
+                //DesktopFile df = DesktopFile.initialize("nengo", "NengoLauncher");
+                //df.setIcon(getClass().getClassLoader().
+                //		getResource("ca/nengo/ui/nengologo256.png").getPath());
+                //df.setCommand("TODO");
+                //df.update();
+            }
+            UIManager.setLookAndFeel(laf);
+
+            //UIManager.put("Slider.paintValue",Boolean.FALSE);
+        } catch(IOException e) {
+            System.out.println("nengo.desktop not copied.");
+        } catch (UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        System.setProperty("swing.aatext", "true");
+
+        /////////////////////////////////////////////////////////////
+        /// Create split pane components
+
+        // creating the script console calls all python init stuff
+        // so call it first (make toolbar, etc.)
+        pythonInterpreter = new PythonInterpreter();
+        scriptConsole = new ScriptConsole(pythonInterpreter);
+        NengoStyle.applyStyle(scriptConsole);
+
+        if (toolbarPanel == null || templatePanel == null) {
+            // these should be made and set by template.py and toolbar.py
+            // when the scriptConsole is created, so we shouldn't be here
+            throw new NullPointerException(
+                    "toolbarPanel or templatePanel not created!");
+        }
+
+        dataListViewer = new DataListView(new SimulatorDataModel(),scriptConsole);
+
+        templateViewer = new JScrollPane(templatePanel,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        templateViewer.getVerticalScrollBar().setUnitIncrement(20);
+        templateViewer.revalidate();
+        Dimension templateWithScrollbarSize = templateViewer.getPreferredSize();
+        templateViewer.setVerticalScrollBarPolicy(
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+        getContentPane().add(templateViewer, BorderLayout.WEST);
+
+        /////////////////////////////////////////////////////////////
+        /// Create nested split panes
+        configPane = new ConfigurationPane(canvas);
+
+        scriptConsolePane = new AuxillarySplitPane(configPane.toJComponent(), scriptConsole,
+                "Script Console", AuxillarySplitPane.Orientation.Bottom);
+
+        dataViewerPane = new AuxillarySplitPane(scriptConsolePane, dataListViewer,
+                "Data Viewer", AuxillarySplitPane.Orientation.Left);
+
+        templatePane = new AuxillarySplitPane(dataViewerPane, templateViewer,
+                "Templates", AuxillarySplitPane.Orientation.Left,
+                templateWithScrollbarSize, false);
+        templatePane.setResizable(false);
+        templatePane.setAuxVisible(true);
+
+        toolbarPane = new AuxillarySplitPane(templatePane, toolbarPanel,
+                "Toolbar", AuxillarySplitPane.Orientation.Top,
+                toolbarPanel.getPreferredSize(), false);
+        toolbarPane.setResizable(false);
+        toolbarPane.setAuxVisible(true);
+
+        getContentPane().add(toolbarPane);
+
+        // Add all panes to the list. The order added controls
+        // the order in the View menu
+        splitPanes = new ArrayList<AuxillarySplitPane>();
+        splitPanes.add(scriptConsolePane);
+        splitPanes.add(dataViewerPane);
+        if (CONFIGURE_PLANE_ENABLED) {
+            splitPanes.add(configPane.toJComponent());
+        }
+        splitPanes.add(templatePane);
+        splitPanes.add(toolbarPane);
+
+        canvas.requestFocus();
+
+        progressIndicator=new ProgressIndicator();
+        getContentPane().add(progressIndicator,BorderLayout.SOUTH);
+    }
+
+    private void initScriptConsole() {
+        scriptConsole.addVariable("world", new ScriptWorldWrapper(this));
+
+        // add listeners
         getWorld().getGround().addChildrenListener(new WorldObject.ChildListener() {
 
             public void childAdded(WorldObject wo) {
                 if (wo instanceof ModelObject) {
                     final ModelObject modelObject = ((ModelObject) wo);
-                    final Object model = modelObject.getModel();
+                    //                    final Object model = modelObject.getModel();
                     final String modelName = modelObject.getName();
 
                     try {
-                        scriptConsole.addVariable(modelName, model);
+                        //scriptConsole.addVariable(modelName, model);
 
                         modelObject.addPropertyChangeListener(Property.REMOVED_FROM_WORLD,
                                 new WorldObject.Listener() {
@@ -263,6 +446,9 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
     }
 
+    /**
+     * Find and initialize the main simulator source code
+     */
     private void initializeSimulatorSourceFiles() {
 
         String savedSourceLocation = NengoConfigManager.getNengoConfig().getProperty("simulator_source");
@@ -277,36 +463,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         }
 
         JavaSourceParser.addSource(simulatorSourceFile);
-    }
-
-    private void objectSelected(WorldObject obj) {
-        while (obj != null && !(obj instanceof ModelObject)) {
-            obj = obj.getParent();
-        }
-
-        if (obj != null) {
-
-            selectedObj = obj;
-
-            if (objectSelectedBorder != null) {
-                objectSelectedBorder.destroy();
-            }
-
-            objectSelectedBorder = new SelectionBorder(obj.getWorld(), obj);
-
-            Object model = ((ModelObject) obj).getModel();
-            scriptConsole.setCurrentObject(model);
-
-            if (configPane.toJComponent().isAuxVisible()) {
-                configPane.configureObj(model);
-            }
-
-        } else {
-            selectedObj = null;
-        }
-
-
-        updateEditMenu();
     }
 
     //	/**
@@ -392,100 +548,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     @Override
     protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
         super.constructShortcutKeys(shortcuts);
-        shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_P,
-                new SetSplitPaneVisibleAction("Focus on script console", scriptConsolePane, true)));
-
-    }
-
-    @Override
-    protected void initialize() {
-        clipboard = new NengoClipboard();
-        clipboard.addClipboardListener(new NengoClipboard.ClipboardListener() {
-
-            public void clipboardChanged() {
-                updateEditMenu();
-            }
-
-        });
-
-        super.initialize();
-
-        //UIEnvironment.setDebugEnabled(true);
-
-        initializeSimulatorSourceFiles();
-
-        if (FileChooser == null) {
-            FileChooser = new NeoFileChooser();
-        }
-
-        /*
-         * Set up Environment variables
-         */
-        Environment.setUserInterface(true);
-
-        /*
-         * Attach listeners for Script Console
-         */
-        initScriptConsole();
-
-        /*
-         * Register plugin classes
-         */
-        //		registerPlugins();
-
-        setExtendedState(NengoConfigManager.getUserInteger(UserProperties.NengoWindowExtendedState,
-                JFrame.MAXIMIZED_BOTH));
-    }
-
-    @Override
-    protected void initLayout(Universe canvas) {
-        try {
-            //Tell the UIManager to use the platform look and feel
-            String laf=UIManager.getSystemLookAndFeelClassName();
-            if (laf.equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")) {
-                laf="javax.swing.plaf.metal.MetalLookAndFeel";
-            }
-            UIManager.setLookAndFeel(laf);
-
-
-            //UIManager.put("Slider.paintValue",Boolean.FALSE);
-        } catch(Exception e) { /*Do nothing*/ }
-        System.setProperty("swing.aatext", "true");
-
-        splitPanes = new ArrayList<AuxillarySplitPane>();
-
-        pythonInterpreter = new PythonInterpreter();
-        scriptConsole = new ScriptConsole(pythonInterpreter);
-        NengoStyle.applyStyle(scriptConsole);
-
-        /*
-         * Create nested split panes
-         */
-        configPane = new ConfigurationPane(canvas);
-        scriptConsolePane = new AuxillarySplitPane(configPane.toJComponent(), scriptConsole,
-                "Script Console", AuxillarySplitPane.Orientation.Bottom);
-
-        dataListViewer = new DataListView(new SimulatorDataModel(),scriptConsole);
-
-        dataViewerPane = new AuxillarySplitPane(scriptConsolePane, dataListViewer, "Data Viewer",
-                AuxillarySplitPane.Orientation.Left);
-
-        splitPanes.add(scriptConsolePane);
-        splitPanes.add(dataViewerPane);
-
-        if (CONFIGURE_PLANE_ENABLED) {
-            splitPanes.add(configPane.toJComponent());
-        }
-
-        getContentPane().add(dataViewerPane);
-
-        canvas.requestFocus();
-        
-        
-        progressIndicator=new ProgressIndicator();
-        getContentPane().add(progressIndicator,BorderLayout.SOUTH);
-        
-
     }
 
     /**
@@ -515,21 +577,51 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         StandardAction pasteAction = null;
         StandardAction removeAction = null;
 
-        if (selectedObj != null && selectedObj instanceof UINeoNode) {
-            UINeoNode neoNode = (UINeoNode) selectedObj;
+        Collection<WorldObject> selectedObjects = SelectionHandler.getActiveSelection();
 
-            cutAction = new CutAction("Cut", (UINeoNode) selectedObj);
-            copyAction = new CopyAction("Copy", (UINeoNode) selectedObj);
-            removeAction = new RemoveModelAction("Remove", neoNode);
+        if (selectedObjects != null && selectedObjects.size() > 0) {
+            ArrayList<UINeoNode> selectedArray = new ArrayList<UINeoNode>();
+            ArrayList<ModelObject> selectedModelObjects = new ArrayList<ModelObject>();
+            for (WorldObject obj : selectedObjects) {
+                if (obj instanceof UINeoNode) {
+                    selectedArray.add((UINeoNode)obj);
+                }
+                if (obj instanceof ModelObject) {
+                    selectedModelObjects.add((ModelObject)obj);
+                }
+            }
+
+            cutAction = new CutAction("Cut", selectedArray);
+            copyAction = new CopyAction("Copy", selectedArray);
+            removeAction = new RemoveModelAction("Remove", selectedModelObjects);
         } else {
             cutAction = new DisabledAction("Cut", "No object selected");
             copyAction = new DisabledAction("Copy", "No object selected");
-            removeAction = new DisabledAction("Copy", "No objects to remove");
+            removeAction = new DisabledAction("Remove", "No objects to remove");
         }
 
-        Node node = getClipboard().getContents();
-        if (node != null) {
-            pasteAction = new PasteAction("Paste", this);
+        if (getClipboard().hasContents()) {
+            pasteAction = new StandardAction("Paste") {
+                private static final long serialVersionUID = 1L;
+                @Override
+                protected void action() {
+                    // look for the active mouse handler. If it exists, it should contain
+                    // the current mouse position (from the mousemoved event), so use this
+                    // to create a new PasteEvent
+                    PasteAction a;
+                    MouseHandler mh = MouseHandler.getActiveMouseHandler();
+                    if (mh != null) {
+                        a = new PasteAction("Paste", (NodeContainer)mh.getWorld(), true);
+                        Point2D pos = mh.getMouseMovedRelativePosition();
+                        if (pos != null) {
+                            a.setPosition(pos.getX(), pos.getY());
+                        }
+                    } else {
+                        a = new PasteAction("Paste", NengoGraphics.getInstance(), true);
+                    }
+                    a.doAction();
+                }
+            };
         } else {
             pasteAction = new DisabledAction("Paste", "No object is in the clipboard");
         }
@@ -543,6 +635,51 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         editMenu.addAction(removeAction, KeyEvent.VK_R, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE,
                 0));
 
+    }
+
+    @Override
+    protected void updateRunMenu() {
+        super.updateRunMenu();
+
+        StandardAction simulateAction = null;
+        StandardAction interactivePlotsAction = null;
+        UINeoNode node = null;
+        WorldObject selectedObj = SelectionHandler.getActiveObject();
+
+        if (selectedObj != null) {
+            if (selectedObj instanceof UINeoNode) {
+                node = (UINeoNode) selectedObj;
+            } else if (selectedObj instanceof UIProjection) {
+                if (((UIProjection) selectedObj).getTermination() != null) {
+                    node = ((UIProjection) selectedObj).getTermination().getNodeParent();
+                } else {
+                    node = ((UIProjection) selectedObj).getOriginUI().getNodeParent();
+                }
+            } else if (selectedObj instanceof Widget){
+                node = ((Widget) selectedObj).getNodeParent();
+            } else if (selectedObj instanceof UIProbe) {
+                node = ((UIProbe) selectedObj).getProbeParent();
+            }
+        }
+
+        if (node != null) {
+            while (node.getNetworkParent() != null) {
+                node = node.getNetworkParent();
+            }
+
+            UINetwork network = (UINetwork) node;
+
+            simulateAction = new RunSimulatorAction("Simulate " + network.getName(), network);
+            interactivePlotsAction = new RunInteractivePlotsAction(network);
+        } else {
+            simulateAction = new DisabledAction("Simulate", "No object selected");
+            interactivePlotsAction = new DisabledAction("Interactive Plots", "No object selected");
+        }
+
+        runMenu.addAction(simulateAction, KeyEvent.VK_F4, KeyStroke.getKeyStroke(KeyEvent.VK_F4,
+                0));
+        runMenu.addAction(interactivePlotsAction, KeyEvent.VK_F5, KeyStroke.getKeyStroke(KeyEvent.VK_F5,
+                0));
     }
 
     @Override
@@ -564,7 +701,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             return nodeContainer.addNodeModel(node, posX, posY);
         } else if (nodeContainer == this) {
             UINeoNode nodeUI = getNengoWorld().addNodeModel(node, posX, posY);
-            DragAction.dropNode(nodeUI);
+            try {
+                DragAction.dropNode(nodeUI);
+            } catch (UserCancelledException e) {
+                // the user should not be given a chance to do this
+                throw new ContainerException("Unexpected cancellation of action by user");
+            }
             return nodeUI;
         } else {
             throw new ContainerException("There are no containers to put this node");
@@ -606,9 +748,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             }
             else if (response == JOptionPane.CANCEL_OPTION ||response == JOptionPane.CLOSED_OPTION)
             {
-                /*
-                 * Cancel exit
-                 */
+                // cancel exit
                 return;
             }
         }
@@ -662,43 +802,54 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     public PythonInterpreter getPythonInterpreter() {
         return pythonInterpreter;
     }
-    
+
     public ProgressIndicator getProgressIndicator() {
-    	return progressIndicator;
+        return progressIndicator;
     }
 
     /**
-     * @return TODO
+     * @return the script console
      */
     public ScriptConsole getScriptConsole() {
         return scriptConsole;
     }
 
     /**
-     * @return TODO
+     * @return is the script console pane visible
      */
-    public WorldObject getSelectedObj() {
-        // check to make sure the object is still in the world before claiming it's still connected
-        if (selectedObj!=null) {
-            if (selectedObj.isDestroyed()) {
-                selectedObj=null;
-            }
+    public boolean isScriptConsoleVisible() {
+        return scriptConsolePane.isAuxVisible();
+    }
+
+    protected void updateScriptConsole() {
+        Object model = SelectionHandler.getActiveModel();
+        scriptConsole.setCurrentObject(model);
+    }
+
+    /**
+     * TODO
+     * 
+     * @author TODO
+     */
+    public class ToggleScriptPane extends StandardAction {
+
+        private static final long serialVersionUID = 1L;
+        private AuxillarySplitPane splitPane;
+
+        /**
+         * @param description TODO
+         * @param spliPane TODO
+         */
+        public ToggleScriptPane(String description, AuxillarySplitPane spliPane) {
+            super(description);
+            this.splitPane = spliPane;
         }
-        return selectedObj;
-    }
 
-    /**
-     * @return TODO
-     */
-    public ConfigurationPane getConfigPane() {
-        return configPane;
-    }
+        @Override
+        protected void action() throws ActionException {
+            splitPane.setAuxVisible(!splitPane.isAuxVisible());
+        }
 
-    /**
-     * @return TODO
-     */
-    public AuxillarySplitPane getScriptConsolePane() {
-        return this.scriptConsolePane;
     }
 
     @Override
@@ -710,12 +861,25 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, MENU_SHORTCUT_KEY_MASK));
 
-        fileMenu.addAction(new SaveNetworkAction("Save Network"),
+        fileMenu.getJMenu().addSeparator();
+
+        fileMenu.addAction(new SaveNetworkAction("Save Selected Network"),
                 KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, MENU_SHORTCUT_KEY_MASK));
-        fileMenu.addAction(new RunNetworkAction("Run Network"),
-                KeyEvent.VK_R,
-                KeyStroke.getKeyStroke(KeyEvent.VK_R, MENU_SHORTCUT_KEY_MASK));
+
+        fileMenu.addAction(new GeneratePDFAction("Save View to PDF"),
+                KeyEvent.VK_P,
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, MENU_SHORTCUT_KEY_MASK));
+
+        fileMenu.addAction(new GenerateScriptAction("Generate Script"),
+                KeyEvent.VK_G,
+                KeyStroke.getKeyStroke(KeyEvent.VK_G, MENU_SHORTCUT_KEY_MASK));
+
+        fileMenu.getJMenu().addSeparator();
+
+        fileMenu.addAction(new ClearAllAction("Clear all"));
+
+        fileMenu.getJMenu().addSeparator();
     }
 
     @Override
@@ -724,10 +888,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
         MenuBuilder viewMenu = new MenuBuilder("View");
         viewMenu.getJMenu().setMnemonic(KeyEvent.VK_V);
         menuBar.add(viewMenu.getJMenu());
-
-        viewMenu.addAction(new OpenScriptEditor("Open Script Editor"),
-                KeyEvent.VK_E,
-                KeyStroke.getKeyStroke(KeyEvent.VK_E, MENU_SHORTCUT_KEY_MASK));
 
         int count = 1;
         for (AuxillarySplitPane splitPane : splitPanes) {
@@ -738,6 +898,11 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
                     KeyStroke.getKeyStroke(0x30 + count++, MENU_SHORTCUT_KEY_MASK));
 
         }
+        viewMenu.getJMenu().addSeparator();
+
+        viewMenu.addAction(new ZoomToFitAction("Zoom to fit", this.getWorld()),
+                KeyEvent.VK_0,
+                KeyStroke.getKeyStroke(KeyEvent.VK_0, MENU_SHORTCUT_KEY_MASK));
     }
 
     public Point2D localToView(Point2D localPoint) {
@@ -785,43 +950,22 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     }
 
     /**
-     * TODO
-     * 
-     * @author TODO
+     * @return the configuration (inspector) pane
      */
-    public class ToggleScriptPane extends StandardAction {
-
-        private static final long serialVersionUID = 1L;
-        private AuxillarySplitPane splitPane;
-
-        /**
-         * @param description TODO
-         * @param spliPane TODO
-         */
-        public ToggleScriptPane(String description, AuxillarySplitPane spliPane) {
-            super(description);
-            this.splitPane = spliPane;
-        }
-
-        @Override
-        protected void action() throws ActionException {
-            splitPane.setAuxVisible(!splitPane.isAuxVisible());
-        }
-
+    public ConfigurationPane getConfigPane() {
+        return configPane;
     }
-    
+
+    protected void updateConfigurationPane() {
+        if (configPane.toJComponent().isAuxVisible()) {
+            configPane.configureObj(SelectionHandler.getActiveModel());
+        }
+    }
+
     public void toggleConfigPane() {
-    	AuxillarySplitPane pane=configPane.toJComponent();
-    	pane.setAuxVisible(!pane.isAuxVisible());
-    	if (pane.isAuxVisible()) {
-    		WorldObject obj=getSelectedObj();
-    		if (obj instanceof ModelObject) {
-    			configPane.configureObj(((ModelObject)obj).getModel());
-    		} else {
-    			configPane.configureObj(null);
-    		}
-    	}
-    	
+        AuxillarySplitPane pane = configPane.toJComponent();
+        pane.setAuxVisible(!pane.isAuxVisible());
+        updateConfigurationPane();
     }
 
     class ConfigurationPane {
@@ -830,7 +974,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
         public ConfigurationPane(Container mainPanel) {
             super();
-            auxSplitPane = new AuxillarySplitPane(mainPanel, null, "Configuration",
+            auxSplitPane = new AuxillarySplitPane(mainPanel, null, "Inspector",
                     AuxillarySplitPane.Orientation.Right);
             auxSplitPane.getAuxPaneWrapper().setBackground(NengoStyle.COLOR_CONFIGURE_BACKGROUND);
             currentObj=null;
@@ -849,13 +993,12 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             int location=auxSplitPane.getDividerLocation();
 
             if (obj==null) {
-                auxSplitPane.setAuxPane(null,"Configuration");
-            } else {
-
-
                 ConfigUtil.ConfigurationPane configurationPane = ConfigUtil.createConfigurationPane(obj);
                 configurationPane.getTree().setBackground(NengoStyle.COLOR_CONFIGURE_BACKGROUND);
-
+                auxSplitPane.setAuxPane(configurationPane,"Inspector");
+            } else {
+                ConfigUtil.ConfigurationPane configurationPane = ConfigUtil.createConfigurationPane(obj);
+                configurationPane.getTree().setBackground(NengoStyle.COLOR_CONFIGURE_BACKGROUND);
 
                 // Style.applyStyle(configurationPane.getTree());
                 // Style.applyStyle(configurationPane.getCellRenderer());
@@ -868,7 +1011,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
                 } else if (obj instanceof Origin) {
                     name = ((Origin) obj).getName();
                 } else {
-                    name = "Configuration";
+                    name = "Inspector";
                 }
                 auxSplitPane.setAuxPane(configurationPane, name + " (" + obj.getClass().getSimpleName()
                         + ")");
@@ -881,22 +1024,6 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
             return auxSplitPane;
         }
     }
-
-    class OpenScriptEditor extends StandardAction {
-
-        private static final long serialVersionUID = 1L;
-
-        public OpenScriptEditor(String description) {
-            super(description);
-        }
-
-        @Override
-        protected void action() throws ActionException {
-            ScriptEditor.openEditor();
-        }
-
-    }
-
 }
 
 /**
@@ -915,7 +1042,7 @@ class RunNetworkAction extends StandardAction {
 
     @Override
     protected void action() throws ActionException {
-        WorldObject selectedNode = NengoGraphics.getInstance().getSelectedObj();
+        WorldObject selectedNode = SelectionHandler.getActiveObject();
 
         UINetwork selectedNetwork = UINetwork.getClosestNetwork(selectedNode);
         if (selectedNetwork != null) {
@@ -945,13 +1072,42 @@ class SaveNetworkAction extends StandardAction {
 
     @Override
     protected void action() throws ActionException {
-        WorldObject selectedNode = NengoGraphics.getInstance().getSelectedObj();
+        WorldObject selectedNode = SelectionHandler.getActiveObject();
 
         UINetwork selectedNetwork = UINetwork.getClosestNetwork(selectedNode);
         if (selectedNetwork != null) {
 
             SaveNodeAction saveNodeAction = new SaveNodeAction(selectedNetwork);
             saveNodeAction.doAction();
+
+        } else {
+            throw new ActionException("No parent network to save, please select a node");
+        }
+    }
+}
+
+/**
+ * Generates a script for the highest network including the selected object
+ * 
+ * @author Chris Eliasmith
+ */
+class GenerateScriptAction extends StandardAction {
+
+    private static final long serialVersionUID = 1L;
+
+    public GenerateScriptAction(String description) {
+        super(description);
+    }
+
+    @Override
+    protected void action() throws ActionException {
+        WorldObject selectedNode = SelectionHandler.getActiveObject();
+
+        UINetwork selectedNetwork = UINetwork.getClosestNetwork(selectedNode);
+        if (selectedNetwork != null) {
+
+            GeneratePythonScriptAction generatePythonScriptAction = new GeneratePythonScriptAction(selectedNetwork);
+            generatePythonScriptAction.doAction();
 
         } else {
             throw new ActionException("No parent network to save, please select a node");

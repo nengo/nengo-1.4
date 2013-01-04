@@ -196,15 +196,15 @@ public class NamedValuePropertyImplTest extends TestCase {
 			myE = new HashMap<String, String>(10);
 			myE.put("1", "1");
 		}
-		
+		@SuppressWarnings("unused")
 		public String getA(String name) {
 			return myA.get(name);
 		}
-		
+		@SuppressWarnings("unused")
 		public String[] getANames() {
 			return myA.keySet().toArray(new String[0]);
 		}
-		
+		@SuppressWarnings("unused")
 		public MockNamedObject getB(String name) {
 			MockNamedObject result = null;
 			for (int i = 0; i < myB.size() && result == null; i++) {
@@ -212,27 +212,27 @@ public class NamedValuePropertyImplTest extends TestCase {
 			}
 			return result;
 		}
-		
+		@SuppressWarnings("unused")
 		public MockNamedObject[] getB() {
 			return myB.toArray(new MockNamedObject[0]);
 		}
-		
+		@SuppressWarnings("unused")
 		public String getC(String name) {
 			return myC.get(name);
 		}
-		
+		@SuppressWarnings("unused")
 		public String[] getCNames() {
 			return myC.keySet().toArray(new String[0]);
 		}
-		
+		@SuppressWarnings("unused")
 		public void setC(String name, String value) {
 			myC.put(name, value);
 		}
-		
+		@SuppressWarnings("unused")
 		public void removeC(String name) {
 			myC.remove(name);
 		}
-		
+		@SuppressWarnings("unused")
 		public MockNamedObject getD(String name) {
 			MockNamedObject result = null;
 			
@@ -242,22 +242,21 @@ public class NamedValuePropertyImplTest extends TestCase {
 			
 			return result;
 		}
-		
+		@SuppressWarnings("unused")
 		public MockNamedObject[] getD() {			
 			return myD.toArray(new MockNamedObject[0]);
 		}
-		
+		@SuppressWarnings("unused")
 		public void setD(MockNamedObject value) {
 			removeD(value.getName());
 			myD.add(value);
 		}
-		
 		public void removeD(String name) {
 			for (int i = 0; i < myD.size(); i++) {
 				if (myD.get(i).getName().equals(name)) myD.remove(i);
 			}
 		}
-		
+		@SuppressWarnings("unused")
 		public Map<String, String> getE() {
 			return myE;
 		}

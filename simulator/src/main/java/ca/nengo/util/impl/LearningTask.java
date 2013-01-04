@@ -17,8 +17,8 @@ import ca.nengo.util.ThreadTask;
 
 public class LearningTask implements ThreadTask {
 
-    private final PlasticEnsembleImpl myParent;
-    private final PlasticEnsembleTermination myTermination;
+    private PlasticEnsembleImpl myParent;
+    private PlasticEnsembleTermination myTermination;
 
     private final int startIdx;
     private final int endIdx;
@@ -88,7 +88,24 @@ public class LearningTask implements ThreadTask {
 
     @Override
     public LearningTask clone() throws CloneNotSupportedException {
-        return (LearningTask) super.clone();
+        return this.clone(myParent, myTermination);
+    }
+    
+    public LearningTask clone(PlasticEnsembleImpl parent) 
+    throws CloneNotSupportedException {
+    	try {
+    		return this.clone(parent, (PlasticEnsembleTermination)parent.getTermination(myTermination.getName()));
+    	} catch (StructuralException e) {
+    		throw new CloneNotSupportedException("Error cloning LearningTask: " + e.getMessage());
+    	}
+    }
+    
+    public LearningTask clone(PlasticEnsembleImpl parent, PlasticEnsembleTermination term) 
+    throws CloneNotSupportedException {
+    	LearningTask result = (LearningTask) super.clone();
+    	result.myParent = parent;
+    	result.myTermination = term;
+    	return result;
     }
 
 }

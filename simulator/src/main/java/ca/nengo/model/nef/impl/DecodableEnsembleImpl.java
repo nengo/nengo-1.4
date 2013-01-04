@@ -34,6 +34,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 import Jama.Matrix;
 import ca.nengo.dynamics.LinearSystem;
 import ca.nengo.dynamics.impl.CanonicalModel;
@@ -77,6 +79,8 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 	private ApproximatorFactory myApproximatorFactory;
 	private Map<String, LinearApproximator> myApproximators;
 	private float myTime; //used to support Probeable
+	
+	private static Logger ourLogger = Logger.getLogger(DecodableEnsembleImpl.class);
 
 	/**
 	 * @param name Name of the Ensemble
@@ -491,6 +495,10 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 		DecodedTermination t = myDecodedTerminations.get(stateName);
 
 		if (origin != null) {
+			if (t != null)
+				ourLogger.warn("Warning, probe set on ensemble with matching origin/termination names (\"" + 
+						stateName + "\"), probing origin by default");
+			
 		    origin.setRequiredOnCPU(true);
 			float[] vals = ((RealOutput) origin.getValues()).getValues();
 			Units[] units = new Units[vals.length];
@@ -498,7 +506,9 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 				units[i] = origin.getValues().getUnits();
 			}
 			result = new TimeSeriesImpl(new float[]{myTime}, new float[][]{vals}, units);
-		} else if (t == null && stateName.endsWith(":STP")) {
+		} else if (t != null) {
+			result = t.getHistory(DecodedTermination.OUTPUT);
+    	} else if (t == null && stateName.endsWith(":STP")) {
                 String originName = stateName.substring(0,stateName.length()-4);
                 try {
                     DecodedOrigin o = (DecodedOrigin) getOrigin(originName);
@@ -544,7 +554,7 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 	}
 	
 	@Override
-	public DecodableEnsemble clone() throws CloneNotSupportedException {
+	public DecodableEnsembleImpl clone() throws CloneNotSupportedException {
 		DecodableEnsembleImpl result = (DecodableEnsembleImpl) super.clone();
 
 		result.myApproximatorFactory = myApproximatorFactory.clone();
@@ -558,6 +568,7 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 			}
 
 			try {
+				// FIXME: this should use DecodedOrigin.clone(Node)
 				DecodedOrigin newOrigin = new DecodedOrigin(
 						result,
 						oldOrigin.getName(),
@@ -572,14 +583,13 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
 				result.myDecodedOrigins.put(newOrigin.getName(), newOrigin);
 				newOrigin.reset(false);
 			} catch (StructuralException e) {
-				throw new CloneNotSupportedException("Problem cloneing DecodedOrigin: " + e.getMessage());
+				throw new CloneNotSupportedException("Error cloning DecodedOrigin: " + e.getMessage());
 			}
 		}
 		
         result.myDecodedTerminations = new LinkedHashMap<String,DecodedTermination>(10);
         for (String key : myDecodedTerminations.keySet()) {
-            DecodedTermination t = (DecodedTermination) myDecodedTerminations.get(key).clone();
-            t.setNode(result);
+            DecodedTermination t = myDecodedTerminations.get(key).clone(result);
             result.myDecodedTerminations.put(key, t);
         }
 

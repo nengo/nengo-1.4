@@ -28,6 +28,8 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.sim.impl;
 
+import java.lang.System;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,7 +56,6 @@ import ca.nengo.util.VisiblyMutable;
 import ca.nengo.util.VisiblyMutableUtils;
 import ca.nengo.util.impl.NodeThreadPool;
 import ca.nengo.util.impl.ProbeImpl;
-import ca.nengo.util.impl.ProbeTask;
 
 /**
  * A Simulator that runs locally (ie in the Java Virtual Machine in which it is
@@ -217,6 +218,8 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 
     public void step(float startTime, float endTime)
             throws SimulationException {
+
+    	myNetwork.fireStepListeners(startTime);
     	
         if(NodeThreadPool.isMultithreading() && myNodeThreadPool != null){
             myNodeThreadPool.step(startTime, endTime);
@@ -265,6 +268,9 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
         for (Node myNode : myNodes) {
             myNode.reset(randomize);
         }
+        
+        // Force garbage collection
+        System.gc();
     }
 
     /**

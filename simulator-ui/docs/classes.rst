@@ -6,6 +6,5 @@ List of Classes
 
    nef.Network
    nef.SimpleNode
-   nef.array.NetworkArray
 
 

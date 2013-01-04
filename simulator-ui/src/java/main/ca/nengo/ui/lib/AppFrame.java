@@ -30,24 +30,31 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.swing.FocusManager;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+
+import org.simplericity.macify.eawt.ApplicationEvent;
+import org.simplericity.macify.eawt.ApplicationListener;
 
 import ca.nengo.plot.Plotter;
 import ca.nengo.ui.lib.actions.ActionException;
 import ca.nengo.ui.lib.actions.ExitAction;
+import ca.nengo.ui.lib.actions.OpenURLAction;
 import ca.nengo.ui.lib.actions.ReversableActionManager;
 import ca.nengo.ui.lib.actions.StandardAction;
+import ca.nengo.ui.lib.actions.ZoomToFitAction;
 import ca.nengo.ui.lib.misc.ShortcutKey;
 import ca.nengo.ui.lib.util.UIEnvironment;
 import ca.nengo.ui.lib.util.menus.MenuBuilder;
 import ca.nengo.ui.lib.world.World;
 import ca.nengo.ui.lib.world.WorldObject;
-import ca.nengo.ui.lib.world.Search.SearchInputHandler;
 import ca.nengo.ui.lib.world.elastic.ElasticWorld;
 import ca.nengo.ui.lib.world.piccolo.WorldImpl;
 import ca.nengo.ui.lib.world.piccolo.objects.Window;
@@ -64,7 +71,7 @@ import edu.umd.cs.piccolo.util.PUtil;
  * 
  * @author Shu Wu
  */
-public abstract class AppFrame extends JFrame {
+public abstract class AppFrame extends JFrame implements ApplicationListener {
     private static final long serialVersionUID = 2769082313231407201L;
 
     /**
@@ -80,10 +87,18 @@ public abstract class AppFrame extends JFrame {
     /**
      * A String which briefly describes some commands used in this application
      */
-    public static final String WORLD_TIPS = "<H3>Mouse</H3>" + "Right Click >> Object menus<BR>"
-            + "Right Click + Drag >> Zoom<BR>" + "Scroll Wheel >> Zoom" + "<H3>Keyboard</H3>"
-            + "CTRL/CMD F >> Search the current window<BR>" + "Hold SHIFT >> Marquee select<BR>"
-            + "Hold CTRL/CMD >> Hover over objects for tooltips";
+    public static final String WORLD_TIPS =
+    	"<H3>Mouse</H3>"
+    	+ "Right Click >> Context menus<BR>"
+        + "Right Click + Drag >> Zoom<BR>"
+        + "Scroll Wheel >> Zoom"
+        + "<H3>Keyboard</H3>"
+        + "CTRL/CMD F >> Search the current window<BR>"
+        + "SHIFT >> Multiple select<BR>"
+        + "SHIFT + Drag >> Marquee select<BR>"
+        + "<H3>Additional Help</H3>" 
+        + "<a href=\"http://nengo.ca/docs/html/index.html\">Full documentation</a> (http://nengo.ca/docs/html/index.html)<BR>"
+        + "<a href=\"http://nengo.ca/faq\">Frequently Asked Questions</a> (http://nengo.ca/faq)";
 
     private ReversableActionManager actionManager;
 
@@ -104,6 +119,8 @@ public abstract class AppFrame extends JFrame {
     private MenuBuilder worldMenu;
 
     protected MenuBuilder editMenu;
+
+    protected MenuBuilder runMenu;
 
     /**
      * TODO
@@ -151,19 +168,30 @@ public abstract class AppFrame extends JFrame {
 
         initViewMenu(menuBar);
 
-        worldMenu = new MenuBuilder("Options");
+        runMenu = new MenuBuilder("Run");
+        runMenu.getJMenu().setMnemonic(KeyEvent.VK_R);
+
+        menuBar.add(runMenu.getJMenu());
+
+        worldMenu = new MenuBuilder("Misc");
         worldMenu.getJMenu().setMnemonic(KeyEvent.VK_O);
         menuBar.add(worldMenu.getJMenu());
 
         updateWorldMenu();
         updateEditMenu();
+        updateRunMenu();
 
         MenuBuilder helpMenu = new MenuBuilder("Help");
         helpMenu.getJMenu().setMnemonic(KeyEvent.VK_H);
         menuBar.add(helpMenu.getJMenu());
 
+        helpMenu.addAction(new OpenURLAction("Documentation (opens in browser)",
+                "http://www.nengo.ca/documentation"), KeyEvent.VK_F1);
         helpMenu.addAction(new TipsAction("Tips and Commands", false), KeyEvent.VK_T);
-        helpMenu.addAction(new AboutAction("About"), KeyEvent.VK_A);
+        boolean isMacOS = System.getProperty("mrj.version") != null;
+        if (!isMacOS) {
+            helpMenu.addAction(new AboutAction("About"), KeyEvent.VK_A);
+        }
 
         menuBar.setVisible(true);
         this.setJMenuBar(menuBar);
@@ -307,38 +335,9 @@ public abstract class AppFrame extends JFrame {
 
     }
 
-    private SearchInputHandler searchHandler;
-
-    /**
-     * @param enabled TODO
-     */
-    public void setSearchEnabled(boolean enabled) {
-        if (searchHandler != null) {
-            searchHandler.destroy();
-        }
-
-    }
-
     protected void constructShortcutKeys(LinkedList<ShortcutKey> shortcuts) {
-        shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_0, new ZoomToFitAction(
-                "Zoom to fit")));
-    }
-
-    class ZoomToFitAction extends StandardAction {
-
-        private static final long serialVersionUID = 1L;
-
-        public ZoomToFitAction(String description) {
-            super(description);
-        }
-
-        @Override
-        protected void action() throws ActionException {
-            World world = getTopWorld();
-            if (world != null) {
-                world.zoomToFit();
-            }
-        }
+        shortcuts.add(new ShortcutKey(MENU_SHORTCUT_KEY_MASK, KeyEvent.VK_0, 
+        		new ZoomToFitAction("Zoom to fit", (WorldImpl)getTopWorld())));
     }
 
     private World getTopWorld() {
@@ -445,7 +444,18 @@ public abstract class AppFrame extends JFrame {
 
         editMenu.addAction(new RedoAction(), KeyEvent.VK_Y, KeyStroke.getKeyStroke(KeyEvent.VK_Y,
                 MENU_SHORTCUT_KEY_MASK));
+        
+        editMenu.getJMenu().addSeparator();
 
+    }
+
+    /**
+     * Updates the menu 'run'
+     */
+    protected void updateRunMenu() {
+        runMenu.reset();
+
+        // Configure parallelization
     }
 
     /**
@@ -453,7 +463,18 @@ public abstract class AppFrame extends JFrame {
      */
     protected void updateWorldMenu() {
         worldMenu.reset();
+
+        if (!universe.isSelectionMode()) {
+            worldMenu.addAction(new SwitchToSelectionMode(), KeyEvent.VK_S);
+        } else {
+            worldMenu.addAction(new SwitchToNavigationMode(), KeyEvent.VK_S);
+        }        
+        
+        worldMenu.getJMenu().addSeparator();
+        
         worldMenu.addAction(new CloseAllPlots(), KeyEvent.VK_M);
+        
+        worldMenu.getJMenu().addSeparator();
 
         if (!isFullScreenMode) {
             // worldMenu.addAction(new TurnOnFullScreen(), KeyEvent.VK_F);
@@ -473,12 +494,8 @@ public abstract class AppFrame extends JFrame {
             worldMenu.addAction(new TurnOffGrid(), KeyEvent.VK_G);
         }
 
-        if (!universe.isSelectionMode()) {
-            worldMenu.addAction(new SwitchToSelectionMode(), KeyEvent.VK_S);
-        } else {
-            worldMenu.addAction(new SwitchToNavigationMode(), KeyEvent.VK_S);
-        }
-
+        worldMenu.getJMenu().addSeparator();
+        
         MenuBuilder qualityMenu = worldMenu.addSubMenu("Rendering Quality");
 
         qualityMenu.getJMenu().setMnemonic(KeyEvent.VK_Q);
@@ -680,6 +697,27 @@ public abstract class AppFrame extends JFrame {
 
     }
 
+    // Everything starting with handle is done for MacOSX only
+    public void handleAbout(ApplicationEvent event) {
+        new AboutAction("About").doAction();
+        event.setHandled(true);
+    }
+    public void handleOpenApplication(ApplicationEvent event) {}
+
+    public void handleOpenFile(ApplicationEvent event) {}
+
+    public void handlePreferences(ApplicationEvent event) {}
+
+    public void handlePrintFile(ApplicationEvent event) {
+        JOptionPane.showMessageDialog(this, "Sorry, printing not implemented");
+    }
+
+    public void handleQuit(ApplicationEvent event) {
+        new ExitAction(this, "Quit").doAction();
+    }
+
+    public void handleReOpenApplication(ApplicationEvent event) {}
+
     /**
      * Action to show the 'about' dialog
      * 
@@ -695,7 +733,13 @@ public abstract class AppFrame extends JFrame {
 
         @Override
         protected void action() throws ActionException {
-            JLabel editor = new JLabel("<html>" + getAboutString() + "</html>");
+            int width = 350;
+            String css = "<style type = \"text/css\">" +
+                    "body { width: " + width + "px }" +
+                    "p { margin-top: 12px }" +
+                    "b { text-decoration: underline }" +
+                    "</style>";
+            JLabel editor = new JLabel("<html><head>" + css + "</head><body>" + getAboutString() + "</body></html>");
             JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, "About "
                     + getAppName(), JOptionPane.PLAIN_MESSAGE);
         }
@@ -910,7 +954,7 @@ public abstract class AppFrame extends JFrame {
     }
 
     protected String getHelp() {
-        return WORLD_TIPS + "<BR>" + getShortcutHelp();
+        return WORLD_TIPS + "<BR>";
     }
 
     /**
@@ -932,46 +976,29 @@ public abstract class AppFrame extends JFrame {
 
         @Override
         protected void action() throws ActionException {
-            JLabel editor;
+            JEditorPane editor;
 
             if (welcome) {
                 String appendum = "To show this message again, click <b>Help -> Tips and Commands</b>";
-                editor = new JLabel("<html><H2>Welcome to " + getAppName() + "</H2>" + getHelp()
+                editor = new JEditorPane("text/html", "<html><H2>Welcome to " + getAppName() + "</H2>" + getHelp()
                         + "<BR><BR>" + appendum + "</html>");
             } else {
-                editor = new JLabel("<html>" + getHelp() + "</html>");
+                editor = new JEditorPane("text/html", "<html>" + getHelp() + "</html>");
             }
+            
+            editor.setEditable(false);
+            editor.setOpaque(false);
+            editor.addHyperlinkListener(new HyperlinkListener() {
+            	public void hyperlinkUpdate(HyperlinkEvent hle) {
+            		if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+            			new OpenURLAction(hle.getDescription(),hle.getDescription()).doAction();
+            		}            		
+            	}
+            });
 
             JOptionPane.showMessageDialog(UIEnvironment.getInstance(), editor, getAppName()
                     + " Tips", JOptionPane.PLAIN_MESSAGE);
         }
-    }
-
-    private String getShortcutHelp() {
-        StringBuilder shortcutKeysString = new StringBuilder(400);
-
-        shortcutKeysString.append("<h3>Additional Shortcuts</h3>");
-        if (getShortcutKeys().length == 0) {
-            shortcutKeysString.append("No shortcuts available");
-        } else {
-            for (ShortcutKey shortcutKey : getShortcutKeys()) {
-                if ((shortcutKey.getModifiers() & MENU_SHORTCUT_KEY_MASK) != 0) {
-                    shortcutKeysString.append("CTRL/CMD ");
-                }
-                if ((shortcutKey.getModifiers() & KeyEvent.ALT_MASK) != 0) {
-                    shortcutKeysString.append("ALT ");
-                }
-                if ((shortcutKey.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
-                    shortcutKeysString.append("SHIFT ");
-                }
-
-                shortcutKeysString.append((char) shortcutKey.getKeyCode());
-                shortcutKeysString.append(" >> ");
-                shortcutKeysString.append(shortcutKey.getAction().getDescription());
-                shortcutKeysString.append("<br>");
-            }
-        }
-        return shortcutKeysString.toString();
     }
 
     /**
@@ -1123,25 +1150,24 @@ public abstract class AppFrame extends JFrame {
             actionManager.undoAction();
         }
     }
-    
+
     /**
-	 * Action to close all plots
-	 * 
-	 * @author Daniel Rasmussen
-	 */
-	class CloseAllPlots extends StandardAction {
-		private static final long serialVersionUID = 1L;
+     * Action to close all plots
+     * 
+     * @author Daniel Rasmussen
+     */
+    class CloseAllPlots extends StandardAction {
+        private static final long serialVersionUID = 1L;
 
-		public CloseAllPlots() {
-			super("Close all plots");
-		}
+        public CloseAllPlots() {
+            super("Close all plots");
+        }
 
-		@Override
-		protected void action() throws ActionException {
-			Plotter.closeAll();
-		}
-	}
-
+        @Override
+        protected void action() throws ActionException {
+            Plotter.closeAll();
+        }
+    }
 }
 
 /**

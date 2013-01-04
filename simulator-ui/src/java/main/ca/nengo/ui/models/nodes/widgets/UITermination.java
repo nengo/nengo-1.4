@@ -39,7 +39,6 @@ import ca.nengo.ui.lib.objects.lines.LineConnector;
 import ca.nengo.ui.lib.objects.lines.LineTerminationIcon;
 import ca.nengo.ui.lib.util.UserMessages;
 import ca.nengo.ui.lib.util.Util;
-import ca.nengo.ui.lib.util.menus.AbstractMenuBuilder;
 import ca.nengo.ui.lib.world.WorldObject;
 import ca.nengo.ui.models.UINeoNode;
 import ca.nengo.ui.models.icons.ModelIcon;
@@ -52,7 +51,6 @@ import ca.nengo.ui.models.tooltips.TooltipBuilder;
  * @author Shu Wu
  */
 public abstract class UITermination extends Widget implements ILineTermination {
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Factory method for creating a UI Wrapper around a termination
@@ -64,7 +62,9 @@ public abstract class UITermination extends Widget implements ILineTermination {
 	 * @return UI Termination Wrapper
 	 */
 	public static UITermination createTerminationUI(UINeoNode uiNodeParent, Termination termination) {
-		if (termination instanceof DecodedTermination) {
+	    if (uiNodeParent instanceof UINetwork) {
+	        return new UINetworkTermination((UINetwork)uiNodeParent, termination);
+	    } else if (termination instanceof DecodedTermination) {
 			return new UIDecodedTermination(uiNodeParent, (DecodedTermination) termination);
 		} else {
 			return new UIGenericTermination(uiNodeParent, termination);
@@ -89,6 +89,8 @@ public abstract class UITermination extends Widget implements ILineTermination {
 		myIconDefaultColor = myIcon.getColor();
 		ModelIcon iconWr = new ModelIcon(this, myIcon);
 		iconWr.configureLabel(false);
+		
+		setSelectable(true);
 
 		setIcon(iconWr);
 	}
@@ -142,14 +144,14 @@ public abstract class UITermination extends Widget implements ILineTermination {
 		tooltips.addProperty("Modulatory", String.valueOf(getModel().getModulatory()));
 	}
 
-	@Override
+	/*@Override
 	protected void constructWidgetMenu(AbstractMenuBuilder menu) {
 		super.constructWidgetMenu(menu);
 
 		if (getConnector() != null) {
 			menu.addAction(new DisconnectAction("Disconnect"));
 		}
-	}
+	}*/
 
 	/**
 	 * Destroys the termination model

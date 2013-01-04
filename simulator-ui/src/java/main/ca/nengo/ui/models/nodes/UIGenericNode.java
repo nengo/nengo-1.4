@@ -36,8 +36,6 @@ import ca.nengo.ui.models.icons.NodeIcon;
  */
 public class UIGenericNode extends UINeoNode {
 
-	private static final long serialVersionUID = 1L;
-
 	public UIGenericNode(Node model) {
 		super(model);
 		setIcon(new NodeIcon(this));

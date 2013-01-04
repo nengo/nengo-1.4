@@ -65,5 +65,7 @@ public interface PlasticNodeTermination extends Termination {
     public float getOutput();
 
     public PlasticNodeTermination clone() throws CloneNotSupportedException;
+    
+    public PlasticNodeTermination clone(Node node) throws CloneNotSupportedException;
 
 }

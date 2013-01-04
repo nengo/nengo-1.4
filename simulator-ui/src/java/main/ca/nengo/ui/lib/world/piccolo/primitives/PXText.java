@@ -59,6 +59,7 @@ class PXText extends PXNode {
 
 	public static double DEFAULT_GREEK_THRESHOLD = 5.5;
 	public static final int PROPERTY_CODE_FONT = 1 << 20;
+	
 
 	public static final int PROPERTY_CODE_TEXT = 1 << 19;
 	/**
@@ -81,6 +82,7 @@ class PXText extends PXNode {
 	private transient TextLayout[] lines;
 	private String text;
 	private Paint textPaint;
+	private static boolean useGreekThreshold = true;
 
 	protected double greekThreshold = DEFAULT_GREEK_THRESHOLD;
 
@@ -103,6 +105,15 @@ class PXText extends PXNode {
 		setFont(NengoStyle.FONT_NORMAL);
 		setTextPaint(NengoStyle.COLOR_FOREGROUND);
 	}
+	
+	static public void setUseGreekThreshold(boolean state) {
+		useGreekThreshold=state;
+	}
+	
+	static public boolean getUseGreekThreshold() {
+		return useGreekThreshold;
+	}
+	
 
 	// provided in case someone needs to override the way that lines are
 	// wrapped.
@@ -121,7 +132,7 @@ class PXText extends PXNode {
 
 		float screenFontSize = getFont().getSize()
 				* (float) paintContext.getScale();
-		if (textPaint != null && screenFontSize > greekThreshold) {
+		if (textPaint != null && (!useGreekThreshold || (screenFontSize > greekThreshold))) {
 			float x = (float) getX();
 			float y = (float) getY();
 			float bottomY = (float) getHeight() + y;

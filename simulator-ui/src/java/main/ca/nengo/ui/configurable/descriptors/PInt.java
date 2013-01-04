@@ -44,11 +44,15 @@ public class PInt extends RangedConfigParam {
     public PInt(String name) {
         super(name);
     }
+    
+    public PInt(String name, String description) {
+        super(name, description);
+    }
+    
+    public PInt(String name, String description, int defaultValue) {
+        super(name, description, defaultValue);
+    }
 
-    /**
-     * @param name TODO
-     * @param defaultValue TODO
-     */
     public PInt(String name, int defaultValue) {
         super(name, defaultValue);
     }

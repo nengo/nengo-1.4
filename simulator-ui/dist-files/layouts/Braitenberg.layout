@@ -1,13 +1,25 @@
-({'x': 0, 'height': 480, 'width': 860, 'state': 0, 'y': 25},
- [('right eye', None, {'height': 32, 'x': 16, 'label': 0, 'width': 87, 'y': 60}),
-  ('left input', None, {'height': 32, 'x': 158, 'label': 0, 'width': 86, 'y': 12}),
-  ('left eye', None, {'height': 32, 'x': 15, 'label': 0, 'width': 75, 'y': 11}),
-  ('right input', None, {'height': 32, 'x': 157, 'label': 0, 'width': 98, 'y': 58}),
-  ('right motor', None, {'height': 32, 'x': 567, 'label': 0, 'width': 107, 'y': 58}),
-  ('left motor', None, {'height': 32, 'x': 564, 'label': 0, 'width': 95, 'y': 7}),
-  ('Room', '3D view', {'height': 193, 'x': 287, 'label': 0, 'width': 208, 'y': 122}),
-  ('right motor', 'spike raster', {'height': 115, 'x': 504, 'label': 1, 'width': 279, 'sample': 1, 'y': 231}),
-  ('right input', 'spike raster', {'height': 104, 'x': 30, 'label': 1, 'width': 253, 'sample': 1, 'y': 247}),
-  ('left input', 'spike raster', {'height': 94, 'x': 29, 'label': 1, 'width': 245, 'sample': 1, 'y': 143}),
-  ('left motor', 'spike raster', {'height': 115, 'x': 505, 'label': 1, 'width': 275, 'sample': 1, 'y': 107})],
- {'sim_spd': 4, 'rcd_time': 2.0, 'filter': 0.03, 'dt': 0, 'show_time': 0.2})
+({'state': 0, 'height': 480, 'width': 860, 'x': 0, 'y': 25},
+ [(u'right eye', None, {'label': 0, 'height': 32, 'width': 87, 'x': 16, 'y': 60}),
+  (u'left input', None, {'label': 0, 'height': 32, 'width': 86, 'x': 158, 'y': 12}),
+  (u'left eye', None, {'label': 0, 'height': 32, 'width': 75, 'x': 15, 'y': 11}),
+  (u'right input', None, {'label': 0, 'height': 32, 'width': 98, 'x': 157, 'y': 58}),
+  (u'right motor', None, {'label': 0, 'height': 32, 'width': 107, 'x': 567, 'y': 58}),
+  (u'left motor', None, {'label': 0, 'height': 32, 'width': 95, 'x': 564, 'y': 7}),
+  (u'Room', '3D view', {'label': 0, 'height': 193, 'width': 208, 'x': 287, 'y': 122}),
+  (u'right motor', 'spike raster', {'label': 1, 'sample': 1, 'height': 115, 'width': 279, 'x': 504, 'y': 231}),
+  (u'right input', 'spike raster', {'label': 1, 'sample': 1, 'height': 104, 'width': 253, 'x': 30, 'y': 247}),
+  (u'left input', 'spike raster', {'label': 1, 'sample': 1, 'height': 94, 'width': 245, 'x': 29, 'y': 143}),
+  (u'left motor', 'spike raster', {'label': 1, 'sample': 1, 'height': 115, 'width': 275, 'x': 505, 'y': 107})],
+ {'dt': 0, 'show_time': 0.2, 'sim_spd': 1, 'filter': 0.03, 'rcd_time': 2.0}) 
+##############################
+### Nengo Workspace layout ###
+##############################
+# elasticmode=false
+# viewbounds=PBounds[x=-248.05787253121377,y=-100.00000000000003,width=849.794652933674,height=526.1312532424928]
+# right input (NEFEnsemble)=Point2D.Double[147.435546875, 120.06562662124634]
+# Room (Network)=Point2D.Double[183.09264024357498, 257.35283821589826]
+# left motor (NEFEnsemble)=Point2D.Double[283.12910318374634, 0.0]
+# right eye (Function Input)=Point2D.Double[-2.7191976273798257, 114.62723136648668]
+# left input (NEFEnsemble)=Point2D.Double[147.435546875, 0.0]
+# right motor (NEFEnsemble)=Point2D.Double[285.67890787124634, 120.06562662124634]
+# left eye (Function Input)=Point2D.Double[2.7191976273798257, -4.531996045633051]

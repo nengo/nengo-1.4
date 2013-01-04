@@ -27,13 +27,17 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.plasticity.impl;
 
+import java.util.Arrays;
+
 import ca.nengo.model.InstantaneousOutput;
+import ca.nengo.model.Node;
 import ca.nengo.model.PlasticNodeTermination;
 import ca.nengo.model.RealOutput;
 import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.neuron.impl.SpikingNeuron;
+import ca.nengo.util.MU;
 
 /**
  * A termination whose transformation evolves according to the PES rule.
@@ -54,11 +58,12 @@ import ca.nengo.model.neuron.impl.SpikingNeuron;
 public class PESTermination extends ModulatedPlasticEnsembleTermination  {
 
     private static final long serialVersionUID = 1L;
+//    private static final Logger ourLogger = Logger.getLogger(PESTermination.class);
 
     private float myLastTime = 0.0f;
     private float[] myFilteredInput;
-    private final float[] myGain;
-    private final float[][] myEncoders;
+    private float[] myGain;
+    private float[][] myEncoders;
 
     private boolean myOja = false; // Apply Oja smoothing?
 
@@ -87,10 +92,8 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
         super.reset(randomize);
         myLastTime = 0.0f;
 
-        if (myFilteredInput == null) { return; }
-        for (int i=0; i < myFilteredInput.length; i++) {
-            myFilteredInput[i] = 0.0f;
-        }
+        if (myFilteredInput != null)
+        	Arrays.fill(myFilteredInput, 0);
     }
 
     /**
@@ -123,15 +126,24 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
                 myFilteredInput[i] *= 1.0f - integrationTime / tauPSC;
                 myFilteredInput[i] += values[i] * integrationTime / tauPSC;
             }
-        } else {
+        } else if (input != null) {
             boolean[] values = ((SpikeOutput) input).getValues();
 
-            if (myFilteredInput == null) {myFilteredInput = new float[values.length];}
+            if (myFilteredInput == null) {
+            	myFilteredInput = new float[values.length];
+            }
 
             for (int i=0; i < values.length; i++) {
                 myFilteredInput[i] *= 1.0f - integrationTime / tauPSC;
                 myFilteredInput[i] += values[i] ? integrationTime / tauPSC : 0;
             }
+        } else {
+        	// no input, so set filtered input to zero if it exists
+        	if (myFilteredInput != null)
+        		Arrays.fill(myFilteredInput, 0);
+        	
+        	// we should have a warning, but putting it here spams up the log (b/c each thread comes here)
+//        	ourLogger.warn("Input values not set on termination " + this.getName() + ".  Assuming input of zero.");
         }
     }
 
@@ -148,6 +160,9 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
             this.updateInput();
             myLastTime = time;
         }
+        
+        if (myFilteredInput == null)
+        	return;
 
         float[][] transform = this.getTransform();
 
@@ -176,10 +191,15 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
 
         return myLearningRate * input * e * gain - oja;
     }
-
+    
     @Override
-    public PESTermination clone() throws CloneNotSupportedException {
-        PESTermination result = (PESTermination) super.clone();
+    public PESTermination clone(Node node) throws CloneNotSupportedException {
+        PESTermination result = (PESTermination)super.clone(node);
+        result.myFilteredInput = (myFilteredInput != null) ? myFilteredInput.clone() : null;
+//        result.myFilteredInput = null;
+        result.myGain = myGain.clone();
+        result.myEncoders = MU.clone(myEncoders);
         return result;
     }
+
 }

@@ -3,12 +3,15 @@
  */
 package ca.nengo.model.impl;
 
+import java.util.HashMap;
+
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
+import ca.nengo.util.ScriptGenException;
 
 /**
  * A Cloneable Node for testing copy&paste / drag&drop.
@@ -140,4 +143,12 @@ public class MockNode implements Node, Cloneable {
 		this.myName = myName;
 	}
 
+	public Node[] getChildren() {
+		return new Node[0];
+	}
+
+	public String toScript(HashMap<String, Object> scriptData) throws ScriptGenException {
+
+		return "";
+	}
 }

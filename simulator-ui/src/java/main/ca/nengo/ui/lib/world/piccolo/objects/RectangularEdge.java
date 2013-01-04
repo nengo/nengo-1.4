@@ -15,8 +15,6 @@ import ca.nengo.ui.lib.world.piccolo.primitives.PXEdge;
  */
 public class RectangularEdge extends WorldObjectImpl {
 
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * Creates a new rectangular edge
 	 * 
