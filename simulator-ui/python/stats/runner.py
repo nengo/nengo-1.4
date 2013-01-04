@@ -103,7 +103,7 @@ def run_once(_filename,**setting):
     
     logfile=time.strftime('%Y%m%d-%H%M%S')+'-%08x'%int(random.randrange(0x7FFFFFFF))
     
-    logline='import nef\nef.log.LogOverride.override(directory="%s/%s",filename="%s")'%(_filename[:-3],param_text.replace('"',r'\"'),logfile)
+    logline='import nef\nnef.log.LogOverride.override(directory="%s/%s",filename="%s")'%(_filename[:-3],param_text.replace('"',r'\"'),logfile)
 
     code='%s\n%s\n%s'%(param_code,logline,core_code)
             
@@ -144,7 +144,7 @@ def run(_filename=None,_iterations=1,_call_after=None,**settings):
         
         logfile=time.strftime('%Y%m%d-%H%M%S')+'-%08x'%int(random.randrange(0x7FFFFFFF))
         
-        logline='import nef\nef.log.LogOverride.override(directory="%s/%s",filename="%s")'%(_filename[:-3],param_text.replace('"',r'\"'),logfile)
+        logline='import nef\nnef.log.LogOverride.override(directory="%s/%s",filename="%s")'%(_filename[:-3],param_text.replace('"',r'\"'),logfile)
 
         code='%s\n%s\n%s'%(param_code,logline,core_code)
                 
