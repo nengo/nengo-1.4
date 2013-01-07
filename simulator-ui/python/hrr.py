@@ -79,6 +79,13 @@ class HRR:
         for i in range(len(self.v)):
             err+=(self.v[i]-other.v[i])**2
         return err/len(self.v)
+    def get_transform_matrix(self):
+        D=len(self.v)
+        T=[]
+        for i in range(D):
+            T.append([self.v[(i-j)%D] for j in range(D)])
+        return numeric.array(T)
+    
 
 
                        
