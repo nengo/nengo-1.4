@@ -1,19 +1,38 @@
+# Filetypes to ignore
 *.class
 *.pyc
 *.pkc
+
+# Garbage OS files
 .DS_Store
-nengo-*
+
+# Build artifacts
+artifacts/
+bin/
+bin-test/
+build/
+dist/
+/nengo-*/
 nengo-latest.zip
-NengoModels
+target/
 
-.metadata/*
-simulator-ui/commandhistory.dat
+# Eclipse generated
+.classpath
+.metadata/
+.project
+.pydevproject
+.settings/
 
-simulator-ui/quick/*
+# Generated in testing
+delimited_file_exporter_test.txt
+nengo.log
 
-simulator-ui/python/timeview/layout.db.bak
-/simulator/target/
-/simulator-ui/target/
-/simulator-ui/build
-/simulator-ui/dist
+# GUI generated
+UIFiles
+User.config
+/simulator-ui/commandhistory.dat
+/simulator-ui/layouts/
+/simulator-ui/quick/
+/simulator-ui/python/timeview/layout.db.bak
+/simulator-ui/python/timeview/layout.db.dir
 /simulator-ui/python/NengoUI.egg-info

@@ -1,7 +1,0 @@
-artifacts
-bin-test
-bin
-delimited_file_exporter_test.txt
-nengo.log
-.settings
-target
