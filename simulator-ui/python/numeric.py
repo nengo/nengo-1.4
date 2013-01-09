@@ -1,7 +1,7 @@
-from com.github.jnumeric.JNumeric import *
+from com.github.tbekolay.jnumeric.JNumeric import *
 
 # gets fft() and inverse_fft()
-import com.github.jnumeric.FFT as FFT
+import com.github.tbekolay.jnumeric.FFT as FFT
 
 
 def diag(values,typecode='f'):
