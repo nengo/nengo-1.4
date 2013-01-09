@@ -36,8 +36,10 @@ import ca.nengo.math.Function;
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Origin;
+import ca.nengo.model.PreciseSpikeOutput;
 import ca.nengo.model.RealOutput;
 import ca.nengo.model.SimulationException;
+import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
@@ -127,14 +129,14 @@ public class NetworkArrayImpl extends NetworkImpl {
      * @throws StructuralException
 	 */
 	public void createEnsembleOrigin(String name) throws StructuralException {
-		DecodedOrigin[] origins = new DecodedOrigin[myNumNodes];
+		Origin[] origins = new Origin[myNumNodes];
 		for (int i = 0; i < myNumNodes; i++) {
-			origins[i] = (DecodedOrigin) myNodes[i].getOrigin(name);
+			origins[i] = myNodes[i].getOrigin(name);
 		}
 		createEnsembleOrigin(name, origins);
 	}
 	
-	private void createEnsembleOrigin(String name, DecodedOrigin[] origins) throws StructuralException {
+	private void createEnsembleOrigin(String name, Origin[] origins) throws StructuralException {
 		myOrigins.put(name, new ArrayOrigin(this, name, origins));
 		this.exposeOrigin(this.myOrigins.get(name), name);
 	}
@@ -546,10 +548,10 @@ public class NetworkArrayImpl extends NetworkImpl {
 		
 		private String myName;
 		private NetworkArrayImpl myParent;
-		private DecodedOrigin[] myOrigins;
+		private Origin[] myOrigins;
 		private int myDimensions;
 
-		public ArrayOrigin(NetworkArrayImpl parent, String name, DecodedOrigin[] origins) {
+		public ArrayOrigin(NetworkArrayImpl parent, String name, Origin[] origins) {
 			myParent = parent;
 			myName = name;
 			myOrigins = origins;
@@ -566,19 +568,45 @@ public class NetworkArrayImpl extends NetworkImpl {
 			return myDimensions;
 		}
 		
-		public void setValues(RealOutput values) {
+		public void setValues(InstantaneousOutput values) {
 			float time = values.getTime();
 			Units units = values.getUnits();
-			float[] vals = ((RealOutput)values).getValues();
+
+			float[] vals;
+			if(values instanceof RealOutput)
+				vals = ((RealOutput)values).getValues();
+			else if(values instanceof PreciseSpikeOutput) {
+				vals = ((PreciseSpikeOutput)values).getSpikeTimes();
+			}
+			else if(values instanceof SpikeOutput) {
+				boolean[] spikes = ((SpikeOutput)values).getValues();
+				vals = new float[spikes.length];
+				for(int i=0; i < spikes.length; i++)
+					vals[i] = spikes[i] ? 1.0f : 0.0f;
+			}
+			else {
+				System.err.println("Unrecognized type in NetworkArrayImpl.setValues()");
+				return;
+			}
 			
 			int d=0;
 			for(int i=0; i < myOrigins.length; i++) {
 				float[] ovals = new float[myOrigins[i].getDimensions()];
 				for(int j=0; j < ovals.length; j++)
-					ovals[j] = vals[d+j];
-				d += myOrigins[i].getDimensions();
+					ovals[j] = vals[d++];
 				
-				myOrigins[i].setValues(new RealOutputImpl(ovals, units, time));
+				if(values instanceof RealOutput)
+					myOrigins[i].setValues(new RealOutputImpl(ovals, units, time));
+				else if(values instanceof PreciseSpikeOutput) {
+					myOrigins[i].setValues(new PreciseSpikeOutputImpl(ovals, units, time));
+				}
+				else if(values instanceof SpikeOutput) {
+					boolean[] ospikes = new boolean[ovals.length];
+					for(int j=0; j < ospikes.length; j++)
+						ospikes[j] = vals[j] == 1.0 ? true : false;
+					myOrigins[i].setValues(new SpikeOutputImpl(ospikes, units, time));
+				}
+				
 			}
 			
 		}
@@ -651,10 +679,13 @@ public class NetworkArrayImpl extends NetworkImpl {
 		}
 		
 		public float[][] getDecoders() {
+			if(! (myOrigins[0] instanceof DecodedOrigin))
+				return null;
+			
 			int neurons = myParent.getNeurons();
 			float[][] decoders = new float[neurons*myOrigins.length][myDimensions];
 			for(int i=0; i < myOrigins.length; i++) {
-				MU.copyInto(myOrigins[i].getDecoders(), decoders, i*neurons, i*myOrigins[i].getDimensions(), neurons);
+				MU.copyInto(((DecodedOrigin)myOrigins[i]).getDecoders(), decoders, i*neurons, i*myOrigins[i].getDimensions(), neurons);
 			}
 			return decoders;
 		}

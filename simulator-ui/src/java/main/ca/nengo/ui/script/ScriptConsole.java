@@ -396,6 +396,7 @@ public class ScriptConsole extends JPanel {
 		appendText(text + "\r\n", COMMAND_STYLE);
 		myHistoryCompletor.add(text);
 		clearCommand();
+		setTypedText();
 
 		final String initText=text;
 		
