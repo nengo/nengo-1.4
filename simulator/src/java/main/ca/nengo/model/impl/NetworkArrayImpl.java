@@ -69,7 +69,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 	private int myDimension;
 	private final int[] myNodeDimensions;
 	
-	private final NEFEnsembleImpl[] myNodes;
+	private NEFEnsembleImpl[] myNodes;
 	private Map<String, Origin> myOrigins;
 	private int myNeurons;
 
@@ -537,6 +537,41 @@ public class NetworkArrayImpl extends NetworkImpl {
 		return encoders;
 	}
 
+	@Override
+	public NetworkArrayImpl clone() throws CloneNotSupportedException {
+		// Note: Cloning fails (so far) because arrayorigin takes network array as node reference, and attempting to 
+		//       find a node with the same name as the network array inside the network array is impossible.
+		// Note: Also need to clone exposed axons?
+		try {
+			NetworkArrayImpl result = (NetworkArrayImpl) super.clone();
+			
+			// Clone node references
+			result.myNodes = new NEFEnsembleImpl[myNodes.length];
+			for (int i = 0; i < myNodes.length; i++) {
+				result.myNodes[i] = (NEFEnsembleImpl) result.getNode(myNodes[i].getName());
+			}
+			
+			// Clone array origins and ensemble terminations
+			for (Origin exposedOrigin : getOrigins()) {
+				Origin clonedOrigin = ((OriginWrapper) exposedOrigin).getBaseOrigin().clone(result);
+				result.exposeOrigin(clonedOrigin, exposedOrigin.getName());
+			}
+			for (Termination exposedTermination : getTerminations()) {
+				Termination clonedTermination = ((TerminationWrapper) exposedTermination).getBaseTermination().clone(result);
+				result.exposeTermination(clonedTermination, exposedTermination.getName());
+			}
+			
+			return result;
+		}
+		catch (CloneNotSupportedException e) {
+			System.err.println(e.getMessage());
+			throw new CloneNotSupportedException("Error cloning NetworkArrayImpl: " + e.getMessage());
+		}
+		catch (StructuralException e) {
+			System.err.println(e.getMessage());
+			throw new CloneNotSupportedException("Error cloning NetworkArrayImpl: " + e.getMessage());
+		}
+	}
 	
 	/**
 	 * Origin representing the concatenation of origins on each of the
@@ -674,8 +709,25 @@ public class NetworkArrayImpl extends NetworkImpl {
 			return new ArrayOrigin(myParent, myName, myOrigins);
 		}
 		
-		public ArrayOrigin clone(Node n) throws CloneNotSupportedException {
-			return null;
+		public ArrayOrigin clone(Node node) throws CloneNotSupportedException {
+			if( !(node instanceof NetworkArrayImpl) ){
+				throw new CloneNotSupportedException("Error cloning ArrayOrigin: Invalid node type");
+			}
+			
+			try {
+				ArrayOrigin result = (ArrayOrigin) super.clone();
+				
+				DecodedOrigin[] origins = new DecodedOrigin[myOrigins.length];
+				for (int i = 0; i < myOrigins.length; i++)
+					origins[i] = (DecodedOrigin) ((NetworkArrayImpl) node).getNodes()[i].getOrigin(myOrigins[i].getName());
+				result.myOrigins = origins;
+				
+				return result;
+			} catch (StructuralException e) {
+				throw new CloneNotSupportedException("Error cloning ArrayOrigin: " + e.getMessage());
+			} catch (CloneNotSupportedException e) {
+				throw new CloneNotSupportedException("Error cloning ArrayOrigin: " + e.getMessage());
+			}
 		}
 		
 		public float[][] getDecoders() {

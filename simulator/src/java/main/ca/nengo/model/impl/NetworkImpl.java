@@ -923,7 +923,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			return (Origin) super.clone();
 		}
 		
-		public Origin clone(Ensemble ensemble) throws CloneNotSupportedException {
+		public Origin clone(Node node) throws CloneNotSupportedException {
 			return this.clone();
 		}
 
@@ -1175,17 +1175,11 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 			String name = exposed.getName();
 			Origin wrapped = ((OriginWrapper) exposed).getWrappedOrigin();
 			try {
-				Origin toExpose = null;
-				
 				// Check to see if referenced node is the network itself. If it is, handle the origin differently.
 				if (wrapped.getNode().getName() != myName ) {
-					toExpose = result.getNode(wrapped.getNode().getName()).getOrigin(wrapped.getName());
+					Origin toExpose = result.getNode(wrapped.getNode().getName()).getOrigin(wrapped.getName());
 					result.exposeOrigin(toExpose, name);
 				}
-				/*else {
-					toExpose = this.getTermination(wrapped.getName()).clone(result);
-				}*/
-				result.exposeOrigin(toExpose, name);
 			} catch (StructuralException e) {
 				throw new CloneNotSupportedException("Problem exposing Origin: " + e.getMessage());
 			}
@@ -1203,9 +1197,6 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 					Termination toExpose = result.getNode(wrapped.getNode().getName()).getTermination(wrapped.getName());
 					result.exposeTermination(toExpose, name);
 				}
-				/*else {
-					toExpose = this.getOrigin(wrapped.getName()).clone(result);
-				}*/
 			} catch (StructuralException e) {
 				throw new CloneNotSupportedException("Problem exposing Termination: " + e.getMessage());
 			}

@@ -297,6 +297,13 @@ public class Window extends WorldObjectImpl implements Interactable {
 	public static enum WindowState {
 		MAXIMIZED, MINIMIZED, NORMAL
 	}
+	
+	public boolean isMaximized() {
+		return (myState == WindowState.MAXIMIZED);
+	}
+	public boolean isMinimized() {
+		return (myState == WindowState.MINIMIZED);
+	}
 
 	class MenuBarHandler extends PBasicInputEventHandler {
 		@Override

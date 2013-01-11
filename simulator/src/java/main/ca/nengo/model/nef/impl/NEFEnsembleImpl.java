@@ -1185,7 +1185,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 
 		// TODO: why do I have to set this?  If I don't pasted ensembles fail to modify correctly
 		//       when radius is changed.
-		result.myReuseApproximators=false;
+		result.myReuseApproximators = false;
 
 		result.myDecodingApproximators = new HashMap<String, LinearApproximator>(5);
 		result.myEncoders = MU.clone(myEncoders);
