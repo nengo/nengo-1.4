@@ -360,18 +360,21 @@ public class SelectionHandler extends PDragSequenceEventHandler {
 				WorldObjectImpl wo = (WorldObjectImpl) ((PiccoloNodeInWorld) node).getWorldObject();
 				
 				if (wo != null && wo.isSelectable()) {
-					moveStackToFront(wo);
-					pressNode = wo;
+					if (!(wo instanceof Window && ((Window)wo).isMaximized())) {
+						// this object is not a maximized window, so move to front
+						moveStackToFront(wo);
+					}
 					
 					if (wo instanceof Window) {
 						// select the parent (Network, ensemble, etc.) of the clicked window
 						WorldObjectImpl parent = (WorldObjectImpl)wo.getParent();
-						if (parent != null) {
+						if (parent != null && parent.getWorld() != null) {
 							parent.getWorld().getSelectionHandler().unselectAll();
 							parent.getWorld().getSelectionHandler().select(parent);
 						}
 					}
 					
+					pressNode = wo;
 					return;
 				}
 			}
