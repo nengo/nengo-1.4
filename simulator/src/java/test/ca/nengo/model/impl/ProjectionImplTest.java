@@ -172,8 +172,8 @@ public class ProjectionImplTest extends TestCase {
 		getError(reference, mixed);
 
 		p.addBias(300, .005f, .01f, true, false);
-		BiasOrigin bo = (BiasOrigin) pre.getOrigin("post:input");
-		BiasTermination bt = (BiasTermination) post.getTermination("input:bias");
+		BiasOrigin bo = (BiasOrigin) pre.getOrigin("post_input");
+		BiasTermination bt = (BiasTermination) post.getTermination("input (bias)");
 		assertTrue(MU.min(getNetWeights(directWeights, bo, bt)) > -1e-10);
 		network.run(-1.5f, 1);
 //		Plotter.plot(probe.getData(), "positive non-optimal");
@@ -183,8 +183,8 @@ public class ProjectionImplTest extends TestCase {
 		p.removeBias();
 
 		p.addBias(300, .005f, .01f, true, true);
-		bo = (BiasOrigin) pre.getOrigin("post:input");
-		bt = (BiasTermination) post.getTermination("input:bias");
+		bo = (BiasOrigin) pre.getOrigin("post_input");
+		bt = (BiasTermination) post.getTermination("input (bias)");
 		assertTrue(MU.min(getNetWeights(directWeights, bo, bt)) > -1e-10);
 		network.run(-1.5f, 1);
 //		Plotter.plot(probe.getData(), "positive optimal");

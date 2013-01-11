@@ -89,13 +89,13 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	/**
 	 * Append to bias termination names
 	 */
-	public static String BIAS_SUFFIX = ":bias";
+	public static String BIAS_SUFFIX = " (bias)";
 
 
 	/**
 	 * Append to interneuron names
 	 */
-	public static String INTERNEURON_SUFFIX = ":interneuron";
+	public static String INTERNEURON_SUFFIX = " (interneuron)";
 
 	private final int myDimension;
 	private float[][] myEncoders;
