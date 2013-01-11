@@ -7,6 +7,8 @@ import binding
 import networkarray
 import gate
 import learned_termination
+import hpes_termination
+import bcm_termination
 import thalamus
 import interneuron
 
@@ -21,5 +23,7 @@ templates=[
     thalamus,
     gate,
     learned_termination,
+    hpes_termination,
+    bcm_termination,
     interneuron,
     ]

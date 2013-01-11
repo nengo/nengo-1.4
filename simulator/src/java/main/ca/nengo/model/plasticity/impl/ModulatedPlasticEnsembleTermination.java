@@ -27,11 +27,11 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.plasticity.impl;
 
+import java.util.Arrays;
+
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.PlasticNodeTermination;
-import ca.nengo.model.RealOutput;
-import ca.nengo.model.SpikeOutput;
 import ca.nengo.model.StructuralException;
 
 /**
@@ -56,6 +56,7 @@ public abstract class ModulatedPlasticEnsembleTermination extends PlasticEnsembl
     private static final long serialVersionUID = 1L;
     protected String myModTermName;
     protected float[] myModInput;
+    protected float[] myFilteredModInput;
 
     /**
      * @param node The parent Node
@@ -89,9 +90,7 @@ public abstract class ModulatedPlasticEnsembleTermination extends PlasticEnsembl
     public void reset(boolean randomize) {
         super.reset(randomize);
         if (myModInput != null) {
-            for (int i=0; i < myModInput.length; i++) {
-                myModInput[i] = 0.0f;
-            }
+        	Arrays.fill(myModInput, 0.0f);
         }
     }
 
@@ -105,20 +104,20 @@ public abstract class ModulatedPlasticEnsembleTermination extends PlasticEnsembl
         if (myModTermName == null) {
             throw new StructuralException("Modulatory termination name not set in PESTermination");
         }
-        if (!(state instanceof RealOutput)) {
-            throw new IllegalArgumentException("PESTermination does not support modulatory input of type " + state.getClass().getName());
+
+        if (!name.equals(myModTermName)) { return; }
+        
+        if (myModInput == null) {
+        	myModInput = new float[state.getDimension()];
         }
-        if (name.equals(myModTermName)) {
-            if (state instanceof RealOutput) {
-                myModInput = ((RealOutput) state).getValues();
-            } else if (state instanceof SpikeOutput) {
-                boolean[] vals = ((SpikeOutput) state).getValues();
-                if (myModInput==null) {myModInput = new float[vals.length];}
-                for (int i=0; i<vals.length; i++) {
-                    myModInput[i] = vals[i] ? 0.001f : 0.0f;
-                }
-            }
+        float integrationTime = 0.001f;
+        updateRaw(myModInput, state, integrationTime);
+        
+        float tauPSC = getNodeTerminations()[0].getTau();
+        if (myFilteredModInput == null) {
+        	myFilteredModInput = new float[state.getDimension()];
         }
+        updateFiltered(myModInput, myFilteredModInput, tauPSC, integrationTime);
     }
     
     @Override

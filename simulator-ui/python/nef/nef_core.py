@@ -3,7 +3,7 @@ from ca.nengo.model import SimulationMode, Origin, Units, Termination, Network
 from ca.nengo.model.nef.impl import NEFEnsembleFactoryImpl
 from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model.neuron.impl import LIFNeuronFactory
-from ca.nengo.model.plasticity.impl import PESTermination, PreLearnTermination, STDPTermination, PlasticEnsembleImpl
+from ca.nengo.model.plasticity.impl import BCMTermination, hPESTermination, PESTermination, PreLearnTermination, STDPTermination, PlasticEnsembleImpl
 from ca.nengo.util import MU
 from ca.nengo.util.impl import FixedVectorGenerator
 from ca.nengo.math.impl import IndicatorPDF,ConstantFunction,PiecewiseConstantFunction,GradientDescentApproximator,FourierFunction
@@ -886,10 +886,10 @@ class Network:
                            created with plastic_array=True in :func:`nef.Network.connect()`
         :type learn_term: string or Termination
         
-        :param mod_term: the modulatory input to the learning rule; while this
-                         is technically not required by the plasticity functions
-                         in Nengo, currently there are no learning rules implemented
-                         that do not require modulatory input.
+        :param mod_term: the modulatory input to the learning rule; this is
+                         optional. It will be checked if `learn_term` is
+                         a `ModulatedPlasticEnsembleTermination`,
+                         and not otherwise.
         :type mod_term: string or Termination
         
         :param float rate: the learning rate that will be used in the learning
@@ -898,7 +898,7 @@ class Network:
                             .. todo:: 
                                      (Possible enhancement: make this 2D for stdp
                                      mode, different rates for in_fcn and out_fcn)
-           
+        
         If *stdp* is True, a triplet-based spike-timinng-dependent plasticity rule
         is used, based on that defined in::
           
@@ -965,6 +965,18 @@ class Network:
                 learn_term.setStableVal(kwargs['homeostasis'])
             else:
                 learn_term.setHomestatic(False)
+        elif isinstance(learn_term,BCMTermination):
+            learn_term.setLearningRate(rate)
+            learn_term.setOriginName('AXON')
+        elif isinstance(learn_term,hPESTermination):
+            supervision_ratio = 0.5
+            if kwargs.has_key('supervisionRatio'):
+                supervision_ratio = kwargs['supervisionRatio']
+            
+            learn_term.setLearningRate(rate)
+            learn_term.setOriginName('AXON')
+            learn_term.setSupervisionRatio(supervision_ratio)
+            learn_term.setModTermName(mod_term)
         elif isinstance(learn_term,PESTermination):
             oja = True
             if kwargs.has_key('oja'):

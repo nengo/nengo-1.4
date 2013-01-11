@@ -148,14 +148,15 @@ public class PlasticEnsembleImpl extends EnsembleImpl implements TaskSpawner {
                 try {
                     Origin origin = this.getOrigin(pet.getOriginName());
                     pet.setOriginState(origin.getName(), origin.getValues(), endTime);
+                    pet.setTerminationState(endTime);
 
                     if (pet instanceof ModulatedPlasticEnsembleTermination) {
                         DecodedTermination modTerm = (DecodedTermination)
-                        this.getTermination(((ModulatedPlasticEnsembleTermination) pet).getModTermName());
+                        		this.getTermination(((ModulatedPlasticEnsembleTermination) pet).getModTermName());
 
                         InstantaneousOutput input = new RealOutputImpl(modTerm.getOutput(), Units.UNK, endTime);
                         ((ModulatedPlasticEnsembleTermination) pet).setModTerminationState
-                        (modTerm.getName(), input, endTime);
+                        	(modTerm.getName(), input, endTime);
                     }
                 }
                 catch (StructuralException e) {

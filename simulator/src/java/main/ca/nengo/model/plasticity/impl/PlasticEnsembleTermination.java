@@ -27,6 +27,8 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.plasticity.impl;
 
+import java.util.Arrays;
+
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.PlasticNodeTermination;
@@ -57,10 +59,15 @@ import ca.nengo.model.nef.NEFEnsemble;
 public abstract class PlasticEnsembleTermination extends EnsembleTermination {
 
     private static final long serialVersionUID = 1L;
+
     protected float myLearningRate = 5e-7f;
+    private float myLastTime = 0.0f;
     protected boolean myLearning = true;
     protected String myOriginName;
     protected float[] myOutput;
+    protected float[] myFilteredOutput;
+    protected float[] myInput;
+    protected float[] myFilteredInput;
 
     /**
      * @param node The parent Node
@@ -102,15 +109,76 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
         }
 
         if (!name.equals(myOriginName)) { return; }
-
-        if (state instanceof RealOutput) {
-            myOutput = ((RealOutput) state).getValues();
+        
+        if (myOutput == null) {
+        	myOutput = new float[state.getDimension()];
+        }
+        float integrationTime = 0.001f;
+        updateRaw(myOutput, state, integrationTime);
+        
+        float tauPSC = getNodeTerminations()[0].getTau();
+        if (myFilteredOutput == null) {
+        	myFilteredOutput = new float[state.getDimension()];
+        }
+        updateFiltered(myOutput, myFilteredOutput, tauPSC, integrationTime);
+    }
+    
+    public void setTerminationState(float time) throws StructuralException {
+    	if (myLastTime >= time) { return; }
+   	
+        InstantaneousOutput state = this.getInput();
+        if (state == null) {
+        	if (myInput != null) {
+        		Arrays.fill(myInput, 0.0f);
+        	}
+        	if (myFilteredInput != null) {
+        		Arrays.fill(myFilteredInput, 0.0f);
+        	}
+        	return;
+        }
+        
+        float integrationTime = 0.001f;
+        if (myInput == null) {
+        	myInput = new float[state.getDimension()];
+        }
+        updateRaw(myInput, state, integrationTime);
+        
+        float tauPSC = getNodeTerminations()[0].getTau();
+        if (myFilteredInput == null) {
+        	myFilteredInput = new float[state.getDimension()];
+        }
+        updateFiltered(myInput, myFilteredInput, tauPSC, integrationTime);
+    	myLastTime = time;
+    }
+    
+    protected static void updateRaw(final float[] raw, final InstantaneousOutput state, final float integrationTime) throws StructuralException {
+    	if (state instanceof RealOutput) {
+    		float[] values = ((RealOutput) state).getValues();
+    		if (values.length != raw.length) {
+    			throw new StructuralException("State is length "
+    					+ values.length + "; should be " + raw.length);
+    		}
+    		for (int i = 0; i < values.length; i++) {
+    			raw[i] = values[i];
+    		}
         } else if (state instanceof SpikeOutput) {
-            boolean[] vals = ((SpikeOutput) state).getValues();
-            if (myOutput==null) {myOutput = new float[vals.length];}
-            for (int i=0; i<vals.length; i++) {
-                myOutput[i] = vals[i] ? 0.001f : 0.0f;
+            boolean[] values = ((SpikeOutput) state).getValues();
+            if (values.length != raw.length) {
+    			throw new StructuralException("State is length "
+    					+ values.length + "; should be " + raw.length);
+    		}
+            for (int i = 0; i < values.length; i++) {
+                raw[i] = values[i] ? integrationTime : 0.0f;
             }
+        } else {
+        	System.err.println("State not real or spiking.");
+        }
+    }
+    
+    protected static void updateFiltered(final float[] raw, final float[] filtered, final float tauPSC, final float integrationTime) {
+    	for (int i = 0; i < raw.length; i++) {
+    		filtered[i] *= 1.0f - integrationTime / tauPSC;
+    		filtered[i] += raw[i] / tauPSC;
         }
     }
 
@@ -163,10 +231,18 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
         // were saved in saveTransform()
         myLearning = true;
         if (myOutput != null) {
-            for (int i=0; i < myOutput.length; i++) {
-                myOutput[i] = 0.0f;
-            }
+        	Arrays.fill(myOutput, 0.0f);
         }
+        if (myFilteredOutput != null) {
+            Arrays.fill(myFilteredOutput, 0.0f);
+        }
+        if (myInput != null) {
+        	Arrays.fill(myInput, 0.0f);
+        }
+        if (myFilteredInput != null) {
+            Arrays.fill(myFilteredInput, 0.0f);
+        }
+        myLastTime = 0.0f;
     }
 
     /**
