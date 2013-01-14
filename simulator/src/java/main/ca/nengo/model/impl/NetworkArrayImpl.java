@@ -168,6 +168,40 @@ public class NetworkArrayImpl extends NetworkImpl {
 		return this.getOrigin(name);
 	}
 	
+	/**
+	 * Create a new origin by splitting the given functions across the nodes.
+	 * 
+	 * This method uses the same signature as ca.nengo.model.nef.NEFEnsemble.addDecodedOrigin()
+     * 
+	 * @param name The name of the newly created origin
+	 * @param functions A list of ca.nengo.math.Function objects to approximate at this origin
+	 * @param nodeOrigin Name of the base Origin to use to build this function approximation
+       (this will always be 'AXON' for spike-based synapses)
+       @param splitFunctions True if the functions should be split across the nodes, otherwise
+       this behaves the same as the default addDecodedOrigin
+	 * @return Origin that encapsulates all of the internal node origins
+	 * @throws StructuralException
+	 */
+	public Origin addDecodedOrigin(String name, Function[] functions, String nodeOrigin, boolean splitFunctions) throws StructuralException {
+		if(!splitFunctions)
+			return addDecodedOrigin(name, functions, nodeOrigin);
+		
+		if(functions.length != myDimension)
+			System.err.println("Warning, trying to split functions but function list length does " +
+					"not match network array dimension");
+		
+		DecodedOrigin[] origins = new DecodedOrigin[myNumNodes];
+		int f=0;
+		for (int i = 0; i < myNumNodes; i++) {
+			Function[] oFuncs = new Function[myNodeDimensions[i]];
+			for (int d=0; d < myNodeDimensions[i]; d++)
+				oFuncs[d] = functions[f++];
+			origins[i] = (DecodedOrigin) myNodes[i].addDecodedOrigin(name,  oFuncs,  nodeOrigin);
+		}
+		this.createEnsembleOrigin(name, origins);
+		return this.getOrigin(name);
+	}
+	
 	
 	/**
 	 * Create a new termination.  A new termination is created on each
