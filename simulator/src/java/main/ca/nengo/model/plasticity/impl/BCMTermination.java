@@ -30,7 +30,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.plasticity.impl;
 
-import ca.nengo.math.impl.IndicatorPDF;
+import ca.nengo.math.impl.GaussianPDF;
 import ca.nengo.model.Node;
 import ca.nengo.model.PlasticNodeTermination;
 import ca.nengo.model.StructuralException;
@@ -46,7 +46,7 @@ public class BCMTermination extends PlasticEnsembleTermination {
 
     private static final long serialVersionUID = 1L;
     
-    private static final float THETA_LENGTH = 1e5f;
+    private static final float THETA_TAU = 10.0f;  // tau for theta filtering
     private float[] myInitialTheta;
     private float[] myTheta;
     private float[] myGain;
@@ -64,11 +64,14 @@ public class BCMTermination extends PlasticEnsembleTermination {
         // If initial theta not passed in, randomly generate
         // between -0.001 and 0.001
         if (initialTheta == null) {
-        	IndicatorPDF uniform = new IndicatorPDF(0.01f, 0.1f);
+        	//IndicatorPDF uniform = new IndicatorPDF(0.05f, 0.2f);
+            GaussianPDF gaussian = new GaussianPDF(0.005f, 0.001f);
         	
         	myInitialTheta = new float[nodeTerminations.length];
         	for (int i = 0; i < myInitialTheta.length; i ++) {
-        		myInitialTheta[i] = uniform.sample()[0];
+        	    // Reasonable assumption: high gain, high theta
+        		//myInitialTheta[i] = uniform.sample()[0] * myGain[i];
+        	    myInitialTheta[i] = gaussian.sample()[0] * myGain[i];
         	}
         } else {
         	myInitialTheta = initialTheta;
@@ -112,9 +115,12 @@ public class BCMTermination extends PlasticEnsembleTermination {
         }
         this.setTransform(transform, false);
         
-        // update theta
+        // update theta based theta's time constant
+        final float a = (float) Math.exp(-0.001f / THETA_TAU);
+        final float nota = 1.0f - a;
         for (int i = start; i < end; i++) {
-        	myTheta[i] += (myFilteredOutput[i] - myTheta[i]) / THETA_LENGTH;
+            myTheta[i] *= a;
+            myTheta[i] += myFilteredOutput[i] * nota;
         }
     }
 
