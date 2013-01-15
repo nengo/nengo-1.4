@@ -116,11 +116,11 @@ public class BCMTermination extends PlasticEnsembleTermination {
         this.setTransform(transform, false);
         
         // update theta based theta's time constant
-        final float a = (float) Math.exp(-0.001f / THETA_TAU);
-        final float nota = 1.0f - a;
+        final float decay = (float) Math.exp(-0.001f / THETA_TAU);
+        final float update = 1.0f - decay;
         for (int i = start; i < end; i++) {
-            myTheta[i] *= a;
-            myTheta[i] += myFilteredOutput[i] * nota;
+            myTheta[i] *= decay;
+            myTheta[i] += myFilteredOutput[i] * update;
         }
     }
 

@@ -27,7 +27,7 @@ import nef
 import numeric
 from java.util import ArrayList
 from java.util import HashMap
-def make(net, preName='pre', postName='post', rate=5e-7, theta=None):
+def make(net, preName='pre', postName='post', rate=5e-4, theta=None):
 
     # get pre and post ensembles from their names
     pre = net.network.getNode(preName)

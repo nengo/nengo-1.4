@@ -23,8 +23,8 @@ net.connect('input','pre')
 
 # Create a modulated connection between the 'pre' and 'post' ensembles.
 learning.make(net,errName='error', N_err=100, preName='pre', postName='post',
-    rate=5e-7) #Make an error population with 100 neurons, and a learning 
-               #rate of 5e-7
+    rate=5e-4) #Make an error population with 100 neurons, and a learning 
+               #rate of 5e-4
 
 # Set the modulatory signal.
 net.connect('pre', 'error')
