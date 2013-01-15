@@ -116,9 +116,9 @@ class LogTermination:
     def tick(self,dt):
         self.value = self.data()
     def text(self):
-        return ';'.join(['%1.3f' % x for x in self.value])
+        return ';'.join(['%1.4f' % x for x in self.value])
     def flush(self):
-        pass    
+        pass
 
 class LogTransform(LogTermination):
     def data(self):
@@ -129,6 +129,8 @@ class LogTransform(LogTermination):
 class LogTheta(LogTermination):
     def data(self):
         return self.termination.getTheta()
+    def text(self):
+        return ';'.join(['%.3e' % x for x in self.value])
 
 
 class Log(StepListener):

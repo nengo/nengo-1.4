@@ -30,7 +30,7 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.plasticity.impl;
 
-import ca.nengo.math.impl.GaussianPDF;
+import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.model.Node;
 import ca.nengo.model.PlasticNodeTermination;
 import ca.nengo.model.StructuralException;
@@ -46,7 +46,9 @@ public class BCMTermination extends PlasticEnsembleTermination {
 
     private static final long serialVersionUID = 1L;
     
-    private static final float THETA_TAU = 10.0f;  // tau for theta filtering
+    private static final float THETA_TAU = 20.0f;  // tau for theta filtering
+    // Attempt to make BCM the same order of magnitude as PES
+    private static final float SCALING_FACTOR = 20000.0f;
     private float[] myInitialTheta;
     private float[] myTheta;
     private float[] myGain;
@@ -62,16 +64,12 @@ public class BCMTermination extends PlasticEnsembleTermination {
         }
         
         // If initial theta not passed in, randomly generate
-        // between -0.001 and 0.001
         if (initialTheta == null) {
-        	//IndicatorPDF uniform = new IndicatorPDF(0.05f, 0.2f);
-            GaussianPDF gaussian = new GaussianPDF(0.005f, 0.001f);
-        	
+        	IndicatorPDF uniform = new IndicatorPDF(0.00001f, 0.00002f);
         	myInitialTheta = new float[nodeTerminations.length];
         	for (int i = 0; i < myInitialTheta.length; i ++) {
         	    // Reasonable assumption: high gain, high theta
-        		//myInitialTheta[i] = uniform.sample()[0] * myGain[i];
-        	    myInitialTheta[i] = gaussian.sample()[0] * myGain[i];
+        		myInitialTheta[i] = uniform.sample()[0] * myGain[i];
         	}
         } else {
         	myInitialTheta = initialTheta;
@@ -110,7 +108,7 @@ public class BCMTermination extends PlasticEnsembleTermination {
             for (int j = 0; j < transform[i].length; j++) {
                 transform[i][j] += myFilteredInput[j] * myFilteredOutput[i]
                 		* (myFilteredOutput[i] - myTheta[i])
-                		* myGain[i] * myLearningRate;
+                		* myGain[i] * myLearningRate * SCALING_FACTOR;
             }
         }
         this.setTransform(transform, false);

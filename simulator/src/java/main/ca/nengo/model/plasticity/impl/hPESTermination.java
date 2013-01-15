@@ -59,7 +59,9 @@ public class hPESTermination extends ModulatedPlasticEnsembleTermination  {
     private float[] myGain;
     private float[][] myEncoders;
     
-    private static final float THETA_LENGTH = 1e5f;
+    private static final float THETA_TAU = 20.0f;  // tau for theta filtering
+    // Attempt to make BCM the same order of magnitude as PES
+    private static final float SCALING_FACTOR = 20000.0f;
     private float[] myInitialTheta;
     private float[] myTheta;
     
@@ -83,16 +85,15 @@ public class hPESTermination extends ModulatedPlasticEnsembleTermination  {
         }
         
         // If initial theta not passed in, randomly generate
-        // between -0.01 and 0.1
         if (initialTheta == null) {
-        	IndicatorPDF uniform = new IndicatorPDF(0.01f, 0.1f);
-        	
-        	myInitialTheta = new float[nodeTerminations.length];
-        	for (int i = 0; i < myInitialTheta.length; i ++) {
-        		myInitialTheta[i] = uniform.sample()[0];
-        	}
+            IndicatorPDF uniform = new IndicatorPDF(0.00005f, 0.00015f);
+            myInitialTheta = new float[nodeTerminations.length];
+            for (int i = 0; i < myInitialTheta.length; i ++) {
+                // Reasonable assumption: high gain, high theta
+                myInitialTheta[i] = uniform.sample()[0] * myGain[i];
+            }
         } else {
-        	myInitialTheta = initialTheta;
+            myInitialTheta = initialTheta;
         }
         myTheta = myInitialTheta.clone();
     }
@@ -146,9 +147,9 @@ public class hPESTermination extends ModulatedPlasticEnsembleTermination  {
         this.setTransform(transform, false);
         
         // update theta
-        for (int i = start; i < end; i++) {
-        	myTheta[i] += (myFilteredOutput[i] - myTheta[i]) / THETA_LENGTH;
-        }
+        //for (int i = start; i < end; i++) {
+        //	myTheta[i] += (myFilteredOutput[i] - myTheta[i]) / THETA_LENGTH;
+        //}
     }
 
     private float deltaOmega(int i, int j, float currentWeight) {
