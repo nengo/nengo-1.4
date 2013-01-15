@@ -122,8 +122,8 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
         }
         
         float e = 0.0f;
-        for (int k = 0; k < myModInput.length; k++) {
-            e += myModInput[k] * myEncoders[i][k];
+        for (int k = 0; k < myFilteredModInput.length; k++) {
+            e += myFilteredModInput[k] * myEncoders[i][k];
         }
 
         return myLearningRate * myFilteredInput[j] * e * myGain[i] - oja;

@@ -35,6 +35,7 @@ import ca.nengo.model.Node;
 import ca.nengo.model.PlasticNodeTermination;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.neuron.Neuron;
+import ca.nengo.model.neuron.impl.SpikingNeuron;
 
 /**
  * BCM rule
@@ -48,15 +49,22 @@ public class BCMTermination extends PlasticEnsembleTermination {
     private static final float THETA_LENGTH = 1e5f;
     private float[] myInitialTheta;
     private float[] myTheta;
+    private float[] myGain;
 
     public BCMTermination(Node node, String name, PlasticNodeTermination[] nodeTerminations, float[] initialTheta) throws StructuralException {
         super(node, name, nodeTerminations);
         setOriginName(Neuron.AXON);
         
+        myGain = new float[nodeTerminations.length];
+        for (int i = 0; i < nodeTerminations.length; i++) {
+            SpikingNeuron neuron = (SpikingNeuron) nodeTerminations[i].getNode();
+            myGain[i] = neuron.getScale();
+        }
+        
         // If initial theta not passed in, randomly generate
         // between -0.001 and 0.001
         if (initialTheta == null) {
-        	IndicatorPDF uniform = new IndicatorPDF(-0.001f, 0.001f);
+        	IndicatorPDF uniform = new IndicatorPDF(0.01f, 0.1f);
         	
         	myInitialTheta = new float[nodeTerminations.length];
         	for (int i = 0; i < myInitialTheta.length; i ++) {
@@ -66,6 +74,10 @@ public class BCMTermination extends PlasticEnsembleTermination {
         	myInitialTheta = initialTheta;
         }
         myTheta = myInitialTheta.clone();
+    }
+    
+    public float[] getTheta() {
+    	return myTheta;
     }
 
     /**
@@ -95,7 +107,7 @@ public class BCMTermination extends PlasticEnsembleTermination {
             for (int j = 0; j < transform[i].length; j++) {
                 transform[i][j] += myFilteredInput[j] * myFilteredOutput[i]
                 		* (myFilteredOutput[i] - myTheta[i])
-                		* myLearningRate;
+                		* myGain[i] * myLearningRate;
             }
         }
         this.setTransform(transform, false);

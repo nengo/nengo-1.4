@@ -20,7 +20,7 @@ class LogOverride:
         cls.override_filename=filename
 
 
-class LogBasic:
+class LogOrigin:
     def __init__(self,name,origin):
         self.name=name
         self.origin=origin
@@ -46,9 +46,9 @@ class LogBasic:
         pass    
  
 
-class LogVector(LogBasic):
+class LogVector(LogOrigin):
     def __init__(self,name,origin,tau):
-        LogBasic.__init__(self,name,origin)
+        LogOrigin.__init__(self,name,origin)
         if tau<=0: tau=None
         self.tau=tau
     def init(self):
@@ -74,14 +74,14 @@ class LogVocab(LogVector):
         return 'vocab'
 
 
-class LogSpikeCount(LogBasic):
+class LogSpikeCount(LogOrigin):
     def __init__(self,name,origin,skip=0):
         self.skip=skip
-        LogBasic.__init__(self,name,origin)
+        LogOrigin.__init__(self,name,origin)
     def init(self):
         self.value=numeric.array([0]*self.length(),typecode='d')
     def length(self):
-        length=LogBasic.length(self)
+        length=LogOrigin.length(self)
         scale=1+self.skip
         length2=length/scale
         if length%scale>0: length2+=1
@@ -98,6 +98,38 @@ class LogSpikeCount(LogBasic):
         return ';'.join(['%d'%x for x in self.value])
     def flush(self):
         self.value[:]=0
+
+
+class LogTermination:
+    def __init__(self, name, termination):
+        self.name = name
+        self.termination = termination
+        self.init()
+    def init(self):
+        self.value = numeric.array([0] * self.length(), typecode='f')
+    def length(self):
+        return len(self.data())
+    def type(self):
+        return 'v<%d>' % self.length()
+    def data(self):
+        return self.termination.getInput().getValues()
+    def tick(self,dt):
+        self.value = self.data()
+    def text(self):
+        return ';'.join(['%1.3f' % x for x in self.value])
+    def flush(self):
+        pass    
+
+class LogTransform(LogTermination):
+    def data(self):
+        return numeric.ravel(self.termination.getTransform())
+    def text(self):
+        return ';'.join(['%.3e' % x for x in self.value])
+
+class LogTheta(LogTermination):
+    def data(self):
+        return self.termination.getTheta()
+
 
 class Log(StepListener):
     def __init__(self,network,name=None,dir=None,filename='%(name)s-%(time)s.csv',interval=0.001,tau=0.01):
@@ -179,6 +211,18 @@ class Log(StepListener):
         node = self.network._get_node(source)
         _origin = node.getOrigin(origin)
         self.logs.append(LogVector(name,_origin,tau))
+    
+    def add_transform(self,source,name=None,termination='input'):
+        if name is None: name=source+":"+termination+"_weights"
+        node = self.network._get_node(source)
+        _termination = node.getTermination(termination)
+        self.logs.append(LogTransform(name,_termination))
+    
+    def add_theta(self,source,name=None,termination='input'):
+        if name is None: name=source+":"+termination+"_theta"
+        node = self.network._get_node(source)
+        _termination = node.getTermination(termination)
+        self.logs.append(LogTheta(name,_termination))
 
     def add_vocab(self,source,vocab=None,name=None,tau='default',terms=None,pairs=False,threshold=0.1,normalize=False):
         if name is None: name=source+'_vocab'

@@ -83,9 +83,9 @@ public class hPESTermination extends ModulatedPlasticEnsembleTermination  {
         }
         
         // If initial theta not passed in, randomly generate
-        // between -0.001 and 0.001
+        // between -0.01 and 0.1
         if (initialTheta == null) {
-        	IndicatorPDF uniform = new IndicatorPDF(-0.001f, 0.001f);
+        	IndicatorPDF uniform = new IndicatorPDF(0.01f, 0.1f);
         	
         	myInitialTheta = new float[nodeTerminations.length];
         	for (int i = 0; i < myInitialTheta.length; i ++) {
@@ -153,17 +153,17 @@ public class hPESTermination extends ModulatedPlasticEnsembleTermination  {
 
     private float deltaOmega(int i, int j, float currentWeight) {
         float e = 0.0f;
-        for (int k = 0; k < myModInput.length; k++) {
-            e += myModInput[k] * myEncoders[i][k];
+        for (int k = 0; k < myFilteredModInput.length; k++) {
+            e += myFilteredModInput[k] * myEncoders[i][k];
         }
         
-        float supervised = myFilteredInput[j] * e * myGain[i];
+        float supervised = myFilteredInput[j] * e;
         
         float unsupervised = myFilteredInput[j] * myFilteredOutput[i]
         		* (myFilteredOutput[i] - myTheta[i]);
 
         return (supervised * mySupervisionRatio + unsupervised * (1 - mySupervisionRatio))
-        		* myLearningRate;
+        		* myGain[i] * myLearningRate;
     }
     
     @Override
