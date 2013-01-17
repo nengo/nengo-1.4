@@ -18,7 +18,7 @@ Is it working? To see if the right function is being computed, compare the 'pre'
 
 
 *Code*:
-    .. literalinclude:: ../../dist-files/demo/learn-product.py
+    .. literalinclude:: ../../dist-files/demo/learn_product.py
 
 
 

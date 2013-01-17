@@ -19,7 +19,7 @@ Repeat the experiment: After a few simulated seconds, the post and pre will matc
 .. image:: images/learn-communicate.png
 
 *Code*:
-    .. literalinclude:: ../../dist-files/demo/learn-communicate.py
+    .. literalinclude:: ../../dist-files/demo/learn_communicate.py
 
 
 
