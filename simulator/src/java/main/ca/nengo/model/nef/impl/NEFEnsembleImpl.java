@@ -27,8 +27,10 @@ a recipient may use your version of this file under either the MPL or the GPL Li
  */
 package ca.nengo.model.nef.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
@@ -109,7 +111,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	private boolean myRadiiAreOne;
 	private DynamicalSystem myDirectModeDynamics;
 	private Integrator myDirectModeIntegrator;
-	private boolean myModeFixed;
+	private List<SimulationMode> myFixedModes;
 
 	private NEFEnsembleFactory myEnsembleFactory;
 
@@ -147,7 +149,7 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 		myReuseApproximators = true;
 		myUnscaledEvalPoints = evalPoints;
 		setRadii(radii);
-		myModeFixed = false;
+		myFixedModes = null;
 
 		myDirectModeIntegrator = new EulerIntegrator(.001f);
 
@@ -1011,6 +1013,9 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 */
 	@Override
     public void setMode(SimulationMode mode) {
+		if(myFixedModes != null && !myFixedModes.contains(mode))
+			return;
+		
 		super.setMode(mode);
 
 		Origin[] origins = getOrigins();
@@ -1025,17 +1030,15 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
 	 * When this method is called, the mode of this node is fixed and cannot be changed by
 	 * subsequent setMode(...) calls.
 	 */
-	public void fixMode()
-	{
-		myModeFixed = true;
+	public void fixMode() {
+		fixMode(new SimulationMode[]{getMode()});
 	}
-
+	
 	/**
-	 * @return whether or not the mode for this ensemble has been fixed
+	 * Set the allowed simulation modes.
 	 */
-	public boolean getModeFixed()
-	{
-		return myModeFixed;
+	public void fixMode(SimulationMode[] modes) {
+		myFixedModes = Arrays.asList(modes);
 	}
 
 	/**
@@ -1059,6 +1062,10 @@ public class NEFEnsembleImpl extends DecodableEnsembleImpl implements NEFEnsembl
     public NEFEnsembleFactory getEnsembleFactory() {
 		return myEnsembleFactory;
 	}
+    
+    public LinearApproximator getDecodingApproximator(String nodeName) {
+    	return myDecodingApproximators.get(nodeName);
+    }
 
     public int getNodeCount() {
 		return getNodes().length;
