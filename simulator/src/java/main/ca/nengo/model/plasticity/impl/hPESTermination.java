@@ -33,8 +33,6 @@ import ca.nengo.model.PlasticNodeTermination;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.neuron.Neuron;
-import ca.nengo.model.neuron.impl.SpikingNeuron;
-import ca.nengo.util.MU;
 
 /**
  * A termination whose transformation evolves according to the PES rule.
@@ -52,12 +50,9 @@ import ca.nengo.util.MU;
  * @author Jonathan Lai
  * @author Trevor Bekolay
  */
-public class hPESTermination extends ModulatedPlasticEnsembleTermination  {
+public class hPESTermination extends PESTermination  {
 
     private static final long serialVersionUID = 1L;
-
-    private float[] myGain;
-    private float[][] myEncoders;
     
     private static final float THETA_TAU = 20.0f;  // tau for theta filtering
     // Attempt to make BCM the same order of magnitude as PES
@@ -77,12 +72,6 @@ public class hPESTermination extends ModulatedPlasticEnsembleTermination  {
     public hPESTermination(NEFEnsemble ensemble, String name, PlasticNodeTermination[] nodeTerminations, float[] initialTheta) throws StructuralException {
         super(ensemble, name, nodeTerminations);
         setOriginName(Neuron.AXON);
-        myEncoders = ensemble.getEncoders();
-        myGain = new float[nodeTerminations.length];
-        for (int i = 0; i < nodeTerminations.length; i++) {
-            SpikingNeuron neuron = (SpikingNeuron) nodeTerminations[i].getNode();
-            myGain[i] = neuron.getScale();
-        }
         
         // If initial theta not passed in, randomly generate
         if (initialTheta == null) {
@@ -146,35 +135,28 @@ public class hPESTermination extends ModulatedPlasticEnsembleTermination  {
         }
         this.setTransform(transform, false);
         
-        // update theta
-        //for (int i = start; i < end; i++) {
-        //	myTheta[i] += (myFilteredOutput[i] - myTheta[i]) / THETA_LENGTH;
-        //}
+        // update theta based on theta's time constant
+        final float decay = (float) Math.exp(-0.001f / THETA_TAU);
+        final float update = 1.0f - decay;
+        for (int i = start; i < end; i++) {
+            myTheta[i] *= decay;
+            myTheta[i] += myFilteredOutput[i] * update;
+        }
     }
 
-    private float deltaOmega(int i, int j, float currentWeight) {
-        float e = 0.0f;
-        for (int k = 0; k < myFilteredModInput.length; k++) {
-            e += myFilteredModInput[k] * myEncoders[i][k];
-        }
-        
-        float supervised = myFilteredInput[j] * e;
-        
+    protected float deltaOmega(int i, int j, float currentWeight) {
+    	float supervised = super.deltaOmega(i, j, currentWeight);
         float unsupervised = myFilteredInput[j] * myFilteredOutput[i]
-        		* (myFilteredOutput[i] - myTheta[i]);
+        		* (myFilteredOutput[i] - myTheta[i])
+        		* myGain[i] * myLearningRate * SCALING_FACTOR;
 
-        return (supervised * mySupervisionRatio + unsupervised * (1 - mySupervisionRatio))
-        		* myGain[i] * myLearningRate;
+        return (supervised * mySupervisionRatio
+        	   + unsupervised * (1 - mySupervisionRatio));
     }
     
     @Override
     public hPESTermination clone(Node node) throws CloneNotSupportedException {
-        hPESTermination result = (hPESTermination)super.clone(node);
-        result.myFilteredInput = (myFilteredInput != null) ? myFilteredInput.clone() : null;
-//        result.myFilteredInput = null;
-        result.myGain = myGain.clone();
-        result.myEncoders = MU.clone(myEncoders);
-        return result;
+    	throw new CloneNotSupportedException("hPESTermination not cloneable yet.");
     }
 
 }

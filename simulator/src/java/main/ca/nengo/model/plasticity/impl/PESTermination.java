@@ -54,7 +54,7 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
 
     private static final long serialVersionUID = 1L;
 
-    private float[] myGain;
+    protected float[] myGain;
     private float[][] myEncoders;
 
     private boolean myOja = false; // Apply Oja smoothing?
@@ -112,7 +112,7 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
         this.setTransform(transform, false);
     }
 
-    private float deltaOmega(int i, int j, float currentWeight) {
+    protected float deltaOmega(int i, int j, float currentWeight) {
         float oja = 0.0f;
 
         if (myOja) {
