@@ -18,6 +18,7 @@ class SPA:
         self.sources={}
         self.init()
         self.connect()
+        self.complete()
         
     def init(self):
         modules=[]
@@ -42,6 +43,10 @@ class SPA:
     def connect(self):
         for module in self.modules.values():
             module.connect(**self.extract_parameters(module, module.connect))
+            
+    def complete(self):
+        for module in self.modules.values():
+            module.complete(**self.extract_parameters(module, module.complete))
             
     def extract_parameters(self, module, func):
         p={}

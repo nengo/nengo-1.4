@@ -33,11 +33,12 @@ class Thalamus(module.Module):
                 self.spa.net.connect(self.name+'.rule', 'sink_'+name, t, pstc_output)
 
         # make gated outputs
-        for source, sink, weight in self.bg.rules.get_rhs_routes():
-            t=self.bg.rules.rhs_route(source,sink,weight)
+        for source, sink, conv, weight in self.bg.rules.get_rhs_routes():
+            t=self.bg.rules.rhs_route(source,sink,conv, weight)
             
             gname='gate_%s_%s'%(source,sink)
             if weight!=1: gname+='(%1.1f)'%weight
+            gname=gname.replace('.','_')
             
             self.net.make(gname, neurons_gate, 1, encoders=[[1]], intercept=(gate_threshold, 1))
             self.net.connect('rule', gname, transform=t, pstc=pstc_to_gate)
@@ -45,6 +46,7 @@ class Thalamus(module.Module):
             
             cname='channel_%s_%s'%(source,sink)
             if weight!=1: cname+='(%1.1f)'%weight
+            cname=cname.replace('.','_')
             
             vocab1=self.spa.sources[source]
             vocab2=self.spa.sinks[sink]
@@ -56,8 +58,13 @@ class Thalamus(module.Module):
             else:
                 transform=vocab1.transform_to(vocab2)
                 
-            self.spa.net.connect('source_'+source, self.name+'.'+cname, transform=transform, pstc=pstc_channel)
-            self.spa.net.connect(self.name+'.'+cname, 'sink_'+sink, pstc=pstc_channel)
+            if conv is None:
+                transform2=np.eye(vocab2.dimensions)*weight
+            else:
+                transform2=vocab2.parse(conv).get_transform_matrix()*weight    
+                
+            self.spa.net.connect('source_'+source, self.name+'.'+cname, transform=transform, pstc=pstc_channel)        
+            self.spa.net.connect(self.name+'.'+cname, 'sink_'+sink, pstc=pstc_channel, transform=transform2)
             
         
             self.net.connect(gname, cname, encoders=-10, pstc=pstc_gate)
