@@ -79,9 +79,9 @@ Learning
 .. toctree::
    :maxdepth: 1
    
-   learn-communicate
-   learn-product
-   learn-square
+   learn_communicate
+   learn_product
+   learn_square
 
 Miscellaneous
 ------------------------

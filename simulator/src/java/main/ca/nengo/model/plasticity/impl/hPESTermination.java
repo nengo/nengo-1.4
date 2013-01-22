@@ -33,8 +33,6 @@ import ca.nengo.model.PlasticNodeTermination;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.neuron.Neuron;
-import ca.nengo.model.neuron.impl.SpikingNeuron;
-import ca.nengo.util.MU;
 
 /**
  * A termination whose transformation evolves according to the PES rule.
@@ -52,14 +50,13 @@ import ca.nengo.util.MU;
  * @author Jonathan Lai
  * @author Trevor Bekolay
  */
-public class hPESTermination extends ModulatedPlasticEnsembleTermination  {
+public class hPESTermination extends PESTermination  {
 
     private static final long serialVersionUID = 1L;
-
-    private float[] myGain;
-    private float[][] myEncoders;
     
-    private static final float THETA_LENGTH = 1e5f;
+    private static final float THETA_TAU = 20.0f;  // tau for theta filtering
+    // Attempt to make BCM the same order of magnitude as PES
+    private static final float SCALING_FACTOR = 20000.0f;
     private float[] myInitialTheta;
     private float[] myTheta;
     
@@ -75,24 +72,17 @@ public class hPESTermination extends ModulatedPlasticEnsembleTermination  {
     public hPESTermination(NEFEnsemble ensemble, String name, PlasticNodeTermination[] nodeTerminations, float[] initialTheta) throws StructuralException {
         super(ensemble, name, nodeTerminations);
         setOriginName(Neuron.AXON);
-        myEncoders = ensemble.getEncoders();
-        myGain = new float[nodeTerminations.length];
-        for (int i = 0; i < nodeTerminations.length; i++) {
-            SpikingNeuron neuron = (SpikingNeuron) nodeTerminations[i].getNode();
-            myGain[i] = neuron.getScale();
-        }
         
         // If initial theta not passed in, randomly generate
-        // between -0.001 and 0.001
         if (initialTheta == null) {
-        	IndicatorPDF uniform = new IndicatorPDF(-0.001f, 0.001f);
-        	
-        	myInitialTheta = new float[nodeTerminations.length];
-        	for (int i = 0; i < myInitialTheta.length; i ++) {
-        		myInitialTheta[i] = uniform.sample()[0];
-        	}
+            IndicatorPDF uniform = new IndicatorPDF(0.00005f, 0.00015f);
+            myInitialTheta = new float[nodeTerminations.length];
+            for (int i = 0; i < myInitialTheta.length; i ++) {
+                // Reasonable assumption: high gain, high theta
+                myInitialTheta[i] = uniform.sample()[0] * myGain[i];
+            }
         } else {
-        	myInitialTheta = initialTheta;
+            myInitialTheta = initialTheta;
         }
         myTheta = myInitialTheta.clone();
     }
@@ -145,35 +135,28 @@ public class hPESTermination extends ModulatedPlasticEnsembleTermination  {
         }
         this.setTransform(transform, false);
         
-        // update theta
+        // update theta based on theta's time constant
+        final float decay = (float) Math.exp(-0.001f / THETA_TAU);
+        final float update = 1.0f - decay;
         for (int i = start; i < end; i++) {
-        	myTheta[i] += (myFilteredOutput[i] - myTheta[i]) / THETA_LENGTH;
+            myTheta[i] *= decay;
+            myTheta[i] += myFilteredOutput[i] * update;
         }
     }
 
-    private float deltaOmega(int i, int j, float currentWeight) {
-        float e = 0.0f;
-        for (int k = 0; k < myModInput.length; k++) {
-            e += myModInput[k] * myEncoders[i][k];
-        }
-        
-        float supervised = myFilteredInput[j] * e * myGain[i];
-        
+    protected float deltaOmega(int i, int j, float currentWeight) {
+    	float supervised = super.deltaOmega(i, j, currentWeight);
         float unsupervised = myFilteredInput[j] * myFilteredOutput[i]
-        		* (myFilteredOutput[i] - myTheta[i]);
+        		* (myFilteredOutput[i] - myTheta[i])
+        		* myGain[i] * myLearningRate * SCALING_FACTOR;
 
-        return (supervised * mySupervisionRatio + unsupervised * (1 - mySupervisionRatio))
-        		* myLearningRate;
+        return (supervised * mySupervisionRatio
+        	   + unsupervised * (1 - mySupervisionRatio));
     }
     
     @Override
     public hPESTermination clone(Node node) throws CloneNotSupportedException {
-        hPESTermination result = (hPESTermination)super.clone(node);
-        result.myFilteredInput = (myFilteredInput != null) ? myFilteredInput.clone() : null;
-//        result.myFilteredInput = null;
-        result.myGain = myGain.clone();
-        result.myEncoders = MU.clone(myEncoders);
-        return result;
+    	throw new CloneNotSupportedException("hPESTermination not cloneable yet.");
     }
 
 }

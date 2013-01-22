@@ -10,5 +10,8 @@ class Module:
     def connect(self):
         pass    
         
+    def complete(self):
+        pass    
+        
             
 

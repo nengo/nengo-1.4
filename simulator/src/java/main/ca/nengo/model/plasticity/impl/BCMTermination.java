@@ -35,6 +35,7 @@ import ca.nengo.model.Node;
 import ca.nengo.model.PlasticNodeTermination;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.neuron.Neuron;
+import ca.nengo.model.neuron.impl.SpikingNeuron;
 
 /**
  * BCM rule
@@ -45,27 +46,39 @@ public class BCMTermination extends PlasticEnsembleTermination {
 
     private static final long serialVersionUID = 1L;
     
-    private static final float THETA_LENGTH = 1e5f;
+    private static final float THETA_TAU = 20.0f;  // tau for theta filtering
+    // Attempt to make BCM the same order of magnitude as PES
+    private static final float SCALING_FACTOR = 20000.0f;
     private float[] myInitialTheta;
     private float[] myTheta;
+    private float[] myGain;
 
     public BCMTermination(Node node, String name, PlasticNodeTermination[] nodeTerminations, float[] initialTheta) throws StructuralException {
         super(node, name, nodeTerminations);
         setOriginName(Neuron.AXON);
         
+        myGain = new float[nodeTerminations.length];
+        for (int i = 0; i < nodeTerminations.length; i++) {
+            SpikingNeuron neuron = (SpikingNeuron) nodeTerminations[i].getNode();
+            myGain[i] = neuron.getScale();
+        }
+        
         // If initial theta not passed in, randomly generate
-        // between -0.001 and 0.001
         if (initialTheta == null) {
-        	IndicatorPDF uniform = new IndicatorPDF(-0.001f, 0.001f);
-        	
+        	IndicatorPDF uniform = new IndicatorPDF(0.00001f, 0.00002f);
         	myInitialTheta = new float[nodeTerminations.length];
         	for (int i = 0; i < myInitialTheta.length; i ++) {
-        		myInitialTheta[i] = uniform.sample()[0];
+        	    // Reasonable assumption: high gain, high theta
+        		myInitialTheta[i] = uniform.sample()[0] * myGain[i];
         	}
         } else {
         	myInitialTheta = initialTheta;
         }
         myTheta = myInitialTheta.clone();
+    }
+    
+    public float[] getTheta() {
+    	return myTheta;
     }
 
     /**
@@ -95,14 +108,17 @@ public class BCMTermination extends PlasticEnsembleTermination {
             for (int j = 0; j < transform[i].length; j++) {
                 transform[i][j] += myFilteredInput[j] * myFilteredOutput[i]
                 		* (myFilteredOutput[i] - myTheta[i])
-                		* myLearningRate;
+                		* myGain[i] * myLearningRate * SCALING_FACTOR;
             }
         }
         this.setTransform(transform, false);
         
-        // update theta
+        // update theta based on theta's time constant
+        final float decay = (float) Math.exp(-0.001f / THETA_TAU);
+        final float update = 1.0f - decay;
         for (int i = start; i < end; i++) {
-        	myTheta[i] += (myFilteredOutput[i] - myTheta[i]) / THETA_LENGTH;
+            myTheta[i] *= decay;
+            myTheta[i] += myFilteredOutput[i] * update;
         }
     }
 

@@ -24,6 +24,10 @@ class Sink:
     def __mul__(self,other):
         if isinstance(other,(float,int)):
             return Sink(self.name,self.weight*other,self.conv,self.add)
+        elif isinstance(other,str):
+            conv=other
+            if self.conv is not None: conv='(%s)*(%s)'%(conv, self.conv)
+            return Sink(self.name,self.weight,conv,self.add)
         elif isinstance(other,Sink):
             assert self.conv is None
             return Sink(self.name,self.weight,other,self.add)
@@ -101,8 +105,8 @@ class Rule:
                         self.rhs_direct[k]=v
                     v=None
                 elif isinstance(v,Sink):
-                    w=self.rhs_route.get((v.name,k),1)
-                    self.rhs_route[v.name,k]=v.weight*w
+                    w=self.rhs_route.get((v.name,k,v.conv),0)
+                    self.rhs_route[v.name,k,v.conv]=v.weight+w
                     v=v.add
     def match(self,*args):
         for m in args:
@@ -177,8 +181,8 @@ class Rules:
     def get_rhs_routes(self):
         routes=[]
         for rule in self.rules.values():
-            for (source,sink),w in rule.rhs_route.items():
-                k=(source,sink,w)
+            for (source,sink,conv),w in rule.rhs_route.items():
+                k=(source,sink,conv,w)
                 if k not in routes: routes.append(k)
         return routes
 
@@ -189,12 +193,12 @@ class Rules:
                 if k not in match:match.append(k)
         return match
 
-    def rhs_route(self,source,sink,weight):
+    def rhs_route(self,source,sink,conv,weight):
         t=[]
         vocab=self.spa.sinks[sink]
         for n in self.names:
             rule=self.rules[n]
-            if rule.rhs_route.get((source,sink),None)==weight:
+            if rule.rhs_route.get((source,sink,conv),None)==weight:
                 t.append([-1])
             else:
                 t.append([0])

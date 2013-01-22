@@ -32,6 +32,7 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -88,7 +89,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	private Map<Termination, Projection> myProjectionMap; //keyed on Termination
 	private String myName;
 	private SimulationMode myMode;
-	private boolean myModeFixed;
+	private List<SimulationMode> myFixedModes;
 	private Simulator mySimulator;
 	private float myStepSize;
 	private Map<String, Probeable> myProbeables;
@@ -129,7 +130,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		myExposedTerminations = new HashMap<String, Termination>(10);
 		myExposedTerminationNames = new HashMap<Termination, String>(10);
 		myMode = SimulationMode.DEFAULT;
-		myModeFixed = false;
+		myFixedModes = null;
 		myMetaData = new HashMap<String, Object>(20);
 		myListeners = new ArrayList<Listener>(10);
 
@@ -505,37 +506,41 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 	 * @see ca.nengo.model.Node#setMode(ca.nengo.model.SimulationMode)
 	 */
 	public void setMode(SimulationMode mode) {
-		if(!myModeFixed) {
-			myMode = mode;
+		if(myFixedModes != null && !myFixedModes.contains(mode))
+			return;
+		myMode = mode;
 
-			Iterator<Node> it = myNodeMap.values().iterator();
-			while (it.hasNext()) {
-				Node node = it.next();
-				if(node instanceof ca.nengo.model.nef.impl.NEFEnsembleImpl)
-				{
-					if(!((ca.nengo.model.nef.impl.NEFEnsembleImpl)node).getModeFixed()) {
-                        node.setMode(mode);
-                    }
-				} else {
-                    node.setMode(mode);
-                }
-			}
+		Iterator<Node> it = myNodeMap.values().iterator();
+		while (it.hasNext()) {
+			Node node = it.next();
+            node.setMode(mode);
 		}
 	}
 
+	/**
+	 * Used to just change the mode of this network (without recursively
+	 * changing the mode of nodes in the network)
+	 */
 	protected void setMyMode(SimulationMode mode) {
-		if(!myModeFixed) {
+		if(myFixedModes == null || myFixedModes.contains(mode)) {
             myMode = mode;
         }
 	}
 
 	/**
-	 * Disallow changing the simulation mode
+	 * Fix the simulation mode to the current mode.
 	 */
 	public void fixMode() {
-		myModeFixed = true;
+		fixMode(new SimulationMode[]{getMode()});
 	}
-
+	
+	/**
+	 * Set the allowed simulation modes.
+	 */
+	public void fixMode(SimulationMode[] modes) {
+		myFixedModes = Arrays.asList(modes);
+	}
+	
 	/**
 	 * @see ca.nengo.model.Node#getMode()
 	 */

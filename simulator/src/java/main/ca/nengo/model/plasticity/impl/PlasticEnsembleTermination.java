@@ -176,9 +176,11 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
     }
     
     protected static void updateFiltered(final float[] raw, final float[] filtered, final float tauPSC, final float integrationTime) {
+        final float decay = (float) Math.exp(-integrationTime / tauPSC);
+        final float update = 1.0f - decay;
     	for (int i = 0; i < raw.length; i++) {
-    		filtered[i] *= 1.0f - integrationTime / tauPSC;
-    		filtered[i] += raw[i] / tauPSC;
+    	    filtered[i] *= decay;
+    	    filtered[i] += raw[i] * update;
         }
     }
 
