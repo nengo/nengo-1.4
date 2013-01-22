@@ -80,9 +80,9 @@ class Interpolator:
                 self.data.append(row)
     def create_function_list(self):
         funcs=[]
-        for i,d in enumerate(self.data):
-            print i,len(d),d
-        
+#        for i,d in enumerate(self.data):
+#            print i,len(d),d
+#        
         for i in range(len(self.data[0])-1):
             f=PiecewiseConstantFunction([x[0] for x in self.data],[0]+[x[i+1] for x in self.data])
             funcs.append(f)

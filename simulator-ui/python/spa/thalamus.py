@@ -14,14 +14,15 @@ class Thalamus(spa.module.Module):
                pstc_output=0.015,mutual_inhibit=1,pstc_inhibit=0.008,
                pstc_to_gate=0.002,pstc_gate=0.008,N_per_D=30,
                pstc_route_input=0.002,pstc_route_output=0.002,neurons_gate=25,
-               route_scale=1,pstc_input=0.01):
+               route_scale=1,pstc_input=0.01,radius=1,max_rate=(200,400)):
         D=self.bg.rules.rule_count
         
         self.bias=self.net.make_input('bias',[1])
-        self.rules=self.net.make_array('rules',rule_neurons,D,intercept=(rule_threshold,1),encoders=[[1]],quick=True,storage_code="%d")
+        self.rules=self.net.make_array('rules',rule_neurons,D,intercept=(rule_threshold,1),encoders=[[1]],quick=True,storage_code="%d",radius=1,max_rate=(200,400))
         self.net.connect(self.bias,self.rules)
 
-
+        self.radius = radius
+        self.max_rate = max_rate
 
         self.net.network.exposeOrigin(self.rules.getOrigin('X'),'rules')
 
@@ -72,9 +73,9 @@ class Thalamus(spa.module.Module):
                 use_sink=False
             
             if module.has_param('subdimensions') and module.p.subdimensions is not None:
-                channel=self.net.make_array(cname,module.p.N_per_D*module.p.subdimensions,module.p.dimensions/module.p.subdimensions,dimensions=module.p.subdimensions,quick=True)
+                channel=self.net.make_array(cname,module.p.N_per_D*module.p.subdimensions,module.p.dimensions/module.p.subdimensions,dimensions=module.p.subdimensions,quick=True,radius=self.radius,max_rate=self.max_rate)
             else:
-                channel=self.net.make(cname,module.p.N_per_D*module.p.dimensions,module.p.dimensions,quick=True)
+                channel=self.net.make(cname,module.p.N_per_D*module.p.dimensions,module.p.dimensions,quick=True,radius=self.radius,max_rate=self.max_rate)
             #channel=self.net.make_array(cname,self.p.N_per_D,sink.dimension,quick=True)
 
             self.net.network.exposeOrigin(channel.getOrigin('X'),cname)
