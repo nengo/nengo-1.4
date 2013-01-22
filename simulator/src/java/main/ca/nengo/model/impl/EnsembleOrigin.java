@@ -85,6 +85,13 @@ public class EnsembleOrigin implements Origin {
 	}
 
 	/**
+	 * @return Array with all of the underlying node origins
+	 */
+	public Origin[] getNodeOrigins(){
+		return myNodeOrigins;
+	}
+
+	/**
 	 * @return A composite of the first-dimensional outputs of all the Node Origins
 	 * 		that make up the EnsembleOrigin. Node Origins should normally have 
 	 * 		dimension 1, but this isn't enforced here. All Node Origins must have 
