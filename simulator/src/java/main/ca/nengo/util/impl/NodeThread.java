@@ -160,6 +160,7 @@ public class NodeThread extends Thread {
 				}
 			}
 		} catch (SimulationException e) {
+			System.err.println(e);
 		}
 	}
 	

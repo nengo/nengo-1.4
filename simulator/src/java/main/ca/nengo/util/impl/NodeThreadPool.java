@@ -246,8 +246,9 @@ public class NodeThreadPool {
 
 			Thread.currentThread().setPriority(oldPriority);
 		}
-		catch(Exception e)
-		{}
+		catch(Exception e) {
+			System.err.println(e);
+		}
 		
 		if(myCollectTimings){
 			stepInterval = new Date().getTime() - stepInterval;
