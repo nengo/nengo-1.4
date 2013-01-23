@@ -273,6 +273,21 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 			myNoises[i] = myNoise.clone();
 		}
 	}
+	
+	/**
+	 * @param noises New output noise model for each dimension of output
+	 * @throws SimulationException 
+	 */
+	public void setNoises(Noise[] noises) throws SimulationException {
+		if(noises.length != getDimensions()) {
+			throw new SimulationException("Provided noises do not match dimension of origin");
+		}
+		myNoise = noises[0];
+		myNoises = new Noise[getDimensions()];
+		for (int i = 0; i < myNoises.length; i++) {
+			myNoises[i] = noises[i];
+		}
+	}
 
 	/**
 	 * @return Noise with which output of this Origin is corrupted
@@ -445,7 +460,8 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	 */
 	public void run(float[] state, float startTime, float endTime) throws SimulationException {
 		if (state != null && state.length != myFunctions[0].getDimension()) {
-			throw new SimulationException("A state of dimension " + myFunctions[0].getDimension() + " was expected");
+			throw new SimulationException("Origin dimension is " + myFunctions[0].getDimension() + 
+					" but state dimension is " + state.length);
 		}
 
 		float[] values = new float[myFunctions.length];

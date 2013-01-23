@@ -60,8 +60,19 @@ public class PiecewiseConstantFunction extends AbstractFunction {
 	 * @param values Values y below x1 and above x1..xn
 	 */
 	public PiecewiseConstantFunction(float[] discontinuities, float[] values) {
-		super(1);
-
+		this(discontinuities, values, 1);
+	}
+	
+	/**
+	 * A version of the constructor that allows you to specify the dimension (this doesn't do anything since
+	 * this function makes no use of its input, but it allows these functions to be attached to multidimensional ensembles).
+	 * 
+	 * @param discontinuities Ordered points x at which the function is y = f(x) is discontinuous
+	 * @param values Values y below x1 and above x1..xn
+	 */
+	public PiecewiseConstantFunction(float[] discontinuities, float[] values, int dimension) {
+		super(dimension);
+		
 		myDiscontinuities = discontinuities;
 		if ( discontinuities.length != (values.length - 1) ) {
 			throw new IllegalArgumentException("There must be one more value than point of discontinuity");
@@ -72,6 +83,7 @@ public class PiecewiseConstantFunction extends AbstractFunction {
 		Arrays.sort(myDiscontinuities);
 
 		setValues(values);
+		
 	}
 
 	/**
