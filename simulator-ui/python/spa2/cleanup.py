@@ -10,7 +10,7 @@ class Cleanup(module.Module):
         self.spa.add_source(self, 'output')        
         self.spa.add_sink(self, 'input')
         
-    def complete(self, N_per_D=30, scaling=1, min_intercept=0.1, mutual_inhibit=0):
+    def complete(self, N_per_D=30, scaling=1, min_intercept=0.1, mutual_inhibit=0, feedback=0, pstc_feedback=0.01):
         vocab=self.spa.sources[self.name]
             
         self.net.make_array('cleanup', 50, len(vocab.keys), intercept=(min_intercept,1), encoders=[[1]])
@@ -22,6 +22,9 @@ class Cleanup(module.Module):
             t[:,i]+=vocab.parse(vocab.keys[i]).v*scaling
         self.net.connect('cleanup','output',transform=t, pstc=0.001)#, func=lambda x: 1)            
         
-        if mutual_inhibit!=0:
+        if mutual_inhibit!=0 or feedback!=0:
             t=(numeric.eye(len(vocab.keys))-1)*mutual_inhibit
-            self.net.connect('cleanup','cleanup',transform=t)
+            t+=numeric.eye(len(vocab.keys))*feedback
+            self.net.connect('cleanup','cleanup',transform=t, pstc=pstc_feedback)
+        
+
