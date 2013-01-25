@@ -27,20 +27,38 @@ import nef
 import numeric
 from java.util import ArrayList
 from java.util import HashMap
-def make(net, preName='pre', postName='post', rate=5e-4, theta=None):
+from ca.nengo.util import MU
+
+def make(net, preName='pre', postName='post', rate=5e-4):
 
     # get pre and post ensembles from their names
     pre = net.network.getNode(preName)
     post = net.network.getNode(postName)
-    
+
+    dim_pre = pre.getDimension()
+    dim_post = post.getDimension()
+
+    t = [[0] * dim_pre for i in range(dim_post)]
+    index_pre = range(dim_pre)
+    index_post = range(dim_post)
+    for i in range(max(len(index_pre),len(index_post))):
+        ipre = index_pre[i % len(index_pre)]
+        ipost = index_post[i % len(index_post)]
+        t[ipost][ipre] = 1
+
+    decoder = pre.getOrigin('X').getDecoders()
+    encoder = post.getEncoders()
+    encoder = MU.prod(encoder, 1.0 / post.getRadii()[0])
+    weight = MU.prod(encoder, MU.prod(t, MU.transpose(decoder)))
+
     # random weight matrix to initialize projection from pre to post
-    def rand_weights(w):
-        for i in range(len(w)):
-            for j in range(len(w[0])):
-                w[i][j] = random.uniform(-1e-3,1e-3)
-        return w
-    weight = rand_weights(numeric.zeros((post.neurons, pre.neurons)).tolist())
-    
+    # def rand_weights(w):
+    #     for i in range(len(w)):
+    #         for j in range(len(w[0])):
+    #             w[i][j] = random.uniform(-1e-3,1e-3)
+    #     return w
+    # weight = rand_weights(numeric.zeros((post.neurons, pre.neurons)).tolist())
+
     # non-decoded termination (to learn transformation)
     count = 0
     prename = pre.getName()
@@ -48,7 +66,7 @@ def make(net, preName='pre', postName='post', rate=5e-4, theta=None):
         count = count + 1
     prename = '%s_%02d' % (prename, count)
 
-    post.addBCMTermination(prename, weight, 0.005, False, theta)
+    post.addBCMTermination(prename, weight, 0.005, False, None)
     
     # Add projections
     net.connect(pre.getOrigin('AXON'),post.getTermination(prename))
@@ -64,7 +82,6 @@ def make(net, preName='pre', postName='post', rate=5e-4, theta=None):
     bcmterm.put("preName", preName)
     bcmterm.put("postName", postName)
     bcmterm.put("rate", rate)
-    bcmterm.put("theta", theta)
 
     bcmterms.put(prename, bcmterm)
 

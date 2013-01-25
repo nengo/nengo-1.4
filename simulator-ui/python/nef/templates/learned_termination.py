@@ -38,7 +38,7 @@ import nef
 import numeric
 from java.util import ArrayList
 from java.util import HashMap
-def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-4):
+def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-4, oja=True):
 
     # get pre and post ensembles from their names
     pre = net.network.getNode(preName)
@@ -76,7 +76,7 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     net.connect(pre.getOrigin('AXON'),post.getTermination(prename))
 
     # Set learning rule on the non-decoded termination
-    net.learn(post,prename,modname,rate=rate)
+    net.learn(post,prename,modname,rate=rate,oja=oja)
 
     if net.network.getMetaData("learnedterm") == None:
         net.network.setMetaData("learnedterm", HashMap())
