@@ -104,11 +104,11 @@ public class BCMTermination extends PlasticEnsembleTermination {
     	
     	// update omega
     	float[][] transform = this.getTransform();
-        for (int i = start; i < end; i++) {
-            for (int j = 0; j < transform[i].length; j++) {
-                transform[i][j] += myFilteredInput[j] * myFilteredOutput[i]
-                		* (myFilteredOutput[i] - myTheta[i])
-                		* myGain[i] * myLearningRate * SCALING_FACTOR;
+        for (int postIx = start; postIx < end; postIx++) {
+            for (int preIx = 0; preIx < transform[postIx].length; preIx++) {
+                transform[postIx][preIx] += myFilteredInput[preIx] * myFilteredOutput[postIx]
+                		* (myFilteredOutput[postIx] - myTheta[postIx])
+                		* myGain[postIx] * myLearningRate * SCALING_FACTOR;
             }
         }
         this.setTransform(transform, false);

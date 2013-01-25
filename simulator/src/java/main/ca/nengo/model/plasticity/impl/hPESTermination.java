@@ -128,9 +128,9 @@ public class hPESTermination extends PESTermination  {
 
         // update omega
         float[][] transform = this.getTransform();
-        for (int i = start; i < end; i++) {
-            for (int j = 0; j < transform[i].length; j++) {
-                transform[i][j] += deltaOmega(i, j, transform[i][j]);
+        for (int postIx = start; postIx < end; postIx++) {
+            for (int preIx = 0; preIx < transform[postIx].length; preIx++) {
+                transform[postIx][preIx] += deltaOmega(postIx, preIx, transform[postIx][preIx]);
             }
         }
         this.setTransform(transform, false);
@@ -144,11 +144,11 @@ public class hPESTermination extends PESTermination  {
         }
     }
 
-    protected float deltaOmega(int i, int j, float currentWeight) {
-    	float supervised = super.deltaOmega(i, j, currentWeight);
-        float unsupervised = myFilteredInput[j] * myFilteredOutput[i]
-        		* (myFilteredOutput[i] - myTheta[i])
-        		* myGain[i] * myLearningRate * SCALING_FACTOR;
+    protected float deltaOmega(int postIx, int preIx, float currentWeight) {
+    	float supervised = super.deltaOmega(postIx, preIx, currentWeight);
+        float unsupervised = myFilteredInput[preIx] * myFilteredOutput[postIx]
+        		* (myFilteredOutput[postIx] - myTheta[postIx])
+        		* myGain[postIx] * myLearningRate * SCALING_FACTOR;
 
         return (supervised * mySupervisionRatio
         	   + unsupervised * (1 - mySupervisionRatio));

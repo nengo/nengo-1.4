@@ -192,9 +192,9 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
     public float[][] getTransform() {
         Termination[] terms = this.getNodeTerminations();
         float[][] transform = new float[terms.length][];
-        for (int i=0; i < terms.length; i++) {
-            PlasticNodeTermination pnt = (PlasticNodeTermination) terms[i];
-            transform[i] = pnt.getWeights();
+        for (int postIx = 0; postIx < terms.length; postIx++) {
+            PlasticNodeTermination pnt = (PlasticNodeTermination) terms[postIx];
+            transform[postIx] = pnt.getWeights();
         }
 
         return transform;
@@ -207,9 +207,9 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
      */
     public void setTransform(float[][] transform, boolean save) {
         Termination[] terms = this.getNodeTerminations();
-        for(int i = 0; i < terms.length; i++) {
-            PlasticNodeTermination pnt = (PlasticNodeTermination) terms[i];
-            pnt.setWeights(transform[i], save);
+        for(int postIx = 0; postIx < terms.length; postIx++) {
+            PlasticNodeTermination pnt = (PlasticNodeTermination) terms[postIx];
+            pnt.setWeights(transform[postIx], save);
         }
     }
 
@@ -272,7 +272,7 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
     public float[] getOutputs() {
         Termination[] terms = this.getNodeTerminations();
         float[] currents = new float[terms.length];
-        for (int i=0; i < terms.length; i++) {
+        for (int i = 0; i < terms.length; i++) {
             PlasticNodeTermination pnt = (PlasticNodeTermination) terms[i];
             currents[i] = pnt.getOutput();
         }

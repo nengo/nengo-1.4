@@ -104,15 +104,15 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
         }
 
         float[][] transform = this.getTransform();
-        for (int i = start; i < end; i++) {
-            for (int j = 0; j < transform[i].length; j++) {
-                transform[i][j] += deltaOmega(i, j, transform[i][j]);
+        for (int postIx = start; postIx < end; postIx++) {
+            for (int preIx = 0; preIx < transform[postIx].length; preIx++) {
+                transform[postIx][preIx] += deltaOmega(postIx, preIx, transform[postIx][preIx]);
             }
         }
         this.setTransform(transform, false);
     }
 
-    protected float deltaOmega(int i, int j, float currentWeight) {
+    protected float deltaOmega(int postIx, int preIx, float currentWeight) {
         float oja = 0.0f;
 
         if (myOja) {
@@ -123,10 +123,10 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
         
         float e = 0.0f;
         for (int k = 0; k < myFilteredModInput.length; k++) {
-            e += myFilteredModInput[k] * myEncoders[i][k];
+            e += myFilteredModInput[k] * myEncoders[postIx][k];
         }
 
-        return myLearningRate * myFilteredInput[j] * e * myGain[i] - oja;
+        return myLearningRate * myFilteredInput[preIx] * e * myGain[postIx] - oja;
     }
     
     @Override
