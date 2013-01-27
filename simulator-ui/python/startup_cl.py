@@ -2,6 +2,8 @@
 
 execfile('python/startup_common.py')
 
+__nengo_cl__ = True
+
 import sys
 sys.argv=sys.argv[1:]   # strip out the "python/startup_cl.py" from the list
 if len(sys.argv)>0:

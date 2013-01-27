@@ -3,3 +3,4 @@ the graphical front-end to Nengo."""
 
 execfile('python/startup_common.py')
 import toolbar
+__nengo_ui__ = True
