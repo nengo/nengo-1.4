@@ -164,7 +164,11 @@ public class SpikeGeneratorOrigin implements Origin {
     
     public void reset(boolean randomize) {
     	myGenerator.reset(randomize);
-    	myOutput = new SpikeOutputImpl(new boolean[]{false}, Units.SPIKES, 0);
+    	if (myOutput instanceof RealOutputImpl){
+            myOutput = new RealOutputImpl(new float[]{0.0f}, Units.SPIKES_PER_S, 0);
+        } else {
+            myOutput = new SpikeOutputImpl(new boolean[]{false}, Units.SPIKES, 0);
+        }
     }
 
 }
