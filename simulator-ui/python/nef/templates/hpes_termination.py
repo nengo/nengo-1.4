@@ -36,30 +36,42 @@ def test_params(net,p):
     
 import random
 from ca.nengo.model.plasticity.impl import STDPTermination, PlasticEnsembleImpl
+from ca.nengo.model import StructuralException
 import nef
 import numeric
 from java.util import ArrayList
 from java.util import HashMap
-def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-4, supervisionRatio=0.5, theta=None):
+def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-4, supervisionRatio=0.5, theta=None, weight=None):
 
     # get pre and post ensembles from their names
     pre = net.network.getNode(preName)
     post = net.network.getNode(postName)
+    
+    # Create error ensemble
+    try:
+        error = net.network.getNode(errName)
+    except StructuralException:
+        error = net.make(errName, N_err, post.dimension)
     
     # modulatory termination (find unused termination)
     count=0
     while 'mod_%02d'%count in [t.name for t in post.terminations]:
         count=count+1
     modname = 'mod_%02d'%count
-    post.addDecodedTermination(modname, numeric.eye(post.dimension), 0.005, True)
+    if error.dimension == post.dimension:
+        modweights = numeric.eye(post.dimension)
+    else:
+        modweights = [[1 for i in range(error.dimension)] for j in range(post.dimension)]
+    post.addDecodedTermination(modname, modweights, 0.005, True)
     
     # random weight matrix to initialize projection from pre to post
-    def rand_weights(w):
-        for i in range(len(w)):
-            for j in range(len(w[0])):
-                w[i][j] = random.uniform(-1e-3,1e-3)
-        return w
-    weight = rand_weights(numeric.zeros((post.neurons, pre.neurons)).tolist())
+    if weight == None:
+        def rand_weights(w):
+            for i in range(len(w)):
+                for j in range(len(w[0])):
+                    w[i][j] = random.uniform(-1e-3,1e-3)
+            return w
+        weight = rand_weights(numeric.zeros((post.neurons, pre.neurons)).tolist())
     
     # non-decoded termination (to learn transformation)
     count = 0
@@ -69,9 +81,6 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     prename = '%s_%02d'%(prename, count)
 
     post.addHPESTermination(prename, weight, 0.005, False, theta)
-    
-    # Create error ensemble
-    error = net.make(errName, N_err, post.dimension)
     
     # Add projections
     net.connect(error.getOrigin('X'),post.getTermination(modname))
