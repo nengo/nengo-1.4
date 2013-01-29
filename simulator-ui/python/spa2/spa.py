@@ -74,6 +74,8 @@ class SPA:
         module_name = self.get_module_name(module)
         if name is None: 
             name = module_name
+        else:
+            name = module_name+'_'+name    
         if vocab is None:
             dims = self.get_param_value('dimensions', module)
             rand = self.get_param_value('randomize_vectors', module)
