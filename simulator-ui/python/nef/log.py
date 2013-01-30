@@ -125,6 +125,8 @@ class LogOutput(LogTermination):
         if self.termination.getFilteredOutput() is None:
             return self.termination.getTheta()
         return self.termination.getFilteredOutput()
+    def text(self):
+        return ';'.join(['%.3e' % x for x in self.value])
 
 class LogTransform(LogTermination):
     def data(self):
