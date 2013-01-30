@@ -116,9 +116,15 @@ class LogTermination:
     def tick(self,dt):
         self.value = self.data()
     def text(self):
-        return ';'.join(['%1.4f' % x for x in self.value])
+        return ';'.join(['%1.5f' % x for x in self.value])
     def flush(self):
         pass
+
+class LogOutput(LogTermination):
+    def data(self):
+        if self.termination.getFilteredOutput() is None:
+            return self.termination.getTheta()
+        return self.termination.getFilteredOutput()
 
 class LogTransform(LogTermination):
     def data(self):
@@ -225,6 +231,12 @@ class Log(StepListener):
         node = self.network._get_node(source)
         _termination = node.getTermination(termination)
         self.logs.append(LogTheta(name,_termination))
+    
+    def add_output(self,source,name=None,termination='input'):
+        if name is None: name=source+":"+termination+"_output"
+        node = self.network._get_node(source)
+        _termination = node.getTermination(termination)
+        self.logs.append(LogOutput(name,_termination))
 
     def add_vocab(self,source,vocab=None,name=None,tau='default',terms=None,pairs=False,threshold=0.1,normalize=False):
         if name is None: name=source+'_vocab'

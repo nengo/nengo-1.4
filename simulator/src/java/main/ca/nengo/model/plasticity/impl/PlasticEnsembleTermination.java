@@ -109,78 +109,78 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
         }
 
         if (!name.equals(myOriginName)) { return; }
-        
+
         if (myOutput == null) {
-        	myOutput = new float[state.getDimension()];
+            myOutput = new float[state.getDimension()];
         }
         float integrationTime = 0.001f;
         updateRaw(myOutput, state, integrationTime);
-        
+
         float tauPSC = getNodeTerminations()[0].getTau();
         if (myFilteredOutput == null) {
-        	myFilteredOutput = new float[state.getDimension()];
+            myFilteredOutput = new float[state.getDimension()];
         }
         updateFiltered(myOutput, myFilteredOutput, tauPSC, integrationTime);
     }
-    
+
     public void setTerminationState(float time) throws StructuralException {
-    	if (myLastTime >= time) { return; }
-   	
+        if (myLastTime >= time) { return; }
+
         InstantaneousOutput state = this.getInput();
         if (state == null) {
-        	if (myInput != null) {
-        		Arrays.fill(myInput, 0.0f);
-        	}
-        	if (myFilteredInput != null) {
-        		Arrays.fill(myFilteredInput, 0.0f);
-        	}
-        	return;
+            if (myInput != null) {
+                Arrays.fill(myInput, 0.0f);
+            }
+            if (myFilteredInput != null) {
+                Arrays.fill(myFilteredInput, 0.0f);
+            }
+            return;
         }
-        
+
         float integrationTime = 0.001f;
         if (myInput == null) {
-        	myInput = new float[state.getDimension()];
+            myInput = new float[state.getDimension()];
         }
         updateRaw(myInput, state, integrationTime);
-        
+
         float tauPSC = getNodeTerminations()[0].getTau();
         if (myFilteredInput == null) {
-        	myFilteredInput = new float[state.getDimension()];
+            myFilteredInput = new float[state.getDimension()];
         }
         updateFiltered(myInput, myFilteredInput, tauPSC, integrationTime);
-    	myLastTime = time;
+        myLastTime = time;
     }
-    
+
     protected static void updateRaw(final float[] raw, final InstantaneousOutput state, final float integrationTime) throws StructuralException {
-    	if (state instanceof RealOutput) {
-    		float[] values = ((RealOutput) state).getValues();
-    		if (values.length != raw.length) {
-    			throw new StructuralException("State is length "
-    					+ values.length + "; should be " + raw.length);
-    		}
-    		for (int i = 0; i < values.length; i++) {
-    			raw[i] = values[i];
-    		}
+        if (state instanceof RealOutput) {
+            float[] values = ((RealOutput) state).getValues();
+            if (values.length != raw.length) {
+                throw new StructuralException("State is length "
+                        + values.length + "; should be " + raw.length);
+            }
+            for (int i = 0; i < values.length; i++) {
+                raw[i] = values[i];
+            }
         } else if (state instanceof SpikeOutput) {
             boolean[] values = ((SpikeOutput) state).getValues();
             if (values.length != raw.length) {
-    			throw new StructuralException("State is length "
-    					+ values.length + "; should be " + raw.length);
-    		}
+                throw new StructuralException("State is length "
+                        + values.length + "; should be " + raw.length);
+            }
             for (int i = 0; i < values.length; i++) {
                 raw[i] = values[i] ? integrationTime : 0.0f;
             }
         } else {
-        	System.err.println("State not real or spiking.");
+            System.err.println("State not real or spiking.");
         }
     }
-    
+
     protected static void updateFiltered(final float[] raw, final float[] filtered, final float tauPSC, final float integrationTime) {
         final float decay = (float) Math.exp(-integrationTime / tauPSC);
         final float update = 1.0f - decay;
-    	for (int i = 0; i < raw.length; i++) {
-    	    filtered[i] *= decay;
-    	    filtered[i] += raw[i] * update;
+        for (int i = 0; i < raw.length; i++) {
+            filtered[i] *= decay;
+            filtered[i] += raw[i] * update;
         }
     }
 
@@ -233,13 +233,13 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
         // were saved in saveTransform()
         myLearning = true;
         if (myOutput != null) {
-        	Arrays.fill(myOutput, 0.0f);
+            Arrays.fill(myOutput, 0.0f);
         }
         if (myFilteredOutput != null) {
             Arrays.fill(myFilteredOutput, 0.0f);
         }
         if (myInput != null) {
-        	Arrays.fill(myInput, 0.0f);
+            Arrays.fill(myInput, 0.0f);
         }
         if (myFilteredInput != null) {
             Arrays.fill(myFilteredInput, 0.0f);
@@ -303,19 +303,26 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
     }
 
     /**
+     * @return Filtered output
+     */
+    public float[] getFilteredOutput() {
+        return myFilteredOutput;
+    }
+
+    /**
      * @param learning Turn learning on or off for this termination
      */
     public void setLearning(boolean learning)
     {
         myLearning = learning;
     }
-    
+
     @Override
     public PlasticEnsembleTermination clone(Node node) throws CloneNotSupportedException {
-    	PlasticEnsembleTermination result = (PlasticEnsembleTermination)super.clone(node);
-    	result.myOutput = (myOutput != null) ? myOutput.clone() : null;
-//    	result.myOutput = null;
-    	result.saveTransform();
+        PlasticEnsembleTermination result = (PlasticEnsembleTermination)super.clone(node);
+        result.myOutput = (myOutput != null) ? myOutput.clone() : null;
+        //    	result.myOutput = null;
+        result.saveTransform();
         return result;
     }
 }
