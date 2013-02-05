@@ -80,7 +80,7 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
         count=count+1
     prename = '%s_%02d'%(prename, count)
 
-    lterm = term = post.addHPESTermination(prename, weight, 0.005, False, theta)
+    lterm = post.addHPESTermination(prename, weight, 0.005, False, theta)
     
     # Add projections
     net.connect(error.getOrigin('X'),post.getTermination(modname))
