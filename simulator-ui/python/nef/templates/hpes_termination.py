@@ -62,7 +62,7 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
         modweights = numeric.eye(post.dimension)
     else:
         modweights = [[1 for i in range(error.dimension)] for j in range(post.dimension)]
-    post.addDecodedTermination(modname, modweights, 0.005, True)
+    mterm = post.addDecodedTermination(modname, modweights, 0.005, True)
     
     # random weight matrix to initialize projection from pre to post
     if weight == None:
@@ -80,7 +80,7 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
         count=count+1
     prename = '%s_%02d'%(prename, count)
 
-    post.addHPESTermination(prename, weight, 0.005, False, theta)
+    lterm = term = post.addHPESTermination(prename, weight, 0.005, False, theta)
     
     # Add projections
     net.connect(error.getOrigin('X'),post.getTermination(modname))
@@ -114,4 +114,6 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     templateproj = net.network.getMetaData("templateProjections")
     templateproj.put(errName, postName)
     templateproj.put(preName, postName)
+    
+    return lterm,mterm
     

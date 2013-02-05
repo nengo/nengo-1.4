@@ -471,37 +471,38 @@ class Network:
             if func is not None:
                 raise Exception('Cannot compute a function from a FunctionInput')
             return pre.getOrigin('origin')
-        elif isinstance(pre,NEFEnsemble) or (hasattr(pre,'getOrigin') and hasattr(pre,'addDecodedOrigin')):
-            if func is not None:
-                if isinstance(func,Function):
-                    if origin_name is None:
-                        fname=func.__class__.__name__
-                        if '.' in fname: fname=fname.split('.')[-1]
-                    else: fname=origin_name
-                    origin=pre.addDecodedOrigin(fname,[func],'AXON')
-                else:
-                    if origin_name is None: fname=func.__name__
-                    else: fname=origin_name
-                    try:
-                        origin=pre.getOrigin(fname)
-                    except StructuralException:
-                        origin=None
-                    if origin is None:
-                        if isinstance(pre,NetworkArrayImpl):
-                            dim=pre.nodes[0].dimension
-                        else:
-                            dim=pre.dimension
-
-                        value=func([0]*dim)
-                        if isinstance(value,(int,float)):
-                            origin=pre.addDecodedOrigin(fname,[functions.PythonFunction(func,dim)],'AXON')
-                        else:
-                            funcs=[functions.PythonFunction(func,dim,use_cache=True,index=i) for i in range(len(value))]
-                            origin=pre.addDecodedOrigin(fname,funcs,'AXON')
-                            
-                return origin
+        elif func != None and hasattr(pre,'addDecodedOrigin'):
+            if isinstance(func,Function):
+                if origin_name is None:
+                    fname=func.__class__.__name__
+                    if '.' in fname: 
+                        fname=fname.split('.')[-1]
+                else: 
+                    fname=origin_name
+                origin=pre.addDecodedOrigin(fname,[func],'AXON')
             else:
-                return pre.getOrigin('X')
+                if origin_name is None: 
+                    fname=func.__name__
+                else: 
+                    fname=origin_name
+                
+                if isinstance(pre,NetworkArrayImpl):
+                    dim=pre.nodes[0].dimension
+                else:
+                    dim=pre.dimension
+
+                value=func([0]*dim)
+                if isinstance(value,(int,float)):
+                    origin=pre.addDecodedOrigin(fname,[functions.PythonFunction(func,dim)],'AXON')
+                else:
+                    funcs=[functions.PythonFunction(func,dim,use_cache=True,index=i) for i in range(len(value))]
+                    origin=pre.addDecodedOrigin(fname,funcs,'AXON')
+                        
+            return origin
+        elif hasattr(pre,"getOrigin"):
+            if origin_name != None:
+                return pre.getOrigin(origin_name)
+            return pre.getOrigin("X")
         else:
             raise Exception('Unknown object to connect from')
 
@@ -760,8 +761,8 @@ class Network:
                 elif dim_post==1: transform=[transform]
                 else:
                     raise Exception("Don't know how to turn %s into a %sx%s matrix"%(transform,dim_post,dim_pre))
-            elif len(transform)!=dim_post and len(transform[0])!=dim_pre:
-                raise Exception("transform must be a %dx%d matrix"%(dim_post,dim_pre))
+            elif (len(transform)!=dim_post and len(transform)!=post.neurons) or len(transform[0])!=dim_pre:
+                raise Exception("transform dimension mismatch (given a %dx%d matrix, should be %dx%d)"%(len(transform),len(transform[0]),dim_post,dim_pre))
         
         if plastic_array:
             suffix = ''
@@ -826,7 +827,10 @@ class Network:
             attempts=1
             while attempts<100:
                 try:
-                    term=post.addDecodedTermination(pre.name+suffix,transform,pstc,modulatory)
+                    if len(transform) == post.dimension:
+                        term=post.addDecodedTermination(pre.name+suffix,transform,pstc,modulatory)
+                    else:
+                        term=post.addTermination(pre.name+suffix,transform,pstc,modulatory)
                     break
                 except StructuralException,e:
                     exception=e
