@@ -261,9 +261,9 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
     public Termination addDecodedTermination(String name, float[][] matrix, float tauPSC, boolean isModulatory)
             throws StructuralException {
 
-        // TODO Should this also check non-decoded terminations?
-        if (myDecodedTerminations.containsKey(name)) {
-            throw new StructuralException("The ensemble already contains a termination named " + name);
+    	for(Termination t : getTerminations()) {
+        	if(t.getName().equals(name))
+        		throw new StructuralException("The ensemble already contains a termination named " + name);
         }
 
         float scale = 1 / tauPSC; //output scaling to make impulse integral = 1
@@ -307,9 +307,9 @@ public class DecodableEnsembleImpl extends PlasticEnsembleImpl implements Decoda
     public Termination addDecodedTermination(String name, float[][] matrix, float[] tfNumerator, float[] tfDenominator,
             float passthrough, boolean isModulatory) throws StructuralException {
 
-        // TODO Should this also check non-decoded terminations?
-        if (myDecodedTerminations.containsKey(name)) {
-            throw new StructuralException("The ensemble already contains a termination named " + name);
+    	for(Termination t : getTerminations()) {
+        	if(t.getName().equals(name))
+        		throw new StructuralException("The ensemble already contains a termination named " + name);
         }
 
         LTISystem dynamics = CanonicalModel.getRealization(tfNumerator, tfDenominator, passthrough);

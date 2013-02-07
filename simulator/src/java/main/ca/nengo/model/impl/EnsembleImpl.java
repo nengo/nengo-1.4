@@ -149,7 +149,11 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	 * @see ca.nengo.model.ExpandableNode#addTermination(java.lang.String, float[][], float, boolean)
 	 */
     public synchronized Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
-		//TODO: check name for duplicate
+    	for(Termination t : getTerminations()) {
+        	if(t.getName().equals(name))
+        		throw new StructuralException("The ensemble already contains a termination named " + name);
+        }
+    	
 		if (myExpandableNodes.length != weights.length) {
 			throw new StructuralException(weights.length + " sets of weights given for "
 					+ myExpandableNodes.length + " expandable nodes");
