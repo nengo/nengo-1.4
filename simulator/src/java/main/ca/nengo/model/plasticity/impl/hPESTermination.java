@@ -33,6 +33,7 @@ import ca.nengo.model.PlasticNodeTermination;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.nef.NEFEnsemble;
 import ca.nengo.model.neuron.Neuron;
+import ca.nengo.util.MU;
 
 /**
  * A termination whose transformation evolves according to the PES rule.
@@ -127,13 +128,16 @@ public class hPESTermination extends PESTermination  {
         }
 
         // update omega
-        float[][] transform = this.getTransform();
-        for (int postIx = start; postIx < end; postIx++) {
-            for (int preIx = 0; preIx < transform[postIx].length; preIx++) {
-                transform[postIx][preIx] += deltaOmega(postIx, preIx, transform[postIx][preIx]);
-            }
-        }
-        this.setTransform(transform, false);
+//        float[][] transform = this.getTransform();
+//        for (int postIx = start; postIx < end; postIx++) {
+//            for (int preIx = 0; preIx < transform[postIx].length; preIx++) {
+//                transform[postIx][preIx] += deltaOmega(postIx, preIx, transform[postIx][preIx]);
+//            }
+//        }
+//        this.setTransform(transform, false);
+        
+        float[][] delta = deltaOmega(start, end);
+        modifyTransform(delta, false, start, end);
         
         // update theta based on theta's time constant
         final float decay = (float) Math.exp(-0.001f / THETA_TAU);
@@ -144,14 +148,18 @@ public class hPESTermination extends PESTermination  {
         }
     }
 
-    protected float deltaOmega(int postIx, int preIx, float currentWeight) {
-    	float supervised = super.deltaOmega(postIx, preIx, currentWeight);
-        float unsupervised = myFilteredInput[preIx] * myFilteredOutput[postIx]
-        		* (myFilteredOutput[postIx] - myTheta[postIx])
-        		* myGain[postIx] * myLearningRate * SCALING_FACTOR;
-
-        return (supervised * mySupervisionRatio
-        	   + unsupervised * (1 - mySupervisionRatio));
+    protected float[][] deltaOmega(int start, int end) {
+    	float[][] supervised = super.deltaOmega(start, end);
+    	if(mySupervisionRatio >= 1.0)
+    		return supervised;
+    	
+    	float[][] unsupervised = new float[supervised.length][supervised[0].length];
+    	for(int postIx=start; postIx < end; postIx++) //this should be able to be matrix-ified as well
+    		for(int preIx=0; preIx < unsupervised[postIx].length; preIx++)
+    			unsupervised[postIx-start][preIx] = myFilteredInput[preIx] * myFilteredOutput[postIx] * 
+    			(myFilteredOutput[postIx] - myTheta[postIx]) * myGain[postIx] * myLearningRate * SCALING_FACTOR;
+    	
+    	return MU.sum(MU.prod(supervised,mySupervisionRatio), MU.prod(unsupervised, 1-mySupervisionRatio));
     }
     
     @Override

@@ -212,6 +212,22 @@ public abstract class PlasticEnsembleTermination extends EnsembleTermination {
             pnt.setWeights(transform[postIx], save);
         }
     }
+    
+    /**
+     * Modifies the transformation weights in-place.
+     * 
+     * @param change The change in the transformation matrix
+     * @param save Whether or not to save the new transformation matrix
+     * @param start Row in transformation matrix to start modifications
+     * @param end Row in transformation matrix to end modifications
+     */
+    public void modifyTransform(float[][] change, boolean save, int start, int end) {
+        Termination[] terms = this.getNodeTerminations();
+        for(int postIx = start; postIx < end; postIx++) {
+            PlasticNodeTermination pnt = (PlasticNodeTermination) terms[postIx];
+            pnt.modifyWeights(change[postIx-start], save);
+        }
+    }
 
     /**
      * Saves the weights in the PlasticNodeTerminations within.

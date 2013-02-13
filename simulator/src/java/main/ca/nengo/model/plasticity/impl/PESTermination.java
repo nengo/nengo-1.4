@@ -56,6 +56,7 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
 
     protected float[] myGain;
     private float[][] myEncoders;
+    private float[][] myScaledEncoders;
 
     private boolean myOja = false; // Apply Oja smoothing?
 
@@ -74,6 +75,8 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
             SpikingNeuron neuron = (SpikingNeuron) nodeTerminations[i].getNode();
             myGain[i] = neuron.getScale();
         }
+        
+        calcScaledEncoders();
     }
 
     /**
@@ -89,6 +92,22 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
     public void setOja(boolean oja) {
         myOja = oja;
     }
+    
+    /**
+     * @param learningRate Learning rate of the termination
+     */
+    public void setLearningRate(float learningRate) {
+    	super.setLearningRate(learningRate);
+    	
+    	calcScaledEncoders();
+    }
+    
+    /**
+     * Calculate encoders scaled by the learning rate and gain (to be used in the transform update).
+     */
+    public void calcScaledEncoders() {
+    	myScaledEncoders = MU.prod(MU.diag(MU.prod(myGain, myLearningRate)), myEncoders);
+    }
 
     /**
      * @see ca.nengo.model.plasticity.impl.PlasticEnsembleTermination#updateTransform(float, int, int)
@@ -103,30 +122,33 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
         	return;
         }
 
-        float[][] transform = this.getTransform();
-        for (int postIx = start; postIx < end; postIx++) {
-            for (int preIx = 0; preIx < transform[postIx].length; preIx++) {
-                transform[postIx][preIx] += deltaOmega(postIx, preIx, transform[postIx][preIx]);
-            }
-        }
-        this.setTransform(transform, false);
+//        float[][] transform = this.getTransform();
+//        for (int postIx = start; postIx < end; postIx++) {
+//            for (int preIx = 0; preIx < transform[postIx].length; preIx++) {
+//                transform[postIx][preIx] += deltaOmega(postIx, preIx, transform[postIx][preIx]);
+//            }
+//        }
+//        this.setTransform(transform, false);
+        
+        float[][] delta = deltaOmega(start, end);
+        modifyTransform(delta, false, start, end);
     }
 
-    protected float deltaOmega(int postIx, int preIx, float currentWeight) {
-        float oja = 0.0f;
-
-        if (myOja) {
-            for (float element : myOutput) {
-                oja += myLearningRate * element * element * currentWeight;
-            }
-        }
-        
-        float e = 0.0f;
-        for (int k = 0; k < myFilteredModInput.length; k++) {
-            e += myFilteredModInput[k] * myEncoders[postIx][k];
-        }
-
-        return myLearningRate * myFilteredInput[preIx] * e * myGain[postIx] - oja;
+    protected float[][] deltaOmega(int start, int end) {
+    	float[][] encoders = MU.copy(myScaledEncoders, start, 0, end-start, -1);
+    	float[][] delta = MU.outerprod(MU.prod(encoders, myFilteredModInput), myFilteredInput);
+    	
+    	if(!myOja)
+    		return delta;
+    	else {
+	    	float[][] transform = getTransform();
+	    	float[] output = MU.prod(MU.prodElementwise(myOutput,myOutput), myLearningRate);
+	    	float[][] oja = MU.zero(delta.length, delta[0].length);
+	    	for(int i=0; i < output.length; i++)
+	    		oja = MU.sum(oja, MU.prod(transform, output[i]));
+	    	
+	    	return MU.difference(delta, oja);
+    	}
     }
     
     @Override
@@ -136,6 +158,7 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
 //        result.myFilteredInput = null;
         result.myGain = myGain.clone();
         result.myEncoders = MU.clone(myEncoders);
+        result.myScaledEncoders = MU.clone(myScaledEncoders);
         return result;
     }
 

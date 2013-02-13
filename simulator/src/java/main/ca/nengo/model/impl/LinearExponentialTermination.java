@@ -142,6 +142,27 @@ public class LinearExponentialTermination implements PlasticNodeTermination {
             saveWeights();
         }
     }
+    
+    /**
+     * This modifies the weights in-place, rather than creating new ones, so will usually
+     * be faster than calling setWeights.
+     * 
+     * @param change The change in the synaptic weights for each input channel
+     */
+    public void modifyWeights(float[] change, boolean save) {
+        if(change.length != myInitialWeights.length) {
+            System.err.println("Error, dimensions don't match in modifyWeights, ignoring new weights");
+            return;
+        }
+
+        for(int i=0; i < change.length; i++)
+        	myWeights[i] += change[i];
+
+        if (save) {
+            saveWeights();
+        }
+    }
+    
 
     /**
      * @param probs The new synaptic vesicle release probabilities for each input channel

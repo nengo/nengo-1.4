@@ -48,6 +48,12 @@ public interface PlasticNodeTermination extends Termination {
      * @param save Should the weights be saved for resetting purposes?
      */
     public void setWeights(float[] weights, boolean save);
+    
+    /**
+     * @param change The change in the synaptic weights for each input channel
+     * @param save Should the weights be saved for resetting purposes?
+     */
+    public void modifyWeights(float[] change, boolean save);
 
     /**
      * Save the current state of the weights so it can be reset there
