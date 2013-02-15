@@ -61,17 +61,8 @@ public class ProgressIndicator extends JPanel implements ActionListener, Simulat
 		stop.addActionListener(this);
 
 		setVisible(false);
-	}
-	
-	void update() {
-		if (!isRunning) {
-			timer.cancel();
-			return;
-		}
-		if (!this.isVisible()) this.setVisible(true);
 		
-		updateBarString();
-		
+		timer = new Timer();
 	}
 	
 	void updateBarString() {
@@ -95,18 +86,21 @@ public class ProgressIndicator extends JPanel implements ActionListener, Simulat
 	}
 	
 	public void start(String text) {
-		if (isRunning) return;
-		
-		
 		timerStart=System.currentTimeMillis();
 		this.text=text;
 		this.isRunning=true;
-		timer=new Timer();
 		timer.schedule(
 		        new TimerTask() {
 					@Override
 		            public void run() {
-						update();
+						if (!isRunning) {
+							cancel();
+							return;
+						}
+						if (!isVisible())
+							setVisible(true);
+						
+						updateBarString();
 		            }
 		        }, 
 		        1000,1000);		
@@ -114,6 +108,7 @@ public class ProgressIndicator extends JPanel implements ActionListener, Simulat
 	
 	public void stop() {
 		if (!isRunning) return;
+		
 		this.setVisible(false);
 		isRunning=false;
 		pythonThread=null;	
@@ -123,7 +118,7 @@ public class ProgressIndicator extends JPanel implements ActionListener, Simulat
 		
 		// TODO: figure out why this needs a 100ms delay before scrolling to the bottom
 		//        (without this delay, the console ends up a few lines above the bottom)
-		new Timer().schedule(
+		timer.schedule(
 		        new TimerTask() {
 					@Override
 		            public void run() {
@@ -164,8 +159,7 @@ public class ProgressIndicator extends JPanel implements ActionListener, Simulat
 		interruptFlag=true;
 		updateBarString();
 		if (pythonThread!=null) interruptViaPython();
-		
-		new Timer().schedule(
+		timer.schedule(
 		        new TimerTask() {
 		            @SuppressWarnings("deprecation")
 					@Override
