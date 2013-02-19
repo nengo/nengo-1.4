@@ -145,9 +145,6 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
      */
     public synchronized void run(float startTime, float endTime, float stepSize, boolean topLevel)
             throws SimulationException {
-    	
-    	 myNodeThreadPool = null;
-         myNodeThreadPool = new NodeThreadPool(myNetwork, myProbeTasks);
 
         //		float pre_time = System.nanoTime();
 
@@ -157,6 +154,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
         if(topLevel)
         {
             resetProbes();
+            makeNodeThreadPool();
         }
 
         fireSimulatorEvent(new SimulatorEvent(0, SimulatorEvent.Type.STARTED));
@@ -209,7 +207,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
         fireSimulatorEvent(new SimulatorEvent(1f, SimulatorEvent.Type.FINISHED));
 
 
-        if(myNodeThreadPool != null){
+        if(topLevel && myNodeThreadPool != null){
             myNodeThreadPool.kill();
             myNodeThreadPool = null;
         }
@@ -237,7 +235,6 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
                 }
             }
 
-            
             for (ThreadTask myTask : myTasks) {
                 myTask.run(startTime, endTime);
             }
@@ -380,6 +377,14 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
      */
     public Probe[] getProbes() {
         return myProbes.toArray(new Probe[0]);
+    }
+    
+    public void makeNodeThreadPool() {
+    	myNodeThreadPool = new NodeThreadPool(myNetwork, myProbeTasks);
+    }
+    
+    public NodeThreadPool getNodeThreadPool() {
+    	return myNodeThreadPool;
     }
 
     public void setDisplayProgress(boolean display)

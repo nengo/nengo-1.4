@@ -2,7 +2,6 @@ import watcher
 import components
 import timelog
 import data
-import simulator
 import hrr
 from timeview.components import hrrgraph, neuronmap
 import nef
@@ -19,6 +18,7 @@ from ca.nengo.math.impl import *
 from ca.nengo.model import Node, SimulationMode
 from ca.nengo.model.plasticity.impl import STDPTermination
 from ca.nengo.model.neuron.impl import SpikingNeuron
+from ca.nengo.util.impl import NodeThreadPool, NEFGPUInterface
 
 from java.lang.System.err import println
 from java.lang import Exception
@@ -689,14 +689,15 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
         self.screenshot_time = time
 
     def run(self):
-        sim = simulator.Simulator(self.network)
+        sim = self.network.getSimulator()
+        sim.makeNodeThreadPool()
 
         sim.step(0.0, 0.001)
-        sim.reset(False)
+        sim.resetNetwork(False, False)
 
         try:
             while self.frame.visible:
-                sim.reset(False)
+                sim.resetNetwork(False, False)
                 # run the network for an instant so that FunctionInputs have values at their Origin so they can be read
                 for n in self.network.nodes:
                     if isinstance(n, FunctionInput):
@@ -778,8 +779,9 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
             if(not self.frame is None):
                 raise error_val
 
-        if sim is not None:
-            sim.kill()
+        if sim is not None and NodeThreadPool.isMultithreading():
+            NEFGPUInterface.requireAllOutputsOnCPU(False);
+            sim.getNodeThreadPool().kill()
 
 
 class RoundedBorder(javax.swing.border.AbstractBorder):
