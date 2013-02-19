@@ -2,7 +2,7 @@ import nef
 import nef.convolution
 import hrr
 
-D=5
+D=20
 
 vocab=hrr.Vocabulary(D, include_pairs=True)
 vocab.parse('a+b+c+d+e')
