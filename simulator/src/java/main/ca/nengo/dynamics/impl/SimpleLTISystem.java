@@ -113,8 +113,6 @@ public class SimpleLTISystem extends LTISystem {
 	 * @see ca.nengo.dynamics.DynamicalSystem#g(float, float[])
 	 */
 	public float[] g(float t, float[] u) {
-		assert u.length == getInputDimension();
-		
 		return MU.prod(C, getState());
 	}
 

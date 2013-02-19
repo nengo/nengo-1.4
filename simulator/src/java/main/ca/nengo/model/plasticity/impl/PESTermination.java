@@ -105,7 +105,7 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
     /**
      * Calculate encoders scaled by the learning rate and gain (to be used in the transform update).
      */
-    public void calcScaledEncoders() {
+    private void calcScaledEncoders() {
     	myScaledEncoders = MU.prod(MU.diag(MU.prod(myGain, myLearningRate)), myEncoders);
     }
 
@@ -121,27 +121,27 @@ public class PESTermination extends ModulatedPlasticEnsembleTermination  {
         if (myFilteredInput == null) {
         	return;
         }
-
-//        float[][] transform = this.getTransform();
-//        for (int postIx = start; postIx < end; postIx++) {
-//            for (int preIx = 0; preIx < transform[postIx].length; preIx++) {
-//                transform[postIx][preIx] += deltaOmega(postIx, preIx, transform[postIx][preIx]);
-//            }
-//        }
-//        this.setTransform(transform, false);
         
         float[][] delta = deltaOmega(start, end);
         modifyTransform(delta, false, start, end);
+        
     }
 
     protected float[][] deltaOmega(int start, int end) {
     	float[][] encoders = MU.copy(myScaledEncoders, start, 0, end-start, -1);
-    	float[][] delta = MU.outerprod(MU.prod(encoders, myFilteredModInput), myFilteredInput);
+//    	float[][] delta = MU.outerprod(MU.prod(encoders, myFilteredModInput), myFilteredInput);
+    	float[] encodedError = MU.prod(encoders, myFilteredModInput);
+    	float[][] delta = new float[end-start][myFilteredInput.length];
+    	for(int i=0; i < delta.length; i++)
+    		if(encodedError[i] != 0.0) {
+    			delta[i] = MU.prod(myFilteredInput, encodedError[i]);
+    		}
+    	
     	
     	if(!myOja)
     		return delta;
     	else {
-	    	float[][] transform = getTransform();
+	    	float[][] transform = MU.copy(getTransform(), start, 0, end-start, -1);
 	    	float[] output = MU.prod(MU.prodElementwise(myOutput,myOutput), myLearningRate);
 	    	float[][] oja = MU.zero(delta.length, delta[0].length);
 	    	for(int i=0; i < output.length; i++)

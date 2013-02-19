@@ -337,17 +337,46 @@ public class MU {
 	 * @return A*B (matrix with the outer product of A and B)
 	 */
 	public static float[][] outerprod(float[] A, float[] B) {
+		int Alen = A.length;
+		int Blen = B.length;
+		float Aval;
+		float[][] result = new float[Alen][Blen];
 		
-		float[][] result = new float[A.length][B.length];
-		
-		for (int i = 0; i < A.length; i++) {
-			for (int j = 0; j < B.length; j++) {
-				result[i][j] = A[i] * B[j];
+		for (int i = 0; i < Alen; i++) {
+			Aval = A[i];
+			for (int j = 0; j < Blen; j++) {
+				result[i][j] = Aval * B[j];
 			}
 		}
 		
 		return result;
 	}
+	
+	/**
+	 * In-place outer product.
+	 * 
+	 * @param A Any vector
+	 * @param B Any vector
+	 * @param result the destination matrix
+	 * @param offset row in destination matrix to insert result
+	 * @return A*B (matrix with the outer product of A and B)
+	 */
+	public static float[][] outerprod(float[] A, float[] B, float[][] result, int offset) {
+		int Alen = A.length;
+		int Blen = B.length;
+		float Aval;
+		
+		for (int i = 0; i < Alen; i++) {
+			Aval = A[i];
+			for (int j = 0; j < Blen; j++) {
+				result[i+offset][j] = Aval * B[j];
+			}
+		}
+		
+		return result;
+	}
+	
+	
 	/**
 	 * @param A Any m x n matrix 
 	 * @param B Any m x n matrix

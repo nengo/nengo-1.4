@@ -219,9 +219,9 @@ public class DecodedTermination implements Termination, Resettable, Probeable {
 
 		for (int i = 0; i < myDynamics.length; i++) {
 			float[] inVal  = new float[]{dynamicsInputs[i]};
-			TimeSeries inSeries = new TimeSeriesImpl(new float[]{startTime, endTime}, new float[][]{inVal, inVal}, myNullUnits);
-			TimeSeries outSeries = myIntegrator.integrate(myDynamics[i], inSeries);
-			result[i] = outSeries.getValues()[outSeries.getValues().length-1][0];
+			float[] dxdt = myDynamics[i].f(startTime, inVal);
+			myDynamics[i].setState(MU.sum(myDynamics[i].getState(), MU.prod(dxdt, endTime-startTime)));
+			result[i] = myDynamics[i].g(endTime, inVal)[0];
 		}
 
 		myTime = endTime;
