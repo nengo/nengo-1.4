@@ -3,7 +3,7 @@ import timelog
 import components
 import watcher
 import data
-import tuningcurves
+from watches import tuningcurvewatch as tuningcurves
 
 from view import View
 

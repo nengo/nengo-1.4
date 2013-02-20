@@ -4,7 +4,6 @@ import timelog
 import data
 import hrr
 from timeview.components import hrrgraph, neuronmap, timecontrol, viewpanel
-from timeview.watches import ensemblewatch, arraywatch, fsmwatch, functionwatch, hrrwatch, neuronwatch, nodewatch, roomwatch
 import nef
 
 import java
@@ -31,9 +30,6 @@ import warnings
 import time
 import os
 
-watches = [roomwatch.RoomWatch(), nodewatch.NodeWatch(), ensemblewatch.EnsembleWatch(), functionwatch.FunctionWatch(), 
-           hrrwatch.HRRWatch(), arraywatch.ArrayWatch(), neuronwatch.NeuronWatch(), fsmwatch.FSMWatch()]
-
 class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnable):
     def __init__(self, network, size=None, ui=None, play=False):
         self.dt = 0.001
@@ -46,9 +42,9 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
 
         self.timelog = timelog.TimeLog()
         self.network = network
+        
         self.watcher = watcher.Watcher(self.timelog)
-        for w in watches:
-            self.watcher.add_watch(w)
+        self.load_watches()
 
         self.requested_mode = None
 
@@ -143,6 +139,17 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
         self.area.add(g)
         self.area.repaint()
         return g
+    
+    def load_watches(self):
+        watch_dir = os.path.join("python","timeview","watches")
+        
+        names = [s[:-3] for s in os.listdir(watch_dir) if (s.endswith(".py") and not s.startswith("__"))]
+        
+        for n in names:
+            module = __import__("timeview.watches." + n, fromlist=[n])
+            for k in module.__dict__.keys():
+                if k.upper() == n.upper():
+                    self.watcher.add_watch(module.__dict__[k]())
 
     def refresh_hrrs(self):
         ''' Call refresh methods on all semantic pointer graphs (useful if HRR has just changed).'''

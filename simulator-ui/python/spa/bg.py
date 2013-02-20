@@ -3,7 +3,6 @@ import ca.nengo
 import nef
 import numeric
 
-import spa.view
 import spa.module
 import spa.rule
 import spa.match

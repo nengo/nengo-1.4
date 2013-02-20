@@ -9,7 +9,6 @@ import buffer
 import directbuffer
 import input
 import match
-import view
 import latch
 import memory
 import directmemory
@@ -22,7 +21,6 @@ reload(buffer)
 reload(directbuffer)
 reload(input)
 reload(match)
-reload(view)
 reload(latch)
 reload(memory)
 reload(directmemory)

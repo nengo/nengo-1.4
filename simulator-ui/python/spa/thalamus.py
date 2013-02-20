@@ -1,7 +1,6 @@
 import nef
 import ca.nengo
 import numeric
-import spa.view
 import spa.module
 
 class Thalamus(spa.module.Module):

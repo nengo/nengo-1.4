@@ -1272,7 +1272,7 @@ class Network:
         :param float maxy: maximum y value to plot
         """                               
         import timeview
-        timeview.funcrep1d.FuncRepWatchCache.define(node,basis,label=label,origin=origin,minx=minx,maxx=maxx,miny=miny,maxy=maxy)
+        timeview.watches.funcrepwatch.FuncRepWatchConfig.define(node,basis,label=label,origin=origin,minx=minx,maxx=maxx,miny=miny,maxy=maxy)
 
 
 def test():
