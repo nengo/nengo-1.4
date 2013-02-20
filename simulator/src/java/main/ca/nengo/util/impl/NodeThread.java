@@ -159,8 +159,10 @@ public class NodeThread extends Thread {
 					return;
 				}
 			}
-		} catch (SimulationException e) {
+		} catch (Exception e) {
 			System.err.println(e);
+			myNodeThreadPool.kill();
+			finished();
 		}
 	}
 	

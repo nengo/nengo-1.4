@@ -15,7 +15,7 @@ from java.awt.event import *
 from ca.nengo.model.nef import *
 from ca.nengo.model.impl import *
 from ca.nengo.math.impl import *
-from ca.nengo.model import Node, SimulationMode
+from ca.nengo.model import Node, SimulationMode, SimulationException
 from ca.nengo.model.plasticity.impl import STDPTermination
 from ca.nengo.model.neuron.impl import SpikingNeuron
 from ca.nengo.util.impl import NodeThreadPool, NEFGPUInterface
@@ -749,7 +749,10 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
 
                     if self.current_tick >= self.timelog.tick_count - 1:
                         self.simulating = True
-                        sim.step(now, now + self.dt)
+                        try:
+                            sim.step(now, now + self.dt)
+                        except SimulationException,se:
+                            self.close()
                         self.simulating = False
                         self.force_origins()
                         now += self.dt

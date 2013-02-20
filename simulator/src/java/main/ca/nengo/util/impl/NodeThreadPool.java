@@ -10,6 +10,7 @@ import java.util.List;
 import ca.nengo.model.Network;
 import ca.nengo.model.Node;
 import ca.nengo.model.Projection;
+import ca.nengo.model.SimulationException;
 import ca.nengo.model.impl.NetworkArrayImpl;
 import ca.nengo.util.TaskSpawner;
 import ca.nengo.util.ThreadTask;
@@ -223,7 +224,7 @@ public class NodeThreadPool {
 	 * 
 	 * @author Eric Crawford
 	 */
-	public void step(float startTime, float endTime){
+	public void step(float startTime, float endTime) throws SimulationException {
 		myStartTime = startTime;
 		myEndTime = endTime;
 		
@@ -240,14 +241,14 @@ public class NodeThreadPool {
 
 			// start the node processing, wait for it to finish
 			startThreads();
-
+			
 			// start the task processing, wait for it to finish
 			startThreads();
 
 			Thread.currentThread().setPriority(oldPriority);
 		}
 		catch(Exception e) {
-			System.err.println(e);
+			throw new SimulationException(e);
 		}
 		
 		if(myCollectTimings){
@@ -266,6 +267,8 @@ public class NodeThreadPool {
 	 */
 	private void startThreads() throws InterruptedException {
 		synchronized(myLock){
+			if(runFinished)
+				throw new InterruptedException();
 			
 			numThreadsComplete = 0;
 			threadsRunning = true;
