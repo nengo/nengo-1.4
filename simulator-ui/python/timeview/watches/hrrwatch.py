@@ -4,7 +4,7 @@ from ca.nengo.model.impl import NetworkArrayImpl, NetworkImpl
 import nef
 
 from timeview import components
-from timeview.watches import watchtemplate
+from timeview.watches import watchtemplate, nodewatch
 
 class HRRWatch(watchtemplate.WatchTemplate):
     def check(self, obj):
@@ -18,5 +18,5 @@ class HRRWatch(watchtemplate.WatchTemplate):
 
     def views(self, obj):
         return [
-            ('semantic pointer', components.HRRGraph, dict(func=nodeWatch.value, args='X', label=obj.name, nodeid=id(obj))),
+            ('semantic pointer', components.HRRGraph, dict(func=nodewatch.NodeWatch.value, args='X', label=obj.name, nodeid=id(obj))),
         ]
