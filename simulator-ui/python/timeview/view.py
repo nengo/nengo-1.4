@@ -150,6 +150,9 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
             for k in module.__dict__.keys():
                 if k.upper() == n.upper():
                     self.watcher.add_watch(module.__dict__[k]())
+                    
+    def add_watch(self, watch):
+        self.watcher.add_watch(watch)
 
     def refresh_hrrs(self):
         ''' Call refresh methods on all semantic pointer graphs (useful if HRR has just changed).'''
