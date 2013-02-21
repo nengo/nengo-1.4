@@ -7,6 +7,7 @@ import hrr
 from ca.nengo.model import Origin, StepListener
 import stats.reader
 import os
+from ca.nengo.model.impl import NetworkArrayImpl
 
 logger = logging.getLogger(__name__)
 
