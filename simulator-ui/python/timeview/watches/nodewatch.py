@@ -4,7 +4,7 @@ from ca.nengo.model import Node, SimulationMode
 from ca.nengo.model.impl import FunctionInput
 from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.util import MU
-from ca.nengo.model.plasticity.impl import PlasticEnsembleTermination
+from ca.nengo.model.plasticity.impl import PlasticEnsembleTermination, STDPTermination
 
 from timeview import components
 from timeview.watches import watchtemplate

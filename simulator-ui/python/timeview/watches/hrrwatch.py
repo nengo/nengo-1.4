@@ -18,5 +18,5 @@ class HRRWatch(watchtemplate.WatchTemplate):
 
     def views(self, obj):
         return [
-            ('semantic pointer', components.HRRGraph, dict(func=nodewatch.NodeWatch.value, args='X', label=obj.name, nodeid=id(obj))),
+            ('semantic pointer', components.HRRGraph, dict(func=nodewatch.NodeWatch().value, args='X', label=obj.name, nodeid=id(obj))),
         ]
