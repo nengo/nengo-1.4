@@ -34,7 +34,6 @@ def test_params(net,p):
     
 import random
 from ca.nengo.model.plasticity.impl import STDPTermination, PlasticEnsembleImpl
-from ca.nengo.model import StructuralException
 import nef
 import numeric
 from java.util import ArrayList
@@ -71,12 +70,12 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     
     # Create error ensemble
     try:
-        net.network.getNode(errName)
-    except StructuralException:
+        net.get(errName) # if it already exists
+    except Exception:
         net.make(errName, N_err, post.dimension)
 
     # Add projections
-    net.connect(net.get(errName).getOrigin('X'),post.getTermination(modname))
+    net.connect(errName, post.getTermination(modname))
     net.connect(pre.getOrigin('AXON'),post.getTermination(prename))
 
     # Set learning rule on the non-decoded termination
