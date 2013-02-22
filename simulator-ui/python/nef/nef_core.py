@@ -467,25 +467,34 @@ class Network:
             if func is not None:
                 raise Exception('Cannot compute a function from a specified Origin')
             return pre
-        elif isinstance(pre,FunctionInput):
+        if isinstance(pre,FunctionInput):
             if func is not None:
                 raise Exception('Cannot compute a function from a FunctionInput')
             return pre.getOrigin('origin')
-        elif func != None and hasattr(pre,'addDecodedOrigin'):
+        
+        if origin_name != None:
+            name = origin_name
+        elif func != None:
             if isinstance(func,Function):
-                if origin_name is None:
-                    fname=func.__class__.__name__
-                    if '.' in fname: 
-                        fname=fname.split('.')[-1]
-                else: 
-                    fname=origin_name
+                name=func.__class__.__name__
+                if '.' in fname: 
+                    name=fname.split('.')[-1]
+            else:
+                name = func.__name__
+        else:
+            name = "X"
+                
+        if hasattr(pre, 'getOrigin'):
+            try:
+                o = pre.getOrigin(name)
+                return o
+            except StructuralException:
+                pass
+            
+        if func != None and hasattr(pre,'addDecodedOrigin'):
+            if isinstance(func,Function):
                 origin=pre.addDecodedOrigin(fname,[func],'AXON')
             else:
-                if origin_name is None: 
-                    fname=func.__name__
-                else: 
-                    fname=origin_name
-                
                 if isinstance(pre,NetworkArrayImpl):
                     dim=pre.nodes[0].dimension
                 else:
@@ -493,18 +502,14 @@ class Network:
 
                 value=func([0]*dim)
                 if isinstance(value,(int,float)):
-                    origin=pre.addDecodedOrigin(fname,[functions.PythonFunction(func,dim)],'AXON')
+                    origin=pre.addDecodedOrigin(name,[functions.PythonFunction(func,dim)],'AXON')
                 else:
                     funcs=[functions.PythonFunction(func,dim,use_cache=True,index=i) for i in range(len(value))]
                     origin=pre.addDecodedOrigin(fname,funcs,'AXON')
                         
             return origin
-        elif hasattr(pre,"getOrigin"):
-            if origin_name != None:
-                return pre.getOrigin(origin_name)
-            return pre.getOrigin("X")
-        else:
-            raise Exception('Unknown object to connect from')
+        
+        raise Exception('Unknown object to connect from')
 
     def compute_transform(self,dim_pre,dim_post,
                           weight=1,index_pre=None,index_post=None):
@@ -719,7 +724,6 @@ class Network:
         origin=self._parse_pre(pre,func,origin_name)
         dim_pre=origin.dimensions
         
-       
         # check for the special case of being given a pre-existing termination
         if isinstance(post,Termination) or encoders!=None:
             if transform is not None: raise Exception('transform cannot be specified when connecting to an existing termination')
