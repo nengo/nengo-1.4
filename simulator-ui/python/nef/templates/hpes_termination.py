@@ -36,6 +36,7 @@ def test_params(net,p):
     
 import random
 from ca.nengo.model.plasticity.impl import STDPTermination, PlasticEnsembleImpl
+from ca.nengo.model import StructuralException
 import nef
 import numeric
 from java.util import ArrayList
@@ -49,7 +50,7 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     # Create error ensemble
     try:
         net.get(errName) # check if it already exists
-    except Exception:
+    except StructuralException:
         net.make(errName, N_err, post.dimension)
     
     # modulatory termination (find unused termination)
