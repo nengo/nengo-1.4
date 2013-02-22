@@ -21,7 +21,7 @@ class EncoderMapWatch(watchtemplate.WatchTemplate):
     def check(self,obj):
         return obj in EncoderMapWatchConfig.config
     def views(self,obj):
-        return [('encoder map',EncoderMap,dict(func=timeview.view.watches.EnsembleWatch.spikes,label=obj.name,config=EncoderMapWatchConfig.config[obj],encoders=obj.encoders))]
+        return [('encoder map',EncoderMap,dict(func=timeview.view.watches.EnsembleWatch().spikes,label=obj.name,config=EncoderMapWatchConfig.config[obj],encoders=obj.encoders))]
 
 class EncoderMap(core.DataViewComponent):
     def __init__(self,view,name,config,func,args=(),label=None,encoders=None):
