@@ -36,7 +36,6 @@ def test_params(net,p):
     
 import random
 from ca.nengo.model.plasticity.impl import STDPTermination, PlasticEnsembleImpl
-from ca.nengo.model import StructuralException
 import nef
 import numeric
 from java.util import ArrayList
@@ -49,19 +48,19 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     
     # Create error ensemble
     try:
-        error = net.network.getNode(errName)
-    except StructuralException:
-        error = net.make(errName, N_err, post.dimension)
+        net.get(errName) # check if it already exists
+    except Exception:
+        net.make(errName, N_err, post.dimension)
     
     # modulatory termination (find unused termination)
     count=0
     while 'mod_%02d'%count in [t.name for t in post.terminations]:
         count=count+1
     modname = 'mod_%02d'%count
-    if error.dimension == post.dimension:
+    if net.get(errName).dimension == post.dimension:
         modweights = numeric.eye(post.dimension)
     else:
-        modweights = [[1 for i in range(error.dimension)] for j in range(post.dimension)]
+        modweights = [[1 for i in range(net.get(errName).dimension)] for j in range(post.dimension)]
     mterm = post.addDecodedTermination(modname, modweights, 0.005, True)
     
     # random weight matrix to initialize projection from pre to post
@@ -83,7 +82,7 @@ def make(net,errName='error', N_err=50, preName='pre', postName='post', rate=5e-
     lterm = post.addHPESTermination(prename, weight, 0.005, False, theta)
     
     # Add projections
-    net.connect(error.getOrigin('X'),post.getTermination(modname))
+    net.connect(errName, post.getTermination(modname))
     net.connect(pre.getOrigin('AXON'),post.getTermination(prename))
 
     # Set learning rule on the non-decoded termination
