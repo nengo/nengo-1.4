@@ -12,6 +12,7 @@ class Watcher:
         
     def add_watch(self,watch):
         self.watches.append(watch)
+        self.watches.sort(key=lambda w: w.priority())
 
     def watch(self,name,func,args=()):
         for key in self.active.keys():

@@ -111,3 +111,6 @@ class NodeWatch(watchtemplate.WatchTemplate):
                                   lfunc=self.weights, largs=(name,), label=label)))
 
         return r
+    
+    def priority(self):
+        return 0

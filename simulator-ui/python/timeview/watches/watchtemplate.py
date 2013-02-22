@@ -16,3 +16,9 @@ class WatchTemplate:
         consists of a string label, a display component (from timeview.components)
         and a dict giving a list of arguments for that component."""
         return [(None, None, None)]
+    
+    def priority(self):
+        """Return a number indicating the priority level of this watcher (this only affects the
+        display, where it is used to sort the views of the watcher).  0 is the highest priority,
+        then 1, 2, etc."""
+        return 100 

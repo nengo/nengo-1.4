@@ -51,3 +51,6 @@ class EnsembleWatch(watchtemplate.WatchTemplate):
                 ('preferred directions', components.PreferredDirection, dict(func=self.spikes, min=0, max=lambda self: 500 * self.view.dt, filter=True, label=obj.name)),
             ]
         return r
+    
+    def priority(self):
+        return 1
