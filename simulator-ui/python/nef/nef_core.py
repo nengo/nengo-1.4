@@ -473,21 +473,23 @@ class Network:
             return pre.getOrigin('origin')
         
         if origin_name != None:
-            name = origin_name
+            fname = origin_name
         elif func != None:
             if isinstance(func,Function):
-                name=func.__class__.__name__
+                fname=func.__class__.__name__
                 if '.' in fname: 
-                    name=fname.split('.')[-1]
+                    fname=fname.split('.')[-1]
             else:
-                name = func.__name__
+                fname = func.__name__
         else:
-            name = "X"
+            fname = "X"
                 
         if hasattr(pre, 'getOrigin'):
             try:
-                o = pre.getOrigin(name)
-                return o
+                o = pre.getOrigin(fname)
+                
+                if o != None:
+                    return o
             except StructuralException:
                 pass
             
@@ -502,7 +504,7 @@ class Network:
 
                 value=func([0]*dim)
                 if isinstance(value,(int,float)):
-                    origin=pre.addDecodedOrigin(name,[functions.PythonFunction(func,dim)],'AXON')
+                    origin=pre.addDecodedOrigin(fname,[functions.PythonFunction(func,dim)],'AXON')
                 else:
                     funcs=[functions.PythonFunction(func,dim,use_cache=True,index=i) for i in range(len(value))]
                     origin=pre.addDecodedOrigin(fname,funcs,'AXON')
