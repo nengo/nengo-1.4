@@ -31,13 +31,13 @@ import time
 import os
 
 class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnable):
-    def __init__(self, network, size=None, ui=None, play=False):
+    def __init__(self, network, size=None, ui=None, play=False, update_frequency=30):
         self.dt = 0.001
         self.tau_filter = 0.03
         self.delay = 10
         self.current_tick = 0
         self.time_shown = 0.5
-        self.data_update_period = 1000.0/50 #minimum time between data updates (real-time, milliseconds)
+        self.data_update_period = 1000.0/update_frequency #minimum time between data updates (real-time, milliseconds)
         self.data_update_time = -1
 
         self.autopause_at = None
