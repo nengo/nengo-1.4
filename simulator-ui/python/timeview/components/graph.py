@@ -73,6 +73,9 @@ class Graph(core.DataViewComponent):
         self.mouse_location = None
         self.fixed_y = fixed_y
         self.use_colors_when_split = use_colors_when_split
+        self.maxy = 1
+        self.miny = -1
+        self.filtered = None
 
         self.map = None
         self.popup_zoom = JCheckBoxMenuItem('auto-zoom', self.autozoom, stateChanged=self.toggle_autozoom)
@@ -80,8 +83,10 @@ class Graph(core.DataViewComponent):
         self.popup.add(JMenuItem('set y range', actionPerformed=self.set_fixed_y))
 
         self.added_popup_separator = False
-
+        self.selection_menu_items = []
         self.popup_dim_menus = []
+        
+        self.tick(0.0) #tick once to initialize variables
 
     def initialize_map(self):
         data = self.data.get_first()
@@ -142,7 +147,7 @@ class Graph(core.DataViewComponent):
                 # Just in case someone altered the layout file and didn't set things right
                 self.sel_all = all(self.indices)
 
-            self.fix_popup()                            # Update the pop-up box
+            self.refix_popup()                            # Update the pop-up box
 
         self.autozoom = d.get('autozoom', True)
         self.popup_zoom.state = self.autozoom
@@ -181,7 +186,6 @@ class Graph(core.DataViewComponent):
         self.fix_popup()
 
     def fix_popup(self):
-
         if not self.added_popup_separator:
             self.popup.add(JPopupMenu.Separator())
             self.sel_all_menu_item = self.popup.add(JCheckBoxMenuItem('select all', self.sel_all, actionPerformed=self.select_all))
@@ -230,32 +234,24 @@ class Graph(core.DataViewComponent):
     def post_process(self, data, start, dt_tau):
         return data
 
-    def paintComponent(self, g):
-        core.DataViewComponent.paintComponent(self, g)
-
+    def tick(self, t):
         if self.neuronmapped and self.map is None:
             self.initialize_map()
 
-        border_top = self.border_top + self.label_offset
-
-        g.color = Color(0.8, 0.8, 0.8)
-        g.drawRect(self.border_left, border_top, self.width - self.border_left - self.border_right, self.size.height - border_top - self.border_bottom)
-
-        g.color = Color(0.8, 0.8, 0.8)
-        g.drawLine(self.border_left, border_top, self.border_left, self.size.height - self.border_bottom)
-
+        #get data
         dt_tau = None
         if self.filter and self.view.tau_filter > 0:
             dt_tau = self.view.dt / self.view.tau_filter
-
-        pts = int(self.view.time_shown / self.view.dt)
-
+        
+        pts = int(self.view.time_shown / self.view.dt)     
+        
         start = self.view.current_tick - pts + 1
         if start < 0:
             start = 0
         if start <= self.view.timelog.tick_count - self.view.timelog.tick_limit:
             start = self.view.timelog.tick_count - self.view.timelog.tick_limit + 1
-
+        self.start = start
+        
         if self.data is not None:
             data = self.data.get(start=start, count=pts, dt_tau=dt_tau)
             data = self.post_process(data, start, dt_tau)
@@ -264,24 +260,10 @@ class Graph(core.DataViewComponent):
                 data[i] = None
         else:
             data = self.rawdata
-            pts = len(self.rawdata)
-
-        maxy = None
-        miny = None
-        dx = float(self.size.width - self.border_left - self.border_right - 1) / (pts - 1)
-
-        if self.x_labels is None:
-            x_labels = dict()
-            x_labels[0] = '%4g' % ((start) * self.view.dt)
-            x_labels[pts] = '%4g' % ((start + pts) * self.view.dt)
-        else:
-            x_labels = self.x_labels
-
-        g.color = Color.black
-        for i, txt in x_labels.items():
-            bounds = g.font.getStringBounds(txt, g.fontRenderContext)
-            g.drawString(txt, self.border_left - bounds.width / 2 + int(i * dx), self.size.height - self.border_bottom + bounds.height)
-
+            pts = len(data)
+        self.pts = pts
+        
+        #initialize indices
         if self.indices is None:
             for x in data:
                 if x is not None:
@@ -289,38 +271,27 @@ class Graph(core.DataViewComponent):
                     for i in range(self.default_selected):
                         if i < len(x):
                             self.indices[i] = True
-                    self.fix_popup()
+                    self.refix_popup()
                     break
             else:
                 return
-
-        self.sel_all = all(self.indices)
-        self.sel_all_menu_item.setState(self.sel_all)
-
-        filtered = []
-        for i, draw in enumerate(self.indices):
-            if draw:
-                if self.neuronmapped:
-                    fdata = [safe_get_index(x, self.map.map[i]) for x in data]
-                else:
-                    fdata = [safe_get_index(x, i) for x in data]
-                trimmed = [x for x in fdata if x is not None]
-                if len(trimmed) == 0:
-                    continue
-                fmaxy = max(trimmed)
-                fminy = min(trimmed)
-                fmaxy = round(fmaxy)[1]
-                fminy = round(fminy)[0]
-                if maxy is None or fmaxy > maxy:
-                    maxy = fmaxy
-                if miny is None or fminy < miny:
-                    miny = fminy
-                filtered.append(fdata)
-
-        if maxy is None:
-            maxy = 1.0
-        if miny is None:
-            miny = -1.0
+        
+        #pick out the data that will be displayed
+        if not self.neuronmapped:
+            self.filtered = [[safe_get_index(x,i) for x in data] for i,draw in enumerate(self.indices) if draw]
+        else:
+            self.filtered = [[safe_get_index(x, self.map.map[i]) for x in data] for i,draw in enumerate(self.indices) if draw]
+        
+        #calculate max/min y
+        maxy = 1.0
+        miny = -1.0
+        if len(self.filtered) > 0:
+            try:
+                maxy = max([max([x for x in d if x != None]) for d in self.filtered])
+                miny = min([min([x for x in d if x != None]) for d in self.filtered])
+            except ValueError:
+                pass #retain default values of max/miny
+            
         if maxy < self.ylimits[1]:
             maxy = float(self.ylimits[1])
         if miny > self.ylimits[0]:
@@ -341,11 +312,47 @@ class Graph(core.DataViewComponent):
 
         if self.fixed_y is not None:
             miny, maxy = self.fixed_y
+            
+        self.miny = miny
+        self.maxy = maxy
 
-        if maxy == miny:
+    def paintComponent(self, g):
+        core.DataViewComponent.paintComponent(self, g) #paints everything white and prints top label
+
+        #initial variables
+        start = self.start
+        pts = self.pts
+        border_top = self.border_top + self.label_offset
+        dx = float(self.size.width - self.border_left - self.border_right - 1) / (pts - 1) #pixel width per data point
+        
+        #draw border
+        g.color = Color(0.8, 0.8, 0.8)
+        g.drawRect(self.border_left, border_top, self.width - self.border_left - self.border_right, self.size.height - border_top - self.border_bottom)
+
+        g.color = Color(0.8, 0.8, 0.8)
+        g.drawLine(self.border_left, border_top, self.border_left, self.size.height - self.border_bottom)
+        
+        self.sel_all = all(self.indices)
+        self.sel_all_menu_item.setState(self.sel_all)
+
+        #draw labels at beginning and end of x axis
+        if self.x_labels is None:
+            x_labels = dict()
+            x_labels[0] = '%4g' % ((start) * self.view.dt)
+            x_labels[pts] = '%4g' % ((start + pts) * self.view.dt)
+        else:
+            x_labels = self.x_labels
+
+        g.color = Color.black
+        for i, txt in x_labels.items():
+            bounds = g.font.getStringBounds(txt, g.fontRenderContext)
+            g.drawString(txt, self.border_left - bounds.width / 2 + int(i * dx), self.size.height - self.border_bottom + bounds.height)
+
+        #drawing main component
+        if self.maxy == self.miny:
             yscale = 0
         else:
-            yscale = float(self.size.height - self.border_bottom - border_top) / (maxy - miny)
+            yscale = float(self.size.height - self.border_bottom - border_top) / (self.maxy - self.miny)
         if self.split and len(filtered) > 0:
             yscale = yscale / len(filtered)
             split_step = float(self.size.height - self.border_bottom - border_top) / len(filtered)
@@ -353,15 +360,15 @@ class Graph(core.DataViewComponent):
         if(not self.neuronmapped):
             # draw zero line
             g.color = Color(0.8, 0.8, 0.8)
-            y0 = int(self.size.height - (0 - miny) * yscale - self.border_bottom)
+            y0 = int(self.size.height - (0 - self.miny) * yscale - self.border_bottom)
             g.drawLine(self.border_left, y0, self.width - self.border_right, y0)
 
             # draw ticks
             tick_count = 10
-            if ('%f' % maxy)[0] == '2':
+            if ('%f' % self.maxy)[0] == '2':
                 tick_count = 8
 
-            tick_span = maxy * 2.0 / tick_count
+            tick_span = self.maxy * 2.0 / tick_count
             tick_size = 3
             for i in range(1, tick_count):
                 yt = int(self.size.height - (i * tick_span) * yscale - self.border_bottom)
@@ -377,53 +384,57 @@ class Graph(core.DataViewComponent):
             pdf.setLineWidth(0.5)
             pdf_line_started = False
 
-        for j, fdata in enumerate(filtered):
-            if (self.size.width - self.border_left - self.border_right) <= 0:
-                break
-            skip = (len(fdata) / (self.size.width - self.border_left - self.border_right)) - 1
-            if self.filter and self.view.tau_filter == 0:
-                skip -= 1     # special case to make unfiltered recoded value graphs look as expected
-            if skip < 0:
-                skip = 0
-            if pdftemplate is not None:   # draw every point for pdf rendering
-                skip = 0
-
-            offset = start % (skip + 1)
-            if not self.split or self.use_colors_when_split:
-                g.color = colors[j % len(colors)]
-            for i in range(len(fdata) - 1 - skip):
-                if skip == 0 or (i + offset) % (skip + 1) == 0:
-                    if fdata[i] is not None and fdata[i + 1 + skip] is not None:
-                        y1 = self.size.height - (fdata[i] - miny) * yscale - self.border_bottom
-                        y2 = self.size.height - (fdata[i + 1 + skip] - miny) * yscale - self.border_bottom
-                        if self.split:
-                            y1 -= (len(filtered) - 1 - j) * split_step
-                            y2 -= (len(filtered) - 1 - j) * split_step
-
-                        if pdftemplate is None:
-                            try:
-                                g.drawLine(int(i * dx + self.border_left), int(y1), int((i + 1 + skip) * dx + self.border_left), int(y2))
-                            except OverflowError:
-                                pass
-                        else:
-                            x = (self.x + i * dx + self.border_left) * scale
-                            y = 800 - (self.y + y1) * scale
-                            if not pdf_line_started:
-                                pdf.moveTo(x, y)
-                                pdf_line_started = True
+        #draw data
+        if self.filtered != None:
+            for j, fdata in enumerate(self.filtered):
+                if (self.size.width - self.border_left - self.border_right) <= 0:
+                    break
+                skip = (len(fdata) / (self.size.width - self.border_left - self.border_right)) - 1 #the number of data points to skip when displaying
+                if self.filter and self.view.tau_filter == 0:
+                    skip -= 1     # special case to make unfiltered recoded value graphs look as expected
+                if skip < 0:
+                    skip = 0
+                if pdftemplate is not None:   # draw every point for pdf rendering
+                    skip = 0
+    
+                if not self.split or self.use_colors_when_split:
+                    g.color = colors[j % len(colors)]
+    
+                offset = start % (skip + 1)
+                for i in range(len(fdata) - 1 - skip):
+                    if skip == 0 or (i + offset) % (skip + 1) == 0:
+                        if fdata[i] is not None and fdata[i + 1 + skip] is not None:
+                            y1 = self.size.height - (fdata[i] - self.miny) * yscale - self.border_bottom
+                            y2 = self.size.height - (fdata[i + 1 + skip] - self.miny) * yscale - self.border_bottom
+                            if self.split:
+                                y1 -= (len(self.filtered) - 1 - j) * split_step
+                                y2 -= (len(self.filtered) - 1 - j) * split_step
+    
+                            if pdftemplate is None:
+                                try:
+                                    g.drawLine(int(i * dx + self.border_left), int(y1), int((i + 1 + skip) * dx + self.border_left), int(y2))
+                                except OverflowError:
+                                    pass
                             else:
-                                pdf.lineTo(x, y)
-            if pdftemplate is not None and pdf_line_started:
-                pdf.setRGBColorStroke(g.color.red, g.color.green, g.color.blue)
-                pdf.stroke()
-                pdf_line_started = False
-        if not self.split:
-            g.color = Color.black
-            if maxy is not None:
-                g.drawString('%6g' % maxy, 0, 10 + border_top)
-            if miny is not None:
-                g.drawString('%6g' % miny, 0, self.size.height - self.border_bottom)
+                                x = (self.x + i * dx + self.border_left) * scale
+                                y = 800 - (self.y + y1) * scale
+                                if not pdf_line_started:
+                                    pdf.moveTo(x, y)
+                                    pdf_line_started = True
+                                else:
+                                    pdf.lineTo(x, y)
+                if pdftemplate is not None and pdf_line_started:
+                    pdf.setRGBColorStroke(g.color.red, g.color.green, g.color.blue)
+                    pdf.stroke()
+                    pdf_line_started = False
+            if not self.split:
+                g.color = Color.black
+                if self.maxy is not None:
+                    g.drawString('%6g' % self.maxy, 0, 10 + border_top)
+                if self.miny is not None:
+                    g.drawString('%6g' % self.miny, 0, self.size.height - self.border_bottom)
 
+        #draw mouse crosshairs
         if self.mouse_location is not None:
             x, y = self.mouse_location
             if x >= self.border_left and x <= self.width - self.border_right:
@@ -443,7 +454,7 @@ class Graph(core.DataViewComponent):
 
                 pt = int((y - self.border_left) * pts / (self.size.width - self.border_right - self.border_left))
 
-                value = (self.size.height - y - self.border_bottom) / yscale + miny
+                value = (self.size.height - y - self.border_bottom) / yscale + self.miny
 
                 g.color = Color.black
                 txt = '%4g' % value

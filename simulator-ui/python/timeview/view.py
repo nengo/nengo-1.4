@@ -37,6 +37,8 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
         self.delay = 10
         self.current_tick = 0
         self.time_shown = 0.5
+        self.data_update_period = 1000.0/50 #minimum time between data updates (real-time, milliseconds)
+        self.data_update_time = -1
 
         self.autopause_at = None
 
@@ -342,6 +344,9 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                         if self.requested_mode is not None:
                             self.network.mode = self.requested_mode
                             self.requested_mode = None
+                            
+                        self.area.tick(now)
+                        
                     if self.requested_mode is not None:
                         self.network.mode = self.requested_mode
                         self.requested_mode = None
@@ -365,7 +370,8 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                         try:
                             sim.step(now, now + self.dt)
                         except SimulationException,se:
-                            self.close()
+                            self.close()  
+                        
                         self.simulating = False
                         self.force_origins()
                         now += self.dt
@@ -381,7 +387,16 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                         self.time_control.slider.value = self.timelog.tick_count
                     else:
                         self.time_control.slider.value = self.current_tick + 1
+                    
+                    #we want to cap the data updates relative to the rendering frame rate,
+                    #otherwise we're doing a bunch of data updates that don't matter (since
+                    #they'll never be displayed)
+                    if last_frame_time != None and last_frame_time >= self.data_update_time:
+                        self.area.tick(now)
+                        self.data_update_time = last_frame_time + self.data_update_period  
+                    
                     self.area.repaint()
+                    
                     this_frame_time = java.lang.System.currentTimeMillis()
                     if last_frame_time is not None:
                         delta = this_frame_time - last_frame_time
@@ -390,6 +405,8 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                             sleep = 0
                         java.lang.Thread.sleep(int(sleep))
                     last_frame_time = this_frame_time
+                    
+                    
 
         except AttributeError, error_val:
             if(not self.frame is None):

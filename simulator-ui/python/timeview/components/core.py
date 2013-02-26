@@ -213,3 +213,15 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
             g.color = Color(0.3, 0.3, 0.3)
             bounds = g.font.getStringBounds(self.label, g.fontRenderContext)
             g.drawString(self.label, self.size.width / 2 - bounds.width / 2, bounds.height)
+            
+    def tick(self, t):
+        """This method will be called in the simulation timescale (as opposed to the rendering
+        timescale of paintComponent).  This is useful for updating the data that will
+        be displayed by paintComponent, since the data changes at the simulation timescale.
+        Note however that this method is not guaranteed to be called every
+        simulation timestep; for example, if the simulation is running very quickly,
+        it would not be desirable to be updating the data far more quickly than it can be
+        displayed.
+        
+        :param float t: the current simulation time"""
+        pass

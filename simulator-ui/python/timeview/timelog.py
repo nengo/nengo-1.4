@@ -50,7 +50,6 @@ class TimeLogItem:
         self.parent.processing=True
         if dt_tau not in self.filtered:
             f=[[x*dt_tau for x in self.data[0]]]
-            #f=[self.data[0]*dt_tau]
             self.filtered[dt_tau]=f
         else:
             f=self.filtered[dt_tau]
@@ -60,9 +59,7 @@ class TimeLogItem:
             decay=math.exp(-dt_tau)
             n=len(self.data[0])
             for i in range(len(f),len(d)):
-                for j in range(n):
-                    v[j]=v[j]*decay+d[i][j]*(1-decay)#dt_tau
-                #v=v*decay+d[i]*scale
+                v = [v[j]*decay + d[i][j]*(1-decay) for j in range(n)]
                 f.append(v[:])
         self.parent.processing=False
         self.semaphore.release()

@@ -7,6 +7,8 @@ from java.awt.event import *
 
 import math
 
+from timeview.components import core
+
 from ca.nengo.model.impl import NetworkImpl
 
 class ViewPanel(JPanel):
@@ -97,6 +99,11 @@ class ViewPanel(JPanel):
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
         self.paintProjections(self.network, g)
+        
+    def tick(self, t):
+        for c in self.getComponents():
+            if isinstance(c, core.DataViewComponent):
+                c.tick(t)
 
     def screenshot(self, filename):
         # TODO: Make this function compatible with both mac and windows systems. The current solution
