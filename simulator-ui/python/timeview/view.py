@@ -37,7 +37,7 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
         self.delay = 10
         self.current_tick = 0
         self.time_shown = 0.5
-        self.data_update_period = 1000.0/update_frequency #minimum time between data updates (real-time, milliseconds)
+        self.data_update_period = int(1000.0/update_frequency) #minimum time between data updates (real-time, milliseconds)
         self.data_update_time = -1
 
         self.autopause_at = None
@@ -243,6 +243,7 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
         controls['rcd_time'] = self.time_control.record_time_spinner.getValue()
         controls['filter'] = self.time_control.filter_spinner.getValue()
         controls['show_time'] = self.time_control.time_shown_spinner.getValue()
+        controls['update_freq'] = self.time_control.freq_spinner.getValue()
 
         view = self.view_save()
 
@@ -265,6 +266,8 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
             self.time_control.filter_spinner.setValue(controls['filter'])
         if('show_time' in control_keys):
             self.time_control.time_shown_spinner.setValue(controls['show_time'])
+        if('update_freq' in control_keys):
+            self.time_control.freq_spinner.setValue(controls['update_freq'])
 
         self.clear_all()
         for name, type, data in layout:
