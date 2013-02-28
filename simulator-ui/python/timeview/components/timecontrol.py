@@ -134,7 +134,7 @@ class TimeControl(JPanel, ChangeListener, ActionListener):
         configPanel.add(spin3)
 
         spin4 = JPanel(layout=BorderLayout(), opaque=False)
-        self.freq_spinner = JSpinner(SpinnerNumberModel(self.view.data_update_period, 1, 50, 1), stateChanged=self.update_frequency)
+        self.freq_spinner = JSpinner(SpinnerNumberModel(1000.0/self.view.data_update_period, 1, 50, 1), stateChanged=self.update_frequency)
         spin4.add(self.freq_spinner)
         spin4.add(JLabel('freq (Hz)'), BorderLayout.NORTH)
         spin4.maximumSize = spin4.preferredSize
