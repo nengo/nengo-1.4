@@ -133,6 +133,13 @@ class TimeControl(JPanel, ChangeListener, ActionListener):
         spin3.maximumSize = spin3.preferredSize
         configPanel.add(spin3)
 
+        spin4 = JPanel(layout=BorderLayout(), opaque=False)
+        self.freq_spinner = JSpinner(SpinnerNumberModel(self.view.data_update_period, 1, 50, 1), stateChanged=self.update_frequency)
+        spin4.add(self.freq_spinner)
+        spin4.add(JLabel('freq (Hz)'), BorderLayout.NORTH)
+        spin4.maximumSize = spin4.preferredSize
+        configPanel.add(spin4)
+
         layout = JPanel(layout=BorderLayout(), opaque=False)
         layout.add(JButton(icon=Icon.save, rolloverIcon=ShadedIcon.save, actionPerformed=self.save, borderPainted=False, focusPainted=False, contentAreaFilled=False, margin=java.awt.Insets(0, 0, 0, 0), toolTipText='save layout'), BorderLayout.WEST)
         layout.add(JButton(icon=Icon.restore, rolloverIcon=ShadedIcon.restore, actionPerformed=self.restore, borderPainted=False, focusPainted=False, contentAreaFilled=False, margin=java.awt.Insets(0, 0, 0, 0), toolTipText='restore layout'), BorderLayout.EAST)
@@ -240,6 +247,9 @@ class TimeControl(JPanel, ChangeListener, ActionListener):
 
     def tick_limit(self, event):
         self.view.timelog.tick_limit = int(event.source.value / self.view.dt) + 1
+
+    def update_frequency(self, event):
+        self.view.data_update_period = 1000.0 / event.source.value
 
     def save(self, event):
         self.view.save()
