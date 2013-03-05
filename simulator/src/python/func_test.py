@@ -1,5 +1,4 @@
-
-import nef
+import nef_theano as nef
 
 net=nef.Network('Function Test',seed=3)
 net.make_input('input',0.5)

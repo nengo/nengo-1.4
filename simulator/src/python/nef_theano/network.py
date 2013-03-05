@@ -57,7 +57,7 @@ class Network:
             else:                     
                 value=pre.origin['X'].value
         if transform is not None: value=TT.dot(value,transform)
-        post.add_filtered_input(value,pstc)
+        post.add_filtered_input(value, pstc)
 
     def make_tick(self):
         updates={}

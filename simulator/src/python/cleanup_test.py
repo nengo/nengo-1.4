@@ -1,4 +1,4 @@
-import nef
+import nef_theano as nef
 import numpy
 net=nef.Network('Cleanup',seed=3)
 

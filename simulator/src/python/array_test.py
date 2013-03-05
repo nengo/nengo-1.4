@@ -1,4 +1,4 @@
-import nef
+import nef_theano as nef
 import numpy
 
 net=nef.Network('Array Test',seed=5)

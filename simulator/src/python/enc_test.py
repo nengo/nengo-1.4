@@ -1,4 +1,4 @@
-import nef
+import nef_theano as nef
 import math
 
 net=nef.Network('Encoder Test')

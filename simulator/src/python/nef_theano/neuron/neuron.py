@@ -2,19 +2,18 @@ import theano
 import numpy
 from theano import tensor as TT
 
-class Neuron:
-
-    def __init__(self, size, dt):
-        self.size = size
-        self.dt = dt
-        self.output = theano.shared(numpy.zeros(size).astype('float32'))
-
-    def reset(self):
-        self.output.set_value(numpy.zeros(self.size).astype('float32'))
-            
-            
-# take a neuron model, run it for the given amount of time with a fixed input, and return the accumulated output over that time            
 def accumulate(input, neuron, time=1.0, init_time=0.05):
+    '''
+    Take a neuron model, run it for the given amount of time with a fixed input
+    Used to generate activity matrix when calculating origin decoders
+    Returns: The accumulated output over that time            
+
+    Parameters
+    ----------
+    neuron: Neuron class, population of neurons from which to accumulate data 
+    time: float, length of time to simulate population for (s)
+    init_time: float, run neurons for this long before collecting data to get rid of startup transients (s)
+    '''
     total = theano.shared(numpy.zeros(neuron.size).astype('float32')) # create internal state variable to keep track of number of spikes
     
     # make the standard neuron update function
@@ -27,11 +26,23 @@ def accumulate(input, neuron, time=1.0, init_time=0.05):
     
     tick.fn(n_calls = int(init_time / neuron.dt))    # call the standard one a few times to get some startup transients out of the way
     accumulate_spikes.fn(n_calls = int(time / neuron.dt))   # call the accumulator version a bunch of times
+
     return total.get_value().astype('float32') / time
     
-    
-    
-    
+class Neuron:
+    def __init__(self, size, dt):
+        '''
+        Constructor for neuron model superclass
+        Subclasses store a set of neurons, and implement an update function
         
-                        
+        Parameters
+        ----------
+        size: int, number of neurons in this population
+        dt: float, size of timestep taken during update
+        '''
+        self.size = size
+        self.dt = dt
+        self.output = theano.shared(numpy.zeros(size).astype('float32')) # set up theano internal state variable
 
+    def reset(self):
+        self.output.set_value(numpy.zeros(self.size).astype('float32')) # reset internal state variable
