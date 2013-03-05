@@ -3,17 +3,14 @@ import numpy
 from theano import tensor as TT
 
 def accumulate(input, neuron, time=1.0, init_time=0.05):
-    '''
-    Take a neuron model, run it for the given amount of time with a fixed input
+    """Take a neuron model, run it for the given amount of time with a fixed input
     Used to generate activity matrix when calculating origin decoders
-    Returns: The accumulated output over that time            
+    Returns the accumulated output over that time            
 
-    Parameters
-    ----------
-    neuron: Neuron class, population of neurons from which to accumulate data 
-    time: float, length of time to simulate population for (s)
-    init_time: float, run neurons for this long before collecting data to get rid of startup transients (s)
-    '''
+    :param Neuron neuron: population of neurons from which to accumulate data 
+    :param float time: length of time to simulate population for (s)
+    :param float init_time: run neurons for this long before collecting data to get rid of startup transients (s)
+    """
     total = theano.shared(numpy.zeros(neuron.size).astype('float32')) # create internal state variable to keep track of number of spikes
     
     # make the standard neuron update function
@@ -31,15 +28,12 @@ def accumulate(input, neuron, time=1.0, init_time=0.05):
     
 class Neuron:
     def __init__(self, size, dt):
-        '''
-        Constructor for neuron model superclass
+        """Constructor for neuron model superclass
         Subclasses store a set of neurons, and implement an update function
         
-        Parameters
-        ----------
-        size: int, number of neurons in this population
-        dt: float, size of timestep taken during update
-        '''
+        :param int size: number of neurons in this population
+        :param float dt: size of timestep taken during update
+        """
         self.size = size
         self.dt = dt
         self.output = theano.shared(numpy.zeros(size).astype('float32')) # set up theano internal state variable

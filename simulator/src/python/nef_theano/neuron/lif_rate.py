@@ -8,30 +8,24 @@ from neuron import Neuron
 
 class LIFRateNeuron(Neuron):
     def __init__(self, size, dt=0.001, t_rc=0.02, t_ref=0.002):
-        '''
-        Constructor for a set of LIF rate neuron
+        """Constructor for a set of LIF rate neuron
         
-        Parameters
-        ----------
-        size: int, number of neurons in set
-        dt: float, timestep for neuron update function
-        t_rc: float, the RC time constant 
-        t_ref: float, refractory period length (s)
-        '''
+        :param int size: number of neurons in set
+        :param float dt: timestep for neuron update function
+        :param float t_rc: the RC time constant 
+        :param float t_ref: refractory period length (s)
+        """
         Neuron.__init__(self, size, dt)
         self.t_rc = t_rc
         self.t_ref = t_ref
         
     def make_alpha_bias(self, max_rates, intercepts):
-        '''
-        Compute the alpha and bias needed to get the given max_rate and intercept values
-        Returns: gain (alpha) and offset (j_bias) values of neurons
+        """Compute the alpha and bias needed to get the given max_rate and intercept values
+        Returns gain (alpha) and offset (j_bias) values of neurons
         
-        Parameters
-        ----------
-        max_rates: float array, maximum firing rates of neurons
-        intercepts: float array, x-intercepts of neurons
-        '''
+        :param float array max_rates: maximum firing rates of neurons
+        :param float array intercepts: x-intercepts of neurons
+        """
         x1 = intercepts; 
         x2 = 1.0
         z1 = 1
@@ -41,14 +35,11 @@ class LIFRateNeuron(Neuron):
         return m, b                                                 
 
     def update(self, input_current):        
-        '''
-        Theano update rule that implementing LIF rate neuron type    
-        Returns: dictionary with firing rate for current time step 
+        """Theano update rule that implementing LIF rate neuron type    
+        Returns dictionary with firing rate for current time step 
     
-        Parameters
-        ----------
-        input_current: float array, the input current for the current time step
-        '''
+        :param float array input_current: the input current for the current time step
+        """
         # set up denominator of LIF firing rate equation
         rate = self.t_ref - self.t_rc * TT.log(1 - 1.0 / TT.maximum(input_current, 0)) 
         # if input current is enough to make neuron spike, calculate firing rate, else return 0
