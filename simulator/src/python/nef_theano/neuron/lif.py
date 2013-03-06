@@ -5,17 +5,17 @@ from theano import tensor as TT
 from neuron import Neuron
 
 class LIFNeuron(Neuron):
-    def __init__(self, size, dt=0.001, t_rc=0.02, t_ref=0.002):
+    def __init__(self, size, dt=0.001, tau_rc=0.02, tau_ref=0.002):
         """ Constructor for a set of LIF rate neuron
         
         :param int size: number of neurons in set
         :param float dt: timestep for neuron update function
-        :param float t_rc: the RC time constant 
-        :param float t_ref: refractory period length (s)
+        :param float tau_rc: the RC time constant 
+        :param float tau_ref: refractory period length (s)
         """
         Neuron.__init__(self, size, dt)
-        self.t_rc = t_rc
-        self.t_ref  = t_ref
+        self.tau_rc = tau_rc
+        self.tau_ref  = tau_ref
         self.voltage = theano.shared(numpy.zeros(size).astype('float32'))          # internal variables
         self.refractory_time = theano.shared(numpy.zeros(size).astype('float32'))  # internal variables
         
@@ -31,7 +31,7 @@ class LIFNeuron(Neuron):
         x1 = intercepts
         x2 = 1.0
         z1 = 1
-        z2 = 1.0 / (1 - TT.exp((self.t_ref - (1.0 / max_rates)) / self.t_rc))        
+        z2 = 1.0 / (1 - TT.exp((self.tau_ref - (1.0 / max_rates)) / self.tau_rc))        
         m = (z1 - z2) / (x1 - x2) # calculate alpha
         b = z1 - m * x1 # calculate j_bias
         return m, b            
@@ -52,7 +52,7 @@ class LIFNeuron(Neuron):
         """
     
         # Euler's method
-        dV = self.dt / self.t_rc * (input_current - self.voltage)
+        dV = self.dt / self.tau_rc * (input_current - self.voltage)
         
         # increase the voltage, ignore values below 0
         v = TT.maximum(self.voltage + dV, 0)  
@@ -67,7 +67,7 @@ class LIFNeuron(Neuron):
         # adjust refractory time (neurons that spike get a new refractory time set, all others get it reduced by dt)
         overshoot = (v - 1) / dV # linearly approximate time since neuron crossed spike threshold
         spiketime = self.dt * (1.0 - overshoot)
-        new_refractory_time = TT.switch(spiked, spiketime + self.t_ref, self.refractory_time - self.dt)
+        new_refractory_time = TT.switch(spiked, spiketime + self.tau_ref, self.refractory_time - self.dt)
         
         # return dictionary of internal variables to update (including setting a neuron that spikes to a voltage of 0)
         return { self.voltage:(v * (1 - spiked)).astype('float32'),

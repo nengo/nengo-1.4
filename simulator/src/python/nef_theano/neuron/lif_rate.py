@@ -7,17 +7,17 @@ from neuron import Neuron
 # an example of implementing a rate-mode neuron
 
 class LIFRateNeuron(Neuron):
-    def __init__(self, size, dt=0.001, t_rc=0.02, t_ref=0.002):
+    def __init__(self, size, dt=0.001, tau_rc=0.02, tau_ref=0.002):
         """Constructor for a set of LIF rate neuron
         
         :param int size: number of neurons in set
         :param float dt: timestep for neuron update function
         :param float t_rc: the RC time constant 
-        :param float t_ref: refractory period length (s)
+        :param float tau_ref: refractory period length (s)
         """
         Neuron.__init__(self, size, dt)
-        self.t_rc = t_rc
-        self.t_ref = t_ref
+        self.tau_rc = tau_rc
+        self.tau_ref = tau_ref
         
     def make_alpha_bias(self, max_rates, intercepts):
         """Compute the alpha and bias needed to get the given max_rate and intercept values
@@ -29,7 +29,7 @@ class LIFRateNeuron(Neuron):
         x1 = intercepts; 
         x2 = 1.0
         z1 = 1
-        z2 = 1.0 / (1 - TT.exp((self.t_ref - (1.0 / max_rates)) / self.t_rc))        
+        z2 = 1.0 / (1 - TT.exp((self.tau_ref - (1.0 / max_rates)) / self.tau_rc))        
         m = (z1 - z2) / (x1 - x2) # calculate alpha
         b = z1 - m * x1 # calculate j_bias
         return m, b                                                 
@@ -41,7 +41,7 @@ class LIFRateNeuron(Neuron):
         :param float array input_current: the input current for the current time step
         """
         # set up denominator of LIF firing rate equation
-        rate = self.t_ref - self.t_rc * TT.log(1 - 1.0 / TT.maximum(input_current, 0)) 
+        rate = self.tau_ref - self.tau_rc * TT.log(1 - 1.0 / TT.maximum(input_current, 0)) 
         # if input current is enough to make neuron spike, calculate firing rate, else return 0
         rate = TT.switch(input_current > 1, 1 / rate, 0) 
         

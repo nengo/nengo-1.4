@@ -8,75 +8,143 @@ import random
 
 class Network:
     def __init__(self,name,seed=None):
-        self.name=name
-        self.dt=0.001
-        self.seed=seed        
-        self.node={}            # all the nodes in the network, indexed by name
-        self.theano_tick=None   # the function to call to run the theano protions of the model ahead one timestep
-        self.tick_nodes=[]      # the list of nodes who have non-theano code that must be run each timestep
+        """Wraps a Nengo network with a set of helper functions for simplifying the creation of Nengo models.
+
+        :param string name: If a string, create and wrap a new NetworkImpl with the given *name*.  
+        :param int seed:    random number seed to use for creating ensembles.  This one seed is used only to
+                            start the random generation process, so each neural group created will be different.        
+        """
+        self.name = name
+        self.dt = 0.001
+        self.run_time = 0.0    
+        self.seed = seed        
+        self.nodes = {}            # all the nodes in the network, indexed by name
+        self.theano_tick = None   # the function call to run the theano portions of the model one timestep
+        self.tick_nodes = []      # the list of nodes who have non-theano code that must be run each timestep
+        self.random = random.Random()
         if seed is not None:
-            self.random=random.Random()
             self.random.seed(seed)
-            
-    # make an ensemble,  Note that all ensembles are actually arrays of length 1        
-    def make(self,name,neurons,dimensions,array_count=1,intercept=(-1,1),seed=None,type='lif',encoders=None):
-        if seed is None:
-            if self.seed is not None: 
-                seed=self.random.randrange(0x7fffffff)
-    
-        self.theano_tick=None  # just in case the model has been run previously, as adding a new node means we have to rebuild the theano function
-        e=ensemble.Ensemble(neurons,dimensions,count=array_count,intercept=intercept,dt=self.dt,seed=seed,type=type,encoders=encoders)        
-        self.node[name]=e
-    def make_array(self,name,neurons,count,dimensions=1,**args):
-        return self.make(name=name,neurons=neurons,dimensions=dimensions,array_count=count,**args)
-    
-    # create an input
-    def make_input(self,name,value,zero_after=None):
-        self.add(input.Input(name,value,zero_after=zero_after))
-            
-    # add an arbitrary non-theano node (used for Input now, should be used for SimpleNodes when those get implemented
-    def add(self,node):
+           
+    #TODO: used for Input now, should be used for SimpleNodes when those get implemented 
+    def add(self, node):
+        """Add an arbitrary non-theano node to the network 
+        
+        :param Node node: 
+        """
         self.tick_nodes.append(node)        
-        self.node[node.name]=node
+        self.nodes[node.name]=node
     
         
-    def connect(self,pre,post,transform=None,pstc=0.01,func=None,origin_name=None):
-        self.theano_tick=None  # just in case the model has been run previously, as adding a new node means we have to rebuild the theano function
+    def connect(self, pre, post, transform=None, pstc=0.01, func=None, origin_name=None):
+       """Connect two nodes in the network.
+
+        *pre* and *post* can be strings giving the names of the nodes, or they
+        can be the nodes themselves (FunctionInputs and NEFEnsembles are
+        supported).  They can also be actual Origins or Terminations, or any
+        combination of the above. 
+
+        If transform is not None, it is used as the transformation matrix for
+        the new termination. 
+
+        If *func* is not None, a new Origin will be created on the pre-synaptic
+        ensemble that will compute the provided function.  The name of this origin 
+        will taken from the name of the function, or *origin_name*, if provided.  If an
+        origin with that name already exists, the existing origin will be used 
+        rather than creating a new one.
+
+        :param string pre: Name of the node to connect from.
+        :param string post: Name of the node to connect to.
+        :param transform: The linear transfom matrix to apply across the connection.
+                          If *transform* is T and *pre* represents ``x``, then the connection
+                          will cause *post* to represent ``Tx``.  Should be an N by M array,
+                          where N is the dimensionality of *post* and M is the dimensionality of *pre*.
+        :type transform: array of floats                              
+        :param float pstc: post-synaptic time constant for the neurotransmitter/receptor on this connection
+        :param function func: function to be computed by this connection.  If None, computes ``f(x)=x``.
+                              The function takes a single parameter x which is the current value of
+                              the *pre* ensemble, and must return wither a float or an array of floats.
+        :param string origin_name: Name of the origin to check for / create to compute the given function.
+                                   Ignored if func is None.  If an origin with this name already
+                                   exists, the existing origin is used instead of creating a new one.
+        """
+        self.theano_tick = None  # reset timer in case the model has been run previously, as adding a new node means we have to rebuild the theano function
                         
-        pre=self.node[pre]
-        post=self.node[post]
-        if hasattr(pre,'value'):   # used for Input objects now, could also be used for SimpleNode origins when they are written
-            assert func is None
-            value=pre.value
-        else:  # this should only be used for ensembles (maybe reorganize this if statement to check if it is an ensemble?)          
-            if func is not None:
-                if origin_name is None: origin_name=func.__name__   #TODO: better analysis to see if we need to build a new origin (rather than just relying on the name)
-                if origin_name not in pre.origin:
-                    pre.add_origin(origin_name,func)                
-                value=pre.origin[origin_name].value
+        pre = self.nodes[pre] # get pre Node object from node dictionary
+        post = self.nodes[post] # get post Node object from node dictionary
+
+        if hasattr(pre, 'projected_value'): # used for Input objects now, could also be used for SimpleNode origins when they are written
+            assert func is None # if pre is an input Node, func must be None
+            projected_value=pre.projected_value # 
+
+        else:  # this should only be used for ensembles (TODO: maybe reorganize this if statement to check if it is an ensemble?)          
+            if func is not None: 
+                if origin_name is None: origin_name=func.__name__ # if no name provided, take name of function being calculated
+                #TODO: better analysis to see if we need to build a new origin (rather than just relying on the name)
+                if origin_name not in pre.origin: # if an origin for this function hasn't already been created
+                    pre.add_origin(origin_name, func) # create origin with to perform desired func
+                projected_value = pre.origin[origin_name].projected_value
             else:                     
-                value=pre.origin['X'].value
-        if transform is not None: value=TT.dot(value,transform)
-        post.add_filtered_input(value, pstc)
+                projected_value = pre.origin['X'].projected_value # otherwise take default identity output from pre population
 
-    def make_tick(self):
-        updates={}
-        for e in self.node.values():
-            if hasattr(e,'update'):
-                updates.update(e.update())    
-        return theano.function([],[],updates=updates)
-        
-    run_time=0.0    
-    def run(self,time):
-        if self.theano_tick is None: self.theano_tick=self.make_tick()
-        for i in range(int(time/self.dt)):
-            t=self.run_time+i*self.dt
-            for node in self.tick_nodes:    # run the non-theano nodes
-                node.t=t
-                node.tick()
-            self.theano_tick()               # run the theano nodes
-        self.run_time+=time   
+        # apply transform matrix if given, directing pre dimensions to specific post dimensions
+        if transform is not None: projected_value=TT.dot(projected_value, transform) 
+
+        # pass in the pre population output function to a new post termination, connecting them for theano
+        post.add_filtered_input(projected_value, pstc) 
+
+    def make(self, name, seed=None, **args) # neurons, dimensions, tau_rc=0.02, tau_ref=0.002, max_rate=(200,400), intercept=(-1,1), radius=1.0, encoders=None, seed=None, neuron_type='lif', array_count=1):
+        """Create and return an ensemble of neurons. Note that all ensembles are actually arrays of length 1        
+        :returns: the newly created ensemble      
+
+        :param string name:          name of the ensemble (must be unique)
+        :param int seed: random number seed to use.  Will be passed to both random.seed() and ca.nengo.math.PDFTools.setSeed().
+                         If this is None and the Network was constructed with a seed parameter, a seed will be randomly generated.
+        """
+        if seed is None: # if no seed provided, get one randomly from the rng
+            seed=self.random.randrange(0x7fffffff)
+    
+        self.theano_tick=None  # just in case the model has been run previously, as adding a new node means we have to rebuild the theano function
+        e = ensemble.Ensemble(**args) #(neurons=neurons, dimensions=dimensions, tau_rc=tau_rc, tau_ref=tau_ref, max_rate=max_rate, intercept=intercept, 
+                                      #      radius=radius, encoders=encoders, dt=self.dt, seed=seed, neuron_type=neuron_type, array_count=array_count)        
+        self.nodes[name] = e # store created ensemble in node dictionary
+
+    def make_array(self, name, array_count, dimensions=1, **args): 
+        """Generate a network array specifically, for legacy code \ non-theano API compatibility
+        """
+        return self.make(name, dimensions=dimensions, array_count=count, **args)
+    
+    def make_input(self, **args): 
+        """ # Create an input and add it to the network
+        """
+        self.add(input.Input(**args))
             
-        
-       
+    def make_theano_tick(self):
+        """Generate the theano function for running the network simulation
+        :returns theano function 
+        """
+        updates={} # dictionary for all variables and the theano description of how to compute them 
 
+        for node in self.nodes.projected_values(): # for every node in the network
+            if hasattr(node, 'update'): # if there is some variable to update 
+                updates.update(node.update()) # add it to the list of variables to update every time step
+
+        return theano.function([], [], updates=updates) # create graph and return optimized update function
+       
+    def run(self, time):
+        """Run the simulation. If called twice, the simulation will continue for *time* more seconds.  
+        
+        :param float time: the amount of time (in seconds) to run
+        """         
+        # if theano graph hasn't been calculated yet, retrieve it
+        if self.theano_tick is None: self.theano_tick = self.make_theano_tick() 
+
+        for i in range(int(time / self.dt)):
+            t = self.run_time + i * self.dt # get current time step
+            # run the non-theano nodes
+            for node in self.tick_nodes:    
+                node.t = t
+                node.tick()
+            # run the theano nodes
+            self.theano_tick()    
+           
+        self.run_time += time # update run_time variable
