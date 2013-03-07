@@ -1,5 +1,5 @@
-D=100
-N=30
+D=100 #Number of dimensions
+N=30  #Neurons per dimension 
 import nef
 import hrr
 
