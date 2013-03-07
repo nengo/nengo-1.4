@@ -36,7 +36,7 @@ class Network:
     
         
     def connect(self, pre, post, transform=None, pstc=0.01, func=None, origin_name=None):
-       """Connect two nodes in the network.
+        """Connect two nodes in the network.
 
         *pre* and *post* can be strings giving the names of the nodes, or they
         can be the nodes themselves (FunctionInputs and NEFEnsembles are
@@ -92,7 +92,7 @@ class Network:
         # pass in the pre population output function to a new post termination, connecting them for theano
         post.add_filtered_input(projected_value, pstc) 
 
-    def make(self, name, seed=None, **args) # neurons, dimensions, tau_rc=0.02, tau_ref=0.002, max_rate=(200,400), intercept=(-1,1), radius=1.0, encoders=None, seed=None, neuron_type='lif', array_count=1):
+    def make(self, name, *args, **kwargs): 
         """Create and return an ensemble of neurons. Note that all ensembles are actually arrays of length 1        
         :returns: the newly created ensemble      
 
@@ -100,23 +100,23 @@ class Network:
         :param int seed: random number seed to use.  Will be passed to both random.seed() and ca.nengo.math.PDFTools.setSeed().
                          If this is None and the Network was constructed with a seed parameter, a seed will be randomly generated.
         """
-        if seed is None: # if no seed provided, get one randomly from the rng
-            seed=self.random.randrange(0x7fffffff)
+        if 'seed' not in kwargs.keys(): # if no seed provided, get one randomly from the rng
+            kwargs['seed'] = self.random.randrange(0x7fffffff)
     
         self.theano_tick=None  # just in case the model has been run previously, as adding a new node means we have to rebuild the theano function
-        e = ensemble.Ensemble(**args) #(neurons=neurons, dimensions=dimensions, tau_rc=tau_rc, tau_ref=tau_ref, max_rate=max_rate, intercept=intercept, 
-                                      #      radius=radius, encoders=encoders, dt=self.dt, seed=seed, neuron_type=neuron_type, array_count=array_count)        
+        e = ensemble.Ensemble(*args, **kwargs) 
+
         self.nodes[name] = e # store created ensemble in node dictionary
 
-    def make_array(self, name, array_count, dimensions=1, **args): 
+    def make_array(self, name, neurons, array_size, dimensions=1, **kwargs): 
         """Generate a network array specifically, for legacy code \ non-theano API compatibility
         """
-        return self.make(name, dimensions=dimensions, array_count=count, **args)
+        return self.make(name=name, neurons=neurons, dimensions=dimensions, array_size=array_size, **kwargs)
     
-    def make_input(self, **args): 
+    def make_input(self, *args, **kwargs): 
         """ # Create an input and add it to the network
         """
-        self.add(input.Input(**args))
+        self.add(input.Input(*args, **kwargs))
             
     def make_theano_tick(self):
         """Generate the theano function for running the network simulation
@@ -124,7 +124,7 @@ class Network:
         """
         updates={} # dictionary for all variables and the theano description of how to compute them 
 
-        for node in self.nodes.projected_values(): # for every node in the network
+        for node in self.nodes.values(): # for every node in the network
             if hasattr(node, 'update'): # if there is some variable to update 
                 updates.update(node.update()) # add it to the list of variables to update every time step
 

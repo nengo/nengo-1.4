@@ -33,8 +33,8 @@ class Origin:
         self.ensemble = ensemble
         self.func = func
         self.decoder = self.compute_decoder()
-        self.dimensions = self.decoder.shape[1]*self.ensemble.array_count
-        self.value = theano.shared(numpy.zeros(self.dimensions).astype('float32'))
+        self.dimensions = self.decoder.shape[1]*self.ensemble.array_size
+        self.projected_value = theano.shared(numpy.zeros(self.dimensions).astype('float32'))
     
     def compute_decoder(self):     
         """Calculate the scaling values to apply to the output to each of the neurons in the attached 
@@ -50,13 +50,13 @@ class Origin:
         # generate sample points from state space randomly to minimize error over in decoder calculation
         samples = make_samples(S, self.ensemble.dimensions, srng) 
 
-        # compute the target values at the sampled values (which are the same as the sample points for the 'X' origin)      ?????????? what does this ( ) part mean?
+        # compute the target projected_values at the sampled points (which are the same as the sample points for the 'X' origin)      ?????????? what does this ( ) part mean?
         if self.func is None: # if no function provided, use identity function as default
-            values = samples 
-        else: # otherwise calculate target values using provided function
-            values=numpy.array([self.func(s) for s in samples.T]) 
-            if len(values.shape)<2: values.shape=values.shape[0],1
-            values=values.T
+            projected_values = samples 
+        else: # otherwise calculate target projected_values using provided function
+            projected_values=numpy.array([self.func(s) for s in samples.T]) 
+            if len(projected_values.shape)<2: projected_values.shape=projected_values.shape[0],1
+            projected_values=projected_values.T
         
         # compute the input current for every neuron and every sample point
         J = numpy.dot(self.ensemble.encoders, samples)
@@ -64,7 +64,7 @@ class Origin:
         
         # duplicate attached population of neurons into array of ensembles, one ensemble per sample point
         # so in parallel we can calculate the activity of all of the neurons at each sample point 
-        neurons = self.ensemble.neuron.__class__((self.ensemble.neurons, S), t_rc=self.ensemble.neuron.t_rc, t_ref=self.ensemble.neuron.t_ref)
+        neurons = self.ensemble.neuron.__class__((self.ensemble.neurons, S), tau_rc=self.ensemble.neuron.tau_rc, tau_ref=self.ensemble.neuron.tau_ref)
         
         # run the neuron model for 1 second, accumulating spikes to get a spike rate
         #  TODO: is this enough?  Should it be less?  If we do less, we may get a good noise approximation!
@@ -72,7 +72,7 @@ class Origin:
         
         # compute Gamma and Upsilon
         G = numpy.dot(A, A.T)
-        U = numpy.dot(A, values.T)
+        U = numpy.dot(A, projected_values.T)
         
         #TODO: optimize this so we're not doing the full eigenvalue decomposition
         #TODO: add NxS method for large N?
@@ -98,5 +98,5 @@ class Origin:
 
         :param array spikes: theano object representing the instantaneous spike raster from the attached population
         """
-        return {self.value:TT.unbroadcast(TT.dot(spikes,self.decoder).reshape([self.dimensions]), 0)} 
+        return {self.projected_value:TT.unbroadcast(TT.dot(spikes,self.decoder).reshape([self.dimensions]), 0)} 
         

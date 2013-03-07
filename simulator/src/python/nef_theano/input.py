@@ -37,4 +37,4 @@ class Input:
             self.zeroed=True
 
         if self.function is not None: # update output projected_value 
-            self.projected_value.set_value(self.function(self.t))
+            self.projected_value.set_value(numpy.float32(self.function(self.t)))

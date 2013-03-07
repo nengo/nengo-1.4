@@ -37,7 +37,7 @@ class Accumulator:
         :param float pstc: post-synaptic time constant on filter
         """
         self.ensemble = ensemble
-        self.projected_value = theano.shared(numpy.zeros(self.ensemble.dimensions * self.ensemble.array_count).astype('float32')) # the current filtered projected_value
+        self.projected_value = theano.shared(numpy.zeros(self.ensemble.dimensions * self.ensemble.array_size).astype('float32')) # the current filtered projected_value
         self.decay = numpy.exp(-self.ensemble.neuron.dt / pstc) # time constant for filter
         self.total = None # the theano object representing the sum of the inputs to this filter
 
@@ -56,7 +56,7 @@ class Accumulator:
 class Ensemble:
     #TODO: implement radius
     def __init__(self, neurons, dimensions, tau_ref=0.002, tau_rc=0.02, max_rate=(200,300), intercept=(-1.0,1.0), 
-                                    radius=1.0, encoders=None, seed=None, neuron_type='lif', dt=0.001, array_count=1):
+                                    radius=1.0, encoders=None, seed=None, neuron_type='lif', dt=0.001, array_size=1):
         """Create an population of neurons with NEF parameters on top
         
         :param int neurons: number of neurons in this population
@@ -70,16 +70,16 @@ class Ensemble:
         :param int seed: seed value for random number generator
         :param string neuron_type: type of neuron model to use, options = {'lif'}
         :param float dt: time step of neurons during update step
-        :param int array_count: number of sub-populations - for network arrays
+        :param int array_size: number of sub-populations - for network arrays
         """
         self.seed = seed
         self.neurons = neurons
         self.dimensions = dimensions
-        self.array_count = array_count
+        self.array_size = array_size
         
         # create the neurons
         # TODO: handle different neuron types, which may have different parameters to pass in
-        self.neuron = neuron.names[neuron_type]((array_count, self.neurons), tau_rc=tau_rc, tau_ref=tau_ref, dt=dt)
+        self.neuron = neuron.names[neuron_type]((array_size, self.neurons), tau_rc=tau_rc, tau_ref=tau_ref, dt=dt)
         
         # compute alpha and bias
         srng = RandomStreams(seed=seed) # set up theano random number generator
@@ -121,23 +121,23 @@ class Ensemble:
         """Compute the set of theano updates needed for this ensemble
         Returns dictionary with new neuron state, termination, and origin values
         """
-        input_current = numpy.tile(self.bias, (self.array_count, 1)) # apply respective biases to neurons in the population 
+        input_current = numpy.tile(self.bias, (self.array_size, 1)) # apply respective biases to neurons in the population 
         
         # increase the input_current by (accumulated current x encoders)
         if len(self.accumulator) > 0: # if there is at least one termination on this population
-            X = sum(a.new_projected_value for a in self.accumulator.projected_values()) # sum of input across each termination for each represented dimension
-            X = X.reshape((self.array_count, self.dimensions)) # reshape for network arrays
+            X = sum(a.new_projected_value for a in self.accumulator.values()) # sum of input across each termination for each represented dimension
+            X = X.reshape((self.array_size, self.dimensions)) # reshape for network arrays
             input_current += TT.dot(X,self.encoders.T) # calculate input_current for each neuron as represented input signal x preferred direction
         
         # pass that total into the neuron model to produce the main theano computation
         updates = self.neuron.update(input_current) # updates is dictionary of theano internal variables to update
         
         # also update the filter projected_values in the accumulators
-        for a in self.accumulator.projected_values():            
+        for a in self.accumulator.values():            
             updates[a.projected_value] = a.new_projected_value.astype('float32') # add accumulated termination inputs to theano internal variable updates
             
         # and compute the decoded origin projected_values from the neuron output
-        for o in self.origin.projected_values():
+        for o in self.origin.values():
             # in the dictionary updates, set each origin's output projected_values equal to the self.neuron.output() we just calculated
             updates.update(o.update(updates[self.neuron.output]))
         
