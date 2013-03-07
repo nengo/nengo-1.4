@@ -7,6 +7,7 @@ def accumulate(input, neuron, time=1.0, init_time=0.05):
     Used to generate activity matrix when calculating origin decoders
     Returns the accumulated output over that time            
 
+    :param input: theano function object describing the input
     :param Neuron neuron: population of neurons from which to accumulate data 
     :param float time: length of time to simulate population for (s)
     :param float init_time: run neurons for this long before collecting data to get rid of startup transients (s)

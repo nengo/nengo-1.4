@@ -3,8 +3,9 @@ from theano.tensor.shared_randomstreams import RandomStreams
 import theano
 import numpy
 import neuron
+import collections
 
-def make_samples(neurons, dimensions, srng):
+def make_samples(neurons, dimensions, radius, srng):
     """Generate sample points uniformly distributed within the sphere
     Returns float array of sample points
     
@@ -18,7 +19,7 @@ def make_samples(neurons, dimensions, srng):
     samples = samples / TT.sqrt(norm)
 
     # generate magnitudes for vectors from uniform distribution
-    scale = srng.uniform([neurons])**(1.0 / dimensions) 
+    scale = srng.uniform([neurons])**(1.0 / dimensions)
     samples = samples.T * scale # scale sample points
     
     return theano.function([],samples)()
@@ -48,15 +49,17 @@ class Origin:
         S=500
                
         # generate sample points from state space randomly to minimize error over in decoder calculation
-        samples = make_samples(S, self.ensemble.dimensions, srng) 
+        samples = make_samples(S, self.ensemble.dimensions, self.ensemble.radius, srng) 
 
-        # compute the target projected_values at the sampled points (which are the same as the sample points for the 'X' origin)      ?????????? what does this ( ) part mean?
+        # compute the target_values at the sampled points (which are the same as the sample points for the 'X' origin)      ?????????? what does this ( ) part mean?
         if self.func is None: # if no function provided, use identity function as default
-            projected_values = samples 
-        else: # otherwise calculate target projected_values using provided function
-            projected_values=numpy.array([self.func(s) for s in samples.T]) 
-            if len(projected_values.shape)<2: projected_values.shape=projected_values.shape[0],1
-            projected_values=projected_values.T
+            target_values = samples 
+        else: # otherwise calculate target_values using provided function
+            # scale all our sample points by ensemble radius, calculate function value, then scale back to unit length
+            # this ensures that we accurately capture the shape of the function when the radius is > 1 (think for func=x**2)
+            target_values = numpy.array([self.func(s * self.ensemble.radius) for s in samples.T]) / self.ensemble.radius 
+            if len(target_values.shape) < 2: target_values.shape = target_values.shape[0], 1
+            target_values = target_values.T
         
         # compute the input current for every neuron and every sample point
         J = numpy.dot(self.ensemble.encoders, samples)
@@ -72,7 +75,7 @@ class Origin:
         
         # compute Gamma and Upsilon
         G = numpy.dot(A, A.T)
-        U = numpy.dot(A, projected_values.T)
+        U = numpy.dot(A, target_values.T)
         
         #TODO: optimize this so we're not doing the full eigenvalue decomposition
         #TODO: add NxS method for large N?
@@ -82,7 +85,7 @@ class Origin:
         limit = .01 * max(w) # formerly 0.1 * 0.1 * max(w), set threshold 
         for i in range(len(w)):
             if w[i] < limit: w[i] = 0 # if < limit set eval = 0
-            else: w[i] = 1.0 / w[i] # prep for upcoming Ginv calculation                                                       ?????????????????????????????????????????????? 
+            else: w[i] = 1.0 / w[i] # prep for upcoming Ginv calculation                                                       
         # w[:, np.core.newaxis] gives transpose of vector, np.multiply is very fast element-wise multiplication
         Ginv = numpy.dot(v, numpy.multiply(w[:, numpy.core.newaxis], v.T)) 
         
@@ -98,5 +101,6 @@ class Origin:
 
         :param array spikes: theano object representing the instantaneous spike raster from the attached population
         """
-        return {self.projected_value:TT.unbroadcast(TT.dot(spikes,self.decoder).reshape([self.dimensions]), 0)} 
+        # multiply the output by the attached ensemble's radius to put us back in the right range
+        return collections.OrderedDict( {self.projected_value: TT.mul( TT.unbroadcast( TT.dot(spikes,self.decoder).reshape([self.dimensions]), 0), self.ensemble.radius).astype('float32')} ) 
         

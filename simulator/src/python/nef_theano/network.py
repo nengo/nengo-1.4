@@ -5,6 +5,7 @@ from theano import tensor as TT
 import theano
 import numpy
 import random
+import collections
 
 class Network:
     def __init__(self,name,seed=None):
@@ -122,7 +123,7 @@ class Network:
         """Generate the theano function for running the network simulation
         :returns theano function 
         """
-        updates={} # dictionary for all variables and the theano description of how to compute them 
+        updates = collections.OrderedDict() # dictionary for all variables and the theano description of how to compute them 
 
         for node in self.nodes.values(): # for every node in the network
             if hasattr(node, 'update'): # if there is some variable to update 

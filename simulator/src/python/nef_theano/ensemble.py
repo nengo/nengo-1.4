@@ -65,7 +65,7 @@ class Ensemble:
         :param float tau_rc: RC constant 
         :param tuple max_rate: lower and upper bounds on randomly generate firing rates for neurons in this population
         :param tuple intercept: lower and upper bounds on randomly generated x offset
-        :param float radius: 
+        :param float radius: the range of input values (-radius:radius) this population is sensitive to 
         :param list encoders: set of possible preferred directions of neurons
         :param int seed: seed value for random number generator
         :param string neuron_type: type of neuron model to use, options = {'lif'}
@@ -76,6 +76,7 @@ class Ensemble:
         self.neurons = neurons
         self.dimensions = dimensions
         self.array_size = array_size
+        self.radius = radius
         
         # create the neurons
         # TODO: handle different neuron types, which may have different parameters to pass in
@@ -107,7 +108,9 @@ class Ensemble:
         if pstc not in self.accumulator: # make sure there's an accumulator for given pstc
             self.accumulator[pstc] = Accumulator(self, pstc)
 
-        self.accumulator[pstc].add(projected_value) # add this termination's contribution to the set of terminations with the same pstc
+        # add this termination's contribution to the set of terminations with the same pstc
+        # rescale projected_value by this neurons radius to put us in the right range
+        self.accumulator[pstc].add(TT.true_div(projected_value, self.radius)) 
         
     def add_origin(self, name, func):
         """Create a new origin to perform a given function over the represented signal
@@ -130,7 +133,7 @@ class Ensemble:
             input_current += TT.dot(X,self.encoders.T) # calculate input_current for each neuron as represented input signal x preferred direction
         
         # pass that total into the neuron model to produce the main theano computation
-        updates = self.neuron.update(input_current) # updates is dictionary of theano internal variables to update
+        updates = self.neuron.update(input_current) # updates is an ordered dictionary of theano internal variables to update
         
         # also update the filter projected_values in the accumulators
         for a in self.accumulator.values():            

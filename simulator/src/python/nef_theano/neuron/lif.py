@@ -1,5 +1,6 @@
 import theano
 import numpy
+import collections
 from theano import tensor as TT
 
 from neuron import Neuron
@@ -69,7 +70,9 @@ class LIFNeuron(Neuron):
         spiketime = self.dt * (1.0 - overshoot)
         new_refractory_time = TT.switch(spiked, spiketime + self.tau_ref, self.refractory_time - self.dt)
         
-        # return dictionary of internal variables to update (including setting a neuron that spikes to a voltage of 0)
-        return { self.voltage:(v * (1 - spiked)).astype('float32'),
-                 self.refractory_time:new_refractory_time.astype('float32'),
-                 self.output:spiked.astype('float32') }
+        # return an ordered dictionary of internal variables to update (including setting a neuron that spikes to a voltage of 0)
+        # important that it's ordered, due to theano memory optimizations
+        
+        return collections.OrderedDict({ self.voltage:(v * (1 - spiked)).astype('float32'),
+                                         self.refractory_time:new_refractory_time.astype('float32'),
+                                         self.output:spiked.astype('float32') } )
