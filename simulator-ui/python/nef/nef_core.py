@@ -44,28 +44,33 @@ class Network:
     """
     
     serialVersionUID=1
-    def __init__(self,name,quick=False,seed=None,fixed_seed=None):
+    def __init__(self,name,quick=None,seed=None,fixed_seed=None):
         """
         :param name: If a string, create and wrap a new NetworkImpl with the given *name*.  
                     If an existing NetworkImpl, then create a wrapper around that network.
         :type name: string or NetworkImpl
-        :param boolean quick: Default setting for the *quick* parameter in :func:`nef.Network.make()`.
-                              Note: the use of this parameter is not encouraged any more: 
-                              use seed=<number> or fixed_seed=<number> instead.               
+        :param boolean quick: Default setting for the *quick* parameter in :func:`nef.Network.make()`.              
         :param int fixed_seed: random number seed to use for creating ensembles.  Every ensemble will
                                use this seed value, resulting in identical neurons in ensembles that
-                               have the same parameters.  Automatically makes use of the *quick* system
-                               to avoid re-computing ensembles.
+                               have the same parameters.  By default, setting this parameter will 
+                               enable quick mode.
         :param int seed: random number seed to use for creating ensembles.  This one seed is used only to
                          start the random generation process, so each neural group created will be
-                         different (unlike the *fixed_seed* parameter).        
+                         different (unlike the *fixed_seed* parameter).  By default, setting this 
+                         parameter will enable quick mode.
         """
         if isinstance(name,NetworkImpl):
             self.network=name
         else:
             self.network=NetworkImpl()
             self.network.name=name
-        self.defaults=dict(quick=quick)
+        
+        if quick != None:
+            #if a quick value is specified, use that as default
+            self.defaults=dict(quick=quick) 
+        else:
+            #otherwise, use quick by default only if a seed was specified
+            self.defaults=dict(quick=(seed != None or fixed_seed != None))
         
         self.seed=seed
         self.fixed_seed=fixed_seed
@@ -128,20 +133,32 @@ class Network:
         :param boolean add_to_network: flag to indicate if created ensemble should be added to the network
         :returns: the newly created ensemble                             
         """
-        if neurons==0:
-            raise Exception("Cannot create an ensemble with zero neurons")
         
+        #sanity checks
+        if neurons==0:
+            raise StructuralException("Cannot create an ensemble with zero neurons")
+        if node_factory != None and (max_rate != (200,400) or intercept != (-1,1) or tau_rc != 0.02 or tau_ref != 0.002):
+            #this isn't ideal, since if the user explicitly specifies one of the default values (for some reason) this
+            #won't catch it.  but to do it properly we would have to make all the default values None and then set them 
+            #within the function, which would be a mess.
+            raise Exception("Cannot specify neuron properties when giving an explicit node factory") 
+        
+        #get default seed if one wasn't specified
         if seed is None:
-            if self.fixed_seed is not None:
-                seed=self.fixed_seed    
-            elif self.seed is not None:
-                seed=self.random.randrange(0x7fffffff)
-        if seed is not None:
-            quick=True                    
+            if self.fixed_seed is not None: #used fixed seed if there is one
+                seed = self.fixed_seed    
+            elif self.seed is not None: #if a network seed was specified, used that to generate the seed
+                seed = self.random.randrange(0x7fffffff)
+                
+        #set the seed
+        if seed is not None:                   
             PDFTools.setSeed(seed)    
             random.seed(seed)
-        if intercept is None: intercept=(-1,1)    
-        if quick is None: quick=self.defaults['quick']
+            
+        #set up quick mode   
+        if quick is None: 
+            quick=self.defaults['quick'] #load default quick value
+            
         if quick:
             storage_name='quick_%s_%d_%d_%1.3f_%1.3f'%(storage_code,neurons,dimensions,tau_rc,tau_ref)
             if type(max_rate) is tuple and len(max_rate)==2:
@@ -172,56 +189,75 @@ class Network:
                 storage_name='quick'+java.io.File.separator+storage_name
         else:
             storage_name=''
+            
+            
+        #set up ensemble factory
         ef=NEFEnsembleFactoryImpl()
-        if node_factory is not None:
+        
+        if node_factory is not None:  #setting up node factory
             ef.nodeFactory=node_factory
         else:
             if type(max_rate) is tuple and len(max_rate)==2:
                 mr=IndicatorPDF(max_rate[0],max_rate[1])
             else:
                 mr=pdfs.ListPDF(max_rate)
+                
             if type(intercept) is tuple and len(intercept)==2:
                 it=IndicatorPDF(intercept[0],intercept[1])
             else:
                 it=pdfs.ListPDF(intercept)
+
             ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc,tauRef=tau_ref,maxRate=mr,intercept=it)
-        # Check if encoder dimensions match ensemble dimensions
-        if encoders is not None:
+            
+        if encoders is not None:  #setting up encoder factory
             if len(encoders[0]) != dimensions:
                 raise Exception('Encoder dimensions (%d) must match specified ensemble dimensions (%d)' % (len(encoders[0]), dimensions))
             try:
                 ef.encoderFactory = FixedVectorGenerator(encoders)
             except:
                 raise Exception('encoders must be a matrix where each row is a non-zero preferred direction vector')
-        if decoder_sign is not None:
+            
+        if decoder_sign is not None:  #setting up approximator factory
             if decoder_sign<0: 
                 ef.approximatorFactory=GradientDescentApproximator.Factory(GradientDescentApproximator.CoefficientsSameSign(False),False)
             elif decoder_sign>0: 
                 ef.approximatorFactory=GradientDescentApproximator.Factory(GradientDescentApproximator.CoefficientsSameSign(True),False)
         else:        
             ef.approximatorFactory.noise=decoder_noise
-        if eval_points is not None:
+            
+        if eval_points is not None:  #setting up eval points
             if len(eval_points[0]) != dimensions:
-                raise Exception('Dimensions of evaluation points (%d) must match specified ensemble dimensions (%d)' %
+                raise StructuralException('Dimensions of evaluation points (%d) must match specified ensemble dimensions (%d)' %
                                 (len(eval_points[0]), dimensions))
             ef.evalPointFactory=generators.FixedEvalPointGenerator(eval_points)
+            
+        #set up radius
         if isinstance(radius,list):
             r=radius
         else:
             r=[radius]*dimensions
 
+        #parse given name to get the name of this ensemble (stripping off the higher level names) and
+        #the parent object
         parent,name=self._parse_name(name)
 
+        #create ensemble
         n=ef.make(name,neurons,r,storage_name,False)
+        
+        if add_to_network: 
+            parent.addNode(n)
+        
+        #set noise on each neuron in the ensemble
         if noise is not None:
             for nn in n.nodes:
                 nn.noise=NoiseFactory.makeRandomNoise(noise_frequency,IndicatorPDF(-noise,noise))
 
+        #set simulation mode
         if mode=='rate' or mode==SimulationMode.RATE:
             n.mode=SimulationMode.RATE
         elif mode=='direct' or mode==SimulationMode.DIRECT:
             n.mode=SimulationMode.DIRECT
-        if add_to_network: parent.addNode(n)
+             
         return n
     
     def _parse_name(self,name):
@@ -511,7 +547,7 @@ class Network:
                         
             return origin
         
-        raise Exception('Unknown object to connect from')
+        raise StructuralException("Cannot connect from " + pre.name + " to " + fname)
 
     def compute_transform(self,dim_pre,dim_post,
                           weight=1,index_pre=None,index_post=None):
