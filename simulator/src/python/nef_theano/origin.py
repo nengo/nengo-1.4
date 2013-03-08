@@ -4,28 +4,29 @@ import theano
 import numpy
 import neuron
 import collections
+import numpy as np
 
-def make_samples(neurons, dimensions, radius, srng):
+def make_samples(num_samples, dimensions, srng):
     """Generate sample points uniformly distributed within the sphere
     Returns float array of sample points
     
-    :param int neurons: number of neurons to generate samples for
+    :param int num_samples: number of num_samples to generate samples for
     :param int dimensions: dimensionality of sphere to generate points in
     :param theano.tensor.shared_randomstreams srng: theano random number generator
     """
-    samples = srng.normal((neurons, dimensions)) # get samples from normal distribution
+    samples = srng.normal((num_samples, dimensions)) # get samples from normal distribution
     # normalize magnitude of sampled points to be of unit length
     norm = TT.sum(samples * samples, axis=[1], keepdims=True) 
     samples = samples / TT.sqrt(norm)
 
     # generate magnitudes for vectors from uniform distribution
-    scale = srng.uniform([neurons])**(1.0 / dimensions)
+    scale = srng.uniform([num_samples])**(1.0 / dimensions)
     samples = samples.T * scale # scale sample points
     
     return theano.function([],samples)()
 
 class Origin:
-    def __init__(self, ensemble, func=None):
+    def __init__(self, ensemble, func=None, eval_points=None):
         """The output to a population of neurons (ensemble), performing a transformation (func) on the represented value
 
         :param Ensemble ensemble: the Ensemble to which this origin is attached
@@ -33,41 +34,48 @@ class Origin:
         """
         self.ensemble = ensemble
         self.func = func
-        self.decoder = self.compute_decoder()
+        self.decoder = self.compute_decoder(eval_points)
         self.dimensions = self.decoder.shape[1]*self.ensemble.array_size
         self.projected_value = theano.shared(numpy.zeros(self.dimensions).astype('float32'))
     
-    def compute_decoder(self):     
+    def compute_decoder(self, eval_points=None):     
         """Calculate the scaling values to apply to the output to each of the neurons in the attached 
         population such that the weighted summation of their output generates the desired decoded output.
         Decoder values computed as D = (A'A)^-1 A'X_f where A is the matrix of activity values of each 
         neuron over sampled X values, and X_f is the vector of desired f(x) values across sampled points
-        """
-        srng = RandomStreams(seed=self.ensemble.seed) # theano random number generator
         
-        #TODO: have this be more for higher dimensions?  5000 maximum (like Nengo)?
-        S=500
-               
-        # generate sample points from state space randomly to minimize error over in decoder calculation
-        samples = make_samples(S, self.ensemble.dimensions, self.ensemble.radius, srng) 
+        :param list eval_points: specific set of points to optimize decoders over 
+        """
+        
+        #TODO: have num_samples be more for higher dimensions?  5000 maximum (like Nengo)?
+        num_samples=500
+
+        if eval_points == None:  
+            # generate sample points from state space randomly to minimize decoder error over in decoder calculation
+            srng = RandomStreams(seed=self.ensemble.seed) # theano random number generator
+            eval_points = make_samples(num_samples, self.ensemble.dimensions, srng) 
+        else: # otherwise reset num_samples, andhow  make sure eval_points is in the right form (rows are input dimensions, columns different samples)
+            eval_points = np.array(eval_points)
+            if len(eval_points.shape) == 1: eval_points.shape = [1, eval_points.shape[0]]
+            num_samples = eval_points.shape[1]
 
         # compute the target_values at the sampled points (which are the same as the sample points for the 'X' origin)      ?????????? what does this ( ) part mean?
         if self.func is None: # if no function provided, use identity function as default
-            target_values = samples 
+            target_values = eval_points 
         else: # otherwise calculate target_values using provided function
             # scale all our sample points by ensemble radius, calculate function value, then scale back to unit length
-            # this ensures that we accurately capture the shape of the function when the radius is > 1 (think for func=x**2)
-            target_values = numpy.array([self.func(s * self.ensemble.radius) for s in samples.T]) / self.ensemble.radius 
+            # this ensures that we accurately capture the shape of the function when the radius is > 1 (think for example func=x**2)
+            target_values = numpy.array([self.func(s * self.ensemble.radius) for s in eval_points.T]) / self.ensemble.radius 
             if len(target_values.shape) < 2: target_values.shape = target_values.shape[0], 1
             target_values = target_values.T
         
         # compute the input current for every neuron and every sample point
-        J = numpy.dot(self.ensemble.encoders, samples)
+        J = numpy.dot(self.ensemble.encoders, eval_points)
         J += numpy.array([self.ensemble.bias]).T
         
         # duplicate attached population of neurons into array of ensembles, one ensemble per sample point
         # so in parallel we can calculate the activity of all of the neurons at each sample point 
-        neurons = self.ensemble.neuron.__class__((self.ensemble.neurons, S), tau_rc=self.ensemble.neuron.tau_rc, tau_ref=self.ensemble.neuron.tau_ref)
+        neurons = self.ensemble.neuron.__class__((self.ensemble.neurons, num_samples), tau_rc=self.ensemble.neuron.tau_rc, tau_ref=self.ensemble.neuron.tau_ref)
         
         # run the neuron model for 1 second, accumulating spikes to get a spike rate
         #  TODO: is this enough?  Should it be less?  If we do less, we may get a good noise approximation!

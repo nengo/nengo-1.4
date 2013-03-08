@@ -133,6 +133,7 @@ class Network:
        
     def run(self, time):
         """Run the simulation. If called twice, the simulation will continue for *time* more seconds.  
+        Note that the ensembles are simulated at the dt timestep specified when they are created.
         
         :param float time: the amount of time (in seconds) to run
         """         

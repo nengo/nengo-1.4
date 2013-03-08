@@ -54,9 +54,8 @@ class Accumulator:
             
         
 class Ensemble:
-    #TODO: implement radius
     def __init__(self, neurons, dimensions, tau_ref=0.002, tau_rc=0.02, max_rate=(200,300), intercept=(-1.0,1.0), 
-                                    radius=1.0, encoders=None, seed=None, neuron_type='lif', dt=0.001, array_size=1):
+                                    radius=1.0, encoders=None, seed=None, neuron_type='lif', dt=0.001, array_size=1, eval_points=None):
         """Create an population of neurons with NEF parameters on top
         
         :param int neurons: number of neurons in this population
@@ -71,12 +70,14 @@ class Ensemble:
         :param string neuron_type: type of neuron model to use, options = {'lif'}
         :param float dt: time step of neurons during update step
         :param int array_size: number of sub-populations - for network arrays
+        :param list eval_points: specific set of points to optimize decoders over by default for this ensemble
         """
         self.seed = seed
         self.neurons = neurons
         self.dimensions = dimensions
         self.array_size = array_size
         self.radius = radius
+        self.eval_points = eval_points
         
         # create the neurons
         # TODO: handle different neuron types, which may have different parameters to pass in
@@ -93,8 +94,10 @@ class Ensemble:
         self.encoders = make_encoders(neurons, dimensions, srng, encoders=encoders)
         self.encoders = (self.encoders.T * alpha).T # combine encoders and gain for simplification
         
-        # make default origin
-        self.origin = dict(X=origin.Origin(self)) # creates origin with identity function
+        self.origin = {} # make origin dictionary
+        self.add_origin('X', func=None, eval_points=self.eval_points) # make default origin
+        
+        #self.origin = dict(X=origin.Origin(self)) # creates origin with identity function
 
         self.accumulator = {} # dictionary of accumulators tracking terminations with different pstc values
     
@@ -112,13 +115,15 @@ class Ensemble:
         # rescale projected_value by this neurons radius to put us in the right range
         self.accumulator[pstc].add(TT.true_div(projected_value, self.radius)) 
         
-    def add_origin(self, name, func):
+    def add_origin(self, name, func, eval_points=None):
         """Create a new origin to perform a given function over the represented signal
         
         :param string name: name of origin
         :param function func: desired transformation to perform over represented signal
+        :param list eval_points: specific set of points to optimize decoders over for this origin
         """
-        self.origin[name] = origin.Origin(self, func)    
+        if eval_points == None: eval_points = self.eval_points
+        self.origin[name] = origin.Origin(self, func, eval_points=eval_points)    
     
     def update(self):
         """Compute the set of theano updates needed for this ensemble
