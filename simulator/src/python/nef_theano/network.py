@@ -25,7 +25,25 @@ class Network:
         self.random = random.Random()
         if seed is not None:
             self.random.seed(seed)
-           
+          
+    def make_subnetwork(self,name):
+        """Create and return a subnetwork.  Subnetworks are just Network objects that are
+        inside other Networks, and are useful for keeping a model organized.
+        
+        :param string name: name of created node
+        :returns: the created Network       
+        """
+        
+        parent,name=self._parse_name(name)
+        network=NetworkImpl()
+        network.name=name
+        parent.addNode(network)
+        if self.seed is None:
+            seed = None
+        else:
+            seed = self.random.randrange(0x7fffffff)
+        return Network(network, seed=seed, fixed_seed=self.fixed_seed)
+
     #TODO: used for Input now, should be used for SimpleNodes when those get implemented 
     def add(self, node):
         """Add an arbitrary non-theano node to the network 
@@ -34,21 +52,52 @@ class Network:
         """
         self.tick_nodes.append(node)        
         self.nodes[node.name]=node
-    
+
+    def compute_transform(self, dim_pre, dim_post, weight=1, index_pre=None, index_post=None):
+        """Helper function used by :func:`nef.Network.connect()` to create the 
+        *dim_pre* by *dim_post* transform matrix. Values are either 0 or *weight*.  
+        *index_pre* and *index_post* are used to determine which values are 
+        non-zero, and indicate which dimensions of the pre-synaptic ensemble 
+        should be routed to which dimensions of the post-synaptic ensemble.
+
+        :param integer dim_pre: first dimension of transform matrix
+        :param integer dim_post: second dimension of transform matrix
+        :param float weight: the non-zero value to put into the matrix
+        :param index_pre: the indexes of the pre-synaptic dimensions to use
+        :type index_pre: list of integers or a single integer
+        :param index_post: the indexes of the post-synaptic dimensions to use
+        :type index_post: list of integers or a single integer
+        :returns: a two-dimensional transform matrix performing the requested routing        
+        """
+        transform = [[0] * dim_pre for i in range(dim_post)] # create a matrix of zeros
+        # default index_pre/post lists set up *weight* value on diagonal of transform
+        # if dim_post != dim_pre, then values wrap around when edge hit
+        if index_pre is None: index_pre = range(dim_pre) 
+        elif isinstance(index_pre, int): index_pre = [index_pre] 
+        if index_post is None: index_post = range(dim_post) 
+        elif isinstance(index_post, int): index_post = [index_post]
+
+        for i in range(max(len(index_pre), len(index_post))):
+            pre = index_pre[i % len(index_pre)]
+            post = index_post[i % len(index_post)]
+            transform[post][pre] = weight
+        return transform
         
-    def connect(self, pre, post, transform=None, pstc=0.01, func=None, origin_name=None):
+    def connect(self, pre, post, transform=None, weight=1, index_pre=None, index_post=None, pstc=0.01, func=None, origin_name=None):
         """Connect two nodes in the network.
 
         *pre* and *post* can be strings giving the names of the nodes, or they
         can be the nodes themselves (FunctionInputs and NEFEnsembles are
-        supported).  They can also be actual Origins or Terminations, or any
+        supported). They can also be actual Origins or Terminations, or any
         combination of the above. 
 
         If transform is not None, it is used as the transformation matrix for
-        the new termination. 
+        the new termination. You can also use *weight*, *index_pre*, and *index_post*
+        to define a transformation matrix instead.  *weight* gives the value,
+        and *index_pre* and *index_post* identify which dimensions to connect.
 
         If *func* is not None, a new Origin will be created on the pre-synaptic
-        ensemble that will compute the provided function.  The name of this origin 
+        ensemble that will compute the provided function. The name of this origin 
         will taken from the name of the function, or *origin_name*, if provided.  If an
         origin with that name already exists, the existing origin will be used 
         rather than creating a new one.
@@ -60,6 +109,14 @@ class Network:
                           will cause *post* to represent ``Tx``.  Should be an N by M array,
                           where N is the dimensionality of *post* and M is the dimensionality of *pre*.
         :type transform: array of floats                              
+        :param index_pre: The indexes of the pre-synaptic dimensions to use.
+                          Ignored if *transform* is not None. See :func:`nef.Network.compute_transform()`
+        :param float weight: scaling factor for a transformation defined with *index_pre* and *index_post*.
+                             Ignored if *transform* is not None. See :func:`nef.Network.compute_transform()`
+        :type index_pre: List of integers or a single integer
+        :param index_post: The indexes of the post-synaptic dimensions to use.
+                           Ignored if *transform* is not None. See :func:`nef.Network.compute_transform()`
+        :type index_post: List of integers or a single integer 
         :param float pstc: post-synaptic time constant for the neurotransmitter/receptor on this connection
         :param function func: function to be computed by this connection.  If None, computes ``f(x)=x``.
                               The function takes a single parameter x which is the current value of
@@ -75,20 +132,24 @@ class Network:
 
         if hasattr(pre, 'projected_value'): # used for Input objects now, could also be used for SimpleNode origins when they are written
             assert func is None # if pre is an input Node, func must be None
-            projected_value=pre.projected_value # 
+            projected_value = pre.projected_value
 
         else:  # this should only be used for ensembles (TODO: maybe reorganize this if statement to check if it is an ensemble?)          
             if func is not None: 
-                if origin_name is None: origin_name=func.__name__ # if no name provided, take name of function being calculated
+                if origin_name is None: origin_name = func.__name__ # if no name provided, take name of function being calculated
                 #TODO: better analysis to see if we need to build a new origin (rather than just relying on the name)
                 if origin_name not in pre.origin: # if an origin for this function hasn't already been created
                     pre.add_origin(origin_name, func) # create origin with to perform desired func
-                projected_value = pre.origin[origin_name].projected_value
-            else:                     
-                projected_value = pre.origin['X'].projected_value # otherwise take default identity output from pre population
+            else:                    
+                origin_name = 'X' # otherwise take default identity output from pre population
+            projected_value = pre.origin[origin_name].projected_value
 
-        # apply transform matrix if given, directing pre dimensions to specific post dimensions
-        if transform is not None: projected_value=TT.dot(projected_value, transform) 
+        # compute transform matrix if not given
+        if transform is None:
+            transform = self.compute_transform(dim_pre=pre.dimensions, dim_post=post.dimensions, weight=weight, index_pre=index_pre, index_post=index_post)
+
+        # apply transform matrix, directing pre dimensions to specific post dimensions
+        projected_value = TT.dot(projected_value, numpy.array(transform).T)
 
         # pass in the pre population output function to a new post termination, connecting them for theano
         post.add_filtered_input(projected_value, pstc) 
@@ -97,7 +158,7 @@ class Network:
         """Create and return an ensemble of neurons. Note that all ensembles are actually arrays of length 1        
         :returns: the newly created ensemble      
 
-        :param string name:          name of the ensemble (must be unique)
+        :param string name: name of the ensemble (must be unique)
         :param int seed: random number seed to use.  Will be passed to both random.seed() and ca.nengo.math.PDFTools.setSeed().
                          If this is None and the Network was constructed with a seed parameter, a seed will be randomly generated.
         """
@@ -129,6 +190,7 @@ class Network:
             if hasattr(node, 'update'): # if there is some variable to update 
                 updates.update(node.update()) # add it to the list of variables to update every time step
 
+        theano.config.compute_test_value = 'warn' # for debugging
         return theano.function([], [], updates=updates) # create graph and return optimized update function
        
     def run(self, time):

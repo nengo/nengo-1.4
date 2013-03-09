@@ -1,4 +1,5 @@
 from theano import tensor as TT
+from numbers import Number
 import theano
 import numpy
 
@@ -20,7 +21,11 @@ class Input:
         if callable(value): # if value parameter is a python function
             self.function = value
             value = self.function(0.0) # initial output value = function value with input 0.0
-        self.projected_value = theano.shared(numpy.array(value).astype('float32')) # theano internal state defining output value
+        if isinstance(value, Number): value = [value] # if scalar, make it a list
+        self.projected_value = theano.shared(numpy.float32(value)) # theano internal state defining output value
+    
+        # find number of parameters of the projected value
+        self.dimensions = len(value)
 
     def reset(self):
         """Resets the function output state values
@@ -37,4 +42,8 @@ class Input:
             self.zeroed=True
 
         if self.function is not None: # update output projected_value 
-            self.projected_value.set_value(numpy.float32(self.function(self.t)))
+            value = self.function(self.t)
+            # if value is a scalar output, make it a list
+            if isinstance(value, Number): value = [value] 
+            # cast as float32 for consistency / speed, but _after_ it's been made a list
+            self.projected_value.set_value(numpy.float32(value)) 
