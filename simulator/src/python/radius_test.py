@@ -1,3 +1,11 @@
+"""This is a test file to test the radius parameter of ensembles
+   Need to test the radius both on identity, linear, and non-linear 
+   projections. It's affects 3 places, the termination, scaling input,
+   the origin, scaling output, and when computing decoders, to scale 
+   the function being computed so that it has the proper shape inside
+   unit length.
+"""
+
 import nef_theano as nef
 import math
 import numpy as np
@@ -29,13 +37,11 @@ Cvals = np.zeros((timesteps,1))
 Dvals = np.zeros((timesteps,1))
 for i in range(timesteps):
     net.run(0.01)
-    #print net.nodes['A'].origin['X'].projected_value.get_value(), net.nodes['B'].origin['X'].projected_value.get_value(), net.nodes['C'].origin['X'].projected_value.get_value()
-     #net.nodes['B'].accumulator[0.01].projected_value.get_value(), net.nodes['C'].accumulator[0.01].projected_value.get_value()
-    Fvals[i] = net.nodes['in'].projected_value.get_value() #net.nodes['A'].accumulator[0.01].projected_value.get_value()
-    Avals[i] = net.nodes['A'].origin['X'].projected_value.get_value() #net.nodes['B'].accumulator[0.01].projected_value.get_value() # get the post-synaptic values because they're already filtered
-    Bvals[i] = net.nodes['B'].origin['X'].projected_value.get_value() #net.nodes['C'].accumulator[0.01].projected_value.get_value()
-    Cvals[i] = net.nodes['C'].origin['X'].projected_value.get_value() # net.nodes['D'].accumulator[0.01].projected_value.get_value() 
-    Dvals[i] = net.nodes['D'].origin['X'].projected_value.get_value() # net.nodes['D'].accumulator[0.01].projected_value.get_value() 
+    Fvals[i] = net.nodes['in'].projected_value.get_value() 
+    Avals[i] = net.nodes['A'].origin['X'].projected_value.get_value() 
+    Bvals[i] = net.nodes['B'].origin['X'].projected_value.get_value()
+    Cvals[i] = net.nodes['C'].origin['X'].projected_value.get_value()
+    Dvals[i] = net.nodes['D'].origin['X'].projected_value.get_value()
 
 plt.ion(); plt.clf(); plt.hold(1);
 plt.plot(Fvals)
