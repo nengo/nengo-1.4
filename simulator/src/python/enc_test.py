@@ -1,3 +1,5 @@
+"""This is a file to test the encoders parameter on ensembles"""
+
 import nef_theano as nef
 import math
 import numpy as np
@@ -13,9 +15,11 @@ net.connect('in', 'A')
 net.connect('A', 'B')
 net.connect('B', 'C')
 
-Avals = np.zeros((1001,1))
-Bvals = np.zeros((1001,1))
-for i in range(1000):
+timesteps = 500
+Avals = np.zeros((timesteps,1))
+Bvals = np.zeros((timesteps,1))
+print "starting simulation"
+for i in range(timesteps):
     net.run(0.1)
     #print net.nodes['A'].origin['X'].projected_value.get_value(), net.nodes['B'].origin['X'].projected_value.get_value(), net.nodes['C'].origin['X'].projected_value.get_value()
      #net.nodes['B'].accumulator[0.01].projected_value.get_value(), net.nodes['C'].accumulator[0.01].projected_value.get_value()
