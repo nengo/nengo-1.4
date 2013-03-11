@@ -127,7 +127,7 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                     self.popup.visible = False
                 menu = JMenu(prefix + name, mouseClicked=click_func)
                 popup.add(menu)
-                self.process_nodes(n.nodes, prefix=prefix + name + ":", popup=menu)
+                self.process_nodes(n.nodes, prefix=prefix + name + ".", popup=menu)
             else:
                 popup.add(JMenuItem(prefix + name, actionPerformed=lambda event, self=self, name=prefix + name: self.add_item(name, self.mouse_click_location)))
 
@@ -271,6 +271,10 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
 
         self.clear_all()
         for name, type, data in layout:
+            
+            name = name.replace(":", ".")
+                #this is just here for backwards compatibility, it should be removed once all the old layout files have been updated
+                
             if name in self.watcher.objects.keys():
                 if type is None:
                     c = self.add_item(name)
