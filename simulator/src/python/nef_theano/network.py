@@ -8,10 +8,10 @@ import random
 import collections
 
 class Network:
-    def __init__(self,name,seed=None):
+    def __init__(self, name, seed=None):
         """Wraps a Nengo network with a set of helper functions for simplifying the creation of Nengo models.
 
-        :param string name: If a string, create and wrap a new NetworkImpl with the given *name*.  
+        :param string name: create and wrap a new Network with the given *name*.  
         :param int seed:    random number seed to use for creating ensembles.  This one seed is used only to
                             start the random generation process, so each neural group created will be different.        
         """
@@ -19,31 +19,13 @@ class Network:
         self.dt = 0.001
         self.run_time = 0.0    
         self.seed = seed        
-        self.nodes = {}            # all the nodes in the network, indexed by name
-        self.theano_tick = None   # the function call to run the theano portions of the model one timestep
-        self.tick_nodes = []      # the list of nodes who have non-theano code that must be run each timestep
+        self.nodes = {} # all the nodes in the network, indexed by name
+        self.theano_tick = None # the function call to run the theano portions of the model one timestep
+        self.tick_nodes = [] # the list of nodes who have non-theano code that must be run each timestep
         self.random = random.Random()
         if seed is not None:
             self.random.seed(seed)
           
-    def make_subnetwork(self,name):
-        """Create and return a subnetwork.  Subnetworks are just Network objects that are
-        inside other Networks, and are useful for keeping a model organized.
-        
-        :param string name: name of created node
-        :returns: the created Network       
-        """
-        
-        parent,name=self._parse_name(name)
-        network=NetworkImpl()
-        network.name=name
-        parent.addNode(network)
-        if self.seed is None:
-            seed = None
-        else:
-            seed = self.random.randrange(0x7fffffff)
-        return Network(network, seed=seed, fixed_seed=self.fixed_seed)
-
     #TODO: used for Input now, should be used for SimpleNodes when those get implemented 
     def add(self, node):
         """Add an arbitrary non-theano node to the network 
@@ -70,6 +52,7 @@ class Network:
         :returns: a two-dimensional transform matrix performing the requested routing        
         """
         transform = [[0] * dim_pre for i in range(dim_post)] # create a matrix of zeros
+
         # default index_pre/post lists set up *weight* value on diagonal of transform
         # if dim_post != dim_pre, then values wrap around when edge hit
         if index_pre is None: index_pre = range(dim_pre) 
@@ -83,8 +66,11 @@ class Network:
             transform[post][pre] = weight
         return transform
         
-    def connect(self, pre, post, transform=None, weight=1, index_pre=None, index_post=None, pstc=0.01, func=None, origin_name=None):
+    def connect(self, pre, post, pstc=0.01, transform=None, weight=1, index_pre=None, index_post=None, 
+                        func=None, origin_name=None, weight_matrix=None):
         """Connect two nodes in the network.
+        Note: cannot specify (transform) AND any of (weight, index_pre, index_post) 
+              cannot specify (weight_matrix) AND any of (transform, weight, index_pre, index_post, func, origin_name)
 
         *pre* and *post* can be strings giving the names of the nodes, or they
         can be the nodes themselves (FunctionInputs and NEFEnsembles are
@@ -104,6 +90,7 @@ class Network:
 
         :param string pre: Name of the node to connect from.
         :param string post: Name of the node to connect to.
+        :param float pstc: post-synaptic time constant for the neurotransmitter/receptor on this connection
         :param transform: The linear transfom matrix to apply across the connection.
                           If *transform* is T and *pre* represents ``x``, then the connection
                           will cause *post* to represent ``Tx``.  Should be an N by M array,
@@ -117,42 +104,65 @@ class Network:
         :param index_post: The indexes of the post-synaptic dimensions to use.
                            Ignored if *transform* is not None. See :func:`nef.Network.compute_transform()`
         :type index_post: List of integers or a single integer 
-        :param float pstc: post-synaptic time constant for the neurotransmitter/receptor on this connection
         :param function func: function to be computed by this connection.  If None, computes ``f(x)=x``.
                               The function takes a single parameter x which is the current value of
                               the *pre* ensemble, and must return wither a float or an array of floats.
         :param string origin_name: Name of the origin to check for / create to compute the given function.
                                    Ignored if func is None.  If an origin with this name already
                                    exists, the existing origin is used instead of creating a new one.
+        :param weight_matrix: For encoded connections, directly connecting the current (as in voltage) output
+                              of the pre population x weight_matrix to the post population 
         """
+        # make sure contradicting things aren't simultaneously specified
+        if weight_matrix is not None:
+            assert transform is None and weight is None and index_pre is None and index_post is None and func is None and origin_name is None
+        else: 
+            assert not (transform is not None and ((weight != 1) or (index_pre is not None) or (index_post is not None)))
+        
+
         self.theano_tick = None  # reset timer in case the model has been run previously, as adding a new node means we have to rebuild the theano function
                         
         pre = self.nodes[pre] # get pre Node object from node dictionary
         post = self.nodes[post] # get post Node object from node dictionary
+    
+        if weight_matrix is None: # if we're doing a decoded connection
+            if hasattr(pre, 'decoded_output'): # used for Input objects now, could also be used for SimpleNode origins when they are written
+                assert func is None # if pre is an input Node, func must be None
+                decoded_output = pre.decoded_output
+                dim_pre = pre.dimensions # if Input object, just grab the number of dimensions from it
 
-        if hasattr(pre, 'projected_value'): # used for Input objects now, could also be used for SimpleNode origins when they are written
-            assert func is None # if pre is an input Node, func must be None
-            projected_value = pre.projected_value
+            else:  # this should only be used for ensembles (TODO: maybe reorganize this if statement to check if it is an ensemble?)          
+                if func is not None: 
+                    if origin_name is None: origin_name = func.__name__ # if no name provided, take name of function being calculated
+                    #TODO: better analysis to see if we need to build a new origin (rather than just relying on the name)
+                    if origin_name not in pre.origin: # if an origin for this function hasn't already been created
+                        pre.add_origin(origin_name, func) # create origin with to perform desired func
+                else:                    
+                    origin_name = 'X' # otherwise take default identity decoded output from pre population
+                decoded_output = pre.origin[origin_name].decoded_output
+                dim_pre = pre.origin[origin_name].dimensions # if ensemble, need to get pre dimensions from origin
 
-        else:  # this should only be used for ensembles (TODO: maybe reorganize this if statement to check if it is an ensemble?)          
-            if func is not None: 
-                if origin_name is None: origin_name = func.__name__ # if no name provided, take name of function being calculated
-                #TODO: better analysis to see if we need to build a new origin (rather than just relying on the name)
-                if origin_name not in pre.origin: # if an origin for this function hasn't already been created
-                    pre.add_origin(origin_name, func) # create origin with to perform desired func
-            else:                    
-                origin_name = 'X' # otherwise take default identity output from pre population
-            projected_value = pre.origin[origin_name].projected_value
+            # compute transform matrix if not given
+            if transform is None:
+                transform = self.compute_transform(dim_pre=dim_pre, dim_post=post.dimensions * post.array_size, weight=weight, index_pre=index_pre, index_post=index_post)
 
-        # compute transform matrix if not given
-        if transform is None:
-            transform = self.compute_transform(dim_pre=pre.dimensions, dim_post=post.dimensions, weight=weight, index_pre=index_pre, index_post=index_post)
+            # apply transform matrix, directing pre dimensions to specific post dimensions
+            decoded_output = TT.dot(numpy.array(transform), decoded_output)
 
-        # apply transform matrix, directing pre dimensions to specific post dimensions
-        projected_value = TT.dot(projected_value, numpy.array(transform).T)
+            # pass in the pre population decoded output function to the post population, connecting them for theano
+            post.add_filtered_input(pstc=pstc, decoded_input=decoded_output) 
 
-        # pass in the pre population output function to a new post termination, connecting them for theano
-        post.add_filtered_input(projected_value, pstc) 
+        else: # if we're doing an encoded connection
+            assert not hasattr(pre, 'decoded_output') # can't get encoded output from Input object
+
+            # get the instantaneous spike raster from the pre population
+            neuron_output = pre.neurons.output 
+            # the encoded input to the next population is the spikes x weight matrix
+            encoded_output = TT.dot(neuron_output, numpy.array(weight_matrix)) #TODO: should this be weight_matrix.T?
+    
+            # pass in the pre population encoded output function to the post population, connecting them for theano
+            post.add_filtered_input(pstc=pstc, encoded_input=encoded_output)
+            
 
     def make(self, name, *args, **kwargs): 
         """Create and return an ensemble of neurons. Note that all ensembles are actually arrays of length 1        

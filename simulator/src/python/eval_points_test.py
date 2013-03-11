@@ -52,10 +52,10 @@ A3vals = np.zeros((timesteps,1))
 print "starting simulation"
 for i in range(timesteps):
     net.run(0.01)
-    Fvals[i] = net.nodes['in'].projected_value.get_value() 
-    A1vals[i] = net.nodes['A1'].origin['pow'].projected_value.get_value() 
-    A2vals[i] = net.nodes['A2'].origin['pow'].projected_value.get_value() 
-    A3vals[i] = net.nodes['A3'].origin['pow'].projected_value.get_value() 
+    Fvals[i] = net.nodes['in'].decoded_output.get_value() 
+    A1vals[i] = net.nodes['A1'].origin['pow'].decoded_output.get_value() 
+    A2vals[i] = net.nodes['A2'].origin['pow'].decoded_output.get_value() 
+    A3vals[i] = net.nodes['A3'].origin['pow'].decoded_output.get_value() 
 
 # plot the results
 plt.ion(); plt.clf(); 

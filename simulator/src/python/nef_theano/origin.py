@@ -36,7 +36,7 @@ class Origin:
         self.func = func
         self.decoder = self.compute_decoder(eval_points)
         self.dimensions = self.decoder.shape[1]*self.ensemble.array_size
-        self.projected_value = theano.shared(numpy.zeros(self.dimensions).astype('float32'))
+        self.decoded_output = theano.shared(numpy.zeros(self.dimensions).astype('float32'))
     
     def compute_decoder(self, eval_points=None):     
         """Calculate the scaling values to apply to the output to each of the neurons in the attached 
@@ -110,5 +110,5 @@ class Origin:
         :param array spikes: theano object representing the instantaneous spike raster from the attached population
         """
         # multiply the output by the attached ensemble's radius to put us back in the right range
-        return collections.OrderedDict( {self.projected_value: TT.mul( TT.unbroadcast( TT.dot(spikes,self.decoder).reshape([self.dimensions]), 0), self.ensemble.radius).astype('float32')} ) 
+        return collections.OrderedDict( {self.decoded_output: TT.mul( TT.unbroadcast( TT.dot(spikes,self.decoder).reshape([self.dimensions]), 0), self.ensemble.radius).astype('float32')} ) 
         

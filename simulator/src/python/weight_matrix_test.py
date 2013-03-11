@@ -1,17 +1,27 @@
-"""This is a test file to test the transform parameter on the connect function.
-   The transform matrix is post x pre dimensions"""
+"""This is a test file to test the weight_matrix parameter on addTermination, 
+   here we test by creating inhibitory connections."""
 
 import nef_theano as nef
 import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-def func(x): 
-    return [math.sin(x), -math.sin(x)]
+net=nef.Network('WeightMatrix Test')
+net.make_input('in', value=math.sin)
+net.make('A', neurons=100, dimensions=1)
+net.make('B', neurons=100, dimensions=1)
 
-net=nef.Network('Transform Test')
-net.make_input('in', value=func)
-net.make('A', 300, 3)
+# setup inhibitory scaling matrix
+inhib_scaling_matrix = [[0]*dimensions for i in range(dimensions)]
+for i in range(dimensions):
+    inhib_scaling_matrix[i][i] = -inhib_scale
+# setup inhibitory matrix
+inhib_matrix = []
+for i in range(dimensions):
+    inhib_matrix_part = [[inhib_scaling_matrix[i]] * neurons]
+    inhib_matrix.append(inhib_matrix_part[0])
+
+net.nodes['A'].addTermination('bg_input', inhib_matrix, tau_inhib, False)
 
 # define our transform and connect up! 
 transform = [[0,1],[1,0],[1,-1]]

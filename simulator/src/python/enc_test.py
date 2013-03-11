@@ -23,8 +23,8 @@ for i in range(timesteps):
     net.run(0.1)
     #print net.nodes['A'].origin['X'].projected_value.get_value(), net.nodes['B'].origin['X'].projected_value.get_value(), net.nodes['C'].origin['X'].projected_value.get_value()
      #net.nodes['B'].accumulator[0.01].projected_value.get_value(), net.nodes['C'].accumulator[0.01].projected_value.get_value()
-    Avals[i] = net.nodes['B'].accumulator[0.01].projected_value.get_value() # get the post-synaptic values because they're already filtered
-    Bvals[i] = net.nodes['C'].accumulator[0.01].projected_value.get_value()
+    Avals[i] = net.nodes['B'].accumulators[0.01].decoded_input.get_value() # get the post-synaptic values because they're already filtered
+    Bvals[i] = net.nodes['C'].accumulators[0.01].decoded_input.get_value()
 
 plt.ion(); plt.hold(1)
 plt.plot(Avals)

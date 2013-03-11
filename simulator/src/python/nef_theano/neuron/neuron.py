@@ -22,7 +22,6 @@ def accumulate(input, neuron, time=1.0, init_time=0.05):
     updates[total] = total + neuron.output # add another internal variable to change to updates dictionary
     accumulate_spikes = theano.function([], [], updates=updates)#, mode=theano.Mode(optimizer=None, linker='py')) # create theano function that does it all
     
-    tick()
     tick.fn(n_calls = int(init_time / neuron.dt))    # call the standard one a few times to get some startup transients out of the way
     accumulate_spikes.fn(n_calls = int(time / neuron.dt))   # call the accumulator version a bunch of times
 
