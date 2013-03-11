@@ -24,7 +24,7 @@ net.connect('C', 'E', index_pre=1)
 net.connect('C', 'F', index_pre=1, index_post=0)
 
 timesteps = 500
-Fvals = np.zeros((timesteps, 1))
+Invals = np.zeros((timesteps, 1))
 Avals = np.zeros((timesteps, 1))
 Bvals = np.zeros((timesteps, 1))
 Cvals = np.zeros((timesteps, 2))
@@ -34,7 +34,7 @@ Fvals = np.zeros((timesteps, 2))
 print "starting simulation"
 for i in range(timesteps):
     net.run(0.01)
-    Fvals[i] = net.nodes['in'].decoded_output.get_value() 
+    Invals[i] = net.nodes['in'].decoded_output.get_value() 
     Avals[i] = net.nodes['A'].origin['X'].decoded_output.get_value() 
     Bvals[i] = net.nodes['B'].origin['X'].decoded_output.get_value()
     Cvals[i] = net.nodes['C'].origin['X'].decoded_output.get_value()
@@ -44,7 +44,7 @@ for i in range(timesteps):
 
 plt.ion(); plt.close(); 
 plt.subplot(711); plt.title('Input')
-plt.plot(Fvals)
+plt.plot(Invals)
 plt.subplot(712); plt.title('A = Input * .5')
 plt.plot(Avals)
 plt.subplot(713); plt.title('B = A * 2')

@@ -75,10 +75,10 @@ class Origin:
         
         # duplicate attached population of neurons into array of ensembles, one ensemble per sample point
         # so in parallel we can calculate the activity of all of the neurons at each sample point 
-        neurons = self.ensemble.neuron.__class__((self.ensemble.neurons, num_samples), tau_rc=self.ensemble.neuron.tau_rc, tau_ref=self.ensemble.neuron.tau_ref)
+        neurons = self.ensemble.neurons.__class__((self.ensemble.neurons_num, num_samples), tau_rc=self.ensemble.neurons.tau_rc, tau_ref=self.ensemble.neurons.tau_ref)
         
         # run the neuron model for 1 second, accumulating spikes to get a spike rate
-        #  TODO: is this enough?  Should it be less?  If we do less, we may get a good noise approximation!
+        #  TODO: is this long enough?  Should it be less?  If we do less, we may get a good noise approximation!
         A = neuron.accumulate(J, neurons)
         
         # compute Gamma and Upsilon
@@ -100,7 +100,7 @@ class Origin:
         #Ginv=numpy.linalg.pinv(G, rcond=.01)  
         
         # compute decoder - least squares method 
-        decoder = numpy.dot(Ginv, U) / (self.ensemble.neuron.dt)
+        decoder = numpy.dot(Ginv, U) / (self.ensemble.neurons.dt)
         return decoder.astype('float32')
 
     def update(self, spikes):

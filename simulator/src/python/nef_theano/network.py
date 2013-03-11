@@ -66,8 +66,9 @@ class Network:
             transform[post][pre] = weight
         return transform
         
+    #TODO: encoded_weight - for and encoded weight matrix that is (pre.neurons_num x post.neurons_num)
     def connect(self, pre, post, pstc=0.01, transform=None, weight=1, index_pre=None, index_post=None, 
-                        func=None, origin_name=None, weight_matrix=None):
+                        func=None, origin_name=None, decoded_weight_matrix=None):
         """Connect two nodes in the network.
         Note: cannot specify (transform) AND any of (weight, index_pre, index_post) 
               cannot specify (weight_matrix) AND any of (transform, weight, index_pre, index_post, func, origin_name)
@@ -110,12 +111,12 @@ class Network:
         :param string origin_name: Name of the origin to check for / create to compute the given function.
                                    Ignored if func is None.  If an origin with this name already
                                    exists, the existing origin is used instead of creating a new one.
-        :param weight_matrix: For encoded connections, directly connecting the current (as in voltage) output
-                              of the pre population x weight_matrix to the post population 
+        :param decoded_weight_matrix: For directly connecting the decoded output of the pre population 
+                                to the neurons of the post population, should be (post.neurons_num x pre.dimensions)
         """
         # make sure contradicting things aren't simultaneously specified
-        if weight_matrix is not None:
-            assert transform is None and weight is None and index_pre is None and index_post is None and func is None and origin_name is None
+        if decoded_weight_matrix is not None:
+            assert (transform is None) and (weight == 1) and (index_pre is None) and (index_post is None) and (func is None) and (origin_name is None)
         else: 
             assert not (transform is not None and ((weight != 1) or (index_pre is not None) or (index_post is not None)))
         
@@ -125,7 +126,7 @@ class Network:
         pre = self.nodes[pre] # get pre Node object from node dictionary
         post = self.nodes[post] # get post Node object from node dictionary
     
-        if weight_matrix is None: # if we're doing a decoded connection
+        if decoded_weight_matrix is None: # if we're doing a decoded connection
             if hasattr(pre, 'decoded_output'): # used for Input objects now, could also be used for SimpleNode origins when they are written
                 assert func is None # if pre is an input Node, func must be None
                 decoded_output = pre.decoded_output
@@ -158,11 +159,10 @@ class Network:
             # get the instantaneous spike raster from the pre population
             neuron_output = pre.neurons.output 
             # the encoded input to the next population is the spikes x weight matrix
-            encoded_output = TT.dot(neuron_output, numpy.array(weight_matrix)) #TODO: should this be weight_matrix.T?
-    
+            encoded_output = TT.dot(neuron_output, numpy.array(decoded_weight_matrix[0]))
+            
             # pass in the pre population encoded output function to the post population, connecting them for theano
             post.add_filtered_input(pstc=pstc, encoded_input=encoded_output)
-            
 
     def make(self, name, *args, **kwargs): 
         """Create and return an ensemble of neurons. Note that all ensembles are actually arrays of length 1        

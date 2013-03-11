@@ -38,9 +38,11 @@ class Accumulator:
         :param float pstc: post-synaptic time constant on filter
         """
         self.ensemble = ensemble
+        # decoded_input should be dimensions * array_size because we account for the transform matrix here, so different array networks get different input
         self.decoded_input = theano.shared(numpy.zeros(self.ensemble.dimensions * self.ensemble.array_size).astype('float32')) # the initial filtered decoded input 
-        self.encoded_input = theano.shared(numpy.zeros(self.ensemble.dimensions * self.ensemble.array_size).astype('float32')) # the initial filtered encoded input 
-        self.decay = numpy.exp(-self.ensemble.neuron.dt / pstc) # time constant for filter
+        # encoded_input, however, is the same for all networks in the arrays, connecting directly to the neurons, so only needs to be size neurons_num
+        self.encoded_input = theano.shared(numpy.zeros(self.ensemble.neurons_num).astype('float32')) # the initial filtered encoded input 
+        self.decay = numpy.exp(-self.ensemble.neurons.dt / pstc) # time constant for filter
         self.decoded_total = None # the theano object representing the sum of the decoded inputs to this filter
         self.encoded_total = None # the theano object representing the sum of the encoded inputs to this filter
 
@@ -66,8 +68,8 @@ class Accumulator:
         if self.encoded_total is None: self.encoded_total = encoded_input # initialize internal value storing encoded input (current) to neurons 
         else: self.encoded_total = self.encoded_total + encoded_input # add input encoded input (current) to neurons
 
-        self.new_encoded_input = self.decay * self.encoded_input + (1 - self.decay) * self.encoded_total # the theano object representing the filtering operation        
-            
+        # flatten because a col + a vec gives a matrix type, but it's actually just a vector still
+        self.new_encoded_input = TT.flatten(self.decay * self.encoded_input + (1 - self.decay) * self.encoded_total) # the theano object representing the filtering operation        
         
 class Ensemble:
     def __init__(self, neurons, dimensions, tau_ref=0.002, tau_rc=0.02, max_rate=(200,300), intercept=(-1.0,1.0), 
@@ -89,7 +91,7 @@ class Ensemble:
         :param list eval_points: specific set of points to optimize decoders over by default for this ensemble
         """
         self.seed = seed
-        self.neurons = neurons
+        self.neurons_num = neurons
         self.dimensions = dimensions
         self.array_size = array_size
         self.radius = radius
@@ -97,24 +99,22 @@ class Ensemble:
         
         # create the neurons
         # TODO: handle different neuron types, which may have different parameters to pass in
-        self.neuron = neuron.names[neuron_type]((array_size, self.neurons), tau_rc=tau_rc, tau_ref=tau_ref, dt=dt)
+        self.neurons = neuron.names[neuron_type]((array_size, self.neurons_num), tau_rc=tau_rc, tau_ref=tau_ref, dt=dt)
         
         # compute alpha and bias
         srng = RandomStreams(seed=seed) # set up theano random number generator
-        max_rates = srng.uniform([neurons], low=max_rate[0], high=max_rate[1])  
-        threshold = srng.uniform([neurons], low=intercept[0], high=intercept[1])
-        alpha, self.bias = theano.function([], self.neuron.make_alpha_bias(max_rates, threshold))()
+        max_rates = srng.uniform([self.neurons_num], low=max_rate[0], high=max_rate[1])  
+        threshold = srng.uniform([self.neurons_num], low=intercept[0], high=intercept[1])
+        alpha, self.bias = theano.function([], self.neurons.make_alpha_bias(max_rates, threshold))()
         self.bias = self.bias.astype('float32') # force to 32 bit for consistency / speed
                 
         # compute encoders
-        self.encoders = make_encoders(neurons, dimensions, srng, encoders=encoders)
+        self.encoders = make_encoders(self.neurons_num, dimensions, srng, encoders=encoders)
         self.encoders = (self.encoders.T * alpha).T # combine encoders and gain for simplification
         
         self.origin = {} # make origin dictionary
         self.add_origin('X', func=None, eval_points=self.eval_points) # make default origin
         
-        #self.origin = dict(X=origin.Origin(self)) # creates origin with identity function
-
         self.accumulators = {} # dictionary of accumulators tracking terminations with different pstc values
     
     def add_filtered_input(self, pstc, decoded_input=None, encoded_input=None):
@@ -150,29 +150,41 @@ class Ensemble:
         """
         if eval_points == None: eval_points = self.eval_points
         self.origin[name] = origin.Origin(self, func, eval_points=eval_points)    
-    
+
     def update(self):
         """Compute the set of theano updates needed for this ensemble
         Returns dictionary with new neuron state, termination, and origin values
         """
-        input_current = numpy.tile(self.bias, (self.array_size, 1)) # apply respective biases to neurons in the population 
         
-        # increase the input_current by (accumulated current x encoders)
-        if len(self.accumulators) > 0: # if there is at least one termination on this population
-            X = sum(a.new_decoded_input for a in self.accumulators.values()) # sum of input across each termination for each represented dimension
-            X = X.reshape((self.array_size, self.dimensions)) # reshape for network arrays
-            input_current += TT.dot(X,self.encoders.T) # calculate input_current for each neuron as represented input signal x preferred direction
+        # find the total input current to this population of neurons
+        input_current = numpy.tile(self.bias, (self.array_size, 1)) # apply respective biases to neurons in the population 
+        X = numpy.zeros(self.dimensions * self.array_size) # set up matrix to store accumulated decoded input, same size as decoded_input
+
+        for a in self.accumulators.values(): 
+            if hasattr(a, 'new_decoded_input'): # if there's a decoded input in this accumulator,
+                X += a.new_decoded_input # add its values to the total decoded input
+            if hasattr(a, 'new_encoded_input'): # if there's an encoded input in this accumulator
+                # encoded input is the same to every array network
+                input_current += a.new_encoded_input # add its values directly to the input current 
+
+        #TODO: optimize for when nothing is added to X (ie there are no decoded inputs)
+        X = X.reshape((self.array_size, self.dimensions)) # reshape decoded input for network arrays
+        # find input current caused by decoded input signals 
+        input_current += TT.dot(X, self.encoders.T) # calculate input_current for each neuron as represented input signal x preferred direction
         
         # pass that total into the neuron model to produce the main theano computation
-        updates = self.neuron.update(input_current) # updates is an ordered dictionary of theano internal variables to update
-        
-        # also update the filter decoded_input in the accumulators
-        for a in self.accumulators.values():            
-            updates[a.decoded_input] = a.new_decoded_input.astype('float32') # add accumulated termination inputs to theano internal variable updates
-            
+        updates = self.neurons.update(input_current) # updates is an ordered dictionary of theano internal variables to update
+
+        for a in self.accumulators.values(): 
+            # also update the filtered decoded and encoded internal theano variables for the accumulators
+            if hasattr(a, 'new_decoded_input'): # if there's a decoded input in this accumulator,
+                updates[a.decoded_input] = a.new_decoded_input.astype('float32') # add accumulated decoded inputs to theano internal variable updates
+            if hasattr(a, 'new_encoded_input'): # if there's an encoded input in this accumulator,
+                updates[a.encoded_input] = a.new_encoded_input.astype('float32') # add accumulated encoded inputs to theano internal variable updates
+
         # and compute the decoded origin decoded_input from the neuron output
         for o in self.origin.values():
             # in the dictionary updates, set each origin's output decoded_input equal to the self.neuron.output() we just calculated
-            updates.update(o.update(updates[self.neuron.output]))
+            updates.update(o.update(updates[self.neurons.output]))
         
         return updates    
