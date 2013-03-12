@@ -1,5 +1,6 @@
 import ensemble
 import input
+import simplenode
 
 from theano import tensor as TT
 import theano
@@ -127,10 +128,17 @@ class Network:
         post = self.nodes[post] # get post Node object from node dictionary
     
         if decoded_weight_matrix is None: # if we're doing a decoded connection
-            if hasattr(pre, 'decoded_output'): # used for Input objects now, could also be used for SimpleNode origins when they are written
+            # if pre is an Input object
+            if isinstance(pre, input.Input) 
                 assert func is None # if pre is an input Node, func must be None
                 decoded_output = pre.decoded_output
                 dim_pre = pre.dimensions # if Input object, just grab the number of dimensions from it
+            #TODO: how to hook up the simple node to the theano business? 
+            '''# if pre is a SimpleNode, then origin_name must also be specified 
+            if isinstance(pre, simplenode.SimpleNode): 
+                assert origin_name is not None
+            ''' 
+                    
 
             else:  # this should only be used for ensembles (TODO: maybe reorganize this if statement to check if it is an ensemble?)          
                 if func is not None: 
@@ -154,7 +162,8 @@ class Network:
             post.add_filtered_input(pstc=pstc, decoded_input=decoded_output) 
 
         else: # if we're doing an encoded connection
-            assert not hasattr(pre, 'decoded_output') # can't get encoded output from Input object
+            # can't get encoded output from Input or SimpleNode objects
+            assert not (isinstance(pre, input.Input) or isinstance(pre, simplenode.SimpleNode)) 
 
             # get the instantaneous spike raster from the pre population
             neuron_output = pre.neurons.output 
