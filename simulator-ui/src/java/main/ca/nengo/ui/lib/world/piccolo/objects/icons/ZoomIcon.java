@@ -10,11 +10,11 @@ public class ZoomIcon extends LayoutIconBase {
 
     @Override
     protected void paintIcon(Graphics2D g2) {
-        int rectangleSize = getSize() - PADDING * 2;
+        float rectangleSize = getSize() - PADDING * 2;
         float ticklen = rectangleSize * 0.3f;
-        g2.drawRect(PADDING, PADDING, rectangleSize, rectangleSize);
+        g2.drawRect(PADDING, PADDING, (int) rectangleSize, (int) rectangleSize);
         // Double sided diagonal arrow
-        int arrowpad = PADDING + STROKE_WIDTH + 1;
+        float arrowpad = PADDING + STROKE_WIDTH + 1;
         rectangleSize = getSize() - arrowpad * 2;
         GeneralPath path = new GeneralPath();
         // ticks

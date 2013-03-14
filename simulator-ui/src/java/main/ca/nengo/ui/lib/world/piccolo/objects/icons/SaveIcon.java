@@ -10,23 +10,24 @@ public class SaveIcon extends LayoutIconBase {
 
     @Override
     protected void paintIcon(Graphics2D g2) {
-        int rectangleSize = getSize() - PADDING * 2;
+        float rectangleSize = getSize() - PADDING * 2;
+        float pad = PADDING;
 
         // Line
-        g2.drawLine(PADDING, rectangleSize + PADDING,
-                rectangleSize + PADDING, rectangleSize + PADDING);
+        g2.drawLine(PADDING, (int) rectangleSize + PADDING,
+                (int) rectangleSize + PADDING, (int) rectangleSize + PADDING);
 
         // Arrow
         GeneralPath path = new GeneralPath();
-        path.moveTo(rectangleSize / 2.0 + PADDING, PADDING);
-        path.lineTo(rectangleSize / 2.0 + PADDING, rectangleSize);
+        path.moveTo(rectangleSize / 2.0f + pad, pad);
+        path.lineTo(rectangleSize / 2.0f + pad, rectangleSize);
 
         // left tick
-        path.lineTo(PADDING * 2, (getSize() / 2.0) - 1);
+        path.lineTo(pad * 2, (getSize() / 2.0f) - 1);
 
         // right tick
-        path.moveTo(rectangleSize / 2.0 + PADDING, rectangleSize);
-        path.lineTo(rectangleSize, (getSize() / 2.0) - 1);
+        path.moveTo(rectangleSize / 2.0f + pad, rectangleSize);
+        path.lineTo(rectangleSize, (getSize() / 2.0f) - 1);
         g2.draw(path);
     }
 }
