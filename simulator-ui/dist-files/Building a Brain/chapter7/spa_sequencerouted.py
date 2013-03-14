@@ -24,7 +24,7 @@ class Routing(SPA):     #Extend the imported SPA class
     BG=BasalGanglia(Rules()) #Set rules defined above
     thal=Thalamus(BG)        #Set thalamus with rules
 
-    input=Input(0.1 , vision='0.8*START+D') #Define the starting input
+    input=Input(0.4, vision='0.8*START+D') #Define the starting input
 
 model=Routing()            #Run the class
 

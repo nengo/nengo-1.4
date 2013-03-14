@@ -29,9 +29,9 @@ import nef.convolution
 import numeric
 from java.util import ArrayList
 from java.util import HashMap
-def make(net,name='Bind', outputName='C', N_per_D=300, invertA=False, invertB=False):
+def make(net,name='Bind', outputName='C', N_per_D=100, invertA=False, invertB=False):
 
     output=net.network.getNode(outputName) 
-    nef.convolution.make_convolution(net, name, None, None, output, int(N_per_D/2+1), quick=True, invert_first=invertA, invert_second=invertB)
+    nef.convolution.make_convolution(net, name, None, None, output, N_per_D, quick=True, invert_first=invertA, invert_second=invertB)
 
 

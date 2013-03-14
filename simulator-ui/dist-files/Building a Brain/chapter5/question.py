@@ -1,6 +1,6 @@
-D=20
-N_input=300
-N_conv=70
+D=20        #Number of dimensions
+N_input=300 #Number of neurons in populations
+N_conv=70   #Number of neurons per D in bind population
 
 import nef
 import nef.convolution

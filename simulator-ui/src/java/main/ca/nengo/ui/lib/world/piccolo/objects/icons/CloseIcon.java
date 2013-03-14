@@ -1,16 +1,21 @@
 package ca.nengo.ui.lib.world.piccolo.objects.icons;
 
 import java.awt.Graphics2D;
+import java.awt.geom.GeneralPath;
 
 public class CloseIcon extends WindowIconBase {
-	public CloseIcon(int size) {
-		super(size);
-	}
+    public CloseIcon(int size) {
+        super(size);
+    }
 
-	@Override
-	protected void paintIcon(Graphics2D g2) {
-		int rectangleSize = getSize() - PADDING;
-		g2.drawLine(PADDING, PADDING, rectangleSize, rectangleSize);
-		g2.drawLine(PADDING, rectangleSize, rectangleSize, PADDING);
-	}
+    @Override
+    protected void paintIcon(Graphics2D g2) {
+        int rectangleSize = getSize() - PADDING;
+        GeneralPath path = new GeneralPath();
+        path.moveTo(PADDING, PADDING);
+        path.lineTo(rectangleSize, rectangleSize);
+        path.moveTo(PADDING, rectangleSize);
+        path.lineTo(rectangleSize, PADDING);
+        g2.draw(path);
+    }
 }
