@@ -9,35 +9,6 @@ import template
 
 SelectionHandler = ca.nengo.ui.lib.world.handlers.SelectionHandler
 
-
-class LayoutComboBox(JComboBox):
-    def __init__(self):
-        JComboBox.__init__(
-            self, ['last saved', 'feed-forward', 'sort by name'],
-            toolTipText='set network layout')
-        self.addActionListener(self)
-        self.maximumSize = self.preferredSize
-        self.viewer = None
-
-    def set_viewer(self, viewer):
-        self.viewer = viewer
-        if self.viewer is not None and self.viewer.justOpened:
-            self.setSelectedIndex(0)
-            self.viewer.justOpened = False
-
-    def actionPerformed(self, event):
-        if self.viewer is None:
-            return
-        layout = self.getSelectedItem()
-
-        if layout == 'last saved':
-            self.viewer.restoreNodeLayout()
-        elif layout == 'feed-forward':
-            self.viewer.doFeedForwardLayout()
-        elif layout == 'sort by name':
-            self.viewer.doSortByNameLayout()
-
-
 from ca.nengo.math.impl import WeightedCostApproximator
 from ca.nengo.util.impl import NEFGPUInterface, NodeThreadPool
 from ca.nengo.ui.configurable.panels import BooleanPanel, IntegerPanel
@@ -197,19 +168,6 @@ class ToolBar(
 
         self.toolbar.add(Box.createHorizontalGlue())
 
-        self.toolbar.add(JLabel("layout:"))
-        self.layoutcombo = LayoutComboBox()
-        self.toolbar.add(self.layoutcombo)
-        self.layoutsave = make_button(
-            'save', self.do_save_layout,
-            "save the current network layout", enabled=False)
-        self.toolbar.add(self.layoutsave)
-        self.button_zoom = make_button(
-            'zoom', self.do_zoom_to_fit, "zoom to fit")
-        self.toolbar.add(self.button_zoom)
-
-        self.toolbar.add(Box.createHorizontalGlue())
-
         self.toolbar.add(make_button('inspect', self.do_inspect, 'inspect'))
         self.button_run = make_button(
             'interactive', self.do_run, 'interactive plots', enabled=False)
@@ -235,11 +193,6 @@ class ToolBar(
 
         topnet = self.get_selected_network(top_parent=True)
         self.button_run.enabled = topnet is not None
-
-        viewer = self.get_current_network_viewer()
-        self.layoutcombo.set_viewer(viewer)
-        self.layoutcombo.enabled = viewer is not None
-        self.layoutsave.enabled = viewer is not None
 
     def get_selected_network(self, top_parent=False):
         network = SelectionHandler.getActiveNetwork(top_parent)
@@ -295,18 +248,6 @@ class ToolBar(
 
     def do_clear_all(self, event):
         ca.nengo.ui.actions.ClearAllAction("Clear all").doAction()
-
-    def do_save_layout(self, event):
-        viewer = self.get_current_network_viewer()
-        viewer.saveNodeLayout()
-        self.layoutcombo.setSelectedIndex(0)
-
-    def do_zoom_to_fit(self, event):
-        viewer = SelectionHandler.getActiveViewer()
-        if viewer is not None:
-            viewer.zoomToFit()
-        else:
-            self.ng.world.zoomToFit()
 
     def do_inspect(self, event):
         self.ng.toggleConfigPane()
