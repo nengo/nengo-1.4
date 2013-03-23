@@ -28,6 +28,8 @@ JNIEXPORT jboolean JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_hasG
 JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_nativePseudoInverse
   (JNIEnv* env, jclass class, jobjectArray java_matrix, jfloat minSV, jint numSV)
 {
+    int i = 0;
+
     jsize M = (*env)->GetArrayLength(env, java_matrix);
     jfloatArray temp_array = (jfloatArray) (*env)->GetObjectArrayElement(env, java_matrix, 0);
     jsize N = (*env)->GetArrayLength(env, temp_array);
@@ -37,10 +39,9 @@ JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_
     A_row_major = (float*)malloc(N*M*sizeof(float));
     A = (float*)malloc(N*M*sizeof(float));
 
-    if(!A || !A_row_major)
+
+	if(!A || !A_row_major)
         exit(EXIT_FAILURE);
-   
-    int i = 0;
 
     // move the data in to a C array
     for(;i < M; i++)
@@ -85,7 +86,8 @@ JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_
 
   // The java array noisy_values_JAVA is just A, not A_transpose, but when we move it to a C array, 
   // we get it in row major format the CUDA routines expect column major format, so we really have A_transpose
-  float* A_transpose = (float*)malloc(numNeurons * numEvalPoints * sizeof(float));
+  float* A_transpose = (float*)malloc(numNeurons * numEvalPoints * sizeof(float)), *gamma;
+  jobjectArray gamma_JAVA;
 
   if(!A_transpose)
     exit(EXIT_FAILURE);
@@ -97,10 +99,10 @@ JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_
      (*env)->GetFloatArrayRegion(env, temp_array, 0, numEvalPoints, (A_transpose + numEvalPoints*i));
   }
 
-  float* gamma = findGamma(A_transpose, numNeurons, numEvalPoints, 0, 0);
+  gamma = findGamma(A_transpose, numNeurons, numEvalPoints, 0, 0);
 
   // gamma is stored in lower triangular format since its symmetric
-  jobjectArray gamma_JAVA = (jobjectArray) (*env)->NewObjectArray(env, numNeurons, (*env)->GetObjectClass(env, temp_array), 0);
+  gamma_JAVA = (jobjectArray) (*env)->NewObjectArray(env, numNeurons, (*env)->GetObjectClass(env, temp_array), 0);
   for(i=0;i < numNeurons; i++)
   {
      temp_array = (jfloatArray) (*env)->NewFloatArray(env, numNeurons);
@@ -124,13 +126,16 @@ JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_
   jfloatArray temp_array = (jfloatArray) (*env)->GetObjectArrayElement(env, noisy_values_JAVA, 0);
   int numEvalPoints = (int) (*env)->GetArrayLength(env, temp_array);
 
-  printf("Using GPU to find gamma and its pseudoInverse. %d neurons, %d sample points\n", numNeurons, numEvalPoints);
-
   int i;
+
+  float* A_transpose, *gamma, *gamma_inv;
+  jobjectArray result;
+
+  printf("Using GPU to find gamma and its pseudoInverse. %d neurons, %d sample points\n", numNeurons, numEvalPoints);
 
   // The java array noisy_values_JAVA is just A, not A_transpose, but when we move it to a C array, 
   // we get it in row major format the CUDA routines expect column major format, so we really have A_transpose
-  float* A_transpose = (float*)malloc(numNeurons * numEvalPoints * sizeof(float));
+  A_transpose = (float*)malloc(numNeurons * numEvalPoints * sizeof(float));
 
   if(!A_transpose)
     exit(EXIT_FAILURE);
@@ -142,10 +147,10 @@ JNIEXPORT jobjectArray JNICALL Java_ca_nengo_math_impl_WeightedCostApproximator_
      (*env)->GetFloatArrayRegion(env, temp_array, 0, numEvalPoints, (A_transpose + numEvalPoints*i));
   }
 
-  float* gamma = findGamma(A_transpose, numNeurons, numEvalPoints, 0, 1);
-  float* gamma_inv = pseudoInverse(gamma, numNeurons, numNeurons, (float)minSV, (int)numSV, 1, 0);
+  gamma = findGamma(A_transpose, numNeurons, numEvalPoints, 0, 1);
+  gamma_inv = pseudoInverse(gamma, numNeurons, numNeurons, (float)minSV, (int)numSV, 1, 0);
 
-  jobjectArray result = (jobjectArray) (*env)->NewObjectArray(env, numNeurons, (*env)->GetObjectClass(env, temp_array), 0);
+  result = (jobjectArray) (*env)->NewObjectArray(env, numNeurons, (*env)->GetObjectClass(env, temp_array), 0);
 
   // move the result in to a Java array
   for(i=0;i < numNeurons; i++)

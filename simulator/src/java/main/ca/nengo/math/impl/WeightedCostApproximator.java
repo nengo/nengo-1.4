@@ -83,12 +83,15 @@ public class WeightedCostApproximator implements LinearApproximator {
 
 		}catch(java.lang.UnsatisfiedLinkError e){
 			canUseGPU = false;
-			myGPUErrorMessage = "Couldn't load native library NengoUtilsGPU.";
+			myGPUErrorMessage = "Couldn't load native library NengoUtilsGPU. - Linker error:";
 			System.out.println(myGPUErrorMessage);
+			System.out.println(e);
 		}
 		catch(Exception e){
 			canUseGPU = false;
-			myGPUErrorMessage = e.getMessage();
+			myGPUErrorMessage = "Couldn't load native library NengoUtilsGPU - General exception:";
+			System.out.println(myGPUErrorMessage);
+			System.out.println(e.getMessage());
 			System.out.println(e.getStackTrace());
 		}
 	}

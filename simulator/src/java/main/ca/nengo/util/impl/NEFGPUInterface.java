@@ -89,8 +89,8 @@ public class NEFGPUInterface {
 		} catch (Exception e) {
 			myNumAvailableDevices = 0;
 			myErrorMessage = "Couldn't load native library NengoGPU - General exception:";
-			myErrorMessage = e.getMessage();
 			System.out.println(myErrorMessage);
+			System.out.println(e.getMessage());
 			System.out.println(e.getStackTrace());
 		}
 	}
