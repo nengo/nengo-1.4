@@ -83,11 +83,14 @@ public class NEFGPUInterface {
 			
 		} catch (java.lang.UnsatisfiedLinkError e) {
 			myNumAvailableDevices = 0;
-			myErrorMessage = "Couldn't load native library NengoGPU.";
+			myErrorMessage = "Couldn't load native library NengoGPU - Linker error:";
 			System.out.println(myErrorMessage);
+			System.out.println(e);
 		} catch (Exception e) {
 			myNumAvailableDevices = 0;
+			myErrorMessage = "Couldn't load native library NengoGPU - General exception:";
 			myErrorMessage = e.getMessage();
+			System.out.println(myErrorMessage);
 			System.out.println(e.getStackTrace());
 		}
 	}

@@ -6,6 +6,7 @@ extern "C"{
 #endif
 
 #include <stdio.h>
+#include <pthread.h>
 #include "NengoGPUData.h"
 
 extern int totalNumEnsembles;
