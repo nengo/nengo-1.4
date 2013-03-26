@@ -36,7 +36,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{991A563F-A27B-4E82-ACA6-63CB5DD96384}</ProjectGuid>
     <RootNamespace>template_runtime_vs2010</RootNamespace>
-    <ProjectName>NengoUtilsGPU_CUDA</ProjectName>
+    <ProjectName>NengoUtilsGPU</ProjectName>
     <CudaToolkitCustomDir>
     </CudaToolkitCustomDir>
   </PropertyGroup>
