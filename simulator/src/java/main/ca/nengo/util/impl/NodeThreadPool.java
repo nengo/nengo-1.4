@@ -25,10 +25,10 @@ public class NodeThreadPool {
 	protected static final int maxNumJavaThreads = 100;
 	protected static final int defaultNumJavaThreads = 8;
 
-
 	// numThreads can change throughout a simulation run. Therefore, it should not be used during a run,
 	// only at the beginning of a run to create the threads.
 	protected static int myNumJavaThreads = defaultNumJavaThreads;
+	protected int myCurrentNumJavaThreads;
 	protected int myNumThreads;
 	protected NodeThread[] myThreads;
 	protected Object myLock;
@@ -96,8 +96,8 @@ public class NodeThreadPool {
 	protected NodeThreadPool(){
 	}
 	
-	public NodeThreadPool(Network network, List<ThreadTask> threadTasks){
-		initialize(network, threadTasks);
+	public NodeThreadPool(Network network, List<ThreadTask> threadTasks, boolean interactive){
+		initialize(network, threadTasks, interactive);
 	}
 	
 	/**
@@ -113,7 +113,7 @@ public class NodeThreadPool {
 	 * 
 	 * @author Eric Crawford
 	 */
-	protected void initialize(Network network, List<ThreadTask> threadTasks){
+	protected void initialize(Network network, List<ThreadTask> threadTasks, boolean interactive){
 		
 		myLock = new Object();
 		
@@ -136,51 +136,60 @@ public class NodeThreadPool {
 		
 		boolean useGPU = NEFGPUInterface.getUseGPU();
 		
-		if(useGPU){
-			myNumThreads = myNumJavaThreads + 1;
-	    }else{
-	    	myNumThreads = myNumJavaThreads;
-	    }
-		
-		
-		myThreads = new NodeThread[myNumThreads];
-		
+		int numNonJavaThreads = 0;
+		GPUThread gpuThread = null;
 		if(useGPU){ 
-			GPUThread gpuThread = new GPUThread(this);
+			gpuThread = new GPUThread(this, interactive);
 			
+			int myNodeslength = myNodes.length;
 			// The NEFGPUInterface removes from myNodes ensembles that are to be run on the GPU and returns the rest.
 			myNodes = gpuThread.getNEFGPUInterface().takeGPUNodes(myNodes);
 			
-			// The NEFGPUInterface removes from myProjections projections that are to be run on the GPU and returns the rest.
-			myProjections = gpuThread.getNEFGPUInterface().takeGPUProjections(myProjections);
-			
-			gpuThread.getNEFGPUInterface().initialize();
-			
-			
-			gpuThread.setCollectTimings(myCollectTimings);
-			gpuThread.setName("GPUThread0");
-			
-			myThreads[myNumJavaThreads] = gpuThread;
-			
-			gpuThread.setPriority(Thread.MAX_PRIORITY);
-			gpuThread.start();
+			if(myNodes.length == myNodeslength){
+				//don't create a GPU thread if there are no nodes to run on the GPU.
+				gpuThread = null;
+				useGPU = false;
+			}else{
+				// The NEFGPUInterface removes from myProjections projections that are to be run on the GPU and returns the rest.
+				myProjections = gpuThread.getNEFGPUInterface().takeGPUProjections(myProjections);
+
+				gpuThread.getNEFGPUInterface().initialize();
+
+				gpuThread.setCollectTimings(myCollectTimings);
+				gpuThread.setName("GPUThread0");
+
+				gpuThread.setPriority(Thread.MAX_PRIORITY);
+				gpuThread.start();
+
+				numNonJavaThreads += 1;
+			}
 		}
-		
+
+		myCurrentNumJavaThreads = Math.min(myNodes.length, myNumJavaThreads);
+		myCurrentNumJavaThreads = Math.max(myCurrentNumJavaThreads, 1);
+
+		myNumThreads = myCurrentNumJavaThreads + numNonJavaThreads;
+
+		myThreads = new NodeThread[myNumThreads];
+
+		if(useGPU){
+			myThreads[myNumThreads-1] = gpuThread;
+		}
+
 		//In the remaining nodes (non-GPU nodes), DO break down the NetworkArrays, we don't want to call the 
 		// "run" method of nodes which are members of classes which derive from the NetworkImpl class since 
 		// NetworkImpls create their own LocalSimulators when run.
 		myNodes = collectNodes(myNodes, true).toArray(new Node[0]);
 
-		int nodesPerJavaThread = (int) Math.ceil((float) myNodes.length / (float) myNumJavaThreads);
-		int projectionsPerJavaThread = (int) Math.ceil((float) myProjections.length / (float) myNumJavaThreads);
-        int tasksPerJavaThread = (int) Math.ceil((float) myTasks.length / (float) myNumJavaThreads);
-
+		int nodesPerJavaThread = (int) Math.ceil((float) myNodes.length / (float) myCurrentNumJavaThreads);
+		int projectionsPerJavaThread = (int) Math.ceil((float) myProjections.length / (float) myCurrentNumJavaThreads);
+        int tasksPerJavaThread = (int) Math.ceil((float) myTasks.length / (float) myCurrentNumJavaThreads);
+        
 		int nodeOffset = 0, projectionOffset = 0, taskOffset = 0;
 		int nodeStartIndex, nodeEndIndex, projectionStartIndex, projectionEndIndex, taskStartIndex, taskEndIndex;
-
 		
 		// Evenly distribute projections, nodes and tasks to the java threads.
-		for(int i = 0; i < myNumJavaThreads; i++){
+		for(int i = 0; i < myCurrentNumJavaThreads; i++){
 
 			nodeStartIndex = nodeOffset;
 			nodeEndIndex = myNodes.length - nodeOffset >= nodesPerJavaThread ?
@@ -357,7 +366,7 @@ public class NodeThreadPool {
     /**
      * Return all the nodes in the network except subnetworks. Essentially returns a "flattened"
      * version of the network. The breakDownNetworkArrays param lets the caller choose whether to include
-     * Network Arrays in the returned list (=false) or to return the NEFEnsemble in the network array (=true).
+     * Network Arrays in the returned list (=false) or to return the NEFEnsembles in the network array (=true).
      * This facility is provided because sometimes Network Arrays should be treated like Networks, which is what
      * they are as far as java is concerned (they extend the NetworkImpl class), and sometimes it is better to 
      * treat them like NEFEnsembles, which they are designed to emulate (they're supposed to be an 
@@ -415,8 +424,7 @@ public class NodeThreadPool {
     
 
     /**
-     * Return all the projections in the network. Essentially returns all the projections that
-     * would be in a "flattened" version of the network.
+     * Returns all the projections that would be in a "flattened" version of the network.
      * 
      * @author Eric Crawford
      */
@@ -447,8 +455,7 @@ public class NodeThreadPool {
     }
 
     /**
-     * Return all the tasks in the network. Essentially returns all the tasks that
-     * would be in a "flattened" version of the network.
+     * Returns all the tasks that would be in a "flattened" version of the network.
      * 
      * @author Eric Crawford
      */

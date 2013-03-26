@@ -10,10 +10,10 @@ LIBPATH=-L${CUDA_LIB_PATH}
 
 LIBS=-lcudart -lm -lc
 
-CC=gcc
+CC=gcc-4.4
 CUDA_CC=nvcc
 CFLAGS=-fPIC -c -m64 -Wall -I. ${CUDA_INCLUDES} ${JAVA_INCLUDES}
-CUDAFLAGS= --ptxas-options=--verbose --compiler-options '-fPIC' -c
+CUDAFLAGS= -ccbin /usr/bin/gcc-4.4 --ptxas-options=--verbose --compiler-options '-fPIC' -c
 
 #the order of the object files here is important, get unsatisfied link error if it gets mixed up
 OBJ=NengoGPU_JNI.o NengoGPU.o NengoGPU_CUDA.o NengoGPUData.o

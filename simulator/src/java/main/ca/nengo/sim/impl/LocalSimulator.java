@@ -133,6 +133,15 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
     }
 
     /**
+     * Setup the run. Interactive specifies whether it is an interactive run or not. 
+     */
+    public void initRun(boolean interactive){
+        if(NodeThreadPool.isMultithreading()){
+            makeNodeThreadPool(interactive);
+        }
+    }
+
+    /**
      * @see ca.nengo.sim.Simulator#run(float, float, float)
      */
     public synchronized void run(float startTime, float endTime, float stepSize)
@@ -153,8 +162,8 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 
         if(topLevel)
         {
+            initRun(false);
             resetProbes();
-            makeNodeThreadPool();
         }
 
         fireSimulatorEvent(new SimulatorEvent(0, SimulatorEvent.Type.STARTED));
@@ -206,12 +215,10 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 
         fireSimulatorEvent(new SimulatorEvent(1f, SimulatorEvent.Type.FINISHED));
 
-
-        if(topLevel && myNodeThreadPool != null){
-            myNodeThreadPool.kill();
-            myNodeThreadPool = null;
+        if(topLevel)
+        {
+            endRun();
         }
-
     }
 
     public void step(float startTime, float endTime)
@@ -219,7 +226,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
 
     	myNetwork.fireStepListeners(startTime);
     	
-        if(NodeThreadPool.isMultithreading() && myNodeThreadPool != null){
+        if(myNodeThreadPool != null){
             myNodeThreadPool.step(startTime, endTime);
         }else{
             for (Projection myProjection : myProjections) {
@@ -243,6 +250,13 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
             while (it.hasNext()) {
                 it.next().collect(endTime);
             }
+        }
+    }
+
+    public void endRun(){
+        if(myNodeThreadPool != null){
+            myNodeThreadPool.kill();
+            myNodeThreadPool = null;
         }
     }
 
@@ -379,8 +393,8 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
         return myProbes.toArray(new Probe[0]);
     }
     
-    public void makeNodeThreadPool() {
-    	myNodeThreadPool = new NodeThreadPool(myNetwork, myProbeTasks);
+    public void makeNodeThreadPool(boolean interactive) {
+        myNodeThreadPool = new NodeThreadPool(myNetwork, myProbeTasks, interactive);
     }
     
     public NodeThreadPool getNodeThreadPool() {

@@ -36,7 +36,7 @@ import ca.nengo.model.neuron.impl.SpikingNeuron;
 public class NEFGPUInterface {
 	private static boolean myUseGPU = false;
 	private static int myNumDevices = 0;
-	private static int myNumAvailableDevices = 0;
+	private static int myNumDetectedDevices = 0;
 	private static String myErrorMessage;
 	
 	private static boolean showTiming = false;
@@ -46,8 +46,7 @@ public class NEFGPUInterface {
 	private long totalRunTime;
 	private int numSteps;
 	
-	protected static boolean myRequireAllOutputsOnCPU;
-	
+	protected boolean myRequireAllOutputsOnCPU;
 	
 	protected NEFEnsembleImpl[] myGPUEnsembles;
 	protected Projection[] myGPUProjections;
@@ -73,21 +72,21 @@ public class NEFGPUInterface {
 		try {
 			myErrorMessage = "";
 			System.loadLibrary("NengoGPU");
-			myNumAvailableDevices = nativeGetNumDevices();
+			myNumDetectedDevices = nativeGetNumDevices();
 			
-			if(myNumAvailableDevices < 1)
+			if(myNumDetectedDevices < 1)
 			{
 				myErrorMessage = "No CUDA-enabled GPU detected.";
 				System.out.println(myErrorMessage);
 			}
 			
 		} catch (java.lang.UnsatisfiedLinkError e) {
-			myNumAvailableDevices = 0;
+			myNumDetectedDevices = 0;
 			myErrorMessage = "Couldn't load native library NengoGPU - Linker error:";
 			System.out.println(myErrorMessage);
 			System.out.println(e);
 		} catch (Exception e) {
-			myNumAvailableDevices = 0;
+			myNumDetectedDevices = 0;
 			myErrorMessage = "Couldn't load native library NengoGPU - General exception:";
 			System.out.println(myErrorMessage);
 			System.out.println(e.getMessage());
@@ -110,18 +109,19 @@ public class NEFGPUInterface {
 
 	static native void nativeKill();
 	
-	public NEFGPUInterface(){
+	public NEFGPUInterface(boolean interactive){
+		myRequireAllOutputsOnCPU = interactive;
     }
 
-	public static int getNumAvailableDevices(){
-		return myNumAvailableDevices;
+	public static int getNumDetectedDevices(){
+		return myNumDetectedDevices;
 	}
 	
-	public static void setRequestedNumDevices(int value){
-		myNumDevices = Math.min(Math.max(value, 0), myNumAvailableDevices);
+	public static void setNumDevices(int value){
+		myNumDevices = Math.min(Math.max(value, 0), myNumDetectedDevices);
 	}
 	
-	public static int getRequestedNumDevices(){
+	public static int getNumDevices(){
 		return myNumDevices;
 	}
 	
@@ -138,12 +138,12 @@ public class NEFGPUInterface {
 		showTiming = false;
 	}
 	
-	public static void requireAllOutputsOnCPU(boolean require){
-		myRequireAllOutputsOnCPU = require;
-	}
-	
 	public static String getErrorMessage(){
 		return myErrorMessage;
+	}
+	
+	public void setRequireAllOutputsOnCPU(boolean require){
+		myRequireAllOutputsOnCPU = require;
 	}
 	
 	/**
@@ -442,6 +442,7 @@ public class NEFGPUInterface {
 
 			neuronData[i] = ((NEFEnsembleImpl) workingNode).getStaticNeuronData();
 
+			//collectSpikes[i] = (workingNode.isCollectingSpikes() || requireAllOutputsOnCPU) ? 1 : 0;
 			collectSpikes[i] = workingNode.isCollectingSpikes() ? 1 : 0;
 			numEnsemblesCollectingSpikes++;
 
