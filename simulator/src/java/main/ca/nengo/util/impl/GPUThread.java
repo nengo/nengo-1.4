@@ -15,15 +15,19 @@ public class GPUThread extends NodeThread {
 
 	NEFGPUInterface myNEFGPUInterface;
 	
-	public GPUThread(NodeThreadPool nodePool) {
+	public GPUThread(NodeThreadPool nodePool, boolean interactive) {
 		super(nodePool, new Node[0], 0, -1, new Projection[0], 0, -1, new ThreadTask[0], 0, -1);
 		
 		// create NEFGPUInterface from nodes and projections.
 		// have to have some way to communicate which nodes and projections it decides are going to run on the GPU
 		// so that the rest of the threads can run the remaining nodes and projections
-		myNEFGPUInterface = new NEFGPUInterface();
+		myNEFGPUInterface = new NEFGPUInterface(interactive);
 	}
 	
+	public GPUThread(NodeThreadPool nodePool) {
+		this(nodePool, false);
+	}
+
 	protected void runNodes(float startTime, float endTime) throws SimulationException{
 		
 		myNEFGPUInterface.step(startTime, endTime);

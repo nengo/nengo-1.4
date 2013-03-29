@@ -53,8 +53,8 @@ class GpuUsePanel(BooleanPanel):
 
 class PGpuCount(PInt):
     def __init__(self, name):
-        default = NEFGPUInterface.getRequestedNumDevices()
-        maximum = NEFGPUInterface.getNumAvailableDevices()
+        default = NEFGPUInterface.getNumDevices()
+        maximum = NEFGPUInterface.getNumDetectedDevices()
 
         PInt.__init__(self, name, default, 0, maximum)
 
@@ -75,7 +75,7 @@ from ca.nengo.ui.configurable import ConfigException
 
 class ParallelizationConfiguration(IConfigurable):
     num_java_threads = NodeThreadPool.getNumJavaThreads()
-    num_sim_GPU = NEFGPUInterface.getRequestedNumDevices()
+    num_sim_GPU = NEFGPUInterface.getNumDevices()
     use_GPU_for_creation = WeightedCostApproximator.getUseGPU()
 
     p_num_java_threads = PInt('Number of Java Threads', num_java_threads,
@@ -94,7 +94,7 @@ class ParallelizationConfiguration(IConfigurable):
         self.p_num_java_threads.setDefaultValue(
             NodeThreadPool.getNumJavaThreads())
         self.p_num_sim_GPU.setDefaultValue(
-            NEFGPUInterface.getRequestedNumDevices())
+            NEFGPUInterface.getNumDevices())
         self.p_use_GPU_for_creation.setDefaultValue(
             WeightedCostApproximator.getUseGPU())
 

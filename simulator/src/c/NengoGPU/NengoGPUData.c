@@ -46,13 +46,14 @@ void freeIntArray(intArray* a)
     if(!a)
         return;
 
-    if(a->array)
+    if(a->array){
         if(a->onDevice) {
             cudaFree(a->array);
         }
         else {
             free(a->array);
         }
+    }
         //a->onDevice ? cudaFree(a->array) : free(a->array);
     
     if(a->name)
@@ -103,13 +104,14 @@ void freeFloatArray(floatArray* a)
     if(!a)
         return;
 
-    if(a->array)
+    if(a->array){
         if(a->onDevice) {
             cudaFree(a->array);
         }
         else {
             free(a->array);
         }
+    }
 //        a->onDevice ? cudaFree(a->array) : free(a->array);
     
     if(a->name)

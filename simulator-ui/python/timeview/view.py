@@ -312,7 +312,7 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
 
     def run(self):
         sim = self.network.getSimulator()
-        sim.makeNodeThreadPool()
+        sim.initRun(True)
 
         sim.step(0.0, 0.001)
         sim.resetNetwork(False, False)
@@ -419,9 +419,8 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
             if(not self.frame is None):
                 raise error_val
 
-        if sim is not None and NodeThreadPool.isMultithreading():
-            NEFGPUInterface.requireAllOutputsOnCPU(False);
-            sim.getNodeThreadPool().kill()
+        if sim:
+          sim.endRun()
         
 def make_layout_dir(dir):
     if not dir.exists():
