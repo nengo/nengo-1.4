@@ -1,9 +1,14 @@
-from com.github.jnumeric.JNumeric import *
+try:
+    # Jnumeric 1.0
+    from com.github.jnumeric.JNumeric import *
+    # gets fft() and inverse_fft()
+    import com.github.jnumeric.FFT as FFT
+except ImportError:
+    # Support for jnumeric 2.0+ 
+    from com.github.tbekolay.jnumeric.JNumeric import *
+    import com.github.tbekolay.jnumeric.FFT as FFT
 
-# gets fft() and inverse_fft()
-import com.github.jnumeric.FFT as FFT
 
-import numeric_random as random
 
 def diag(values,typecode='f'):
     a=zeros((len(values),len(values)),typecode=typecode)
@@ -76,23 +81,3 @@ def mean(x,axis=0):
         x=array(x)    
         length=x.shape[axis]        
     return sum(x,axis=axis)/length    
-
-
-# Return evenly spaced values within a given interval [start, stop)
-# start: start of the interval - optional - default is 0
-# stop:  end of the interval. the interval does not include this value, 
-#        except in the cases where /step/ is not an integer and floating
-#        point round-off affects the length of /out/.
-# step:  spacing between values. For any output /out/, this is the distance
-#        between two adjacent values, out[i+1] - out[i]. Default step size 
-#        is 1. If /step/ is specified, /start/ must also be given.
-def arange(start = 0.0, stop = None, step = 1.0):
-    if( stop is None ):
-        stop = float(start)
-        start = 0.0
-        step = 1.0
-    
-    rslt_len = ceil((stop - start) / step)
-
-    return array([1.0 * i * step + start for i in range(rslt_len)])
- 
