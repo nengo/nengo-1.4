@@ -111,3 +111,25 @@ class Interpolator:
 class PythonFunctionCache:
     transientFunctions={}
     cache={}
+    
+    
+class LookupFunction(AbstractFunction):
+    def __init__(self, dimensions, data):
+        AbstractFunction.__init__(self, dimensions)
+        self.data = data
+        self.counter = 0
+        self.warned = False
+    def map(self,x):
+        if self.counter>=len(self.data): 
+            if not self.warned:
+                print 'Warning: A lookup-table function is being called more often than expected.'
+                print '   This is usually due to running in direct mode.  The simulated output is 0.'
+                
+                #TODO: maybe have this fall back on a nearest-neighbour implementation?
+                self.warned = True
+            return 0
+        value = self.data[self.counter]
+        self.counter += 1
+        return value
+        
+

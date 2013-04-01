@@ -515,8 +515,10 @@ class Network:
                 fname=func.__class__.__name__
                 if '.' in fname: 
                     fname=fname.split('.')[-1]
-            else:
+            elif callable(func):
                 fname = func.__name__
+            else:  # only option left is that it's an array
+                fname = "lookup"    
         else:
             fname = "X"
                 
@@ -538,12 +540,20 @@ class Network:
                 else:
                     dim=pre.dimension
 
-                value=func([0]*dim)
-                if isinstance(value,(int,float)):
-                    origin=pre.addDecodedOrigin(fname,[functions.PythonFunction(func,dim)],'AXON')
+                if callable(func):
+                    value=func([0]*dim)
+                    if isinstance(value,(int,float)):
+                        origin=pre.addDecodedOrigin(fname,[functions.PythonFunction(func,dim)],'AXON')
+                    else:
+                        funcs=[functions.PythonFunction(func,dim,use_cache=True,index=i) for i in range(len(value))]
+                        origin=pre.addDecodedOrigin(fname,funcs,'AXON')
                 else:
-                    funcs=[functions.PythonFunction(func,dim,use_cache=True,index=i) for i in range(len(value))]
-                    origin=pre.addDecodedOrigin(fname,funcs,'AXON')
+                    if len(pre.evalPoints) != len(func):
+                        raise StructuralException(
+                            'A function specified as a lookup table must have a data value for each eval_point (got %d, expected %d)'%(len(func), len(pre.evalPoints)))
+                    funcs = [functions.LookupFunction(dim, [data[i] for data in func]) for i in range(len(func[0]))]
+                    origin = pre.addDecodedOrigin(fname,funcs,'AXON')
+                            
                         
             return origin
         
@@ -636,7 +646,16 @@ class Network:
         ensemble that will compute the provided function.  The name of this origin 
         will taken from the name of the function, or *origin_name*, if provided.  If an
         origin with that name already exists, the existing origin will be used 
-        rather than creating a new one.
+        rather than creating a new one.  
+        
+        *func* can also be an matrix of values of the same length as the 
+        *eval_points* provided to the *make* function for the *pre* population.
+        This uses the data as a lookup table.  For example, we can compute
+        XOR using the following::
+        
+            net.make('A', 50, 2, eval_points=[[-1,-1], [-1, 1], [1, -1], [1, 1]])
+            net.make('B', 50, 1)
+            net.connect('A', 'B', func=[[1], [-1], [-1], [1]])
 
         If *weight_func* is not None, the connection will be made using a
         synaptic connection weight matrix rather than a DecodedOrigin and
