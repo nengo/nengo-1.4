@@ -1333,6 +1333,11 @@ class Network:
         :param float maxy: maximum y value to plot
         """                               
         import timeview
+        
+        if isinstance(node, basestring):
+            node=self.alias.get(node, node) # handle aliased names
+            node=self._get_nodes(node)[-1]        
+        
         timeview.watches.funcrepwatch.FuncRepWatchConfig.define(node,basis,label=label,origin=origin,minx=minx,maxx=maxx,miny=miny,maxy=maxy)
 
 
