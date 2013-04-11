@@ -104,11 +104,13 @@ Step 5: Compiling the shared libraries
 
 3. If you installed CUDA in a location other than the default, open the file ``Makefile`` with your favourite text editor and edit it so that the variables ``CUDA_INC_PATH`` and ``CUDA_LIB_PATH`` point to the correct locations. If you installed CUDA in the default location, you don't have to change anything. 
 
-4. Type ``make`` to compile the code in the directory. If successful, this creates a shared library called ``libNengoGPU.so``. This is the native library that Nengo will call to perform the neural simulations on the GPU(s). 
+4. ``nvcc``, the CUDA compiler, is incompatible with versions of gcc that are too new, where ``too new`` is a function of the nvcc version. gcc-4.4 is generally a safe bet. Install it with ``sudo apt-get install gcc-4.4``. If you have gcc-4.4 installed in some directory other than the default (/usr/bin), then you have to edit the ``GCC_PATH`` variable in the NengoGPU Makefile to point there.
 
-5. ``***`` Redo steps 1-3 in the ``NengoUtilsGPU`` directory, which should be located in the same directory as the ``NengoGPU`` directory. In this case, there are two additional variables in the ``Makefile`` that you might have to edit which point to CULA libraries and include files: ``CULA_INC_PATH`` and ``CULA_LIB_PATH``. Again, you only have to edit these if you installed CULA in a location other than the default.
+5. Type ``make`` to compile the code in the directory. If successful, this creates a shared library called ``libNengoGPU.so``. This is the native library that Nengo will call to perform the neural simulations on the GPU(s). 
 
-6. We have make sure that the CUDA libraries, which are referenced by ``libNengoGPU.so``, can be found at runtime. To acheive this, cd into ``/etc/ld.so.conf.d/``. Using your favourite text editor and ensuring you have root priveleges, create a text file called ``cuda.conf`` (``eg. sudo vim cuda.conf``). In this file type the lines::
+6. ``***`` Redo steps 1-3 in the ``NengoUtilsGPU`` directory, which should be located in the same directory as the ``NengoGPU`` directory. In this case, there are two additional variables in the ``Makefile`` that you might have to edit which point to CULA libraries and include files: ``CULA_INC_PATH`` and ``CULA_LIB_PATH``. Again, you only have to edit these if you installed CULA in a location other than the default.
+
+7. We have make sure that the CUDA libraries, which are referenced by ``libNengoGPU.so``, can be found at runtime. To acheive this, cd into ``/etc/ld.so.conf.d/``. Using your favourite text editor and ensuring you have root priveleges, create a text file called ``cuda.conf`` (``eg. sudo vim cuda.conf``). In this file type the lines::
 
     <absolute-path-to-CUDA-dir>/lib/
     <absolute-path-to-CUDA-dir>/lib64/
@@ -125,7 +127,7 @@ Step 5: Compiling the shared libraries
 
   Save the file and exit. Finally, run ``sudo ldconfig``. This populates the file ``/etc/ld.so.cache`` using the files in ``/etc/ld.so.conf.d/``. ``ld.so.cache`` tells the machine were to look for shared libraries at runtime (in addition to the default locations like ``/usr/lib`` and ``/usr/local/lib``). 
 
-7. This step is only for developers running Nengo through an IDE like Eclipse. Those using a prepackaged version of Nengo can skip this step.
+8. This step is only for developers running Nengo through an IDE like Eclipse. Those using a prepackaged version of Nengo can skip this step.
   The Java Virtual Machine has to be told where to look for native libraries. Edit the JVM arguments in your Run and Debug configurations so that they contains the following text::
 
     -Djava.library.path=<absolute-path-to-NengoGPU-dir>
@@ -139,23 +141,24 @@ Step 5: Compiling the shared libraries
 Step 6: Using NengoGPU and NengoUtilsGPU 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Now open up Nengo. Click on the |parallel| icon on the right side of the tool bar at the top of the Nengo UI. This will open up a menu which lets you configure the parallelization of Nengo.
+.. Commented this stuff out until we reimplement the UI elements.
+.. 1. Now open up Nengo. Click on the |parallel| icon on the right side of the tool bar at the top of the Nengo UI. This will open up a menu which lets you configure the parallelization of Nengo.
 
-2. If the previous steps worked properly, then the field ``Number of GPUs for Simulation`` will be enabled and you will be able to choose the number of GPUs to use for Nengo simulations. This field will not let you choose more GPUs than Nengo can detect on your system. If the ``libNengoGPU`` library wasn't found (either because building it didn't succeed or Java doesn't know where to find it) or no CUDA enabled GPUs can be detected on your system, then this field will be grayed out and an error message will appear to the right of the field. In this case, revisit the relevant step above.
+.. 2. If the previous steps worked properly, then the field ``Number of GPUs for Simulation`` will be enabled and you will be able to choose the number of GPUs to use for Nengo simulations. This field will not let you choose more GPUs than Nengo can detect on your system. If the ``libNengoGPU`` library wasn't found (either because building it didn't succeed or Java doesn't know where to find it) or no CUDA enabled GPUs can be detected on your system, then this field will be grayed out and an error message will appear to the right of the field. In this case, revisit the relevant step above.
 
-3. After setting the ``Number of GPUs for Simulation`` field to a non-zero value, any simulations you run that contain NEF Ensembles should run those NEF Ensembles on the GPU! There should be no change at all in the way you simulate networks except, of course, that they will run faster. You can still set probes, collect spikes, etc, in the same way you did before.  
+.. 3. After setting the ``Number of GPUs for Simulation`` field to a non-zero value, any simulations you run that contain NEF Ensembles should run those NEF Ensembles on the GPU! There should be no change at all in the way you simulate networks except, of course, that they will run faster. You can still set probes, collect spikes, etc, in the same way you did before.  
 
-4. NengoGPU provides support for running certain NEF Ensembles on the CPU while the rest are simulated on the GPU(s). Right click on the NEF Ensembles that you want to stay on the CPU and select the ``configure`` option. Set the ``useGPU`` field to false, and the ensemble you are configuring will run on the CPU no matter what. You can also edit the same field on a Network object, and it will force all NEF Ensembles within the Network to run on the CPU. 
+1. NengoGPU provides support for running certain NEF Ensembles on the CPU while the rest are simulated on the GPU(s). Right click on the NEF Ensembles that you want to stay on the CPU and select the ``configure`` option. Set the ``useGPU`` field to false, and the ensemble you are configuring will run on the CPU no matter what. You can also edit the same field on a Network object, and it will force all NEF Ensembles within the Network to run on the CPU. 
 
-5. You can also set the number of GPUs to use for simulation in a python script. This is useful if you want to ensure that a given network, created by a script (and maybe even run in that script), always runs with the same number of devices. To achieve this, add the following line to your script::
+2. You can also set the number of GPUs to use for simulation in a python script. This is useful if you want to ensure that a given network, created by a script (and maybe even run in that script), always runs with the same number of devices. To achieve this, add the following line to your script::
 
     ca.nengo.util.impl.NEFGPUInterface.setRequestedNumDevices(x) 
       
   where x is the number of devices you want to use for the resulting network.
 
-6. GPU simulations can be combined with CPU multithreading. In the parallelization dialog, it lets you select the number of CPU threads to use. All NEF Ensembles that are set to run on the GPU will run there, and the rest of the nodes in the Network will be parallelized via multithreading. This is especially useful for speeding up Simple Nodes that do a lot of computation. The optimal number of threads will vary greatly depending on the particular network you are running and the specs of your machine, and generally takes some experimentation to get right. However, using a number of threads equivalent to the number of cores on your machine is usually a good place to start.
+3. GPU simulations can be combined with CPU multithreading. In the parallelization dialog, it lets you select the number of CPU threads to use. All NEF Ensembles that are set to run on the GPU will run there, and the rest of the nodes in the Network will be parallelized via multithreading. This is especially useful for speeding up Simple Nodes that do a lot of computation. The optimal number of threads will vary greatly depending on the particular network you are running and the specs of your machine, and generally takes some experimentation to get right. However, using a number of threads equivalent to the number of cores on your machine is usually a good place to start.
 
-7. ``***`` If you installed ``libNengoUtilsGPU`` and it succeeded, then the parallelization dialog will have the ``Use GPU for Ensemble Creation`` checkbox enabled. If you check the box and press OK, then all NEF Ensembles you create afterwards will use the GPU for the Singular Value Decomposition, and this process should be significantly faster, especially for larger ensembles. If the install failed, Nengo cannot detect a CUDA-enabled GPU, or you simply chose not to install NengoUtilsGPU, then the box will be disabled and an error message will appear to its right. Note that the SVD implementation cannot take advantage of multiple GPUs, which is why there is no option to select the number of GPUs for ensemble creation. To change whether a GPU is used for ensemble creation from a python script, use the line::
+4. ``***`` If you installed ``libNengoUtilsGPU`` and it succeeded, then the parallelization dialog will have the ``Use GPU for Ensemble Creation`` checkbox enabled. If you check the box and press OK, then all NEF Ensembles you create afterwards will use the GPU for the Singular Value Decomposition, and this process should be significantly faster, especially for larger ensembles. If the install failed, Nengo cannot detect a CUDA-enabled GPU, or you simply chose not to install NengoUtilsGPU, then the box will be disabled and an error message will appear to its right. Note that the SVD implementation cannot take advantage of multiple GPUs, which is why there is no option to select the number of GPUs for ensemble creation. To change whether a GPU is used for ensemble creation from a python script, use the line::
 
     ca.nengo.math.impl.WeightedCostApproximator.setUseGPU(x)
 
