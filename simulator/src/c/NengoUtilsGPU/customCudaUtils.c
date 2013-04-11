@@ -12,13 +12,13 @@ extern "C"
 
 // get number of devices available
 int getGPUDeviceCount(){
-    //cudaError_t err;
+    cudaError_t err;
     int numDevices;
     
-    cudaGetDeviceCount(&numDevices);
-    //checkCudaError(err);
-    
-    return numDevices;
+    err = cudaGetDeviceCount(&numDevices);
+	if( err == cudaSuccess )
+		return numDevices;
+	return 0;
 }
 
 // get the max or min in a float array. type is 'M' for max, 'm' for min
