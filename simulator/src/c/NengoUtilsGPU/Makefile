@@ -13,10 +13,12 @@ LIBPATH=-L${CUDA_LIB_PATH} -L${CULA_LIB_PATH}
 
 LIBS=-lcula_core -lcula_lapack -lcublas -lcudart -lm -lc
 
-CC=gcc
+GCC_PATH=/usr/bin/gcc-4.4
+
+CC=gcc-4.4
 CUDA_CC=nvcc
 CFLAGS=-fPIC -c -m64 -Wall -I. ${JAVA_INCLUDES} ${CUDA_INCLUDES}
-CUDAFLAGS= --ptxas-options=--verbose --compiler-options '-fPIC' -c 
+CUDAFLAGS= -ccbin ${GCC_PATH} --ptxas-options=--verbose --compiler-options '-fPIC' -c 
 
 OBJ=customCudaUtils.o weightedCostApproximatorGPU.o NengoUtilsGPU_JNI.o
 

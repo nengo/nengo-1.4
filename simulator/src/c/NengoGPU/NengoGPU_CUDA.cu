@@ -122,11 +122,11 @@ void printIntRange(FILE* fp, int* array, int start, int end)
 
 // get number of devices available
 int getGPUDeviceCount(){
-  cudaError_t err;
+  //cudaError_t err;
   int numDevices;
   
-  err = cudaGetDeviceCount(&numDevices);
-  checkCudaError(err, "get GPU device count");
+  cudaGetDeviceCount(&numDevices);
+  //checkCudaError(err, "get GPU device count");
   
   return numDevices;
 }

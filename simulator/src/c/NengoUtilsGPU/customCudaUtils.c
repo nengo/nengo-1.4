@@ -12,11 +12,11 @@ extern "C"
 
 // get number of devices available
 int getGPUDeviceCount(){
-    cudaError_t err;
+    //cudaError_t err;
     int numDevices;
     
-    err = cudaGetDeviceCount(&numDevices);
-    checkCudaError(err);
+    cudaGetDeviceCount(&numDevices);
+    //checkCudaError(err);
     
     return numDevices;
 }
@@ -164,9 +164,9 @@ __host__ void checkCudaError(cudaError_t err)
         if(!err)
                 return;
 
-        printf("%s\n", cudaGetErrorString(err));
+        printf("NengoUtilsGPU: %s\n", cudaGetErrorString(err));
 
-        culaShutdown();
+        //culaShutdown();
         exit(EXIT_FAILURE);
 }
 
