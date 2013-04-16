@@ -80,6 +80,8 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	private Node[] myNodes;
 	private Map<String, Origin> myOrigins;
 	private Map<String, EnsembleTermination> myTerminations;
+	
+	private Map<String, Object> myData;
 
 	/**
 	 * Note that setMode(SimulationMode.DEFAULT) is called at construction time.
@@ -114,7 +116,13 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 
         myStateNames = findStateNames(myNodes);
         myListeners = new ArrayList<Listener>(3);
+        
+        myData = new LinkedHashMap<String, Object>(2);
 	}
+	
+	public Object getData(String key) {return myData.get(key);}
+	public void setData(String key, Object value) {myData.put(key, value);}
+	
 
 	/**
 	 * Replaces the set of nodes inside the Ensemble
