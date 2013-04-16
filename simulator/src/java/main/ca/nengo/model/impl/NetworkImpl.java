@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -114,6 +115,9 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
     private transient Collection<StepListener> myStepListeners;
 
+	private Map<String, Object> myData;
+	
+    
 
 	/**
 	 * Sets up a network's data structures
@@ -138,6 +142,8 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		OrderedExposedTerminations = new LinkedList <Termination> ();
 		
 		myStepListeners = new ArrayList<StepListener>(1);
+		
+		myData = new LinkedHashMap<String, Object>(2);		
 	}
 
 	/**
@@ -1631,4 +1637,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
 		return py.toString();
 	}
+	
+	public Object getData(String key) {return myData.get(key);}
+	public void setData(String key, Object value) {myData.put(key, value);}	
 }

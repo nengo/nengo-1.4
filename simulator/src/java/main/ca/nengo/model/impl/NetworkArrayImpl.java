@@ -74,8 +74,6 @@ public class NetworkArrayImpl extends NetworkImpl {
 	private Map<String, Origin> myOrigins;
 	private int myNeurons;
 
-	private Map<String, Object> myData;
-	
 	
 	/**
 	 * Create a network holding an array of nodes.  An 'X' Origin
@@ -124,7 +122,6 @@ public class NetworkArrayImpl extends NetworkImpl {
 		createEnsembleOrigin("X");
 		this.setUseGPU(true);
 		
-		myData = new LinkedHashMap<String, Object>(2);
 	}
 	
 	/** 
@@ -151,8 +148,6 @@ public class NetworkArrayImpl extends NetworkImpl {
 		return myNeurons;
 	}
 	
-	public Object getData(String key) {return myData.get(key);}
-	public void setData(String key, Object value) {myData.put(key, value);}
 	
 		
 	
