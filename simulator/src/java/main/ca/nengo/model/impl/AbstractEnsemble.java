@@ -120,8 +120,8 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
         myData = new LinkedHashMap<String, Object>(2);
 	}
 	
-	public Object getData(String key) {return myData.get(key);}
-	public void setData(String key, Object value) {myData.put(key, value);}
+	public Object getMetadata(String key) {return myData.get(key);}
+	public void setMetadata(String key, Object value) {myData.put(key, value);}
 	
 
 	/**
