@@ -81,7 +81,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	private Map<String, Origin> myOrigins;
 	private Map<String, EnsembleTermination> myTerminations;
 	
-	private Map<String, Object> myData;
+	private transient Map<String, Object> myData;
 
 	/**
 	 * Note that setMode(SimulationMode.DEFAULT) is called at construction time.

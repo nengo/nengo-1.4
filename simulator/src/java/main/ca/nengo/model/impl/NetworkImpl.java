@@ -115,7 +115,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
     private transient Collection<StepListener> myStepListeners;
 
-	private Map<String, Object> myData;
+	private transient Map<String, Object> myData;
 	
     
 
