@@ -115,7 +115,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 
     private transient Collection<StepListener> myStepListeners;
 
-	private transient Map<String, Object> myData;
+	private transient Map<String, Object> myMetadata;
 	
     
 
@@ -141,9 +141,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		OrderedExposedOrigins = new LinkedList <Origin> ();
 		OrderedExposedTerminations = new LinkedList <Termination> ();
 		
-		myStepListeners = new ArrayList<StepListener>(1);
-		
-		myData = new LinkedHashMap<String, Object>(2);		
+		myStepListeners = new ArrayList<StepListener>(1);		
 	}
 
 	/**
@@ -1638,6 +1636,12 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
 		return py.toString();
 	}
 	
-	public Object getMetadata(String key) {return myData.get(key);}
-	public void setMetadata(String key, Object value) {myData.put(key, value);}	
+	public Object getMetadata(String key) {
+		if (myMetadata==null) myMetadata = new LinkedHashMap<String, Object>(2);
+		return myMetadata.get(key);
+	}
+	public void setMetadata(String key, Object value) {
+		if (myMetadata==null) myMetadata = new LinkedHashMap<String, Object>(2);		
+		myMetadata.put(key, value);
+	}
 }

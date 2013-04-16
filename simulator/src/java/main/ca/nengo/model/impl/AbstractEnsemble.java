@@ -81,7 +81,7 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 	private Map<String, Origin> myOrigins;
 	private Map<String, EnsembleTermination> myTerminations;
 	
-	private transient Map<String, Object> myData;
+	private transient Map<String, Object> myMetadata;
 
 	/**
 	 * Note that setMode(SimulationMode.DEFAULT) is called at construction time.
@@ -117,11 +117,16 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
         myStateNames = findStateNames(myNodes);
         myListeners = new ArrayList<Listener>(3);
         
-        myData = new LinkedHashMap<String, Object>(2);
 	}
 	
-	public Object getMetadata(String key) {return myData.get(key);}
-	public void setMetadata(String key, Object value) {myData.put(key, value);}
+	public Object getMetadata(String key) {
+		if (myMetadata==null) myMetadata = new LinkedHashMap<String, Object>(2);
+		return myMetadata.get(key);
+	}
+	public void setMetadata(String key, Object value) {
+		if (myMetadata==null) myMetadata = new LinkedHashMap<String, Object>(2);		
+		myMetadata.put(key, value);
+	}
 	
 
 	/**
