@@ -8,36 +8,34 @@ import timeview.components.core as core
 import timeview.view
 from timeview.watches import watchtemplate
 
-#this is here to provide the functionality of a global variable without cluttering the global namespace
-class FuncRepWatchConfig:
-    config={}
-    
-    @classmethod
-    def define(cls,obj,func,label='1D function',origin='X',minx=-1,maxx=1,miny=-1,maxy=1):
-        cls.config[obj]=(origin,label,func,minx,maxx,miny,maxy)
-
 class FuncRepWatch(watchtemplate.WatchTemplate):
     def check(self,obj):
-        return obj in FuncRepWatchConfig.config and obj.getOrigin(FuncRepWatchConfig.config[obj][0]) is not None
+        return hasattr(obj, 'getMetadata') and obj.getMetadata('FuncRepWatch') is not None
     def value(self,obj):
-        return obj.getOrigin(FuncRepWatchConfig.config[obj][0]).getValues().getValues()    
+        return obj.getOrigin('X').getValues().getValues()    
     def views(self,obj):
-        return [(FuncRepWatchConfig.config[obj][1],FunctionRepresentation,dict(func=self.value,label=obj.name,config=FuncRepWatchConfig.config[obj]))]
+        basis, label, minx, maxx, miny, maxy = obj.getMetadata('FuncRepWatch')
+        return [(label,FunctionRepresentation,dict(func=self.value,label=obj.name,
+                    basis=basis, minx=minx, maxx=maxx, miny=miny, maxy=maxy))]
 
 
 class FunctionRepresentation(core.DataViewComponent):
-    def __init__(self,view,name,config,func,args=(),label=None):
+    def __init__(self,view,name,func, basis, minx, maxx, miny, maxy, args=(),label=None):
         core.DataViewComponent.__init__(self,label)
         self.view=view
         self.name=name
         self.func=func
+        self.basis=basis
         self.data=self.view.watcher.watch(name,func,args=args)
 
         self.border_top=20
         self.border_left=20
         self.border_right=20
         self.border_bottom=20
-        self.config=config
+        self.minx = minx
+        self.maxx = maxx
+        self.miny = miny
+        self.maxy = maxy
         self.start = 0
 
         self.setSize(240,240+self.label_offset)
@@ -46,9 +44,7 @@ class FunctionRepresentation(core.DataViewComponent):
         self.min = -0.0001
             
     def paintComponent(self,g):
-        
-        origin,label,f,minx,maxx,miny,maxy = self.config
-        
+                
         core.DataViewComponent.paintComponent(self,g)
 
         width=self.size.width-self.border_left-self.border_right
@@ -68,16 +64,16 @@ class FunctionRepresentation(core.DataViewComponent):
         g.drawRect(self.border_left,self.border_top+self.label_offset,width,height)
         
         g.color=Color.black
-        txt='%4g'%maxx
+        txt='%4g'%self.maxx
         bounds=g.font.getStringBounds(txt,g.fontRenderContext)
         g.drawString(txt,self.size.width-self.border_right-bounds.width/2,self.size.height-self.border_bottom+bounds.height)
 
-        txt='%4g'%minx
+        txt='%4g'%self.minx
         bounds=g.font.getStringBounds(txt,g.fontRenderContext)
         g.drawString(txt,self.border_left-bounds.width/2,self.size.height-self.border_bottom+bounds.height)
 
-        g.drawString('%6g'%maxy,0,10+self.border_top+self.label_offset)
-        g.drawString('%6g'%miny,0,self.size.height-self.border_bottom)
+        g.drawString('%6g'%self.maxy,0,10+self.border_top+self.label_offset)
+        g.drawString('%6g'%self.miny,0,self.size.height-self.border_bottom)
 
         g.color=Color.black
         
@@ -88,12 +84,12 @@ class FunctionRepresentation(core.DataViewComponent):
 
             steps=100
 
-            dx=float(maxx-minx)/(width*steps)
+            dx=float(self.maxx-self.minx)/(width*steps)
 
             for i in range(width*steps):
-                x=minx+i*dx
-                value=sum([f(j,x)*d for j,d in enumerate(data)])
-                y=float((value-miny)*height/(maxy-miny))
+                x=self.minx+i*dx
+                value=sum([self.basis(j,x)*d for j,d in enumerate(data)])
+                y=float((value-self.miny)*height/(self.maxy-self.miny))
                 
                 xx=self.border_left+i/float(steps)
                 yy=self.height-self.border_bottom-y
@@ -106,18 +102,18 @@ class FunctionRepresentation(core.DataViewComponent):
             pdf.setRGBColorStroke(g.color.red,g.color.green,g.color.blue)        
             pdf.stroke()        
         else:                
-            dx=float(maxx-minx)/(width-1)
+            dx=float(self.maxx-self.minx)/(width-1)
             px,py=None,None
             for i in range(width):
-                x=minx+i*dx
-                value=sum([f(j,x)*d for j,d in enumerate(data)])
+                x=self.minx+i*dx
+                value=sum([self.basis(j,x)*d for j,d in enumerate(data)])
 
-                y=int((value-miny)*height/(maxy-miny))
+                y=int((value-self.miny)*height/(self.maxy-self.miny))
 
                 xx=self.border_left+i
                 yy=self.height-self.border_bottom-y
 
-                if px is not None and miny<value<maxy:
+                if px is not None and self.miny<value<self.maxy:
                     g.drawLine(px,py,xx,yy)
                 px,py=xx,yy
 

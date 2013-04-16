@@ -1304,7 +1304,7 @@ class Network:
         """
         return log.Log(self,name=name,dir=dir,filename=filename,interval=interval,tau=tau)
         
-    def set_view_function_1d(self,node,basis,label='1D function',origin='X',minx=-1,maxx=1,miny=-1,maxy=1):
+    def set_view_function_1d(self,node,basis,label='1D function',minx=-1,maxx=1,miny=-1,maxy=1):
         """Define a function representation for the given node.
         
         This has no effect on the model itself, but provides a useful display in the
@@ -1325,7 +1325,6 @@ class Network:
         :param function basis: The set of basis functions to use.  This is a single function accepting
                                two parameters: the basis index and the x value.  It should return the
                                corresponding y value.
-        :param string origin: Which origin to use.  Defaults to ``X``.
         :param string label: The text that will appear in the pop-up menu to activate this view
         :param float minx: minimum x value to plot
         :param float maxx: maximum x value to plot
@@ -1338,7 +1337,7 @@ class Network:
             node=self.alias.get(node, node) # handle aliased names
             node=self._get_nodes(node)[-1]        
         
-        timeview.watches.funcrepwatch.FuncRepWatchConfig.define(node,basis,label=label,origin=origin,minx=minx,maxx=maxx,miny=miny,maxy=maxy)
+        node.setMetadata('FuncRepWatch', (basis, label, minx, maxx, miny, maxy))
 
 
 def test():
