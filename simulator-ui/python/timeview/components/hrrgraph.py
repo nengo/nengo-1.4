@@ -12,6 +12,11 @@ import numeric
 
 class HRRGraph(graph.Graph):
     def __init__(self, view, name, func, args=(), filter=True, ylimits=(-1.0, 1.0), label=None, nodeid=None):
+        self.fixed_value = None
+        self.cache = {}
+        self.cache_dt_tau = None
+        self.cache_tick_count = 0
+
         graph.Graph.__init__(self, view, name, func, args=args, filter=filter, ylimits=ylimits, split=False, neuronmapped=False, label=label)
 
         self.border_top = 30
@@ -47,11 +52,6 @@ class HRRGraph(graph.Graph):
         self.popup_release = JMenuItem('release value', actionPerformed=self.release_value)
         self.popup_release.setEnabled(False)
         self.popup.add(self.popup_release)
-
-        self.fixed_value = None
-        self.cache = {}
-        self.cache_dt_tau = None
-        self.cache_tick_count = 0
 
     def toggle_normalize(self, event):
         if event.source.state == self.normalize:
@@ -243,6 +243,9 @@ class HRRGraph(graph.Graph):
         forget = self.cache_tick_count - self.view.watcher.timelog.tick_limit
         if forget in self.cache:
             del self.cache[forget]
+
+        if not hasattr(self, 'vocab'):
+            return []
 
         if len(self.vocab.keys) == 0:
             return []

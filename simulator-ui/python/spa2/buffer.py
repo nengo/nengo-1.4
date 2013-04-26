@@ -2,7 +2,7 @@ import module
 import numeric
 
 class Buffer(module.Module):
-    def init(self, dimensions=16, N_per_D=30, feedback=1, pstc_feedback=0.01, array_dimensions=None, intercept=None):
+    def init(self, dimensions=16, N_per_D=30, feedback=1, pstc_feedback=0.01, array_dimensions=None, intercept=(-1,1)):
         if intercept is None: intercept=(-1,1)
         else: intercept=(intercept,1)
         if array_dimensions is None:
