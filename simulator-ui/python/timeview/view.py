@@ -429,15 +429,18 @@ def make_layout_dir(dir):
         if devdir.exists():
             devlayouts = devdir.listFiles()
             for layout in devlayouts:
-                newlayout = dir.getPath() + '/' + layout.getName()
+                newlayout = os.path.join(dir.getPath(),  layout.getName())
                 copyfile(layout.getCanonicalPath(), newlayout)
 
 
 def save_layout_file(name, view, layout, controls):
-    dir = java.io.File('layouts')
+    parent = os.path.dirname(__file__)
+    parent = os.path.join(parent[:parent.index("python")], "layouts")
+    
+    dir = java.io.File(parent)
     make_layout_dir(dir)
 
-    fn = 'layouts/%s.layout' % name
+    fn = os.path.join(parent, "%s.layout" % name)
     # Check if file exists
     # - If it does, extract java layout information, otherwise just make a new file
     java_layout = ""
@@ -462,25 +465,23 @@ def save_layout_file(name, view, layout, controls):
 
 
 def load_layout_file(name, try_backup = True):
-    # Support for loading a file using just the name, and a file extension 
-    # (useful for loading backup files)
-    if(isinstance(name, list)):
-        fn = '.'.join(name)
-    else:
-        fn = '%s.layout' % name
+    #if no path specified, load path automatically based on this file's location
+    parent = ""
+    if "/" not in name and "\\" not in name: 
+        parent = os.path.dirname(__file__)
+        parent = os.path.join(parent[:parent.index("python")], "layouts")
+        
+    fn = os.path.join(parent, name)
+    
+    #if no extension specified, assume .layout
+    if "." not in name:
+        fn = fn + ".layout"
 
     read_fail = False 
     data = []
     if not java.io.File(fn).exists():
-        make_layout_dir(java.io.File('layouts'))
-        fn = 'layouts/' + fn
-        bckup_fn = fn + '.bak'
-        if not java.io.File(fn).exists():
-            if not java.io.File(bckup_fn).exists():
-                return None
-            else:
-                warnings.warn('Could not load layout file "%s"' % fn, RuntimeWarning)
-                read_fail = True
+        warnings.warn('Could not load layout file "%s"' % fn, RuntimeWarning)
+        read_fail = True
     
     if not read_fail:
         try:
@@ -512,7 +513,7 @@ def load_layout_file(name, try_backup = True):
     if read_fail:
         if try_backup:
             warnings.warn('Attempting to load backup file "%s.bak"' %fn, RuntimeWarning)
-            result = load_layout_file([fn,'bak'], try_backup = False)
+            result = load_layout_file(fn+".bak", try_backup = False)
             if result is None:
                 warnings.warn('Backup load failed. Using default layout', RuntimeWarning)
             return result
