@@ -143,7 +143,7 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
         return g
     
     def load_watches(self):
-        watch_dir = os.path.join("python","timeview","watches")
+        watch_dir = os.path.join(os.path.dirname(__file__),"watches")
         
         names = [s[:-3] for s in os.listdir(watch_dir) if (s.endswith(".py") and not s.startswith("__"))]
         

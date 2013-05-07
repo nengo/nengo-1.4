@@ -21,12 +21,12 @@
 	<classpathentry kind="lib" path="lib/jython.jar"/>
 	<classpathentry kind="lib" path="lib/piccolo.jar"/>
 	<classpathentry kind="lib" path="lib/piccolox.jar"/>
-	<classpathentry kind="lib" path="python/jar/jbullet.jar"/>
-	<classpathentry kind="lib" path="python/jar/jpct.jar"/>
-	<classpathentry kind="lib" path="python/jar/vecmath.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/simulator"/>
 	<classpathentry kind="lib" path="lib/itextpdf-5.3.4.jar"/>
 	<classpathentry kind="lib" path="/simulator/lib/junit.jar"/>
+	<classpathentry kind="lib" path="lib/jbullet.jar"/>
+	<classpathentry kind="lib" path="lib/jpct.jar"/>
+	<classpathentry kind="lib" path="lib/vecmath.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
