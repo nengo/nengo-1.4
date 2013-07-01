@@ -353,9 +353,9 @@ class Graph(core.DataViewComponent):
             yscale = 0
         else:
             yscale = float(self.size.height - self.border_bottom - border_top) / (self.maxy - self.miny)
-        if self.split and len(filtered) > 0:
-            yscale = yscale / len(filtered)
-            split_step = float(self.size.height - self.border_bottom - border_top) / len(filtered)
+        if self.split and len(self.filtered) > 0:
+            yscale = yscale / len(self.filtered)
+            split_step = float(self.size.height - self.border_bottom - border_top) / len(self.filtered)
 
         if(not self.neuronmapped):
             # draw zero line
