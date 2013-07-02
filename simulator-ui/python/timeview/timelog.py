@@ -24,7 +24,7 @@ class TimeLogItem:
             v=None
         if self.length is None: self.length=len(v)
         else:
-            if len(v)<self.length: v=v+[0]*(self.length-len(v))
+            if len(v)<self.length: v.extend([0]*(self.length-len(v)))
             elif len(v)>self.length: v=v[:self.length]    
         self.data.append(v)
         if limit is not None and len(self.data)>limit:
