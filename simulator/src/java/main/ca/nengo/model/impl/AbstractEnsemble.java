@@ -115,8 +115,10 @@ public abstract class AbstractEnsemble implements Ensemble, Probeable, VisiblyMu
 		}
 
         myStateNames = findStateNames(myNodes);
-        myListeners = new ArrayList<Listener>(3);
         
+        if(myListeners == null){
+        	myListeners = new ArrayList<Listener>(3);
+        }
 	}
 	
 	public Object getMetadata(String key) {
