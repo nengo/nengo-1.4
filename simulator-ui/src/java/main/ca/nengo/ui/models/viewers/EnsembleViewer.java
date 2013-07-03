@@ -26,6 +26,9 @@ a recipient may use your version of this file under either the MPL or the GPL Li
 
 package ca.nengo.ui.models.viewers;
 
+import java.util.Enumeration;
+import java.util.HashMap;
+
 import ca.nengo.model.Ensemble;
 import ca.nengo.model.Node;
 import ca.nengo.model.Network;
@@ -74,35 +77,72 @@ public class EnsembleViewer extends NodeViewer {
 	}
 
 	@Override
-	public void updateViewFromModel(boolean isFirstUpdate) {
-		getGround().clearLayer();
+	public synchronized void updateViewFromModel(boolean isFirstUpdate) {
+	       /*
+         * Get the current children and map them
+         */
+        HashMap<Node, UINeoNode> currentNodes = new HashMap<Node, UINeoNode>(
+                getGround().getChildrenCount());
 
-		Node[] nodes = getModel().getNodes();
+        Enumeration<UINeoNode> en = neoNodesChildren.elements();
+        while (en.hasMoreElements()) {
+            UINeoNode node = en.nextElement();
+            if (!node.isDestroyed()) {
+                Util.Assert(node.getModel() != null);
+                currentNodes.put(node.getModel(), node);
+            }
+        }
+        neoNodesChildren.clear();
 
-		/*
-		 * Construct Neurons
-		 */
-		for (Node node : nodes) {
-			if (node instanceof Neuron) {
-				Neuron neuron = (Neuron) node;
+        /*
+         * Construct Nodes from the Network model
+         */
+        Node[] nodes = getModel().getNodes();
 
-				UINeuron neuronUI = new UINeuron(neuron);
+        for (Node node : nodes) {
+            if (getUINode(node) == null) {
+                UINeoNode nodeUI = currentNodes.get(node);
 
-				addUINode(neuronUI, false, false);
-			} else if (node instanceof Ensemble) {
-				Ensemble ensemble = (Ensemble)node;
-				UIEnsemble ensembleUI = new UIEnsemble(ensemble);
-				addUINode(ensembleUI,false,false);
-				
-			} else if (node instanceof Network) {
-				Network network = (Network)node;
-				UINetwork networkUI = new UINetwork(network);
-				addUINode(networkUI, false, false);
-			} else {
-				UserMessages.showError("Unsupported node type " + node.getClass().getSimpleName()
-						+ " in EnsembleViewer");
-			}
-		}
+                if (nodeUI == null) {
+                	if (node instanceof Neuron) {
+        				Neuron neuron = (Neuron) node;
+
+        				UINeuron neuronUI = new UINeuron(neuron);
+
+        				addUINode(neuronUI, false, false);
+        			} else if (node instanceof Ensemble) {
+        				Ensemble ensemble = (Ensemble)node;
+        				UIEnsemble ensembleUI = new UIEnsemble(ensemble);
+        				addUINode(ensembleUI,false,false);
+        				
+        			} else if (node instanceof Network) {
+        				Network network = (Network)node;
+        				UINetwork networkUI = new UINetwork(network);
+        				addUINode(networkUI, false, false);
+        			} else {
+        				UserMessages.showError("Unsupported node type " + node.getClass().getSimpleName()
+        						+ " in EnsembleViewer");
+        			}
+                } else {
+                    neoNodesChildren.put(nodeUI.getModel(), nodeUI);
+                }
+
+            } else {
+                Util.Assert(false, "Trying to add node which already exists");
+            }
+        }
+
+
+        /*
+         * Prune existing nodes by deleting them
+         */
+        for (Node node : currentNodes.keySet()) {
+            // Remove nodes which are no longer referenced by the network model
+            if (getUINode(node) == null) {
+                UINeoNode nodeUI = currentNodes.get(node);
+                nodeUI.destroy();
+            }
+        }
 
 		if (getViewerParent().getNetworkParent() != null) {
 			/*
@@ -113,20 +153,25 @@ public class EnsembleViewer extends NodeViewer {
 			for (Probe probe : probes) {
 				Probeable target = probe.getTarget();
 
-				if (!(target instanceof Node)) {
-					UserMessages.showError("Unsupported target type for probe");
-				} else {
-
-					if (probe.isInEnsemble() && probe.getEnsembleName() == getModel().getName()) {
-						Node node = (Node) target;
-
-						UINeoNode nodeUI = getUINode(node);
-						nodeUI.showProbe(probe);
+				if(target != null){
+					if (!(target instanceof Node)) {
+						UserMessages.showError("Unsupported target type for probe");
+					} else {
+	
+						if (probe.isInEnsemble() && probe.getEnsembleName() == getModel().getName()) {
+							Node node = (Node) target;
+	
+							UINeoNode nodeUI = getUINode(node);
+							if(nodeUI  != null){
+								nodeUI.showProbe(probe);
+							}
+						}
 					}
 				}
-
 			}
 		}
+		
+		applyDefaultLayout();
 	}
 
 	@Override
