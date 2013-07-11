@@ -23,3 +23,4 @@ from xyplot import XYPlot
 from hrrgraph import HRRGraph
 from text_list import TextList
 from colorgrid import ColorGrid
+from boxes import Boxes
