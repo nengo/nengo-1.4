@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import ca.nengo.math.PDF;
+import ca.nengo.math.impl.IndicatorPDF;
 import ca.nengo.model.ExpandableNode;
 import ca.nengo.model.Node;
 import ca.nengo.model.SimulationMode;
@@ -149,6 +151,16 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	 * @see ca.nengo.model.ExpandableNode#addTermination(java.lang.String, float[][], float, boolean)
 	 */
     public synchronized Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
+    	return addTermination(name, weights, new IndicatorPDF(tauPSC,tauPSC), modulatory);
+	}
+    
+    /**
+	 * @param weights Each row is used as a 1 by m matrix of weights in a new termination on the nth expandable node
+	 * @param tauPSC PDF from which psc time constants will be sampled
+	 *
+	 * @see ca.nengo.model.ExpandableNode#addTermination(java.lang.String, float[][], float, boolean)
+	 */
+    public synchronized Termination addTermination(String name, float[][] weights, PDF tauPSC, boolean modulatory) throws StructuralException {
     	for(Termination t : getTerminations()) {
         	if(t.getName().equals(name))
         		throw new StructuralException("The ensemble already contains a termination named " + name);
@@ -167,7 +179,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 				throw new StructuralException("Equal numbers of weights are needed for termination onto each node");
 			}
 
-			components[i] = myExpandableNodes[i].addTermination(name, new float[][]{weights[i]}, tauPSC, modulatory);
+			components[i] = myExpandableNodes[i].addTermination(name, new float[][]{weights[i]}, tauPSC.sample()[0], modulatory);
 		}
 
 		EnsembleTermination result = new EnsembleTermination(this, name, components);

@@ -147,7 +147,7 @@ public class DecodedOrigin implements Origin, Resettable, SimulationMode.ModeCon
 	 * 		(ie all elements with same length), or if the number of columns in decoders is not equal
 	 * 		to the number of functions
 	 */
-	public DecodedOrigin(Node node, String name, Node[] nodes, String nodeOrigin, Function[] functions, float[][] decoders) throws StructuralException {
+	public DecodedOrigin(Node node, String name, Node[] nodes, String nodeOrigin, Function[] functions, float[][] decoders, int dummy) throws StructuralException {
 		checkFunctionDimensions(functions);
 
 		if (!MU.isMatrix(decoders)) {

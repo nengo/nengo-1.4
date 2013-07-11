@@ -272,6 +272,7 @@ public class WeightedCostApproximator implements LinearApproximator {
 			if(!myQuiet) {
                 Memory.report("before inverse");
             }
+			
 			myGammaInverse = pseudoInverse(gamma, absNoiseSD*absNoiseSD, nSV);
 			if(!myQuiet) {
                 Memory.report("after inverse");
@@ -396,7 +397,6 @@ public class WeightedCostApproximator implements LinearApproximator {
 
 			if(pinvfile.exists())
 			{
-
 				java.io.File file=new java.io.File(path,filename);
 				if (file.canRead()) {
                     file.delete();
@@ -423,32 +423,32 @@ public class WeightedCostApproximator implements LinearApproximator {
 				channel.write(buffer);
 				channel.force(true);
 	            channel.close();
-
+	            
+	            Process process;
 				if (System.getProperty("os.name").startsWith("Windows")) {
-					Process process=runtime.exec("cmd /c pseudoInverse.bat "+filename+" "+filename+".inv"+" "+minSV+" "+nSV,null,path);
+					process=runtime.exec("cmd /c pseudoInverse.bat "+filename+" "+filename+".inv"+" "+minSV+" "+nSV,null,path);
 					process.waitFor();
 				} else {
-					Process process=runtime.exec("external"+java.io.File.separatorChar+"pseudoInverse external/"+filename+" external/"+filename+".inv"+" "+minSV+" "+nSV,null,null);
-					process.waitFor();
-
-					java.io.InputStream s=process.getErrorStream();
-					if (s.available()>0) {
-						System.out.println("external error:");
-						while (s.available()>0) {
-							System.out.write(s.read());
-						}
-					}
-					java.io.InputStream s2=process.getInputStream();
-					if (s2.available()>0) {
-						System.out.println("external output:");
-						while (s2.available()>0) {
-							System.out.write(s2.read());
-						}
+					process=runtime.exec("external"+java.io.File.separatorChar+"pseudoInverse external/"+filename+" external/"+filename+".inv"+" "+minSV+" "+nSV,null,null);
+					process.waitFor();	
+				}
+				
+				java.io.InputStream s=process.getErrorStream();
+				if (s.available()>0) {
+					System.out.println("external error:");
+					while (s.available()>0) {
+						System.out.write(s.read());
 					}
 				}
+//				java.io.InputStream s2=process.getInputStream();
+//				if (s2.available()>0) {
+//					System.out.println("external output:");
+//					while (s2.available()>0) {
+//						System.out.write(s2.read());
+//					}
+//				}
 
 				// matrix file cleaned up in finally block
-
 				channel=new java.io.RandomAccessFile(file2,"r").getChannel();
 	//			buffer=channel.map(java.nio.channels.FileChannel.MapMode.READ_ONLY, 0, matrix.length*matrix.length*4);
 				buffer= java.nio.ByteBuffer.allocate(matrix.length*matrix.length*4);

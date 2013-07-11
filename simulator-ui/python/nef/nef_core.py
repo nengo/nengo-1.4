@@ -822,7 +822,7 @@ class Network:
                 elif dim_post==1: transform=[transform]
                 else:
                     raise Exception("Don't know how to turn %s into a %sx%s matrix"%(transform,dim_post,dim_pre))
-            elif (len(transform)!=dim_post and len(transform)!=post.neurons) or len(transform[0])!=dim_pre:
+            elif (len(transform)!=dim_post and len(transform)!=post.neurons) or (len(transform[0])!=dim_pre and len(transform[0])!=pre.neurons):
                 raise Exception("transform dimension mismatch (given a %dx%d matrix, should be %dx%d)"%(len(transform),len(transform[0]),dim_post,dim_pre))
         
         if plastic_array:

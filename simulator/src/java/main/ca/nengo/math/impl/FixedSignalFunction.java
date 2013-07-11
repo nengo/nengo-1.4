@@ -18,7 +18,15 @@ public class FixedSignalFunction extends AbstractFunction {
 	/**
 	 * @param signal sequence defining output (each element is a (potentially) multidimensional output)
 	 * @param dimension Dimension of signal on which to base Function output
+	 * @param reportdimension value this function will report as its input dimension (this is only needed
+	 * 			for compatibility with other components, since this function takes no input)
 	 */
+	public FixedSignalFunction(float[][] signal, int dimension, int reportdimension) {
+		super(reportdimension);
+		mySignal = signal;
+		myDimension = dimension;
+		myIndex = 0;
+	}
 	public FixedSignalFunction(float[][] signal, int dimension) {
 		super(1);
 		mySignal = signal;
@@ -26,16 +34,10 @@ public class FixedSignalFunction extends AbstractFunction {
 		myIndex = 0;
 	}
 
-	/**
-	 * @return TimeSeries from which to obtain Function of time
-	 */
 	public float[][] getSignal() {
 		return mySignal;
 	}
 
-	/**
-	 * @param series TimeSeries from which to obtain Function of time
-	 */
 	public void setSignal(float[][] signal) {
 		mySignal = signal;
 	}

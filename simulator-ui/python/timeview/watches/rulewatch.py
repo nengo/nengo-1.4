@@ -11,7 +11,12 @@ class RuleWatch(WatchTemplate):
         # If it is, retrieve the rule information from the documentation string
         return not obj.documentation is None and obj.documentation.startswith('THAL: ')
     def measure(self,obj):
-        return obj.getNode('rules').getOrigin('X').getValues().getValues()
+        try:
+            v = obj.getNode('rules').getOrigin('X').getValues().getValues()
+        except StructuralException:
+            v = obj.getNode('rule').getOrigin('X').getValues().getValues()
+            print v
+        return v
     def views(self,obj):
         names = obj.documentation[6:].split(',')
         return [('rule activation',TextList,dict(func=self.measure,label="Rules",names=names,show_values=False,ignore_filter=True))]
