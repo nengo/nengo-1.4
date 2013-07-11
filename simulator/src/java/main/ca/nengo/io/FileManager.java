@@ -60,25 +60,6 @@ public class FileManager {
 	 */
 	public static final String ENSEMBLE_EXTENSION = "nef";
 
-	private static File ourDefaultLocation = new File("./work");
-	static {
-		ourDefaultLocation.mkdirs();
-	}
-
-	/**
-	 * @return Default location for saving files
-	 */
-	public static File getDefaultLocation() {
-		return ourDefaultLocation;
-	}
-
-	/**
-	 * @param location Default location for saving files
-	 */
-	public static void setDefaultLocation(File location) {
-		ourDefaultLocation = location;
-	}
-
 	/**
 	 * @param node Node to serialize
 	 * @param destination File to save serialized Node in

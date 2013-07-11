@@ -7,6 +7,8 @@ from java.awt.event import *
 
 from ca.nengo.model import SimulationMode
 
+import os
+
 # for save_pdf
 import sys
 if 'lib/itextpdf-5.3.4.jar' not in sys.path:
@@ -18,9 +20,11 @@ class Icon:
 class ShadedIcon:
     pass
 
+parent = os.path.dirname(__file__)
+parent = parent[:parent.index("python")]
 for name in 'pause play configure end start backward forward restart arrowup arrowdown save restore refresh data pdf'.split():
-    setattr(Icon, name, ImageIcon('python/images/%s.png' % name))
-    setattr(ShadedIcon, name, ImageIcon('python/images/%s-pressed.png' % name))
+    setattr(Icon, name, ImageIcon(parent + ('python/images/%s.png' % name)))
+    setattr(ShadedIcon, name, ImageIcon(parent + ('python/images/%s-pressed.png' % name)))
 
 class TimeControl(JPanel, ChangeListener, ActionListener):
     def __init__(self, view):
