@@ -42,6 +42,7 @@ import ca.nengo.model.Node;
 import ca.nengo.model.SimulationMode;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
+import ca.nengo.model.neuron.impl.ExpandableSpikingNeuron;
 import ca.nengo.util.ScriptGenException;
 
 /**
@@ -151,7 +152,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	 * @see ca.nengo.model.ExpandableNode#addTermination(java.lang.String, float[][], float, boolean)
 	 */
     public synchronized Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
-    	return addTermination(name, weights, new IndicatorPDF(tauPSC,tauPSC), modulatory);
+    	return addTermination(name, weights, new IndicatorPDF(tauPSC,tauPSC), null, modulatory);
 	}
     
     /**
@@ -160,7 +161,7 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 	 *
 	 * @see ca.nengo.model.ExpandableNode#addTermination(java.lang.String, float[][], float, boolean)
 	 */
-    public synchronized Termination addTermination(String name, float[][] weights, PDF tauPSC, boolean modulatory) throws StructuralException {
+    public synchronized Termination addTermination(String name, float[][] weights, PDF tauPSC, PDF delays, boolean modulatory) throws StructuralException {
     	for(Termination t : getTerminations()) {
         	if(t.getName().equals(name))
         		throw new StructuralException("The ensemble already contains a termination named " + name);
@@ -178,8 +179,16 @@ public class EnsembleImpl extends AbstractEnsemble implements ExpandableNode {
 			if (weights[i].length != dimension) {
 				throw new StructuralException("Equal numbers of weights are needed for termination onto each node");
 			}
-
-			components[i] = myExpandableNodes[i].addTermination(name, new float[][]{weights[i]}, tauPSC.sample()[0], modulatory);
+			
+			if(delays == null)
+				components[i] = myExpandableNodes[i].addTermination(name, new float[][]{weights[i]}, tauPSC.sample()[0], modulatory);
+			else {
+				if(myExpandableNodes[i] instanceof ExpandableSpikingNeuron) 
+					components[i] = ((ExpandableSpikingNeuron)myExpandableNodes[i]).addDelayedTermination(name, 
+							new float[][]{weights[i]}, tauPSC.sample()[0], delays.sample()[0], modulatory);
+				else
+					throw new StructuralException("Cannot specify delays for non-ExpandableSpikingNeuron");
+			}
 		}
 
 		EnsembleTermination result = new EnsembleTermination(this, name, components);

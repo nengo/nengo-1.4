@@ -74,7 +74,7 @@ public class ExpandableSpikingNeuron extends SpikingNeuron implements Expandable
 	 * @see ca.nengo.model.ExpandableNode#addTermination(java.lang.String, float[][], float, boolean)
 	 */
     public Termination addTermination(String name, float[][] weights, float tauPSC, boolean modulatory) throws StructuralException {
-		if ( !(mySynapticIntegrator instanceof ExpandableSynapticIntegrator) ) {
+    	if ( !(mySynapticIntegrator instanceof ExpandableSynapticIntegrator) ) {
 			throw new StructuralException("Underlying SynapticIntegrator is not expandable");
 		}
 		if (weights.length != 1) {
@@ -85,6 +85,20 @@ public class ExpandableSpikingNeuron extends SpikingNeuron implements Expandable
 		
 		return mySynapticIntegrator.addTermination(name, weights[0], tauPSC, modulatory);
 	}
+    
+    public Termination addDelayedTermination(String name, float[][] weights, float tauPSC, float delay, boolean modulatory) throws StructuralException {
+    	if ( !(mySynapticIntegrator instanceof LinearSynapticIntegrator) ) {
+			throw new StructuralException("Underlying SynapticIntegrator is not a LinearSynapticIntegrator");
+		}
+		if (weights.length != 1) {
+			throw new StructuralException("Weights matrix must have one row (has " + weights.length + ")");
+		}
+
+		fireVisibleChangeEvent();
+		
+		return ((LinearSynapticIntegrator)mySynapticIntegrator).addTermination(name, weights[0], tauPSC, delay, modulatory);
+    }
+    
 
 	/**
 	 * @see ca.nengo.model.ExpandableNode#getDimension()

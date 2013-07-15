@@ -39,6 +39,7 @@ import ca.nengo.model.Node;
 import ca.nengo.model.StructuralException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.Units;
+import ca.nengo.model.impl.DelayedLinearExponentialTermination;
 import ca.nengo.model.impl.LinearExponentialTermination;
 import ca.nengo.model.neuron.ExpandableSynapticIntegrator;
 import ca.nengo.model.neuron.SynapticIntegrator;
@@ -195,6 +196,19 @@ public class LinearSynapticIntegrator implements ExpandableSynapticIntegrator {
 		result.setModulatory(modulatory);
 		myTerminations.put(name, result);
 
+		return result;
+	}
+	
+	public Termination addTermination(String name, float[] weights, float tauPSC, float delay, boolean modulatory) throws StructuralException {
+		if (myTerminations.containsKey(name)) {
+			throw new StructuralException("This SynapticIntegrator already has a Termination named " + name);
+		}
+		
+		DelayedLinearExponentialTermination result = new DelayedLinearExponentialTermination(myNode, name, 
+				weights, tauPSC, (int)(delay/myMaxTimeStep));
+		result.setModulatory(modulatory);
+		myTerminations.put(name,  result);
+		
 		return result;
 	}
 
