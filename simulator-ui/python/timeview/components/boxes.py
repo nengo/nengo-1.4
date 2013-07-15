@@ -9,14 +9,14 @@ from math import sqrt
 
 
 class Boxes(core.DataViewComponent):
-    def __init__(self, view, name, func, args=(), rows=None, label=None):
+    def __init__(self, view, name, func, args=(), label=None):
         core.DataViewComponent.__init__(self, label)
         self.view = view
         self.name = name
         self.func = func
         self.args = args
         self.data = self.view.watcher.watch(name, func, args=args)
-        self.margin = 10
+        self.margin = 0
         self.setSize(200, 200)
         self.boxes = None
         
@@ -28,15 +28,16 @@ class Boxes(core.DataViewComponent):
             return
         
         self.minx = 1000
-        self.maxx = -1
+        self.maxx = -1000
         self.miny = 1000
-        self.maxy = -1
+        self.maxy = -1000
+        
+        self.convert_coords()
         
         for b in self.boxes:
-            x0 = b[1][0]
-            x1 = b[2][0]
-            y0 = b[1][1]
-            y1 = b[2][1]
+            x0,y0 = b[1]
+            x1,y1 = b[2]
+
             if x0 < self.minx:
                 self.minx = x0
             if x1 > self.maxx:
@@ -48,7 +49,22 @@ class Boxes(core.DataViewComponent):
                 
         self.xscale = self.size.width / (self.maxx - self.minx)
         self.yscale = self.size.height / (self.maxy - self.miny)
+        
+#        print (self.maxx-self.minx)*self.xscale,(self.maxy-self.miny)*self.yscale 
+#        print self.minx,self.maxx,self.xscale
+#        print self.miny,self.maxy,self.yscale
 
+    def convert_coords(self):
+        #convert euclidian points to drawing points
+        minx = min([b[i][0] for b in self.boxes for i in range(1,2)])
+        miny = min([-b[i][1] for b in self.boxes for i in range(1,2)])
+        
+        def conv(pt):
+            x,y = pt
+            return (x-minx,-y-miny)
+        
+        self.boxes = [[b[0],conv(b[1]),conv(b[2])] for b in self.boxes]
+                       
     def paintComponent(self, g):
         core.DataViewComponent.paintComponent(self, g)
 
@@ -59,6 +75,6 @@ class Boxes(core.DataViewComponent):
             g.color = b[0]
             x0 = b[1][0]
             y0 = b[1][1]
-            x = b[2][0] - x0
-            y = b[2][1] - y0
-            g.fillRect(int(x0*self.xscale), int(y0*self.yscale), int(x*self.xscale), int(y*self.yscale))
+            x_len = b[2][0] - b[1][0]
+            y_len = b[2][1] - b[1][1]
+            g.fillRect(int(x0*self.xscale), int(y0*self.yscale), int(x_len*self.xscale), int(y_len*self.yscale))
