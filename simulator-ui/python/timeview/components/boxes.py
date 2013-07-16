@@ -72,9 +72,15 @@ class Boxes(core.DataViewComponent):
             return
         
         for b in self.boxes:
-            g.color = b[0]
+            if b[0] == "-":
+                g.color = Color.black
+            else:
+                g.color = b[0]
             x0 = b[1][0]
             y0 = b[1][1]
             x_len = b[2][0] - b[1][0]
             y_len = b[2][1] - b[1][1]
-            g.fillRect(int(x0*self.xscale), int(y0*self.yscale), int(x_len*self.xscale), int(y_len*self.yscale))
+            if b[0] == "-":
+                g.drawLine(int(x0*self.xscale), int(y0*self.yscale), int(b[2][0]*self.xscale), int(b[2][1]*self.yscale))
+            else:
+                g.fillRect(int(x0*self.xscale), int(y0*self.yscale), int(x_len*self.xscale), int(y_len*self.yscale))
