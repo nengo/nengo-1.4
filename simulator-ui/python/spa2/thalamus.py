@@ -11,47 +11,65 @@ class Thalamus(module.Module):
         D=self.bg.rules.count()
         
         self.net.make_input('bias', [1])
-        self.net.make_array('rule', rule_neurons, D, intercept=(rule_threshold, 1), encoders=[[1]])
-        self.net.connect('bias', 'rule')
+        self.net.make_array('rules', rule_neurons, D, intercept=(rule_threshold, 1), encoders=[[1]])
+        self.net.connect('bias', 'rules')
         
         if mutual_inhibit>0:
-            self.net.connect('rule', 'rule', (np.eye(D)-1)*mutual_inhibit, pstc=pstc_mutual)       
+            self.net.connect('rules', 'rules', (np.eye(D)-1)*mutual_inhibit, pstc=pstc_mutual)       
 
-    def connect(self, weight_GPi=-3, pstc_GPi=0.008, pstc_output=0.01, neurons_gate=40, gate_threshold=0.3, pstc_to_gate=0.002, pstc_gate=0.008, channel_N_per_D=50, pstc_channel=0.01):
+    def connect(self, weight_GPi=-3, pstc_GPi=0.008, pstc_output=0.01, neurons_gate=40, gate_threshold=0.3, pstc_to_gate=0.002, pstc_gate=0.008, channel_N_per_D=30, pstc_channel=0.01, array_dimensions=16, verbose=False):
         self.bg.rules.initialize(self.spa)
 
         # Store rules in the documentation comment for this network for use in the interactive mode view    
         self.net.network.documentation = 'THAL: ' + ','.join(self.bg.rules.names)
                 
-        self.spa.net.connect(self.bg.name+'.GPi', self.name+'.rule', weight=weight_GPi, pstc=pstc_GPi, func=self.bg.get_output_function())
+        self.spa.net.connect(self.bg.name+'.GPi', self.name+'.rules', weight=weight_GPi, pstc=pstc_GPi, func=self.bg.get_output_function())
 
 
+        if verbose: print '  making direct connections to:'    
         # make direct outputs
         for name in self.spa.sinks.keys():
+            if verbose: print '      '+name    
             t=self.bg.rules.rhs_direct(name)
             if t is not None:
-                self.spa.net.connect(self.name+'.rule', 'sink_'+name, t, pstc_output)
+                self.spa.net.connect(self.name+'.rules', 'sink_'+name, t, pstc_output)
 
+        used_names=[]        
+        if verbose: print '  making gated connections:'    
         # make gated outputs
         for source, sink, conv, weight in self.bg.rules.get_rhs_routes():
             t=self.bg.rules.rhs_route(source,sink,conv, weight)
+            if verbose: print '      %s->%s'%(source, sink)     
             
-            gname='gate_%s_%s'%(source,sink)
-            if weight!=1: gname+='(%1.1f)'%weight
-            gname=gname.replace('.','_')
+            index = 0
+            name = '%s_%s'%(source,sink)
+            if weight!=1: 
+                name+='(%1.1f)'%weight
+                name=name.replace('.','_')
+            while name in used_names:
+                index += 1
+                name = '%s_%s_%d'%(source, sink, index)
+                if weight!=1: 
+                    name+='(%1.1f)'%weight
+                    name=name.replace('.','_')
+            used_names.append(name)    
+            
+            gname='gate_%s'%(name)
             
             self.net.make(gname, neurons_gate, 1, encoders=[[1]], intercept=(gate_threshold, 1))
-            self.net.connect('rule', gname, transform=t, pstc=pstc_to_gate)
+            self.net.connect('rules', gname, transform=t, pstc=pstc_to_gate)
             self.net.connect('bias', gname)
             
-            cname='channel_%s_%s'%(source,sink)
-            if weight!=1: cname+='(%1.1f)'%weight
-            cname=cname.replace('.','_')
+            cname='channel_%s'%(name)
             
             vocab1=self.spa.sources[source]
             vocab2=self.spa.sinks[sink]
             
-            self.net.make(cname, channel_N_per_D*vocab2.dimensions, vocab2.dimensions)
+            if array_dimensions is None:
+                self.net.make(cname, channel_N_per_D*vocab2.dimensions, vocab2.dimensions)
+            else:
+                self.net.make_array(cname, channel_N_per_D*array_dimensions, length=vocab2.dimensions/array_dimensions, dimensions=array_dimensions)    
+
             
             if vocab1 is vocab2: 
                 transform=None            

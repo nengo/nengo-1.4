@@ -9,11 +9,13 @@ class SPA:
     randomize_vectors=True
     verbose=False
 
-    def __init__(self,network):
+    def __init__(self,network, vocab=None):
         self.net=network
         self.params={}
         self.modules={}
         self.vocabs={}
+        if vocab is not None:
+            self.vocabs[vocab.dimensions, vocab.randomize] = vocab
         self.sinks={}
         self.sources={}
         self.init()
@@ -41,11 +43,13 @@ class SPA:
         module.init(**self.extract_parameters(module, module.init))
 
     def connect(self):
-        for module in self.modules.values():
+        for name,module in self.modules.items():
+            if self.verbose: print 'Connecting module:',name         
             module.connect(**self.extract_parameters(module, module.connect))
             
     def complete(self):
-        for module in self.modules.values():
+        for name,module in self.modules.items():
+            if self.verbose: print 'Completing module:',name            
             module.complete(**self.extract_parameters(module, module.complete))
             
     def extract_parameters(self, module, func):
