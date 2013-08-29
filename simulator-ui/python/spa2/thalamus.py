@@ -1,4 +1,5 @@
 import module
+import convolution
 
 import numeric as np
 
@@ -87,4 +88,50 @@ class Thalamus(module.Module):
         
             self.net.connect(gname, cname, encoders=-10, pstc=pstc_gate)
 
+        for source, sink, conv, weight in self.bg.rules.get_rhs_route_convs():
+            t=self.bg.rules.rhs_route_conv(source,sink,conv, weight)
+            if verbose: print '      %s*%s->%s'%(source, conv, sink) 
 
+            index = 0
+            name = '%s_%s_%s'%(source,conv,sink)
+            if weight!=1: 
+                name+='(%1.1f)'%weight
+                name=name.replace('.','_')
+            while name in used_names:
+                index += 1
+                name = '%s_%s_%d'%(source, sink, index)
+                if weight!=1: 
+                    name+='(%1.1f)'%weight
+                    name=name.replace('.','_')
+            used_names.append(name)    
+            
+            gname='gate_%s'%(name)
+            
+            self.net.make(gname, neurons_gate, 1, encoders=[[1]], intercept=(gate_threshold, 1))
+            self.net.connect('rules', gname, transform=t, pstc=pstc_to_gate)
+            self.net.connect('bias', gname)
+            
+            cname='channel_%s'%(name)
+            
+            inv1 = False
+            if source[0]=='~':
+                source = source[1:]
+                inv1 = True
+            inv2 = False
+            if conv[0]=='~':
+                conv = conv[1:]
+                inv2 = True
+            
+            vocab1=self.spa.sources[source]
+            vocab2=self.spa.sources[conv]
+            vocab3=self.spa.sinks[sink]
+            
+            
+            assert vocab1==vocab2
+            assert vocab1==vocab3
+            
+            convolution.connect(self.spa.net, self.name+'.'+cname, vocab1.dimensions, 
+                    'source_'+source, 'source_'+conv, 'sink_'+sink, invert1=inv1, invert2=inv2)
+            
+            self.net.connect(gname, cname, encoders=-10, pstc=pstc_gate)
+            

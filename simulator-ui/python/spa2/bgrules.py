@@ -62,8 +62,8 @@ class Rule:
         self.func=func
         self.name=func.func_name
         args,varargs,keywords,defaults=inspect.getargspec(func)
-        if defaults is None or args is None or len(args)!=len(defaults):
-            raise Exception('No value specified for match in rule '+self.name)
+        #if defaults is None or args is None or len(args)!=len(defaults):
+        #    raise Exception('No value specified for match in rule '+self.name)
         self.scale=1.0
 
         globals={}
@@ -81,6 +81,7 @@ class Rule:
 
         self.rhs_direct={}
         self.rhs_route={}
+        self.rhs_route_conv={}
         self.lhs_match={}
         self.rhs_learn={}
         self.learn_error=[]
@@ -105,8 +106,12 @@ class Rule:
                         self.rhs_direct[k]=v
                     v=None
                 elif isinstance(v,Sink):
-                    w=self.rhs_route.get((v.name,k,v.conv),0)
-                    self.rhs_route[v.name,k,v.conv]=v.weight+w
+                    if isinstance(v.conv, Sink):
+                        w = self.rhs_route_conv.get((v.name,k,v.conv.name),0)
+                        self.rhs_route_conv[v.name,k,v.conv.name] = v.weight + w
+                    else:
+                        w=self.rhs_route.get((v.name,k,v.conv),0)
+                        self.rhs_route[v.name,k,v.conv]=v.weight+w
                     v=v.add
     def match(self,*args):
         for m in args:
@@ -186,6 +191,15 @@ class Rules:
                 if k not in routes: routes.append(k)
         return routes
 
+    def get_rhs_route_convs(self):
+        routes=[]
+        for rule in self.rules.values():
+            for (source,sink,conv),w in rule.rhs_route_conv.items():
+                k=(source,sink,conv,w)
+                if k not in routes: routes.append(k)
+        return routes
+        
+        
     def get_lhs_matches(self):
         match=[]
         for rule in self.rules.values():
@@ -203,11 +217,21 @@ class Rules:
             else:
                 t.append([0])
         return numeric.array(t).T
-            
+
+    def rhs_route_conv(self,source,sink,conv,weight):
+        t=[]
+        vocab=self.spa.sinks[sink]
+        for n in self.names:
+            rule=self.rules[n]
+            if rule.rhs_route_conv.get((source,sink,conv),None)==weight:
+                t.append([-1])
+            else:
+                t.append([0])
+        return numeric.array(t).T
+
+        
     def lhs_match(self,a,b):
         t=[]
-        assert self.spa.vocab(b) is self.spa.vocab(b)
-        vocab=self.spa.vocab(a)
         for n in self.names:
             rule=self.rules[n]
             t.append(rule.lhs_match.get((a,b),0)*rule.scale)
@@ -227,94 +251,3 @@ class Rules:
                         if( not pred_error in pred_errors ):    
                             pred_errors.append(pred_error)
         return (indexes, transforms, pred_errors)
-"""
-
-                    
-    def _lhs_keys(self):
-        keys=[]
-        for r in self._rules.values():
-            for k in r.lhs.keys():
-                if k not in keys: keys.append(k)
-        return keys
-    def _rhs_set_keys(self):
-        keys=[]
-        for r in self._rules.values():
-            for k in r.rhs_set.keys():
-                if k not in keys: keys.append(k)
-        return keys
-    def _rhs_route_keys(self):
-        keys=[]
-        for r in self._rules.values():
-            for k in r.rhs_route.keys():
-                if k not in keys and len(k)==2 and r.rhs_route[k] is None: keys.append(k)
-        return keys
-    def _rhs_route_conv_keys(self):
-        keys=[]
-        for r in self._rules.values():
-            for k in r.rhs_route.keys():
-                if k not in keys and isinstance(r.rhs_route[k].weight,str): keys.append(k)
-        return keys
-    def _rhs_route_conv2_keys(self):
-        keys=[]
-        for r in self._rules.values():
-            for k in r.rhs_route.keys():
-                if k not in keys and len(k)==3: keys.append(k)
-        return keys
-
-    def _make_lhs_transform(self,key,vocab):
-        t=[]
-        for n in self._names:
-            lhs=self._rules[n].lhs
-            if key not in lhs: t.append([0]*vocab.dimensions)
-            else: t.append(vocab.parse(lhs[key]).v)
-        return t
-
-    def _make_rhs_set_transform(self,key,vocab):
-        t=[]
-        for n in self._names:
-            rhs=self._rules[n].rhs_set
-            if key not in rhs: t.append([0]*vocab.dimensions)
-            else: t.append(vocab.parse(rhs[key]).v)
-        return numeric.array(t).T
-
-    def _make_lhs_scalar_transform(self,key):
-        t=[]
-        for n in self._names:
-            lhs=self._rules[n].lhs
-            if key not in lhs: t.append([0])
-            else: t.append([lhs[key]])
-        return t
-            
-    def _make_rhs_route_transform(self,key1,key2,key3=None):
-        t=[]
-        for n in self._names:
-            rhs=self._rules[n].rhs_route
-            if key3 is not None:
-                k=(key1,key2,key3)
-            else:
-                k=(key1,key2)
-            if not rhs.has_key(k):
-                w=0
-            else:
-                v=rhs[k]
-                if v==None: w=-1
-                else: w=0                
-            t.append([w])
-        return numeric.array(t).T
-
-    def _make_rhs_route_conv_transform(self,key1,key2,vocab):
-        t=[]
-        for n in self._names:
-            rhs=self._rules[n].rhs_route
-            k=(key1,key2)
-            if not rhs.has_key(k):
-                w=[0]*vocab.dimensions
-            else:
-                v=rhs[k]
-                if isinstance(v,str):
-                    w=vocab.parse(v).v
-                else:
-                    w=[0]*vocab.dimensions                
-            t.append([w])
-        return numeric.array(t).T
-"""

@@ -1,5 +1,6 @@
 import module
 import bgrules
+import numeric
 
 # connection weights from (Gurney, Prescott, & Redgrave, 2001)
 mm=1
@@ -74,7 +75,7 @@ class BasalGanglia(module.Module):
         return func_gpi    
         
         
-    def connect(self, lg=0.2, pstc_input=0.002, verbose=False):
+    def connect(self, lg=0.2, pstc_input=0.002, verbose=False, N_match=150, pstc_match=0.002):
         if verbose: print '  parsing rules'
         self.rules.initialize(self.spa)
 
@@ -82,6 +83,36 @@ class BasalGanglia(module.Module):
         # TODO: Figure out a different way to do this, as this line is pretty much the only Nengo-specific
         #       bit of code in here.  
         self.net.network.documentation = 'BG: ' + ','.join(self.rules.names)
+        
+        for (a,b) in self.rules.get_lhs_matches():
+            t=self.rules.lhs_match(a,b)
+            name='match_%s_%s'%(a,b)
+            vocab1 = self.spa.sources[a]
+            vocab2 = self.spa.sources[b]
+            assert vocab1==vocab2
+            
+            dim = vocab1.dimensions
+                        
+            self.net.make_array(name,N_match,dim,dimensions=2,encoders=[[1,1],[1,-1],[-1,-1],[-1,1]],radius=1.4)
+
+            t1=numeric.zeros((dim*2,dim),typecode='f')
+            t2=numeric.zeros((dim*2,dim),typecode='f')
+            for i in range(dim):
+                t1[i*2,i]=1.0
+                t2[i*2+1,i]=1.0
+            self.spa.net.connect('source_'+a, self.name+'.'+name, transform=t1, pstc=pstc_match)
+            self.spa.net.connect('source_'+b, self.name+'.'+name, transform=t2, pstc=pstc_match)
+            
+            transform=numeric.array([t for i in range(dim)]).T
+            
+            def product(x): return x[0]*x[1]
+            
+            self.net.connect(name, 'StrD1', transform=(1+lg)*transform, pstc=pstc_input, func=product)
+            self.net.connect(name, 'StrD2', transform=(1-lg)*transform, pstc=pstc_input, func=product)
+            self.net.connect(name, 'STN', transform=transform, pstc=pstc_input, func=product)
+            
+
+            
         
         # TODO: add support for matches (do this with a subnetwork, not a separate module)
         #if len(self.rules.get_lhs_matches())>0:
