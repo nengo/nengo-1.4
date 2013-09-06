@@ -18,11 +18,11 @@ import sys, os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 sys.path.append('../python')
-sys.path.append('dummy')
 
 # Create fake packages for the Java ones we can't import
 import fake_packages
-fake_packages.FakePackages(['ca'])
+fake_packages.FakePackages(
+    ['ca', 'com', 'java', '_javax', 'numeric'])
 
 # -- General configuration -----------------------------------------------------
 

@@ -19,10 +19,7 @@ class _fake_object(object):
         return object.__new__(cls)
 
     def __init__(self, *args, **kwargs):
-        pass
-
-    def __str__(self):
-        return ""
+        self.__all__ = [] # make sure `from pkg import *` gets nothing
 
     def __call__(self, *args, **kwargs):
         return self
