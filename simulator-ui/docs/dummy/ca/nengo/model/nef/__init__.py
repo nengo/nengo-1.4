@@ -1,1 +1,0 @@
-class NEFEnsemble: pass

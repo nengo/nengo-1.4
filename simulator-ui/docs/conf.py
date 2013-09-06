@@ -20,6 +20,10 @@ import sys, os
 sys.path.append('../python')
 sys.path.append('dummy')
 
+# Create fake packages for the Java ones we can't import
+import fake_packages
+fake_packages.FakePackages(['ca'])
+
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -101,14 +105,14 @@ html_theme = 'default'
 html_theme_options = {
     'relbartextcolor':'white',
     'relbarbgcolor':'#03961e',
-    
+
     'sidebarbgcolor':'#EEEEEE',
     'sidebarlinkcolor':'#0c7a00',
     'sidebartextcolor':'#222222',
-    
+
     'footertextcolor':'#888888',
     'footerbgcolor':'#EEEEEE',
-    
+
     'headtextcolor':'#0c7a00',
     'headlinkcolor':'#0c7a00',
 
