@@ -3,6 +3,7 @@
 	<name>simulator-ui</name>
 	<comment></comment>
 	<projects>
+		<project>simulator</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
