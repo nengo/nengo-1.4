@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+import plotlib.pyplot as plt
 
 class Simulator:
     def __init__(self, probes, simulator, dt):

@@ -200,14 +200,18 @@ class Network:
             ef.nodeFactory=node_factory
         else:
             if type(max_rate) is tuple and len(max_rate)==2:
-                mr=IndicatorPDF(max_rate[0],max_rate[1])
+                mr = IndicatorPDF(max_rate[0],max_rate[1])
+            elif isinstance(max_rate, IndicatorPDF):
+                mr = max_rate
             else:
-                mr=pdfs.ListPDF(max_rate)
+                mr = pdfs.ListPDF(max_rate)
                 
             if type(intercept) is tuple and len(intercept)==2:
-                it=IndicatorPDF(intercept[0],intercept[1])
+                it = IndicatorPDF(intercept[0],intercept[1])
+            elif isinstance(intercept, IndicatorPDF):
+                it = intercept
             else:
-                it=pdfs.ListPDF(intercept)
+                it = pdfs.ListPDF(intercept)
 
             ef.nodeFactory=LIFNeuronFactory(tauRC=tau_rc,tauRef=tau_ref,maxRate=mr,intercept=it)
             

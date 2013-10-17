@@ -64,3 +64,9 @@ class Model(nef.Network):
         self.probes[self.t] = probeTimeNode(self.t)
         self.add(self.probes[self.t])
         return Simulator(self.probes, self.network.simulator, dt)
+    
+    def connect(self, pre, post, **kwargs):
+        if 'filter' in kwargs.keys():
+            kwargs['pstc'] = kwargs['filter']
+            del kwargs['filter']
+        return nef.Network.connect(self, pre, post, **kwargs)

@@ -32,32 +32,39 @@ def plot(time, data, label):
     pd.value_data.append(data_class(data, label))
 
 
-def ylim(limits):
+def ylim(*args, **kwargs):
     pass
 
-def xlim(limits):
+def xlim(*args, **kwargs):
     pass
 
-def yticks(ticks):
+def yticks(*args, **kwargs):
     pass
 
-def xticks(ticks):
+def xticks(*args, **kwargs):
     pass
 
-def legend():
+def legend(*args, **kwargs):
     pass
 
+def grid(b = None, which = 'major', axis = 'both', **kwargs):
+    pass
 
-def figure(fig_num = -1):
-    if( fig_num < 0 ):
+def figure(num = None, figsize = None, dpi = None, facecolor = None, \
+          edgecolor = None, frameon = True, FigureClass = None, **kwargs):
+    if( num is None ):
         temp_fig_num = pd.fig_num + 1
     else:
-        temp_fig_num = fig_num
+        temp_fig_num = num
     reset()
     pd.fig_num = temp_fig_num
 
 
-def show():
+def vlines(x, ymin, ymax, colors = 'k', linestyles = 'solid', label = '', \
+           hold = None, **kwargs):
+    pass
+
+def show(*args, **kwargs):
     plotter = DefaultPlotter()
     time_dict = {}
     value_dict = {}
@@ -78,7 +85,10 @@ def show():
         for value in value_dict[key]:
             for d in range(len(value.values[i])):
                 values = [values[i] + [value.values[i][d]] for i in range(len(values))]
-                labels.append(value.label + "[%d]" % d)
+                if( len(value.values[i]) == 1 ):
+                    labels.append(value.label)
+                else:
+                    labels.append(value.label + "[%d]" % d)
 
         ts = TimeSeriesImpl(time_dict[key], values, [Units.UNK] * len(value_dict[key]))
         for i,label in enumerate(labels):
