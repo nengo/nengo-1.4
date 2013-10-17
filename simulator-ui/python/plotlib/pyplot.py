@@ -35,6 +35,14 @@ def plot(time, data, label):
 def ylim(limits):
     pass
 
+def xlim(limits):
+    pass
+
+def yticks(ticks):
+    pass
+
+def xticks(ticks):
+    pass
 
 def legend():
     pass
