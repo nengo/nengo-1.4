@@ -54,7 +54,7 @@ class NodeTermination(Termination):
                 self._filtered_values[i] = x * decay + v[i] * (1 - decay)
                 
     def get(self):
-        return self.getOutput()            
+        return self._filtered_values
 
 
 class NodeOrigin(BasicOrigin):
@@ -88,16 +88,16 @@ class Node(ca.nengo.model.Node, Probeable):
     input and outputs the square of that input::
     
       class SquaringNode(nef.Node):
-          def __init__(self, name):
+          def __init__(self, name, dimensions=1):
               nef.Node.__init__(self, name)
-              self.input = self.make_input(dimensions=1, pstc=0.01)
-              self.output = self.make_output(dimensions=1)
+              self.input = self.make_input('input', dimensions=dimensions, pstc=0.01)
+              self.output = self.make_output('output', dimensions=dimensions)
           def tick(self):
-              self.output.set(self.input.get()**2)
+              self.output.set([x**2 for x in self.input.get()])
               
       square = net.add(SquaringNode('square'))
-      net.connect('A', 'square:input')
-      net.connect('square:output', 'B')
+      net.connect('A', square.getTermination('input'))
+      net.connect('square.getOrigin('output'), 'B')
       
     The current time can be accessed via ``self.t``.  This value will be the
     time for the beginning of the current time step.  The end of the current
