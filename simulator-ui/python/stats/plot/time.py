@@ -2,14 +2,16 @@ import core
 import numpy
 import matplotlib
 import scipy.ndimage
+import scipy.cluster
 
 class Time(core.Plot):
-    def __init__(self,time,time_range=None,**args):
+    def __init__(self, time, time_range=None, ylabel_rotation='vertical', **args):
         core.Plot.__init__(self,**args)
-        self.time=time
-        self.xlim=time_range
-        self.subplots=[]
-        self.heights=[]
+        self.time = time
+        self.xlim = time_range
+        self.ylabel_rotation = ylabel_rotation
+        self.subplots = []
+        self.heights = []
     def _fix_plots(self):
         totalh=float(sum(self.heights))
         space=self.fig.subplotpars.top-self.fig.subplotpars.bottom
@@ -35,11 +37,18 @@ class Time(core.Plot):
         self.subplots.append(axes)
         self._fix_plots()
         
-        axes.set_ylabel(label)
+        axes.set_ylabel(label, rotation=self.ylabel_rotation)
         return axes
             
+    def _add_overlays(self, axes, overlays):
+        min, max = axes.get_ylim()
+        mid = (min+max)/2
+        for t, text in overlays:        
+            axes.text(t, mid, text, ha='center', va='center', 
+                      fontsize=12, weight='bold')
             
-    def add(self,label,data,height=1,linewidth=1,range=None):
+    def add(self, label, data, height=1, linewidth=1, range=None, 
+                  overlays=[]):
         axes=self._create_axes(label,height)
                 
         if len(data.shape)<2:
@@ -49,17 +58,26 @@ class Time(core.Plot):
             axes.plot(self.time,line,color=c,linewidth=linewidth)
         if range is not None:
             axes.set_ylim(range)    
+        self._add_overlays(axes, overlays)    
             
-    def add_spikes(self,label,data,height=1,sample_by_variance=None,sample=None,sample_filter_width=20,cluster=False,cluster_filter_width=2,merge=None,contrast_scale=1.0,yticks=None,style='image'):
+    def add_spikes(self, label, data, height=1, sample_by_variance=None,
+                         sample=None, sample_filter_width=20,
+                         cluster=False, cluster_filter_width=2,
+                         merge=None, contrast_scale=1.0, yticks=None,
+                         style='image', sample_index=None, cluster_index=None,
+                         overlays=[]):
         axes=self._create_axes(label,height)
-
-        if sample_by_variance is not None and sample_by_variance<len(data.T):
+        
+        if sample_index:
+            data = data[:, sample_index]    
+        elif sample_by_variance is not None and sample_by_variance<len(data.T):
             dd=scipy.ndimage.gaussian_filter1d(data.astype(float).T,sample_filter_width,axis=1)
             vard=numpy.var(dd,axis=1)
                         
             threshold=sorted(vard)[-sample_by_variance]                        
             index=[k for k,v in enumerate(vard) if v>=threshold]
             data=data[:,index]
+            self.sample_index = index
         if sample is not None and sample<len(data.T):    
             stepsize=float(len(data.T))/sample
             data2=[]
@@ -73,13 +91,15 @@ class Time(core.Plot):
                         break
             data=numpy.array(data2).T    
             
-            
-        if cluster:
+        if cluster_index:
+            data = data[:, cluster_index]    
+        elif cluster:
             dd=scipy.ndimage.gaussian_filter1d(data.astype(float).T,cluster_filter_width,axis=1)
             z=scipy.cluster.hierarchy.linkage(dd)
             tree=scipy.cluster.hierarchy.to_tree(z)
             order=tree.pre_order()
             data=data[:,order]
+            self.cluster_index = order
         if merge is not None and merge<len(data.T):    
             stepsize=float(len(data.T))/merge
             data2=[]
@@ -133,6 +153,7 @@ class Time(core.Plot):
             axes.set_yticks(vals)
             axes.set_yticklabels(yticks)
                 
+        self._add_overlays(axes, overlays)    
         
         
             
