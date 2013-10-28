@@ -2,6 +2,8 @@ import copy
 import nef
 from .simulator import Simulator
 from ca.nengo.model.impl import FunctionInput
+from ca.nengo.model import Units
+from ca.nengo.math.impl import PostfixFunction
 
 class probeSimpleNode(nef.SimpleNode):
     def __init__(self, name, num_dim, radius = 1, pstc = 0.03):
@@ -52,18 +54,18 @@ class Model(nef.Network):
 
     def probe(self, name, filter = 0.001):
         node = self.get(name)
+        sim = self.network.simulator
+        
         if( isinstance(node, FunctionInput) ):
-            dim = len(node.functions)
+            self.probes[name] = {'probe': sim.addProbe(name, "input", True), 'filter': filter}
         else:
-            dim = node.dimension
-        self.probes[name] = probeSimpleNode(name+"_probe", dim, pstc = filter)
-        self.add(self.probes[name])
-        self.connect(name, self.probes[name].getTermination("Input"))
+            self.probes[name] = {'probe': sim.addProbe(name, "X", True), 'filter': filter}
 
-    def simulator(self, dt):
-        self.probes[self.t] = probeTimeNode(self.t)
-        self.add(self.probes[self.t])
-        return Simulator(self.probes, self.network.simulator, dt)
+    def simulator(self, dt, **kwargs):
+        time_function = FunctionInput(self.t, [PostfixFunction("x0",1)], Units.UNK)
+        self.add(time_function)
+        self.probes[self.t] = self.network.simulator.addProbe(self.t, "input", True)
+        return Simulator(self.probes, self.network.simulator, dt, self.t)
     
     def connect(self, pre, post, **kwargs):
         if 'filter' in kwargs.keys():
