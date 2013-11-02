@@ -108,7 +108,7 @@ class Thalamus(module.Module):
             gname='gate_%s'%(name)
             
             self.net.make(gname, neurons_gate, 1, encoders=[[1]], intercept=(gate_threshold, 1))
-            self.net.connect('rules', gname, transform=t, pstc=pstc_to_gate)
+            self.net.connect('rules', gname, transform=t*2, pstc=pstc_to_gate)
             self.net.connect('bias', gname)
             
             cname='channel_%s'%(name)
