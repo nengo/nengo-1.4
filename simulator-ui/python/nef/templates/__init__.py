@@ -10,6 +10,7 @@ import learned_termination
 import hpes_termination
 import bcm_termination
 import thalamus
+import thalamus_rule
 import interneuron
 
 templates=[
@@ -21,6 +22,7 @@ templates=[
     basalganglia,
     basalganglia_rule,
     thalamus,
+    thalamus_rule,
     gate,
     learned_termination,
     interneuron,

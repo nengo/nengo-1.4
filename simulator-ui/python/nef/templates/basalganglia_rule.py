@@ -7,7 +7,7 @@ description="""<html>This template is dropped onto a basal ganglia model generat
 params=[
     ('index','Rule Index',int, 'The number of the rule currently being defined (0 indexed)'),
     ('pattern','Semantic Pointer',str,'The input representation that activates the rule'),
-    ('dimensions','Dimensionality',int,'The dimensionality of the input'),
+    ('dimensions','Dimensionality',int,'The dimensionality of the input semantic pointer'),
     ('pstc','Input PSTC [s]',float,'Post-synaptic time constant for input filtering, in seconds'),
     ('use_single_input','Use Single Input',bool,'Use a converged input rather than seperate inputs to striatum and STN'),
     ]
