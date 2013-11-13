@@ -9,7 +9,7 @@ description="""<html>This template is designed to take output from a Basal Gangl
 params=[
     ('name','Name',str,'Name of the new thalamus sub-network'),
     ('neurons','Neurons per dimension',int,'Number of neurons for each dimension of the thalamus'),
-    ('dimensions','Dimensions',int,'Number of dimensions for the thalamus'),
+    ('dimensions','Number of actions',int,'Number of actions for the thalamus'),
     ('useQuick', 'Quick mode', bool,'Whether to use quick mode'),
     ]
 
