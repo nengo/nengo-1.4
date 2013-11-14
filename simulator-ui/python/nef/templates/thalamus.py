@@ -1,4 +1,5 @@
 import nef
+import numeric
 
 title='Thalamus'
 label='Thalamus'
@@ -10,6 +11,7 @@ params=[
     ('name','Name',str,'Name of the new thalamus sub-network'),
     ('neurons','Neurons per dimension',int,'Number of neurons for each dimension of the thalamus'),
     ('dimensions','Number of actions',int,'Number of actions for the thalamus'),
+    ('mutual_inhib', 'Mutual Inhibition', bool,'Whether to use mutual inhibition'),
     ('useQuick', 'Quick mode', bool,'Whether to use quick mode'),
     ]
 
@@ -22,7 +24,7 @@ def test_params(net,p):
 
 from java.util import ArrayList
 from java.util import HashMap
-def make(net,name='Network Array', neurons=50, dimensions=2, inhib_scale=3, tau_inhib=.005, useQuick=True):
+def make(net,name='Network Array', neurons=50, dimensions=2, inhib_scale=3, tau_inhib=.005, useQuick=True, mutual_inhib = False, mutual_inhib_weight = 1, pstc_mutual_inhib = 0.008):
     thalamus = net.make_array(name, neurons, dimensions, max_rate=(100,300), intercept=(-1, 0), radius=1, encoders=[[1]], quick=useQuick)    
 
     # setup inhibitory scaling matrix
@@ -40,6 +42,9 @@ def make(net,name='Network Array', neurons=50, dimensions=2, inhib_scale=3, tau_
     def addOne(x):
         return [x[0]+1]            
     net.connect(thalamus, None, func=addOne, origin_name='xBiased', create_projection=False)
+
+    if mutual_inhib:
+        net.connect(thalamus.getOrigin("xBiased"), thalamus, (numeric.eye(dimensions)-1) * mutual_inhib_weight, pstc = pstc_mutual_inhib)
     
     if net.network.getMetaData("Thalamus") == None:
         net.network.setMetaData("Thalamus", HashMap())

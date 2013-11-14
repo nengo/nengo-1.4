@@ -116,7 +116,7 @@ public class NetworkArrayImpl extends NetworkImpl {
 		myOrigins = new HashMap<String, Origin>(10);
 		
 		for (int i = 0; i < nodes.length; i++) {
-			this.addNode(nodes[i]);
+			super.addNode(nodes[i]);
 			myNeurons += nodes[i].getNodeCount();
 		}
 		createEnsembleOrigin("X");
@@ -375,6 +375,17 @@ public class NetworkArrayImpl extends NetworkImpl {
 		exposeTermination(term,name);
 		return getTermination(name);
 	}
+
+	/**
+	 * @see ca.nengo.model.Network#addNode(ca.nengo.model.Node)
+	 */
+	public void addNode(Node node) throws StructuralException {
+		// Hack to get UI to update node removal
+		super.addNode(node);
+		super.removeNode(node.getName());
+		throw new StructuralException("Nodes cannot be added to NetworkArrayImpl named " + this.getName());
+	}
+	
 	
 	/**
 	 * Gets the nodes in the proper order from the network array. The NetworkImpl version of this function relies on 
@@ -784,6 +795,107 @@ public class NetworkArrayImpl extends NetworkImpl {
 			}
 			return decoders;
 		}
+	}
 
+	/**
+	 * Origin representing the concatenation of origins on each of the
+	 * ensembles within the network array.
+	 */
+	public class ArraySummedOrigin extends BasicOrigin {
+
+		private static final long serialVersionUID = 1L;
+		
+		private String myName;
+		private NetworkArrayImpl myParent;
+		private Origin[] myOrigins;
+		private int myDimensions;
+
+		public ArraySummedOrigin(NetworkArrayImpl parent, String name, Origin[] origins) {
+			myParent = parent;
+			myName = name;
+			myOrigins = origins;
+			myDimensions = myOrigins[0].getDimensions();
+		}
+		
+		public String getName() {
+			return myName;
+		}
+		
+		public int getDimensions() {
+			return myDimensions;
+		}
+		
+		public Origin[] getNodeOrigins(){
+			return myOrigins;
+		}
+		
+		public void setValues(InstantaneousOutput values) {
+			// TODO: Implement this? 
+			return;
+		}
+
+		public InstantaneousOutput getValues() throws SimulationException {
+			InstantaneousOutput v0 = myOrigins[0].getValues();
+			
+			Units unit = v0.getUnits();
+			float time = v0.getTime();
+			
+			if(v0 instanceof RealOutputImpl) {
+				float[] vals = new float[myOrigins[0].getDimensions()];
+				for(int i = 0; i < myOrigins.length; i++) {
+					float[] ovals = ((RealOutputImpl)myOrigins[i].getValues()).getValues();
+					for(int j = 0; j < ovals.length; j++)
+						vals[j] += ovals[j];
+				}
+				
+				return new RealOutputImpl(vals, unit, time);
+			} else {
+				System.err.println("Unknown type in ArraySummedOrigin.getValues()");
+				return null;
+			}
+		}
+		
+		public Node getNode() {
+			return myParent;
+		}
+		
+		public boolean getRequiredOnCPU() {
+			for(int i=0; i < myOrigins.length; i++)
+				if(myOrigins[i].getRequiredOnCPU())
+					return true;
+			return false;
+		}
+		
+		public void setRequiredOnCPU(boolean req) {
+			for(int i=0; i < myOrigins.length; i++)
+				myOrigins[i].setRequiredOnCPU(req);
+		}
+		
+		public ArraySummedOrigin clone() throws CloneNotSupportedException {
+			//this is how it was implemented in networkarray, but I don't think it will work (myOrigins needs to be updated to the cloned origins)
+			return new ArraySummedOrigin(myParent, myName, myOrigins);
+		}
+		
+		public ArraySummedOrigin clone(Node node) throws CloneNotSupportedException {
+			if( !(node instanceof NetworkArrayImpl) ){
+				throw new CloneNotSupportedException("Error cloning ArrayOrigin: Invalid node type");
+			}
+			
+			try {
+				ArraySummedOrigin result = (ArraySummedOrigin) super.clone();
+				
+				DecodedOrigin[] origins = new DecodedOrigin[myOrigins.length];
+				for (int i = 0; i < myOrigins.length; i++)
+					origins[i] = (DecodedOrigin) ((NetworkArrayImpl) node).getNodes()[i].getOrigin(myOrigins[i].getName());
+				result.myOrigins = origins;
+				
+				return result;
+			} catch (StructuralException e) {
+				throw new CloneNotSupportedException("Error cloning ArrayOrigin: " + e.getMessage());
+			} catch (CloneNotSupportedException e) {
+				throw new CloneNotSupportedException("Error cloning ArrayOrigin: " + e.getMessage());
+			}
+		}
+			
 	}
 }

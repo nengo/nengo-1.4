@@ -16,7 +16,7 @@ def_params = [
 
 params = []
 
-dynamic_params_max_actions = 0
+dynamic_params_max_actions = 8
 
 def test_params(net,node,p):
     if 'index' in p:
@@ -36,7 +36,7 @@ def test_drop(net,node):
                 for i in range(len(def_params2)):
                     params.append(def_params2[i])
         else:
-            if len(params) != len(filter(lambda x: not x.name.startswith('output'), nodes)) + len(def_params):
+            if len(params) != len(nodes) + len(def_params):
                 for i in range(len(params)):
                     params.pop()
                 for i in range(len(def_params)):
@@ -55,9 +55,7 @@ from ca.nengo.model.impl import NetworkImpl
 from ca.nengo.model import Network
 from ca.nengo.math.impl import PostfixFunction
 from ca.nengo.model.neuron import Neuron
-from ca.nengo.model.impl import EnsembleOrigin
-
-import java
+from ca.nengo.model.impl.NetworkArrayImpl import ArraySummedOrigin
 
 def make(net, node, index = 0, dimensions = 8, pattern = 'I', **args):
     # Figure out which dictionary to use
@@ -70,26 +68,25 @@ def make(net, node, index = 0, dimensions = 8, pattern = 'I', **args):
         # Get the transform for the given pattern
         transform = vocab.parse(pattern).v
 
-        rule_index, ens_origin = addOrigin(node, index, transform)
+        rule_index, ens_origin = addOriginToEnsemble(node, index, transform)
 
-        node.exposeOrigin(ens_origin, 'rule%d_%d' % (index, rule_index))
+        node.exposeOrigin(ens_origin, 'rule0%d_%d' % (index, rule_index))
     else:
-        output_nodes = filter(lambda x: x.name.startswith('output'), node.getNodes())
-        output = net.make('output%d' % len(output_nodes), 1, dimensions, quick = True, mode = 'direct', add_to_network = False)
-        node.addNode(output)
         rule_index = 0
+        origins = []
         for i in range(len(node.getNodes())):
             pattern = args['pattern%d' % i]
             transform = vocab.parse(pattern).v
 
-            rule_index, ens_origin = addOrigin(node, i, transform)
-            output_term = output.addDecodedTermination('action%d' % i, numeric.eye(dimensions), 0.001, False)
-            node.addProjection(ens_origin, output_term)
-        node.exposeOrigin(output.getOrigin('X'), 'rule_%d' % rule_index)
+            rule_index, ens_origin = addOriginToEnsemble(node, i, transform)
+            origins.append(ens_origin)
+
+        summed_origin = ArraySummedOrigin(node, node, 'ruleset_0%d' % rule_index, origins)
+
+        node.exposeOrigin(summed_origin, 'ruleset_0%d' % rule_index)
 
 
-
-def addOrigin(node, index, transform):
+def addOriginToEnsemble(node, index, transform):
     ens = node.getNode('%d' % index)
 
     # Get the next rule index for the given action index
