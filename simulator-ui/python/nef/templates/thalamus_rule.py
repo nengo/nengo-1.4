@@ -70,7 +70,7 @@ def make(net, node, index = 0, dimensions = 8, pattern = 'I', **args):
 
         rule_index, ens_origin = addOriginToEnsemble(node, index, transform)
 
-        node.exposeOrigin(ens_origin, 'rule0%d_%d' % (index, rule_index))
+        node.exposeOrigin(ens_origin, 'rule_%02d[%d]' % (rule_index, index))
     else:
         rule_index = 0
         origins = []
@@ -81,9 +81,9 @@ def make(net, node, index = 0, dimensions = 8, pattern = 'I', **args):
             rule_index, ens_origin = addOriginToEnsemble(node, i, transform)
             origins.append(ens_origin)
 
-        summed_origin = ArraySummedOrigin(node, node, 'ruleset_0%d' % rule_index, origins)
+        summed_origin = ArraySummedOrigin(node, node, 'rule_%02d' % rule_index, origins)
 
-        node.exposeOrigin(summed_origin, 'ruleset_0%d' % rule_index)
+        node.exposeOrigin(summed_origin, 'rule_%02d' % rule_index)
 
 
 def addOriginToEnsemble(node, index, transform):
@@ -93,7 +93,7 @@ def addOriginToEnsemble(node, index, transform):
     rule_index = 0
     while True:
         try:
-            origin = ens.getOrigin('rule%d' % rule_index)
+            origin = ens.getOrigin('rule%02d' % rule_index)
             if origin is None:
                 break
             rule_index += 1
@@ -101,5 +101,5 @@ def addOriginToEnsemble(node, index, transform):
             break
 
     # Add the new ensemble origin
-    return rule_index, ens.addDecodedOrigin('rule%d' % rule_index, [PostfixFunction('(x0+1)*%0.10f'%transform[i],1) for i in range(len(transform))], \
+    return rule_index, ens.addDecodedOrigin('rule%02d' % rule_index, [PostfixFunction('(x0+1)*%0.10f'%transform[i],1) for i in range(len(transform))], \
                                             Neuron.AXON)
