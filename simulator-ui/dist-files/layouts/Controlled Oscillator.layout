@@ -1,0 +1,12 @@
+({'state': 0, 'height': 600, 'width': 950, 'x': 135, 'y': 112},
+ [(u'SpeedNeurons', None, {'label': False, 'height': 32, 'width': 142, 'x': 293, 'y': 42}),
+  (u'Oscillator', None, {'label': False, 'height': 32, 'width': 93, 'x': 526, 'y': 39}),
+  (u'Speed', None, {'label': False, 'height': 32, 'width': 67, 'x': 49, 'y': 42}),
+  (u'Start', None, {'label': False, 'height': 32, 'width': 53, 'x': 141, 'y': 434}),
+  (u'Start', 'control', {'label': True, 'range': 1.0, 'limits_w': 0, 'limits': True, 'height': 164, 'width': 82, 'x': 53, 'y': 305}),
+  (u'Speed', 'control', {'label': True, 'range': 1.0, 'limits_w': 0, 'limits': True, 'height': 200, 'width': 80, 'x': 62, 'y': 78}),
+  (u'Oscillator', 'XY plot|X', {'label': True, 'sel_dim': [0, 1], 'last_maxy': 1.0000000000000007, 'height': 200, 'width': 200, 'x': 511, 'autohide': True, 'autozoom': True, 'y': 271}),
+  (u'Oscillator', 'voltage grid', {'label': True, 'rows': None, 'height': 200, 'width': 200, 'x': 730, 'y': 270, 'cols': None, 'max': 1, 'auto_improve': True}),
+  (u'Oscillator', 'spike raster', {'label': True, 'sample': 20, 'height': 200, 'width': 328, 'x': 604, 'y': 62}),
+  (u'SpeedNeurons', 'value|X', {'label': True, 'sel_dim': [0], 'last_maxy': 1.0000000000000007, 'sel_all': True, 'height': 145, 'width': 209, 'x': 172, 'fixed_y': None, 'autozoom': False, 'y': 83})],
+ {'dt': 0, 'show_time': 0.5, 'sim_spd': 4, 'filter': 0.03, 'rcd_time': 4.0}) 
