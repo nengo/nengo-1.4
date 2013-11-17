@@ -133,6 +133,14 @@ public class LIFNeuronFactory implements NodeFactory {
 		myIntercept = intercept;
 	}
 
+
+	public Neuron make(String name, float scale, float bias) throws StructuralException {
+		SynapticIntegrator integrator = new LinearSynapticIntegrator(ourMaxTimeStep, ourCurrentUnits);
+		SpikeGenerator generator = new LIFSpikeGenerator(ourMaxTimeStep, myTauRC, myTauRef);
+		
+		return new ExpandableSpikingNeuron(integrator, generator, scale, bias, name);		
+	}
+	
 	/**
 	 * @see ca.nengo.model.impl.NodeFactory#make(String)
 	 */
@@ -153,10 +161,7 @@ public class LIFNeuronFactory implements NodeFactory {
 		
 		float bias = 1f - scale * intercept;
 		
-		SynapticIntegrator integrator = new LinearSynapticIntegrator(ourMaxTimeStep, ourCurrentUnits);
-		SpikeGenerator generator = new LIFSpikeGenerator(ourMaxTimeStep, myTauRC, myTauRef);
-		
-		return new ExpandableSpikingNeuron(integrator, generator, scale, bias, name);		
+		return this.make(name, scale, bias);
 	}
 
 	/**
