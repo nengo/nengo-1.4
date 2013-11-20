@@ -179,7 +179,7 @@ public class BiasOrigin extends DecodedOrigin {
 
 		NEFEnsembleFactory ef = new NEFEnsembleFactoryImpl() {
 			private static final long serialVersionUID = 1L;
-			protected void addDefaultOrigins(NEFEnsemble ensemble) {} //wait until some neurons are adjusted
+			public void addDefaultOrigins(NEFEnsemble ensemble) {} //wait until some neurons are adjusted
 		};
 		ef.setEncoderFactory(new Rectifier(ef.getEncoderFactory(), true));
 		ef.setEvalPointFactory(new BiasedVG(new RandomHypersphereVG(false, 0.5f, 0f), 0, excitatoryProjection ? .5f : -.5f));

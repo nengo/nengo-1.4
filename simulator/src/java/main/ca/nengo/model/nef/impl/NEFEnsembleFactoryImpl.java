@@ -304,12 +304,17 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 	 * @return New NEFEnsemble with given parameters
 	 * @throws StructuralException
 	 */
-	protected NEFEnsemble construct(String name, NEFNode[] nodes, float[][] encoders, ApproximatorFactory af, float[][] evalPoints, float[] radii)
+	public NEFEnsemble construct(String name, NEFNode[] nodes, float[][] encoders, ApproximatorFactory af, float[][] evalPoints, float[] radii)
 			throws StructuralException {
 		if (!VisiblyMutableUtils.isValidName(name)) throw new StructuralException("name '"+name+"' must not contain '.' or ':'");
 		return new NEFEnsembleImpl(name, nodes, encoders, af, evalPoints, radii);
 	}
 
+//	public NEFEnsemble construct(String name, NEFNode[] nodes, float[][] encoders, float[][] evalPoints, float[] radii)
+//			throws StructuralException {
+//		return this.construct(name, nodes, encoders, evalPoints, myApproximatorFactory, radii);
+//	}
+//
 	/**
 	 * Adds standard decoded Origins to the given NEFEnsemble
 	 *
@@ -318,7 +323,7 @@ public class NEFEnsembleFactoryImpl implements NEFEnsembleFactory, java.io.Seria
 	 * @param ensemble A new NEFEnsemble
 	 * @throws StructuralException
 	 */
-	protected void addDefaultOrigins(NEFEnsemble ensemble) throws StructuralException {
+	public void addDefaultOrigins(NEFEnsemble ensemble) throws StructuralException {
 		Function[] functions = new Function[ensemble.getDimension()];
 		for (int i = 0; i < functions.length; i++) {
 			functions[i] = new IdentityFunction(ensemble.getDimension(), i);
