@@ -46,6 +46,7 @@ import ca.nengo.model.Projection;
 import ca.nengo.model.SimulationException;
 import ca.nengo.model.Termination;
 import ca.nengo.model.impl.NetworkImpl;
+import ca.nengo.model.impl.SocketUDPNode;
 import ca.nengo.model.plasticity.impl.PlasticEnsembleTermination;
 import ca.nengo.sim.Simulator;
 import ca.nengo.sim.SimulatorEvent;
@@ -71,6 +72,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
     private ThreadTask[] myTasks;
     private List<ThreadTask> myProbeTasks;
     private Map<String, Node> myNodeMap;
+    private List<Node> mySocketNodes;
     private List<Probe> myProbes;
     private Network myNetwork;
     private boolean myDisplayProgress;
@@ -99,8 +101,12 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
         myProjections = network.getProjections();
 
         myNodeMap = new HashMap<String, Node>(myNodes.length * 2);
+        if (mySocketNodes == null)
+        	mySocketNodes = new ArrayList<Node>(2);
         for (Node myNode : myNodes) {
             myNodeMap.put(myNode.getName(), myNode);
+            if (myNode instanceof SocketUDPNode) 
+            	mySocketNodes.add(myNode);
         }
 
         if (myProbes == null) {
@@ -135,7 +141,14 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
     /**
      * Setup the run. Interactive specifies whether it is an interactive run or not. 
      */
-    public void initRun(boolean interactive){
+    public void initRun(boolean interactive) throws SimulationException {
+    	// Find all instances of the SocketUDPNodes and initialize them (get them to bind to their
+    	// respective sockets).
+    	Iterator<Node> it = mySocketNodes.iterator();
+    	while (it.hasNext()) {
+  			((SocketUDPNode) it.next()).initialize();
+    	}
+    	
         if(NodeThreadPool.isMultithreading()){
             makeNodeThreadPool(interactive);
         }
@@ -253,8 +266,15 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
         }
     }
 
-    public void endRun(){
-        if(myNodeThreadPool != null){
+    public void endRun() throws SimulationException {
+    	// Find all instances of the SocketUDPNodes and shut them down. (get them to unbind from their
+    	// respective sockets).
+    	Iterator<Node> it = mySocketNodes.iterator();
+    	while (it.hasNext()) {
+  			((SocketUDPNode) it.next()).close();
+    	}
+
+    	if(myNodeThreadPool != null){
             myNodeThreadPool.kill();
             myNodeThreadPool = null;
         }

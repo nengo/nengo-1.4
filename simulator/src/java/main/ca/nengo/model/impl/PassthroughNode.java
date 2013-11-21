@@ -335,6 +335,20 @@ public class PassthroughNode implements Node {
 			myTransform = transform;
 		}
 
+		/**
+		 * @param node Parent node
+		 * @param name Termination name
+		 * @param transform Transformation matrix
+		 */
+		public PassthroughTermination(Node node, String name, float[][] transform) {
+			assert MU.isMatrix(transform);
+
+			myNode = node;
+			myName = name;
+			myDimension = transform[0].length;
+			myTransform = transform;
+		}
+
 		public int getDimensions() {
 			return myDimension;
 		}
@@ -375,7 +389,12 @@ public class PassthroughNode implements Node {
 		 * @return Transformation matrix
 		 */
 		public float[][] getTransform() {
-			return myTransform;
+			if (myTransform != null)
+				return myTransform.clone();
+			else
+				// If transform is null, then PassthroughTermination is just doing a identity transform.
+				// So, return identity matrix.
+				return MU.I(myDimension);
 		}
 
 		public boolean getModulatory() {
@@ -413,8 +432,10 @@ public class PassthroughNode implements Node {
 		public PassthroughTermination clone(Node node) throws CloneNotSupportedException {
 			PassthroughTermination result = (PassthroughTermination) super.clone();
 			result.myNode = node;
-			result.myValues = myValues.clone();
-			result.myTransform = MU.clone(myTransform);
+			if (myValues != null)
+				result.myValues = myValues.clone();
+			if (myTransform != null)
+				result.myTransform = MU.clone(myTransform);
 			return result;
 		}
 

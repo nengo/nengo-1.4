@@ -78,12 +78,13 @@ public class ActionException extends UIException {
 
 	@Override
 	public String getMessage() {
-
 		String message = super.getMessage();
-		if (message == null && targetException != null) {
-			message = targetException.getMessage();
+		if (message == null) {
+			message = "";
+		}
+		if (targetException != null) {
+			message += targetException.getMessage();
 		}
 		return message;
 	}
-
 }

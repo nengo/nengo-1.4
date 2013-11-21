@@ -428,6 +428,12 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
                     }
 				}
 			}
+			else if(node instanceof SocketUDPNode)
+			{
+				// If the node to be removed is a SocketUDPNode, make sure to close down the socket
+				// before removing it.
+				((SocketUDPNode) node).close();
+			}
 
 			myNodeMap.remove(name);
 			node.removeChangeListener(this);

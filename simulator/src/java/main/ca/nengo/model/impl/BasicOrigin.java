@@ -243,7 +243,9 @@ public class BasicOrigin implements Origin, Noise.Noisy, Resettable, Configurabl
 	}
 	
 	public BasicOrigin clone(Node node) throws CloneNotSupportedException {
-		return this.clone();
+		BasicOrigin result = this.clone();
+		result.myNode = node;
+		return result;
 	}
 
 	/**
