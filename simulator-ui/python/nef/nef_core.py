@@ -1290,7 +1290,7 @@ class Network:
         self.network.reset(True)
         self.run_time=0.0
         
-    def log(self,name=None,dir=None,filename='%(name)s-%(time)s.csv',interval=0.001,tau=0.01):
+    def log(self,name=None,dir=None,filename='%(name)s-%(time)s.csv',interval=0.001,tau=0.01, auto_flush=True):
         """Creates a :py:class:`nef.Log` object which dumps data to a .csv file as the model runs.
         
         See the :py:class:`nef.Log` documentation for details.
@@ -1304,7 +1304,7 @@ class Network:
         :param float interval: The time interval between each row of the log.  Defaults to 0.001 (1ms).
         :param float tau: The default filter time for data.  Defaults to 0.01 (10ms).        
         """
-        return log.Log(self,name=name,dir=dir,filename=filename,interval=interval,tau=tau)
+        return log.Log(self,name=name,dir=dir,filename=filename,interval=interval,tau=tau, auto_flush=auto_flush)
         
     def set_view_function_1d(self,node,basis,label='1D function',minx=-1,maxx=1,miny=-1,maxy=1):
         """Define a function representation for the given node.

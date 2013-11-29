@@ -143,7 +143,7 @@ class LogTheta(LogTermination):
 
 
 class Log(StepListener):
-    def __init__(self,network,name=None,dir=None,filename='%(name)s-%(time)s.csv',interval=0.001,tau=0.01):
+    def __init__(self,network,name=None,dir=None,filename='%(name)s-%(time)s.csv',interval=0.001,tau=0.01, auto_flush=True):
         if not isinstance(network,Network):
             network=Network(network)
         self.network=network
@@ -161,6 +161,7 @@ class Log(StepListener):
         self.interval=interval
         self.tau=tau
         self.t=None
+        self.auto_flush = auto_flush
 
         self.logs=[]
         self.network.network.addStepListener(self)
@@ -263,10 +264,20 @@ class Log(StepListener):
         data=[log.text() for log in self.logs]
         self.write('%1.3f,%s\n'%(self.t,','.join(data)))
         
+    next_flush_time = None    
     def write(self,text):
-        f=open(self.filename,'a')
-        f.write(text)
-        f.close()
+        if self.auto_flush:
+            f=open(self.filename,'a')
+            f.write(text)
+            f.close()
+        else:
+            if not hasattr(self, 'logfile'):
+                self.logfile = open(self.filename,'a')    
+            self.logfile.write(text)
+            if self.next_flush_time is None or time.time() > self.next_flush_time:
+                self.logfile.flush()
+                self.next_flush_time = time.time() + 1.0
+                
         
     def read(self):
         if '/' in self.filename:
