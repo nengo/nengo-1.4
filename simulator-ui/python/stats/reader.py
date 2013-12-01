@@ -25,13 +25,16 @@ class Reader:
         self.cache={}
         self.computed=computed.Computed(os.path.join(self.dir,self.filename)[:-4])   
     def find_file(self,filename):
-        files=os.listdir(self.dir)
+        dir, filename = os.path.split(filename)
+        dir = os.path.join(self.dir, dir)
+    
+        files=os.listdir(dir)
         files=[x for x in files if x.endswith('.csv') and x.startswith(filename)]
         times=[os.path.getmtime(os.path.join(self.dir,x)) for x in files]
         if len(times)==0:
             print 'No log files found in "%s/%s*"'%(self.dir,filename)
             return None
-        return files[times.index(max(times))]
+        return os.path.join(dir, files[times.index(max(times))])
     def read_header(self):
         if not os.path.exists(os.path.join(self.dir,self.filename)):
             self.header=[]
