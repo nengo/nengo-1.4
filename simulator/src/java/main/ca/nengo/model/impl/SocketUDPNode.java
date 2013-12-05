@@ -390,7 +390,7 @@ public class SocketUDPNode implements Node, Resettable {
 				// - bytes 4-(myDim+1)*4: values[i] (float)
 				ByteBuffer buffer = ByteBuffer.allocate((myDimension + 1) * 4);
 				buffer.order(myByteOrder);
-				buffer.putFloat(startTime);
+				buffer.putFloat((float)((startTime + endTime) / 2.0));
 				for(int i = 0; i < myDimension; i++)
 					buffer.putFloat(values[i]);
 				byte[] bufArray = buffer.array();
@@ -443,6 +443,7 @@ public class SocketUDPNode implements Node, Resettable {
 						mySocket.receive(packet);
 						
 						ByteBuffer buffer = ByteBuffer.wrap(bufArray);
+						buffer.order(myByteOrder);
 						for (i = 0; i < myDimension + 1; i++) {
 							tempValues[i] = buffer.getFloat();
 						}
