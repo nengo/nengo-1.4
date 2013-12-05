@@ -48,6 +48,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import org.apache.log4j.Logger;
 
@@ -115,6 +116,7 @@ public class SocketUDPNode implements Node, Resettable {
 	private NengoUDPPacketComparator myComparator;
 	private boolean myIsReceiver;
 	private boolean myIsSender;
+	private ByteOrder myByteOrder = ByteOrder.BIG_ENDIAN;
 
 	/**
 	 * Constructor for a SocketUDPNode that sends and receives data.
@@ -284,6 +286,17 @@ public class SocketUDPNode implements Node, Resettable {
 	public boolean isReceiver(){
 		return myIsReceiver;
 	}
+	
+	public void setByteOrder(ByteOrder byteOrder){
+		myByteOrder = byteOrder;
+	}
+	
+	public void setByteOrder(String byteOrder){
+		if (byteOrder.toLowerCase() == "little")
+			myByteOrder = ByteOrder.LITTLE_ENDIAN;
+		else if (byteOrder.toLowerCase() == "big")
+			myByteOrder = ByteOrder.BIG_ENDIAN;
+	}
 
 	/**
 	 * @see ca.nengo.model.Node#getOrigin(java.lang.String)
@@ -376,6 +389,7 @@ public class SocketUDPNode implements Node, Resettable {
 				// - bytes 1-4: Timestamp (float)
 				// - bytes 4-(myDim+1)*4: values[i] (float)
 				ByteBuffer buffer = ByteBuffer.allocate((myDimension + 1) * 4);
+				buffer.order(myByteOrder);
 				buffer.putFloat(startTime);
 				for(int i = 0; i < myDimension; i++)
 					buffer.putFloat(values[i]);
