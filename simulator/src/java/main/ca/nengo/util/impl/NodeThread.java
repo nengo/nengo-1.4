@@ -160,7 +160,7 @@ public class NodeThread extends Thread {
 				}
 			}
 		} catch (Exception e) {
-			System.err.println(e);
+			e.printStackTrace();
 			myNodeThreadPool.kill();
 			finished();
 		}
