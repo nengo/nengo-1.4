@@ -117,6 +117,8 @@ public class SocketUDPNode implements Node, Resettable {
 	private boolean myIsReceiver;
 	private boolean myIsSender;
 	private ByteOrder myByteOrder = ByteOrder.BIG_ENDIAN;
+	private float myUpdateInterval = 0;
+	private float myNextUpdate = 0;
 
 	/**
 	 * Constructor for a SocketUDPNode that sends and receives data.
@@ -145,6 +147,7 @@ public class SocketUDPNode implements Node, Resettable {
 		myComparator = new NengoUDPPacketComparator();
 		mySocketBuffer = new PriorityQueue<float[]>(10, myComparator);
 		mySocket = null;
+		myNextUpdate = 0;
 		
 		myIsSender = false;
 		myIsReceiver = false;
@@ -297,6 +300,10 @@ public class SocketUDPNode implements Node, Resettable {
 		else if (byteOrder.toLowerCase() == "big")
 			myByteOrder = ByteOrder.BIG_ENDIAN;
 	}
+	
+	public void setUpdateInterval(float interval){
+		myUpdateInterval = interval;
+	}
 
 	/**
 	 * @see ca.nengo.model.Node#getOrigin(java.lang.String)
@@ -356,7 +363,7 @@ public class SocketUDPNode implements Node, Resettable {
 		// TODO: Thread this thing, so that it doesn't block if the blocking receive calls
 		//       are called before the send calls. (waiting for a receive before a send causes 
 		//       a deadlock situation.
-		if (isSender()) {
+		if (isSender() && startTime >= myNextUpdate) {
 			if (mySocket == null)
 				// If for some reason the socket hasn't been initialized, then initialize it.
 				initialize();
@@ -390,7 +397,7 @@ public class SocketUDPNode implements Node, Resettable {
 				// - bytes 4-(myDim+1)*4: values[i] (float)
 				ByteBuffer buffer = ByteBuffer.allocate((myDimension + 1) * 4);
 				buffer.order(myByteOrder);
-				buffer.putFloat((float)((startTime + endTime) / 2.0));
+				buffer.putFloat((float)((startTime + endTime + myUpdateInterval) / 2.0));
 				for(int i = 0; i < myDimension; i++)
 					buffer.putFloat(values[i]);
 				byte[] bufArray = buffer.array();
@@ -428,7 +435,7 @@ public class SocketUDPNode implements Node, Resettable {
 				for (i = 0; i < myDimension; i++)
 					values[i] = tempValues[i+1];
 			}
-			else if (foundFutureItem) {
+			else if (foundFutureItem || startTime < myNextUpdate) {
 				// Buffer contained item in the future, so skip waiting for a new packet to arrive, and hurry 
 				// the heck up.
 				values = ((RealOutputImpl) myOrigin.getValues()).getValues().clone();
@@ -449,7 +456,7 @@ public class SocketUDPNode implements Node, Resettable {
 						}
 						
 						// Check for timestamp for validity (i.e. within the start and end of this run call).
-						if ((tempValues[0] >= startTime && tempValues[0] <= endTime) || myIgnoreTimestamp) {
+						if ((tempValues[0] >= startTime && tempValues[0] <= endTime) || myIgnoreTimestamp || tempValues[0] < 0) {
 							// Valid timestamp encountered; or have been instructed to ignore timestamps. 
 							// No further actions required, just break out of while loop.
 							values = Arrays.copyOfRange(tempValues, 1, myDimension+1);
@@ -478,6 +485,8 @@ public class SocketUDPNode implements Node, Resettable {
 			}
 			myOrigin.setValues(new RealOutputImpl(values, Units.UNK, endTime));
 		}
+		if (startTime >= myNextUpdate)
+			myNextUpdate += myUpdateInterval;
 	}
 
 	/**
@@ -485,6 +494,7 @@ public class SocketUDPNode implements Node, Resettable {
 	 */
 	public void reset(boolean randomize) {
 		float time = 0;
+		myNextUpdate = 0;
 		if (myOrigin != null) {
 			try {
 				if (myOrigin.getValues() != null) {
