@@ -1,11 +1,15 @@
 package ca.nengo.util.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import ca.nengo.model.InstantaneousOutput;
 import ca.nengo.model.Node;
 import ca.nengo.model.Projection;
 import ca.nengo.model.SimulationException;
+import ca.nengo.model.impl.SocketUDPNode;
 import ca.nengo.util.ThreadTask;
 
 /**
@@ -18,6 +22,7 @@ public class NodeThread extends Thread {
 	private NodeThreadPool myNodeThreadPool;
 
 	private Node[] myNodes;
+	private List<Node> myDeferredSocketNodes;
 	private int myStartIndexInNodes;
 	private int myEndIndexInNodes;
 
@@ -46,6 +51,7 @@ public class NodeThread extends Thread {
 		myNodeThreadPool = nodePool;
 
 		myNodes = nodes;
+		myDeferredSocketNodes = new ArrayList<Node>(2);
 		myProjections = projections;
         myTasks = tasks;
 
@@ -95,10 +101,18 @@ public class NodeThread extends Thread {
 		
 		
 		for (int i = myStartIndexInNodes; i < myEndIndexInNodes; i++) {
-			
+			if (myNodes[i] instanceof SocketUDPNode && ((SocketUDPNode)myNodes[i]).isReceiver()) {
+				myDeferredSocketNodes.add(myNodes[i]);
+				continue;
+			}
 			myNodes[i].run(startTime, endTime);
 		}
 		
+		Iterator<Node> it = myDeferredSocketNodes.iterator();
+    	while (it.hasNext()) {
+  			it.next().run(startTime, endTime);
+    	}
+    	myDeferredSocketNodes.clear();
 	}
 	
 	protected void runTasks(float startTime, float endTime) throws SimulationException {

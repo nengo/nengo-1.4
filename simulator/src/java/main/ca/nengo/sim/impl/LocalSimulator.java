@@ -73,6 +73,7 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
     private List<ThreadTask> myProbeTasks;
     private Map<String, Node> myNodeMap;
     private List<Node> mySocketNodes;
+    private List<Node> myDeferredSocketNodes;
     private List<Probe> myProbes;
     private Network myNetwork;
     private boolean myDisplayProgress;
@@ -103,6 +104,8 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
         myNodeMap = new HashMap<String, Node>(myNodes.length * 2);
         if (mySocketNodes == null)
         	mySocketNodes = new ArrayList<Node>(2);
+        if (myDeferredSocketNodes == null)
+        	myDeferredSocketNodes = new ArrayList<Node>(2);
         for (Node myNode : myNodes) {
             myNodeMap.put(myNode.getName(), myNode);
             if (myNode instanceof SocketUDPNode) 
@@ -250,10 +253,19 @@ public class LocalSimulator implements Simulator, java.io.Serializable {
             for (Node myNode : myNodes) {
                 if(myNode instanceof NetworkImpl) {
                     ((NetworkImpl)myNode).run(startTime, endTime, false);
+                } else if(myNode instanceof SocketUDPNode && ((SocketUDPNode)myNode).isReceiver()) {
+                	myDeferredSocketNodes.add(myNode);
+                	continue;
                 } else {
                     myNode.run(startTime, endTime);
                 }
             }
+
+    		Iterator<Node> it1 = myDeferredSocketNodes.iterator();
+        	while (it1.hasNext()) {
+      			it1.next().run(startTime, endTime);
+        	}
+        	myDeferredSocketNodes.clear();
 
             for (ThreadTask myTask : myTasks) {
                 myTask.run(startTime, endTime);
