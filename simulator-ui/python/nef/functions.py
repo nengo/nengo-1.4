@@ -12,8 +12,13 @@ class PythonFunction(AbstractFunction):
         self.index=index
         self.use_cache=use_cache
 
-        code = inspect.getsource(func)
-        self.simple=self.checkIfSimple(code)
+        try:
+            code = inspect.getsource(func)
+            self.simple=self.checkIfSimple(code)
+        except IOError:
+            code = None
+            self.simple = False
+            
         
         if self.simple:
           self.setCode(code)
