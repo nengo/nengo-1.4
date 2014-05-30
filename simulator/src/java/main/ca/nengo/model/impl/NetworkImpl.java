@@ -1361,7 +1361,7 @@ public class NetworkImpl implements Network, VisiblyMutable, VisiblyMutable.List
             	 if(array.containsKey("useQuick"))
             	 {  
             		String useQuick = (Boolean)array.get("useQuick") ? "True" : "False";
-            	 	py.append(", useQuick=" + useQuick);
+            	 	py.append(", quick=" + useQuick);
             	 }
             	 
             	 if(array.containsKey("encoders")){ py.append(", encoders=" + array.get("encoders")); }

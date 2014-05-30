@@ -417,11 +417,29 @@ public class ProjectionImpl implements Projection {
     		AbstractFunction absFun = (AbstractFunction) fns[0];
     		String code = absFun.getCode();
     		
+    		StringBuilder indentedCode = new StringBuilder();
+    		
+    		String[] split = code.split("\n");
+    		
+    		int i = 0;
+    		while(split[0].startsWith(" ", i)){
+    			i++;
+    		}
+    		
+    		if(i > 0){
+	    		for(String s: split){
+	    			indentedCode.append(s.substring(i) + "\n");
+	    		}
+    		}
+    		
+    		code = indentedCode.toString();
+    		
     		if(code != ""){
     			py.insert(0, code);
     		}else{
     			throw new ScriptGenException("Trying to generate script of non user-defined function on an origin which is not supported.");
     		}
+    		
     		
     		return absFun.getName();
     	}

@@ -350,24 +350,24 @@ class Network:
 
         narr=HashMap(10)
         narr.put("name", name)
-        narr.put("neurons", neurons)
-        narr.put("length", length)
-        narr.put("dimensions", dimensions)
+        narr.put("neurons", int(neurons))
+        narr.put("length", int(length))
+        narr.put("dimensions", int(dimensions))
 
         if radius:
-          narr.put("radius", radius)
+          narr.put("radius", float(radius))
 
         if max_rate:
-          narr.put("rLow", max_rate[0])
-          narr.put("rHigh", max_rate[1])
-        
+          narr.put("rLow", float(max_rate[0]))
+          narr.put("rHigh", float(max_rate[1]))
+
         if intercept:
-          narr.put("iLow", intercept[0])
-          narr.put("iHigh", intercept[1])
-        
+          narr.put("iLow", float(intercept[0]))
+          narr.put("iHigh", float(intercept[1]))
+
         if quick:
           narr.put("useQuick", quick)
-        
+
         if encoders:
           narr.put("encoders", str(encoders))
 
