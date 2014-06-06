@@ -131,8 +131,10 @@
 		<replace dir="${dist.dir}" token="BUILDNUMBER" value="${buildhash}">
 			<include name="nengo"/>
             <include name="nengo-cl"/>
+            <include name="javaviz-server"/>
 			<include name="nengo.bat"/>
             <include name="nengo-cl.bat"/>
+            <include name="javaviz-server.bat"/>
 			<include name="lib/build/launch-nengo.xml"/>
             <include name="lib/build/launch-nengo-cl.xml"/>
 		</replace>
@@ -151,6 +153,7 @@
 		<replace dir="${dist.dir}" token="LIBS" value="${libs.unix}">
 		    <include name="nengo"/>
 		    <include name="nengo-cl"/>
+		    <include name="javaviz-server"/>
 	    </replace>
 
         <pathconvert targetos="windows" property="libs.windows" refid="distlibs">
@@ -162,6 +165,7 @@
 		<replace dir="${dist.dir}" token="LIBS" value="${libs.windows}">
 		    <include name="nengo.bat"/>
 		    <include name="nengo-cl.bat"/>
+		    <include name="javaviz-server.bat"/>
 		</replace>
 
 		<pathconvert pathsep="\n" property="libs.xml" refid="distlibs">
@@ -195,6 +199,7 @@
 			<fileset dir="${dist.dir}">
 				<include name="nengo"/>
 				<include name="nengo-cl"/>
+				<include name="javaviz-server"/>
 				<include name="external/pseudoInverse"/>
 			</fileset>
 		</chmod>
