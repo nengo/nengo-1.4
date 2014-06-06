@@ -459,7 +459,8 @@ public class SocketUDPNode implements Node, Resettable {
 						if ((tempValues[0] >= startTime && tempValues[0] <= endTime) || myIgnoreTimestamp || tempValues[0] < 0) {
 							// Valid timestamp encountered; or have been instructed to ignore timestamps. 
 							// No further actions required, just break out of while loop.
-							values = Arrays.copyOfRange(tempValues, 1, myDimension+1);
+							//values = Arrays.copyOfRange(tempValues, 1, myDimension+1);
+							System.arraycopy(tempValues, 1, values, 0, myDimension);
 							break;
 						}
 						else if (tempValues[0] > endTime) {
