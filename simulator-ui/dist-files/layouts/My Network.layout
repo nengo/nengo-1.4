@@ -1,0 +1,8 @@
+({'state': 0, 'height': 700, 'width': 950, 'x': 210, 'y': 123},
+ [(u'input', None, {'label': False, 'height': 32, 'width': 53, 'x': 250, 'y': 19}),
+  (u'My Ensemble', None, {'label': False, 'height': 32, 'width': 131, 'x': 483, 'y': 20}),
+  (u'My Ensemble', u'value|X', {'label': True, 'sel_dim': [0, 1], 'last_maxy': 1.0, 'sel_all': True, 'height': 200, 'width': 300, 'x': 519, 'fixed_y': None, 'autozoom': False, 'y': 56}),
+  (u'input', 'control', {'label': True, 'range': 1.0, 'limits_w': 0, 'limits': True, 'height': 200, 'width': 120, 'x': 63, 'y': 51}),
+  (u'input', 'value|origin', {'label': True, 'sel_dim': [0, 1], 'last_maxy': 1.0, 'sel_all': True, 'height': 200, 'width': 300, 'x': 201, 'fixed_y': None, 'autozoom': False, 'y': 53}),
+  (u'My Ensemble', 'spike raster', {'label': True, 'sample': 10, 'height': 200, 'width': 300, 'x': 522, 'y': 280})],
+ {'dt': 0, 'show_time': 0.5, 'sim_spd': 4, 'update_freq': 30.303030303030305, 'filter': 0.03, 'rcd_time': 4.0}) 
