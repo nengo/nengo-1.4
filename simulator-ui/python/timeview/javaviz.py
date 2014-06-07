@@ -9,6 +9,7 @@ class ProbeNode(nef.Node):
         self.termination_count = 0
         self.probes = {}
         self.receiver = receiver
+        self.data = []
 
         # make a dummy connection for drawing arrow in the gui.
         #  we use "current" since that is ignored by the
@@ -17,14 +18,14 @@ class ProbeNode(nef.Node):
 
     def add_probe(self, id, dimensions, origin_name):
         self.probes[id] = self.make_output(origin_name, dimensions)
-        self.receiver.register(id, self.probes[id])
+        self.receiver.register(id, self, dimensions)
 
     def add_spike_probe(self, id, num_neurons):
         # Assuming it will only have 1 spike probe
         self.spike_probe = lambda: None
         self.spike_probe._value = [0] * num_neurons
-        self.receiver.register(id, self.spike_probe)
-        
+        self.receiver.register(id, self.spike_probe, num_neurons)
+
     def set_encoders(self, n_neurons, dimensions, encoder_data):
         self.encoders = []
         for i in range(n_neurons):
@@ -35,6 +36,26 @@ class ProbeNode(nef.Node):
         self.make_input(name, dimensions)
         self.termination_count += 1
         return self.getTermination(name)
+
+    def add_data(self, id, time, data):
+        self.data.append((id, time, data))
+
+    def run(self, start, end):
+        for p in self.probes.values():
+            for i in range(len(p._value)):
+                p._value[i] = 0
+        while len(self.data) > 0:
+            if self.data[0][1] >= start:
+                break
+            id, time, data = self.data.pop(0)
+            for i in range(len(data)):
+                # we add these inputs since we may receive more than one
+                # packet of data per timestep as the simulator and the
+                # visualizer are not kept locked together in time
+                self.probes[id]._value[i] += data[i]
+
+        nef.Node.run(self, start, end)
+
 
 
 import java
@@ -48,9 +69,12 @@ class ValueReceiver(java.lang.Thread):
         self.buffer = jarray.zeros(maxLength,'b')
         self.packet = java.net.DatagramPacket(self.buffer, maxLength)
         self.probes = {}
+        self.probe_lengths = {}
+        self.sim_time = None
 
-    def register(self, id, probe):
+    def register(self, id, probe, length):
         self.probes[id] = probe
+        self.probe_lengths[id] = length
 
     def run(self):
         while True:
@@ -67,6 +91,7 @@ class ValueReceiver(java.lang.Thread):
             id = d.readInt()
             probe = self.probes[id]
 
+
             if callable(probe):
                 num_spikes = d.readUnsignedShort()
                 for i in range(num_spikes):
@@ -74,11 +99,11 @@ class ValueReceiver(java.lang.Thread):
                     probe._value[spike_index] += 1.0
             else:
                 time = d.readFloat()
+                self.sim_time = time
 
-                length = len(probe._value)
+                length = self.probe_lengths[id]
 
-                for i in range(length):
-                    probe._value[i] = d.readFloat()
+                probe.add_data(id, time, [d.readFloat() for i in range(length)])
 
         self.socket.close()
         print 'finished running JavaViz'
@@ -124,6 +149,9 @@ class ControlNode(nef.Node, java.awt.event.WindowListener):
                 packet = java.net.DatagramPacket(msg, len(msg), self.address, self.port)
                 self.socket.send(packet)
 
+            # don't let the visualizer get too far ahead of the simulation
+            while self.t > self.receiver.sim_time + 0.002:
+                pass
             yield self.dt
     def windowActivated(self, event):
         pass
