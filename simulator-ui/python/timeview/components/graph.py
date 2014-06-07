@@ -85,7 +85,7 @@ class Graph(core.DataViewComponent):
         self.added_popup_separator = False
         self.selection_menu_items = []
         self.popup_dim_menus = []
-        
+
         self.tick(0.0) #tick once to initialize variables
 
     def initialize_map(self):
@@ -102,9 +102,10 @@ class Graph(core.DataViewComponent):
         save_info = core.DataViewComponent.save(self)
 
         sel_dim = []
-        for n in range(len(self.indices)):          # Get the checkbox states
-            if(self.indices[n]):
-                sel_dim += [n]
+        if self.indices is not None:
+            for n in range(len(self.indices)):      # Get the checkbox states
+                if(self.indices[n]):
+                    sel_dim += [n]
 
         save_info['sel_dim'] = sel_dim              # Save the checkbox states
         save_info['sel_all'] = self.sel_all         # Save select all status
@@ -138,11 +139,11 @@ class Graph(core.DataViewComponent):
                 self.indices = [False] * data_dim
 
                 sel_dim = d.get('sel_dim', range(min(data_dim, self.default_selected)))
-                
+
                 for dim in sel_dim:                         # Iterate and restore the saved state
                     if(dim < data_dim):
                         self.indices[dim] = True
-            
+
                 # Check if all of the indices are selected
                 # Just in case someone altered the layout file and didn't set things right
                 self.sel_all = all(self.indices)
@@ -242,16 +243,16 @@ class Graph(core.DataViewComponent):
         dt_tau = None
         if self.filter and self.view.tau_filter > 0:
             dt_tau = self.view.dt / self.view.tau_filter
-        
-        pts = int(self.view.time_shown / self.view.dt)     
-        
+
+        pts = int(self.view.time_shown / self.view.dt)
+
         start = self.view.current_tick - pts + 1
         if start < 0:
             start = 0
         if start <= self.view.timelog.tick_count - self.view.timelog.tick_limit:
             start = self.view.timelog.tick_count - self.view.timelog.tick_limit + 1
         self.start = start
-        
+
         if self.data is not None:
             data = self.data.get(start=start, count=pts, dt_tau=dt_tau)
             data = self.post_process(data, start, dt_tau)
@@ -262,7 +263,7 @@ class Graph(core.DataViewComponent):
             data = self.rawdata
             pts = len(data)
         self.pts = pts
-        
+
         #initialize indices
         if self.indices is None:
             for x in data:
@@ -275,13 +276,13 @@ class Graph(core.DataViewComponent):
                     break
             else:
                 return
-        
+
         #pick out the data that will be displayed
         if not self.neuronmapped:
             self.filtered = [[safe_get_index(x,i) for x in data] for i,draw in enumerate(self.indices) if draw]
         else:
             self.filtered = [[safe_get_index(x, self.map.map[i]) for x in data] for i,draw in enumerate(self.indices) if draw]
-        
+
         #calculate max/min y
         maxy = 1.0
         miny = -1.0
@@ -291,7 +292,7 @@ class Graph(core.DataViewComponent):
                 miny = min([min([x for x in d if x != None]) for d in self.filtered])
             except ValueError:
                 pass #retain default values of max/miny
-            
+
         if maxy < self.ylimits[1]:
             maxy = float(self.ylimits[1])
         if miny > self.ylimits[0]:
@@ -312,7 +313,7 @@ class Graph(core.DataViewComponent):
 
         if self.fixed_y is not None:
             miny, maxy = self.fixed_y
-            
+
         self.miny = miny
         self.maxy = maxy
 
@@ -324,16 +325,13 @@ class Graph(core.DataViewComponent):
         pts = self.pts
         border_top = self.border_top + self.label_offset
         dx = float(self.size.width - self.border_left - self.border_right - 1) / (pts - 1) #pixel width per data point
-        
+
         #draw border
         g.color = Color(0.8, 0.8, 0.8)
         g.drawRect(self.border_left, border_top, self.width - self.border_left - self.border_right, self.size.height - border_top - self.border_bottom)
 
         g.color = Color(0.8, 0.8, 0.8)
         g.drawLine(self.border_left, border_top, self.border_left, self.size.height - self.border_bottom)
-        
-        self.sel_all = all(self.indices)
-        self.sel_all_menu_item.setState(self.sel_all)
 
         #draw labels at beginning and end of x axis
         if self.x_labels is None:
@@ -347,6 +345,11 @@ class Graph(core.DataViewComponent):
         for i, txt in x_labels.items():
             bounds = g.font.getStringBounds(txt, g.fontRenderContext)
             g.drawString(txt, self.border_left - bounds.width / 2 + int(i * dx), self.size.height - self.border_bottom + bounds.height)
+
+        if self.indices is None:
+            return
+        self.sel_all = all(self.indices)
+        self.sel_all_menu_item.setState(self.sel_all)
 
         #drawing main component
         if self.maxy == self.miny:
@@ -396,10 +399,10 @@ class Graph(core.DataViewComponent):
                     skip = 0
                 if pdftemplate is not None:   # draw every point for pdf rendering
                     skip = 0
-    
+
                 if not self.split or self.use_colors_when_split:
                     g.color = colors[j % len(colors)]
-    
+
                 offset = start % (skip + 1)
                 for i in range(len(fdata) - 1 - skip):
                     if skip == 0 or (i + offset) % (skip + 1) == 0:
@@ -409,7 +412,7 @@ class Graph(core.DataViewComponent):
                             if self.split:
                                 y1 -= (len(self.filtered) - 1 - j) * split_step
                                 y2 -= (len(self.filtered) - 1 - j) * split_step
-    
+
                             if pdftemplate is None:
                                 try:
                                     g.drawLine(int(i * dx + self.border_left), int(y1), int((i + 1 + skip) * dx + self.border_left), int(y2))
