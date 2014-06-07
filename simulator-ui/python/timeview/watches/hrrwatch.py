@@ -15,6 +15,13 @@ class HRRWatch(watchtemplate.WatchTemplate):
                 return (obj.dimension >= 8 and obj.getOrigin("X"))
             except:
                 return False
+        elif isinstance(obj, nef.Node):
+            try:
+                if obj.getOrigin('X').dimensions >= 8:
+                    return True
+            except:
+                return False
+        return False
 
     def views(self, obj):
         return [
