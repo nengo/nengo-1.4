@@ -70,7 +70,7 @@ class ValueReceiver(java.lang.Thread):
         self.packet = java.net.DatagramPacket(self.buffer, maxLength)
         self.probes = {}
         self.probe_lengths = {}
-        self.sim_time = None
+        self.sim_time = 0.0
 
     def register(self, id, probe, length):
         self.probes[id] = probe
@@ -89,6 +89,12 @@ class ValueReceiver(java.lang.Thread):
                     java.io.ByteArrayInputStream(self.packet.getData()))
 
             id = d.readInt()
+            if id == -1:
+                # dummy probe
+                time = d.readFloat()
+                self.sim_time = time
+                continue
+
             probe = self.probes[id]
 
 
