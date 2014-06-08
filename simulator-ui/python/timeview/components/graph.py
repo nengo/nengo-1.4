@@ -14,6 +14,8 @@ from math import ceil
 def safe_get_index(x, i):
     if x is None:
         return None
+    if len(x) <= i:
+        return None
     return x[i]
 
 
