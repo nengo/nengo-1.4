@@ -134,8 +134,10 @@ class ControlNode(nef.Node, java.awt.event.WindowListener):
 
     def register(self, id, input):
         self.inputs[id] = input
-        self.formats[input] = '>Lf'+'f'*input.getOrigin('origin').getDimensions()
         self.ids[input.name] = id
+
+    def register_semantic(self, id, probe_node):
+        self.ids[probe_node.name] = id
 
     def start(self):
         cache = {}
@@ -145,13 +147,18 @@ class ControlNode(nef.Node, java.awt.event.WindowListener):
                 msg = struct.pack('>f', self.t)
                 for key, value in self.view.forced_origins.items():
                     (name, origin, index) = key
-                    if origin=='origin':
-                        id = self.ids.get(name, None)
-                        if id is not None:
-                            prev = cache.get((id,index),None)
-                            if value != prev:
+                    id = self.ids.get(name, None)
+                    if id is not None:
+                        prev = cache.get((id,index),None)
+                        if value != prev:
+                            if index is None:
+                                for i in range(len(value)):
+                                    msg += struct.pack('>LLf', id, i, value[i])
+                            else:
                                 msg += struct.pack('>LLf', id, index, value)
-                                cache[(id, index)] = value
+                            cache[(id, index)] = value
+                    else:
+                        print 'No registered id for ', key
                 packet = java.net.DatagramPacket(msg, len(msg), self.address, self.port)
                 self.socket.send(packet)
 
