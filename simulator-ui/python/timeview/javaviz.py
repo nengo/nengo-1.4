@@ -149,14 +149,11 @@ class ControlNode(nef.Node, java.awt.event.WindowListener):
                     (name, origin, index) = key
                     id = self.ids.get(name, None)
                     if id is not None:
-                        prev = cache.get((id,index),None)
-                        if value != prev:
-                            if index is None:
-                                for i in range(len(value)):
-                                    msg += struct.pack('>LLf', id, i, value[i])
-                            else:
-                                msg += struct.pack('>LLf', id, index, value)
-                            cache[(id, index)] = value
+                        if index is None:
+                            for i in range(len(value)):
+                                msg += struct.pack('>LLf', id, i, value[i])
+                        else:
+                            msg += struct.pack('>LLf', id, index, value)
                     else:
                         print 'No registered id for ', key
                 packet = java.net.DatagramPacket(msg, len(msg), self.address, self.port)
