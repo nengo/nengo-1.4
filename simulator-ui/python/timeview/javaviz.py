@@ -38,6 +38,9 @@ class ProbeNode(nef.Node):
         return self.getTermination(name)
 
     def add_data(self, id, time, data):
+        # if we've been reset
+        if len(self.data) > 0 and self.data[0][1] > time:
+            del self.data[:]
         self.data.append((id, time, data))
 
     def run(self, start, end):
