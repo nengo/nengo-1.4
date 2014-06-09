@@ -39,8 +39,13 @@ class ProbeNode(nef.Node):
 
     def add_data(self, id, time, data):
         # if we've been reset
-        if len(self.data) > 0 and self.data[0][1] > time:
-            del self.data[:]
+        try:
+            if len(self.data) > 0 and self.data[0][1] > time:
+                del self.data[:]
+        except IndexError:
+            # this can happen (rarely) due to threads updating
+            # at unlucky times
+            pass
         self.data.append((id, time, data))
 
     def run(self, start, end):
