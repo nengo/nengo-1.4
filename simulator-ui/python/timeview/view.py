@@ -117,7 +117,9 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
     def process_nodes(self, nodes, popup, prefix=""):
         names = [(n.name, n) for n in nodes]
         names.sort()
-
+        
+        submenus = {}
+        
         for i, (name, n) in enumerate(names):
             self.watcher.add_object(prefix + name, n)
 
@@ -128,6 +130,21 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                 menu = JMenu(prefix + name, mouseClicked=click_func)
                 popup.add(menu)
                 self.process_nodes(n.nodes, prefix=prefix + name + ".", popup=menu)
+            elif ">" in name:
+                netname = name.split(">")[:-1]
+                objname = name.split(">")[-1]
+                menu = popup
+                for i,net in enumerate(netname):
+                    subnet = ">".join(netname[:i+1])
+                    
+                    if subnet in submenus:
+                        menu = submenus[subnet]
+                    else:
+                        submenu = JMenu(subnet)
+                        menu.add(submenu)
+                        submenus[subnet] = submenu
+                        menu = submenu
+                menu.add(JMenuItem(objname, actionPerformed=lambda event, self=self, name=name: self.add_item(name, self.mouse_click_location)))
             else:
                 popup.add(JMenuItem(prefix + name, actionPerformed=lambda event, self=self, name=prefix + name: self.add_item(name, self.mouse_click_location)))
 
