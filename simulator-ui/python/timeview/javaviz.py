@@ -42,11 +42,11 @@ class ProbeNode(nef.Node):
         try:
             if len(self.data) > 0 and self.data[0][1] > time:
                 del self.data[:]
-        except IndexError:
+            self.data.append((id, time, data))
+        except IndexError, IndexOutOfBoundsException:
             # this can happen (rarely) due to threads updating
             # at unlucky times
             pass
-        self.data.append((id, time, data))
 
     def run(self, start, end):
         for p in self.probes.values():
