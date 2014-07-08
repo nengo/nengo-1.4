@@ -68,6 +68,7 @@ class ProbeNode(nef.Node):
 
 import java
 import jarray
+from java.awt.event import KeyEvent
 class ValueReceiver(java.lang.Thread):
     def __init__(self, port):
         self.socket = java.net.DatagramSocket(port)
@@ -122,11 +123,12 @@ class ValueReceiver(java.lang.Thread):
         self.socket.close()
         print 'finished running JavaViz'
 
-class ControlNode(nef.Node, java.awt.event.WindowListener):
+class ControlNode(nef.Node, java.awt.event.WindowListener, java.awt.event.KeyListener):
 
     def __init__(self, name, address, port, receiver, dt=0.001):
         nef.Node.__init__(self, name)
         self.view = None
+        self.uses_keyboard = False
         self.receiver = receiver
         self.socket = java.net.DatagramSocket()
         self.address = java.net.InetAddress.getByName(address)
@@ -139,8 +141,17 @@ class ControlNode(nef.Node, java.awt.event.WindowListener):
     def set_view(self, view):
         self.view = view
         self.view.frame.addWindowListener(self)
+        #self.view.frame.addKeyListener(self)
+        self.view.area.addKeyListener(self)
+        #self.view.time_control.addKeyListener(self)
 
     def register(self, id, input):
+        if input.name == 'keyboard':
+            try:
+                self.uses_keyboard = input.getOrigin('origin').dimensions
+                print 'Using keyboard: dimensions=', self.uses_keyboard
+            except:
+                pass
         self.inputs[id] = input
         self.ids[input.name] = id
 
@@ -170,6 +181,8 @@ class ControlNode(nef.Node, java.awt.event.WindowListener):
             # don't let the visualizer get too far ahead of the simulation
             while self.t > self.receiver.sim_time + 0.002:
                 pass
+            if self.view is not None and self.uses_keyboard:
+                self.view.area.requestFocusInWindow()
             yield self.dt
     def windowActivated(self, event):
         pass
@@ -186,4 +199,30 @@ class ControlNode(nef.Node, java.awt.event.WindowListener):
         pass
     def windowOpened(self, event):
         pass
+        
+    def set_key(self, index, value):
+        print 'set_key', index, value
+        if self.uses_keyboard > 0 and index < self.uses_keyboard:
+            self.view.forced_origins[('keyboard', 'origin', index)] = value
+        
+    def keyPressed(self,event):
+        if event.keyChar=='w': self.set_key(0, 1)
+        if event.keyChar=='s': self.set_key(0, -1)
+        if event.keyChar=='a': self.set_key(1, -1)
+        if event.keyChar=='d': self.set_key(1, 1)
+        if event.keyCode==KeyEvent.VK_LEFT: self.set_key(2, -1)
+        if event.keyCode==KeyEvent.VK_RIGHT: self.set_key(2, 1)
+        if event.keyCode==KeyEvent.VK_UP: self.set_key(3, 1)
+        if event.keyCode==KeyEvent.VK_DOWN: self.set_key(3, -1)
+    def keyReleased(self,event):
+        if event.keyChar=='w': self.set_key(0, 0)
+        if event.keyChar=='s': self.set_key(0, 0)
+        if event.keyChar=='a': self.set_key(1, 0)
+        if event.keyChar=='d': self.set_key(1, 0)
+        if event.keyCode==KeyEvent.VK_LEFT: self.set_key(2, 0)
+        if event.keyCode==KeyEvent.VK_RIGHT: self.set_key(2, 0)
+        if event.keyCode==KeyEvent.VK_UP: self.set_key(3, 0)
+        if event.keyCode==KeyEvent.VK_DOWN: self.set_key(3, 0)
+    def keyTyped(self,event):
+        pass        
 
