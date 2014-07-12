@@ -132,7 +132,7 @@ public class SocketUDPNode implements Node, Resettable {
 	 * @throws UnknownHostException
 	 * @throws SocketException
 	 */
-	public SocketUDPNode(String name, int dimension, int localPort, String destAddress, int destPort,
+	public SocketUDPNode(String name, int dimension, int recvDimension, int localPort, String destAddress, int destPort,
 		                 int socketTimeout, boolean ignoreTimestamp) throws UnknownHostException {
 		myName = name;
 		myDimension = dimension;
@@ -157,7 +157,7 @@ public class SocketUDPNode implements Node, Resettable {
 			myIsSender = true;
 		if (myLocalPort > 0) {
 			myIsReceiver = true;
-			myOrigin = new BasicOrigin(this, ORIGIN, dimension, Units.UNK);
+			myOrigin = new BasicOrigin(this, ORIGIN, recvDimension, Units.UNK);
 		}
 
 		reset(false);
@@ -183,9 +183,9 @@ public class SocketUDPNode implements Node, Resettable {
 	 * @param localPort Port number on the local machine to bind to. Set to 0 to bind to first available port.
 	 * @param socketTimeout Timeout on socket in milliseconds (socket blocks until timeout expires)
 	 */
-	public SocketUDPNode(String name, int dimension, int localPort, int socketTimeout)
+	public SocketUDPNode(String name, int dimension, int recvDimension, int localPort, int socketTimeout)
 			throws UnknownHostException {
-		this(name, dimension, localPort, "", -1, Math.max(socketTimeout, 1), false);
+		this(name, dimension, recvDimension, localPort, "", -1, Math.max(socketTimeout, 1), false);
 	}
 
 	/**
@@ -198,9 +198,9 @@ public class SocketUDPNode implements Node, Resettable {
 	 * @param ignoreTimestamp Set to true to ignore timestamps on incoming packets.
 	 * @param socketTimeout Timeout on socket in milliseconds (socket blocks until timeout expires)
 	 */
-	public SocketUDPNode(String name, int dimension, int localPort, int socketTimeout,
+	public SocketUDPNode(String name, int dimension, int recvDimension, int localPort, int socketTimeout,
 		                 boolean ignoreTimestamp) throws UnknownHostException {
-		this(name, dimension, localPort, "", -1, Math.max(socketTimeout, 1), ignoreTimestamp);
+		this(name, dimension, recvDimension, localPort, "", -1, Math.max(socketTimeout, 1), ignoreTimestamp);
 	}
 
 	/**
@@ -213,7 +213,7 @@ public class SocketUDPNode implements Node, Resettable {
 	 */
 	public SocketUDPNode(String name, int dimension, String destAddress, int destPort)
 			throws UnknownHostException {
-		this(name, dimension, -1, destAddress, destPort, -1, false);
+		this(name, dimension, 0, -1, destAddress, destPort, -1, false);
 	}
 
 	public void initialize() throws SimulationException{
@@ -363,7 +363,7 @@ public class SocketUDPNode implements Node, Resettable {
 		// TODO: Thread this thing, so that it doesn't block if the blocking receive calls
 		//       are called before the send calls. (waiting for a receive before a send causes 
 		//       a deadlock situation.
-		if (isSender() && startTime >= myNextUpdate) {
+		if (isSender() && (startTime + myUpdateInterval / 2.0) >= myNextUpdate) {
 			if (mySocket == null)
 				// If for some reason the socket hasn't been initialized, then initialize it.
 				initialize();
@@ -412,8 +412,8 @@ public class SocketUDPNode implements Node, Resettable {
 			}
 		}
 		if (isReceiver()) {
-			float[] values = new float[myDimension];
-			float[] tempValues = new float[myDimension+1];
+			float[] values = new float[myOrigin.getDimensions()];
+			float[] tempValues = new float[myOrigin.getDimensions()+1];
 
 			// Check items in priority queue to see if there is anything that is good to go (i.e. timestamp is within 
 			// startTime and endTime.
@@ -432,7 +432,7 @@ public class SocketUDPNode implements Node, Resettable {
 			if (foundItem) {
 				// If an item was found in the queue (i.e. message with future timestamp was received before), use this
 				// data instead of waiting on socket for new data.
-				for (i = 0; i < myDimension; i++)
+				for (i = 0; i < myOrigin.getDimensions(); i++)
 					values[i] = tempValues[i+1];
 			}
 			else if (foundFutureItem || startTime < myNextUpdate) {
@@ -443,7 +443,7 @@ public class SocketUDPNode implements Node, Resettable {
 			else {
 				// If no items were found in queue, wait on socket for new data.
 				try {
-					byte[] bufArray = new byte[(myDimension + 1) * 4];
+					byte[] bufArray = new byte[(myOrigin.getDimensions() + 1) * 4];
 					DatagramPacket packet = new DatagramPacket(bufArray, bufArray.length);
 					
 					while (true) {
@@ -451,7 +451,7 @@ public class SocketUDPNode implements Node, Resettable {
 						
 						ByteBuffer buffer = ByteBuffer.wrap(bufArray);
 						buffer.order(myByteOrder);
-						for (i = 0; i < myDimension + 1; i++) {
+						for (i = 0; i < myOrigin.getDimensions() + 1; i++) {
 							tempValues[i] = buffer.getFloat();
 						}
 						
@@ -459,8 +459,7 @@ public class SocketUDPNode implements Node, Resettable {
 						if ((tempValues[0] >= startTime && tempValues[0] <= endTime) || myIgnoreTimestamp || tempValues[0] < 0) {
 							// Valid timestamp encountered; or have been instructed to ignore timestamps. 
 							// No further actions required, just break out of while loop.
-							//values = Arrays.copyOfRange(tempValues, 1, myDimension+1);
-							System.arraycopy(tempValues, 1, values, 0, myDimension);
+							System.arraycopy(tempValues, 1, values, 0, myOrigin.getDimensions());
 							break;
 						}
 						else if (tempValues[0] > endTime) {
