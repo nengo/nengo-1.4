@@ -309,7 +309,7 @@ public class SocketUDPNode implements Node, Resettable {
 	 * @see ca.nengo.model.Node#getOrigin(java.lang.String)
 	 */
 	public Origin getOrigin(String name) throws StructuralException {
-		if (ORIGIN.equals(name) && myOrigin != null) {
+		if (myOrigin != null && myOrigin.getName().equals(name)) {
 			return myOrigin;
 		} else {
 			throw new StructuralException("Unknown origin: " + name);
@@ -618,6 +618,9 @@ public class SocketUDPNode implements Node, Resettable {
 		reset(false);
 	}
 
+    public void releaseMemory() {
+	}	
+	
 	private class NengoUDPPacketComparator implements Comparator<float[]> {
 		public int compare(float[] o1, float[] o2) {
 			return o1[0] < o2[0] ? -1 : o1[0] == o2[0] ? 0 : 1; 
