@@ -7,6 +7,8 @@ from java.awt.event import *
 
 from ca.nengo.model import SimulationMode
 
+from timeview import data
+
 import os
 
 # for save_pdf

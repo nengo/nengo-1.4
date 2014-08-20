@@ -8,7 +8,19 @@ from java.awt.event import *
 from java.io import *
 from javax.swing.filechooser import FileFilter
 
-import view
+import os
+
+class Icon:
+    pass
+
+class ShadedIcon:
+    pass
+
+parent = os.path.dirname(__file__)
+parent = parent[:parent.index("python")]
+for name in 'pause play configure end start backward forward restart arrowup arrowdown save restore refresh data pdf'.split():
+    setattr(Icon, name, ImageIcon(parent + ('python/images/%s.png' % name)))
+    setattr(ShadedIcon, name, ImageIcon(parent + ('python/images/%s-pressed.png' % name)))
 
 class CSVFilter(FileFilter):
     def accept(self,f):
@@ -45,7 +57,7 @@ class DataPanel(JPanel,MouseListener):
         
     def make_controls(self):
         panel=JPanel(background=self.background)
-        panel.add(JButton(view.Icon.refresh,actionPerformed=self.refresh,rolloverIcon=view.ShadedIcon.refresh,toolTipText='refresh',borderPainted=False,focusPainted=False,contentAreaFilled=False))
+        panel.add(JButton(Icon.refresh,actionPerformed=self.refresh,rolloverIcon=ShadedIcon.refresh,toolTipText='refresh',borderPainted=False,focusPainted=False,contentAreaFilled=False))
 
         filter=JPanel(layout=BorderLayout(),opaque=False)
         self.filter = JSpinner(SpinnerNumberModel(self.view.tau_filter,0,0.5,0.01),stateChanged=self.refresh)
@@ -61,7 +73,7 @@ class DataPanel(JPanel,MouseListener):
         decimals.maximumSize=decimals.preferredSize
         panel.add(decimals)
 
-        panel.add(JButton(view.Icon.save,actionPerformed=self.save,rolloverIcon=view.ShadedIcon.save,toolTipText='save',borderPainted=False,focusPainted=False,contentAreaFilled=False))
+        panel.add(JButton(Icon.save,actionPerformed=self.save,rolloverIcon=ShadedIcon.save,toolTipText='save',borderPainted=False,focusPainted=False,contentAreaFilled=False))
 
         return panel
         
