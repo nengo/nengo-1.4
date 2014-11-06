@@ -388,6 +388,13 @@ public class IzhikevichSpikeGenerator implements SpikeGenerator, Probeable {
 
 		return spiking;
 	}
+	
+	/**
+	 * @return membrane voltage
+	 */
+	public float getVoltage() {
+		return (float)myVoltage;
+	}
 
 	/**
 	 * @see Probeable#getHistory(String)
