@@ -2,11 +2,12 @@ from __future__ import generators
 
 import sys
 for p in ['python/jar/jpct.jar','python/jar/jbullet.jar','python/jar/vecmath.jar']:
-    if p not in sys.path: 
+    if p not in sys.path:
         sys.path.append(p)
 
 import java
 from javax.swing import *
+from javax.swing import JComponent
 from javax.swing.event import *
 from java.awt import *
 from java.awt.event import *
@@ -46,7 +47,7 @@ def createBox(x, y, z):
     box.addTriangle(SimpleVector(-x, y, -z), SimpleVector(-x, y, z), SimpleVector(x, y, -z))
 
     return box
-    
+
 def createBoxPieces(x,y,z):
     pieces=[]
     box=Object3D(12)
@@ -80,7 +81,7 @@ def createBoxPieces(x,y,z):
     pieces.append(box)
 
     return pieces
-    
+
 
 
 class Room(ccm.Model):
@@ -117,13 +118,13 @@ class Room(ccm.Model):
         self.physics.addRigidBody(RigidBody(rbi))
         rbi=RigidBodyConstructionInfo(0,DefaultMotionState(t),StaticPlaneShape(Vector3f(-1,0,0),-x/2.0),Vector3f(0,0,0))
         self.physics.addRigidBody(RigidBody(rbi))
-        
+
         self.vehicle_raycaster=DefaultVehicleRaycaster(self.physics)
-        
+
         if not isinstance(color,(list,tuple)):
             room=createBox(x/2.0, y/2.0, z/2.0)
             room.translate(0, 0, z/2.0)
-            room.invert()        
+            room.invert()
             colorname='room%d'%id(self)
             TextureManager.getInstance().addTexture(colorname,Texture(1, 1, color))
             room.setTexture(colorname)
@@ -134,7 +135,7 @@ class Room(ccm.Model):
             room=createBoxPieces(x/2.0, y/2.0, z/2.0)
             for i,r in enumerate(room):
                 r.translate(0, 0, z/2.0)
-                r.invert()        
+                r.invert()
                 colorname='room%d_%d'%(id(self),i)
                 TextureManager.getInstance().addTexture(colorname,Texture(1, 1, color[i%len(color)]))
                 r.setTexture(colorname)
@@ -143,7 +144,7 @@ class Room(ccm.Model):
                 self.world.addObject(r)
 
         self.ratelimit=RateLimit()
-    
+
     def add(self, obj, x,y,z=None):
         if z is None:
             t=Transform()
@@ -154,7 +155,7 @@ class Room(ccm.Model):
         self.temp=obj
         if hasattr(obj,'physics'):
             t=Transform()
-            ms=obj.physics.motionState            
+            ms=obj.physics.motionState
             ms.getWorldTransform(t)
             m=Matrix4f()
             t.getMatrix(m)
@@ -164,16 +165,16 @@ class Room(ccm.Model):
             t.set(m)
             ms.worldTransform=t
             obj.physics.motionState=ms
-            
+
             self.physics.addRigidBody(obj.physics)
 
-            if hasattr(obj,'wheels'):                
+            if hasattr(obj,'wheels'):
                 tuning=VehicleTuning()
                 obj.vehicle=RaycastVehicle(tuning,obj.physics,self.vehicle_raycaster)
                 obj.physics.setActivationState(CollisionObject.DISABLE_DEACTIVATION)
                 self.physics.addVehicle(obj.vehicle)
                 obj.vehicle.setCoordinateSystem(1,2,0)
-                
+
                 for w in obj.wheels:
                     wheel=obj.vehicle.addWheel(Vector3f(w.x,w.y,w.z),Vector3f(w.dir),Vector3f(w.axle),w.suspension_rest_len,w.radius,tuning,False)
                     wheel.suspensionStiffness=w.suspension_stiffness
@@ -182,11 +183,11 @@ class Room(ccm.Model):
                     wheel.wheelsDampingRelaxation=w.damping_relaxation
                     wheel.wheelsDampingCompression=w.damping_compression
                     wheel.rollInfluence=w.roll_influence
-                    
+
         self.objects.append(obj)
         self.world.addObject(obj.shape)
-        
-            
+
+
 
     def start(self):
         dt=self.dt
@@ -200,7 +201,7 @@ class Room(ccm.Model):
                         obj.vehicle.applyEngineForce(w.force,i)
                         #obj.vehicle.setBrake(w.brake,i)
 
-            self.physics.stepSimulation(dt,10,dt*0.1)    
+            self.physics.stepSimulation(dt,10,dt*0.1)
             yield dt
     def physics_dump(self):
         d={}
@@ -210,7 +211,7 @@ class Room(ccm.Model):
                 obj.physics.getMotionState().getWorldTransform(t)
                 m=Matrix4f()
                 t.getMatrix(m)
-                
+
                 trans=Matrix()
                 trans.set(3,0,m.m03)
                 trans.set(3,1,m.m13)
@@ -220,7 +221,7 @@ class Room(ccm.Model):
                     for j in range(3):
                         rot.set(i,j,m.getElement(j,i))
                 d[obj]=(trans,rot)
-        return d                    
+        return d
 
     def update_shapes(self,physics):
         for obj in self.objects:
@@ -236,7 +237,7 @@ class Room(ccm.Model):
                         m4.translate(p)
                         s.translationMatrix=m4
                         s.rotationMatrix=rot
-                    
+
 
 class Wheel:
     def __init__(self,x,y,z,dir=(0,0,-1),axle=(0,-1,0),radius=0.3,
@@ -254,10 +255,10 @@ class Wheel:
         self.friction=friction
         self.damping_relaxation=damping_relaxation
         self.damping_compression=damping_compression
-        self.roll_influence=roll_influence     
-        
+        self.roll_influence=roll_influence
+
         self.force=0
-        self.brake=0                   
+        self.brake=0
 
 
 class RangeSensorCallback(CollisionWorld.RayResultCallback):
@@ -273,42 +274,42 @@ class RangeSensor(ccm.Model):
         self.dir=Vector3f(x,y,z)
         self.dir.normalize()
         self.dir.scale(maximum)
-        
+
         self.origin=Vector3f(origin)
-        
+
         self.range=0
         self.timestep=timestep
-        
+
     def start(self):
         while True:
             physics=self.parent.parent.physics
-            
+
             t=Transform()
             self.parent.physics.getWorldTransform(t)
             pt1=Vector3f(self.origin)
             pt2=Vector3f(self.dir)
             t.transform(pt1)
             t.transform(pt2)
-            
+
             callback=CollisionWorld.ClosestRayResultCallback(pt1,pt2)
             physics.rayTest(pt1,pt2,callback)
-            
+
             delta=Vector3f(callback.hitPointWorld)
             delta.sub(pt1)
             self.range=delta.length()
-        
+
             yield self.timestep
-            
 
 
-        
-        
-            
-    
-        
-class Box(ccm.Model):      
+
+
+
+
+
+
+class Box(ccm.Model):
     def __init__(self, x, y, z, mass=1,scale=1, draw_as_cylinder=False,color=Color.blue,overdraw_length=1,overdraw_radius=1,flat_shading=False):
-        
+
         if draw_as_cylinder:
             if y is max(x,y,z):
                 radius=(x+z)/4*overdraw_radius
@@ -321,7 +322,7 @@ class Box(ccm.Model):
         else:
             self.shape=createBox(x/2.0*scale, y/2.0*scale, z/2.0*scale)
         if flat_shading: self.shape.shadingMode=Object3D.SHADING_FAKED_FLAT
-            
+
         colorname='box%d'%id(self)
         TextureManager.getInstance().addTexture(colorname,Texture(1, 1, color))
         self.shape.setTexture(colorname)
@@ -334,14 +335,14 @@ class Box(ccm.Model):
 
         t=Transform()
         t.setIdentity()
-        
+
         ms=DefaultMotionState(t)
         rb=RigidBodyConstructionInfo(mass,ms,shape,inertia)
         self.physics=RigidBody(rb)
-        
+
     def add_sphere_at(self,x,y,z,radius,color,room):
         s=Primitives.getSphere(radius)
-        
+
         colorname='added_sphere_%d'%id(s)
         TextureManager.getInstance().addTexture(colorname,Texture(1,1,color))
         s.setTexture(colorname)
@@ -350,16 +351,16 @@ class Box(ccm.Model):
             self.extra_shapes=[]
         self.extra_shapes.append((s,x,y,z))
         room.world.addObject(s)
-        
-        
-class Sphere(ccm.Model):      
+
+
+class Sphere(ccm.Model):
     def __init__(self, r, mass=1,color=Color.red):
         colorname='sphere_%d'%id(self)
         self.shape=Primitives.getSphere(r)
         TextureManager.getInstance().addTexture(colorname,Texture(1, 1, color))
         self.shape.setTexture(colorname)
         self.shape.build()
-        
+
         shape=BoxShape(Vector3f(r/2.0,r/2.0,r/2.0))
 
         inertia=Vector3f(0,0,0)
@@ -367,16 +368,16 @@ class Sphere(ccm.Model):
 
         t=Transform()
         t.setIdentity()
-        
+
         ms=DefaultMotionState(t)
         rb=RigidBodyConstructionInfo(mass,ms,shape,inertia)
         self.physics=RigidBody(rb)
-        
+
 
 import math
 class MD2(ccm.Model):
     _shapes={}
-    def __init__(self, filename, texture, scale=1.0, mass=1,overdraw_scale=1.0):        
+    def __init__(self, filename, texture, scale=1.0, mass=1,overdraw_scale=1.0):
         if not TextureManager.getInstance().containsTexture(texture):
             TextureManager.getInstance().addTexture(texture,Texture(texture))
         if (filename,scale) not in MD2._shapes:
@@ -385,7 +386,7 @@ class MD2(ccm.Model):
             shape.rotateAxis(SimpleVector(0, 0, 1), -math.pi/2)
             shape.rotateMesh()
             shape.rotationMatrix=Matrix()
-            
+
             MD2._shapes[(filename,scale)]=shape
         #self.shape=MD2._shapes[(filename,scale)].cloneObject()
         self.shape=Object3D(MD2._shapes[(filename,scale)],False)
@@ -404,18 +405,18 @@ class MD2(ccm.Model):
         rb=RigidBodyConstructionInfo(mass,ms,shape,inertia)
         self.physics=RigidBody(rb)
         self.shape.setOrigin(SimpleVector(-(maxx+minx)/2,-(maxy+miny)/2,-(maxz+minz)/2))
-        
-        
-    def start(self):    
+
+
+    def start(self):
         self.frame=0
         self.sch.add(self.animate)
-            
+
     def animate(self):
         self.frame=(self.frame+0.002)
         while self.frame>1: self.frame-=1
-        self.shape.animate(self.frame, 1)        
+        self.shape.animate(self.frame, 1)
         return 0.01
-        
+
 
 class RateLimit(ccm.Model):
     def start(self):
@@ -441,11 +442,11 @@ class RateLimit(ccm.Model):
                 java.lang.Thread.currentThread().sleep(1)
 
 
-        
-        
-        
-        
-class View(JComponent): 
+
+
+
+
+class View(JComponent):
     def __init__(self, obj, location, size=(800, 600),keys=None):
         JComponent.__init__(self)
         self.location=list(location)
@@ -464,7 +465,7 @@ class View(JComponent):
         x, y, z=self.location
         self.obj.world.camera.setPosition(x, -y, z)
         self.obj.world.camera.lookAt(SimpleVector(0, 0, 0))
-        
+
         self.buffer.clear(self.clearColor)
         self.obj.world.renderScene(self.buffer)
         self.obj.world.draw(self.buffer)
@@ -476,7 +477,7 @@ class View(JComponent):
         if self.keys is not None and hasattr(self.keys,'key_released'):
             self.keys.key_released(KeyEvent.getKeyText(event.keyCode))
 
-        
+
     def keyPressed(self,event):
         if self.keys is not None and hasattr(self.keys,'key_pressed'):
             self.keys.key_pressed(KeyEvent.getKeyText(event.keyCode))
@@ -500,5 +501,3 @@ class View(JComponent):
             self.location[0]+=1
         elif event.keyCode==KeyEvent.VK_D:
             self.location[0]-=1
-        
-        
