@@ -1,6 +1,6 @@
 import nef
-from ca.nengo.ui.configurable import *
-from javax.swing import *
+from ca.nengo.ui.configurable import Property, PropertyInputPanel
+from javax.swing import JComboBox
 from javax.swing.event import DocumentListener
 
 title='Network Array'
@@ -11,8 +11,8 @@ class SignInputPanel(PropertyInputPanel,DocumentListener):
     def __init__(self,property):
         PropertyInputPanel.__init__(self,property)
         self.comboBox = JComboBox(["Unconstrained", "Positive", "Negative"])
-        self.add(self.comboBox)    
-        
+        self.add(self.comboBox)
+
     def isValueSet(self):
         return True
     def getValue(self):
@@ -24,7 +24,7 @@ class SignInputPanel(PropertyInputPanel,DocumentListener):
         else:
             return 0
     def setValue(self, value):
-        pass 
+        pass
 
 class PTemplateSign(Property):
     def createInputPanel(self):
@@ -33,7 +33,7 @@ class PTemplateSign(Property):
         return "Encoder Sign"
     def getTypeClass(self):
         return PInt
-    
+
 description="""<html>This template enables constructing subnetworks full D (# of dimensions) independent populations of neurons.  These are faster to construct but cannot compute all the same nonlinear functions as a single large population with D dimensions.</html>"""
 
 params=[

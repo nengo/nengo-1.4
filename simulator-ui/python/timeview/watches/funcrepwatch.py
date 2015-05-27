@@ -1,18 +1,13 @@
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
-import java
-from numeric import array, dot, reshape, ones, transpose, concatenate, floor, zeros, repeat
+from java.awt import Color
 
 import timeview.components.core as core
-import timeview.view
 from timeview.watches import watchtemplate
 
 class FuncRepWatch(watchtemplate.WatchTemplate):
     def check(self,obj):
         return hasattr(obj, 'getMetadata') and obj.getMetadata('FuncRepWatch') is not None
     def value(self,obj):
-        return obj.getOrigin('X').getValues().getValues()    
+        return obj.getOrigin('X').getValues().getValues()
     def views(self,obj):
         basis, label, minx, maxx, miny, maxy = obj.getMetadata('FuncRepWatch')
         return [(label,FunctionRepresentation,dict(func=self.value,label=obj.name,
@@ -42,27 +37,27 @@ class FunctionRepresentation(core.DataViewComponent):
 
         self.max = 0.0001
         self.min = -0.0001
-            
+
     def paintComponent(self,g):
-                
+
         core.DataViewComponent.paintComponent(self,g)
 
         width=self.size.width-self.border_left-self.border_right
         height=self.size.height-self.border_top-self.border_bottom-self.label_offset
-            
+
         if width<2: return
 
         dt_tau=None
         if self.view.tau_filter>0:
             dt_tau=self.view.dt/self.view.tau_filter
-        try:    
+        try:
             data=self.data.get(start=self.view.current_tick,count=1,dt_tau=dt_tau)[0]
         except:
             return
-        
+
         g.color=Color(0.8,0.8,0.8)
         g.drawRect(self.border_left,self.border_top+self.label_offset,width,height)
-        
+
         g.color=Color.black
         txt='%4g'%self.maxx
         bounds=g.font.getStringBounds(txt,g.fontRenderContext)
@@ -76,7 +71,7 @@ class FunctionRepresentation(core.DataViewComponent):
         g.drawString('%6g'%self.miny,0,self.size.height-self.border_bottom)
 
         g.color=Color.black
-        
+
         pdftemplate=getattr(self.view.area,'pdftemplate',None)
         if pdftemplate is not None:
             pdf,scale=pdftemplate
@@ -90,7 +85,7 @@ class FunctionRepresentation(core.DataViewComponent):
                 x=self.minx+i*dx
                 value=sum([self.basis(j,x)*d for j,d in enumerate(data)])
                 y=float((value-self.miny)*height/(self.maxy-self.miny))
-                
+
                 xx=self.border_left+i/float(steps)
                 yy=self.height-self.border_bottom-y
 
@@ -99,9 +94,9 @@ class FunctionRepresentation(core.DataViewComponent):
                 else:
                     if 0<y<height:
                         pdf.lineTo((self.x+xx)*scale,800-(self.y+yy)*scale)
-            pdf.setRGBColorStroke(g.color.red,g.color.green,g.color.blue)        
-            pdf.stroke()        
-        else:                
+            pdf.setRGBColorStroke(g.color.red,g.color.green,g.color.blue)
+            pdf.stroke()
+        else:
             dx=float(self.maxx-self.minx)/(width-1)
             px,py=None,None
             for i in range(width):
@@ -116,4 +111,3 @@ class FunctionRepresentation(core.DataViewComponent):
                 if px is not None and self.miny<value<self.maxy:
                     g.drawLine(px,py,xx,yy)
                 px,py=xx,yy
-

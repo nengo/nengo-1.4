@@ -1,10 +1,9 @@
 import core
 
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
-import java
+from java.awt import Color
+from java.awt.event import ComponentListener, KeyEvent, KeyListener, InputEvent
+
+from com.threed.jpct import FrameBuffer, SimpleVector
 
 
 class View3D(core.DataViewComponent, ComponentListener, KeyListener):
@@ -22,7 +21,6 @@ class View3D(core.DataViewComponent, ComponentListener, KeyListener):
         self.initialize()
 
     def initialize(self):
-        from com.threed.jpct import FrameBuffer
         self.buffer = FrameBuffer(self.width, self.height, FrameBuffer.SAMPLINGMODE_NORMAL)
 
     def componentHidden(self, event):
@@ -64,7 +62,7 @@ class View3D(core.DataViewComponent, ComponentListener, KeyListener):
             self.mouse_pressed_y = event.y
             #java.lang.System.out.println("event %s "%(event))
             if event.modifiersEx & InputEvent.BUTTON3_DOWN_MASK:
-                from com.threed.jpct import SimpleVector
+
                 camera.rotateCameraAxis(SimpleVector(-dy, dx, 0), 0.003)
                 #camera.align(self.view.watcher.objects[self.name]._simulator.model.room)
                 #camera.setOrientation(camera.getDirection(),SimpleVector(0,0,1))

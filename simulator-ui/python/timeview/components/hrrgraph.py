@@ -2,13 +2,11 @@ import core
 import graph
 import hrr
 
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
+from javax.swing import JCheckBoxMenuItem, JMenuItem, JOptionPane
+from java.awt import Color, Font
+
 import math
 import numeric
-
 
 class HRRGraph(graph.Graph):
     def __init__(self, view, name, func, args=(), filter=True, ylimits=(-1.0, 1.0), label=None, nodeid=None):

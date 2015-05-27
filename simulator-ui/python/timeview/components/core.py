@@ -1,7 +1,8 @@
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
+from javax.swing import (
+    BorderFactory, JCheckBoxMenuItem, JMenuItem, JPanel, JPopupMenu)
+from java.awt import Color, Cursor, RenderingHints
+from java.awt.event import (ActionListener, MouseEvent, MouseMotionListener,
+                            MouseListener, MouseWheelListener)
 import javax
 import java
 
@@ -213,7 +214,7 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
             g.color = Color(0.3, 0.3, 0.3)
             bounds = g.font.getStringBounds(self.label, g.fontRenderContext)
             g.drawString(self.label, self.size.width / 2 - bounds.width / 2, bounds.height)
-            
+
     def tick(self, t):
         """This method will be called in the simulation timescale (as opposed to the rendering
         timescale of paintComponent).  This is useful for updating the data that will
@@ -222,6 +223,6 @@ class DataViewComponent(JPanel, MouseListener, MouseWheelListener, MouseMotionLi
         simulation timestep; for example, if the simulation is running very quickly,
         it would not be desirable to be updating the data far more quickly than it can be
         displayed.
-        
+
         :param float t: the current simulation time"""
         pass

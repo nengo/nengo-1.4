@@ -1,15 +1,11 @@
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
-import java
+from javax.swing import (ButtonGroup, JCheckBoxMenuItem, JMenu, JPopupMenu,
+                         JRadioButtonMenuItem, Timer)
+from java.awt import Color
 
 import core
 from graph import round
 
-from math import sqrt
-from math import log
-from math import ceil
+from math import ceil, log
 
 
 class XYPlot(core.DataViewComponent):

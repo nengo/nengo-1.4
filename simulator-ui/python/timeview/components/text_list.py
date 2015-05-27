@@ -1,10 +1,7 @@
 import core
-from java.awt import Color
 
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
+from javax.swing import JCheckBoxMenuItem, JPopupMenu
+from java.awt import Color
 
 
 class TextList(core.DataViewComponent):

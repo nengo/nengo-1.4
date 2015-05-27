@@ -1,17 +1,13 @@
 import core
 
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
-from java.util import Hashtable
+import java
+from javax.swing import (
+    JCheckBoxMenuItem, JFileChooser, JLabel, JMenuItem, JOptionPane,
+    JPopupMenu, JSlider, Timer)
+from java.awt import Color, Font
+from java.awt.event import ComponentListener
 
 import random
-
-from math import floor
-from math import ceil
-
-import java
 
 
 class FunctionControl(core.DataViewComponent, ComponentListener):

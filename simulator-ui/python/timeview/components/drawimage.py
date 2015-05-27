@@ -1,8 +1,3 @@
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
-
 import core
 
 class DrawImage(core.DataViewComponent):
@@ -16,14 +11,14 @@ class DrawImage(core.DataViewComponent):
         self.margin = 0
         self.setSize(200, 200)
         self.image = None
-        
+
     def tick(self, t):
         try:
             self.image = self.data.get(start=self.view.current_tick, count=1)[0][0]
         except Exception,e:
             print "error in get",e
             return
-                       
+
     def paintComponent(self, g):
         core.DataViewComponent.paintComponent(self, g)
 

@@ -1,10 +1,7 @@
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
+from javax.swing import JCheckBoxMenuItem, JMenuItem, JOptionPane, JPopupMenu
+from java.awt import Color
 
 import core
-import neuronmap
 import clicker
 
 from math import sqrt

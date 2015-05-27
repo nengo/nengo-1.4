@@ -1,13 +1,7 @@
 import core
 
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
-
-from math import sqrt
-from math import log
-from math import ceil
+from javax.swing import ButtonGroup, JMenu, JPopupMenu, JRadioButtonMenuItem
+from java.awt import Color
 
 
 def safe_get_index(x, i):

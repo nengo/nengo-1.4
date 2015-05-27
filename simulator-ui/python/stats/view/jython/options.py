@@ -1,7 +1,8 @@
-import java
-from javax.swing import *
-from java.awt import *
-from java.awt.event import *
+from javax.swing import (
+    BorderFactory, BoxLayout, DefaultListModel, JCheckBox, JComboBox, JLabel,
+    JList, JPanel, JTabbedPane, JTextField, SwingConstants)
+from java.awt import BorderLayout, Color
+from java.awt.event import ActionListener
 
 class ParameterPanel(JPanel):
     def __init__(self,view,name,values,default):
@@ -14,11 +15,11 @@ class ParameterPanel(JPanel):
         self.add(JLabel(name,horizontalAlignment=SwingConstants.LEFT),BorderLayout.NORTH)
         self.new_value=JTextField('',actionPerformed=self.create_new_value)
         self.add(self.new_value,BorderLayout.SOUTH)
-        self.add(self.values)      
+        self.add(self.values)
         self.values.setSelectedValue(default,True)
     def adjust(self,event):
         if not event.valueIsAdjusting:
-            self.view.graph.update()    
+            self.view.graph.update()
     def create_new_value(self,event):
         value=self.new_value.text
         self.new_value.text=''
@@ -32,10 +33,10 @@ class ParameterPanel(JPanel):
             self.values_data.sort()
             model=DefaultListModel()
             for v in self.values_data:
-                model.addElement(v) 
-            self.values.model=model    
-            self.values.setSelectedValue(selected,True) 
-        
+                model.addElement(v)
+            self.values.model=model
+            self.values.setSelectedValue(selected,True)
+
 class ParametersPanel(JPanel):
     def __init__(self,view):
         self.view=view
@@ -51,15 +52,15 @@ class ParametersPanel(JPanel):
         values={}
         for k,v in self.params.items():
             values[k]=[x for x in v.values.selectedValues]
-        return values    
+        return values
 
 class BarTab(JPanel):
     def __init__(self,options):
         self.options=options
-                        
+
         self.show_samples=JCheckBox('Show samples',False,actionPerformed=self.options.changed)
         self.add(self.show_samples)
-        
+
 class LineTab(JPanel,ActionListener):
     def __init__(self,options):
         self.options=options
@@ -82,15 +83,15 @@ class LineTab(JPanel,ActionListener):
         axis.maximumSize=axis.minimumSize
         self.add(axis)
     def actionPerformed(self,event):
-        self.options.changed(event)    
-        
-        
+        self.options.changed(event)
+
+
 def make_option(label,component):
     panel=JPanel(layout=BorderLayout())
     panel.add(JLabel(label+':'),BorderLayout.WEST)
     panel.add(component)
-    return panel        
-        
+    return panel
+
 class GlobalPanel(JPanel, ActionListener):
     def __init__(self,options):
         self.options=options
@@ -100,43 +101,41 @@ class GlobalPanel(JPanel, ActionListener):
         self.add(self.opt_color)
         self.dpi=JTextField('80',actionPerformed=self.options.changed)
         self.add(make_option('dpi',self.dpi))
-        
+
         self.metrics=JComboBox(['mean','median','sd','var'],editable=False)
         self.metrics.selectedIndex=0
         self.metrics.addActionListener(self)
         self.add(make_option('metric',self.metrics))
     def actionPerformed(self,event):
-        self.options.changed(event)    
-        
-                
-        
+        self.options.changed(event)
+
+
+
 class OptionsPanel(JPanel):
     def __init__(self,view):
         self.view=view
         self.layout=BorderLayout()
         self.parameters=ParametersPanel(self.view)
         self.add(self.parameters,BorderLayout.NORTH)
-        
+
         self.tabs=JTabbedPane(stateChanged=self.changed)
         self.bar_tab=BarTab(self)
         self.line_tab=LineTab(self)
         self.tabs.addTab('Bar',self.bar_tab)
         self.tabs.addTab('Line',self.line_tab)
         self.add(self.tabs)
-        
-        self.global=GlobalPanel(self)
-        self.add(self.global,BorderLayout.SOUTH)
+
+        setattr(self, 'global', GlobalPanel(self))
+        self.add(getattr(self, 'global'), BorderLayout.SOUTH)
     def get_graph_type(self):
         if self.tabs.selectedIndex==0:
             return 'bar'
         elif self.tabs.selectedIndex==1:
             return 'line'
         else:
-            return None    
-        
+            return None
+
     def update(self):
         self.parameters.update(self.view.stats.params,self.view.stats.options,self.view.stats.defaults)
     def changed(self,event):
-        self.view.graph.update()    
-            
-
+        self.view.graph.update()

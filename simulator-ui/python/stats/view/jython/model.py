@@ -1,5 +1,6 @@
-from javax.swing import *
-from java.awt import *
+from javax.swing import (
+    DefaultComboBoxModel, ImageIcon, JButton, JComboBox, JLabel, JPanel)
+from java.awt import BorderLayout
 
 import os
 
@@ -13,12 +14,12 @@ class ModelSelectionPanel(JPanel):
 
         self.layout=BorderLayout()
         self.add(self.files)
-        
+
         self.add(JLabel('select model:'),BorderLayout.WEST)
-        
+
         #TODO: make this button open a file dialog, allowing directory changes
-        self.add(JButton(icon=ImageIcon('python/images/open.png')),BorderLayout.EAST)            
-        
+        self.add(JButton(icon=ImageIcon('python/images/open.png')),BorderLayout.EAST)
+
     def find_files(self):
         selected=self.files.selectedItem
         files=set()
@@ -27,5 +28,3 @@ class ModelSelectionPanel(JPanel):
             elif os.path.exists(os.path.join(self.dir,f,'code.py')): files.add(f)
         self.files.model=DefaultComboBoxModel(sorted(files))
         self.files.selectedItem=selected
-        
-

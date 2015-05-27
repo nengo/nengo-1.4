@@ -1,14 +1,20 @@
-from javax.swing import *
-from java.awt import *
+from javax.swing import (
+    AbstractButton, BorderFactory, BoxLayout, ImageIcon,
+    JButton, JLabel, JPanel, JSeparator, SwingConstants, TransferHandler)
+from java.awt import BorderLayout, Color, Component, Image
 import java
 
-from ca.nengo.ui.configurable.descriptors import *
-from ca.nengo.ui.configurable import *
+from ca.nengo.ui.configurable.descriptors import (
+    PBoolean, PInt, PFloat, PString)
+from ca.nengo.ui.configurable import (
+    ConfigException, ConfigSchemaImpl, IConfigurable, Property)
 from ca.nengo.ui.configurable.managers import ConfigDialogClosedException
 
 import ca.nengo
 import inspect
 import threading
+
+import nef.templates
 
 ################################################################################
 class Properties:
@@ -17,7 +23,7 @@ class Properties:
     pmap[int] = PInt
     pmap[float] = PFloat
     pmap[bool] = PBoolean
-    
+
     def __init__(self,params):
         self._params = params
         self._list = []
@@ -36,7 +42,7 @@ class Properties:
                 p = type(text)
             else:
                 p = self.pmap[type](text)
-            p.setDescription(help)    
+            p.setDescription(help)
             self._list.append(p)
             self._properties[key] = p
 
@@ -90,9 +96,8 @@ class TemplateConstructor(IConfigurable):
         if callable(params):
             params = params(self.network,self.node)
         self.properties = Properties(params)
-    
+
 ################################################################################
-import nef.templates
 
 class TemplateBar(TransferHandler):
     def __init__(self):
@@ -106,19 +111,19 @@ class TemplateBar(TransferHandler):
         self.labels = []
         self.panels = []
 
-        
+
         self.ng = ca.nengo.ui.NengoGraphics.getInstance()
         dh = DropHandler()
         self.ng.universe.transferHandler = dh
         self.ng.universe.getDropTarget().addDropTargetListener(dh)
-        
+
         self.add_template('Network','ca.nengo.ui.models.constructors.CNetwork','images/nengoIcons/network.gif')
         self.add_template('Ensemble','ca.nengo.ui.models.constructors.CNEFEnsemble','images/nengoIcons/ensemble.gif')
         self.add_template('Input','ca.nengo.ui.models.constructors.CFunctionInput','images/nengoIcons/input.png')
         #self.add_template('Origin','ca.nengo.ui.models.constructors.CDecodedOrigin','images/nengoIcons/origin.png')
         self.add_template('Origin','nef.templates.origin','images/nengoIcons/origin.png')
         self.add_template('Termination','nef.templates.termination','images/nengoIcons/termination.png')
-        
+
         self.panel.add(JSeparator(JSeparator.HORIZONTAL,maximumSize = (200,1),foreground = Color(0.3,0.3,0.3),background = Color(0.1,0.1,0.1)))
 
         for template in nef.templates.templates:
@@ -126,7 +131,7 @@ class TemplateBar(TransferHandler):
 
         # get NengoGraphics to add me
         self.ng.setTemplatePanel(self.panel)
-        
+
     def add_template(self,name,constructor,image):
         icon = ImageIcon(image)
         if icon.iconWidth>self.max_icon_width:
@@ -147,7 +152,7 @@ class TemplateBar(TransferHandler):
         self.labels.append(label)
         panel.add(label,BorderLayout.SOUTH)
         self.panels.append(panel)
-        
+
         panel.alignmentY = Component.CENTER_ALIGNMENT
         panel.border = BorderFactory.createEmptyBorder(2,1,2,1)
         panel.maximumSize = panel.preferredSize
@@ -226,11 +231,11 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
     def canImport(self,support,flavors = None):
         if flavors is not None:   # Java 1.5
             return True
-    
+
         constructor = support.getTransferable().getTransferData(TemplateTransferable.flavor)
-        
+
         constructor = eval(constructor)
-        
+
         if constructor is ca.nengo.ui.models.constructors.CNetwork: return True
 
         drop_on_ensemble = False
@@ -264,7 +269,7 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
         else:
             constructor = support.getTransferable().getTransferData(TemplateTransferable.flavor)
             net,pos = self.find_target(support.dropLocation.dropPoint)
-            
+
         try:
             constructor = eval(constructor)
             drop_on_ensemble = False
@@ -304,7 +309,7 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
                 uc.configureAndWait()
                 if constructor.model is not None:
                     node.showTermination(constructor.model.name)
-                
+
             elif isinstance(constructor,TemplateConstructor):
                 assert isinstance(nodeContainer,ca.nengo.ui.models.viewers.NetworkViewer)
                 nodeContainer.setNewItemPosition(position.x,position.y)
@@ -313,15 +318,15 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
                 else: nodemodel = None
                 constructor.set_network(nodeContainer.getModel(),node = nodemodel)
                 uc = ca.nengo.ui.configurable.managers.UserTemplateConfigurer(constructor)
-                
-                # do the configuring in a separate thread so we don't block the 
-                #  main UI thread (this was causing the progress indicator to 
+
+                # do the configuring in a separate thread so we don't block the
+                #  main UI thread (this was causing the progress indicator to
                 #  not appear for templates)
                 threading.Thread(target=self.configureAndWait,args=(node,uc)).start()
 
         except ca.nengo.ui.configurable.managers.ConfigDialogClosedException:
             pass
-    
+
     def configureAndWait(self, node, user_configurer):
         #if node is not None:
         #    origins = node.model.getOrigins()
@@ -341,8 +346,8 @@ class DropHandler(TransferHandler,java.awt.dnd.DropTargetListener):
             #for t in node.model.getTerminations():
                 #pass
                 #if t not in terminations: node.showTermination(t.name)
-                
-            
+
+
 ################################################################################
 class TemplateTransferable(java.awt.datatransfer.Transferable):
     flavor = java.awt.datatransfer.DataFlavor("application/nengo;class = java.lang.String")
@@ -354,7 +359,7 @@ class TemplateTransferable(java.awt.datatransfer.Transferable):
         return flavor.equals(self.flavor)
     def getTransferData(self,flavor):
         return self.action
-        
+
 ################################################################################
 ### Main
 template = TemplateBar()
