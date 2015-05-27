@@ -1,7 +1,4 @@
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
+from java.awt import Color
 import java
 
 import core

@@ -1,19 +1,17 @@
 import java
-from java.awt import *
-from javax.swing import *
+from java.awt import Color
+from javax.swing import (
+    AbstractButton, Box, ImageIcon, JButton, JLabel, JToolBar)
 
 import ca.nengo
-import sys
-
-import template
-
-SelectionHandler = ca.nengo.ui.lib.world.handlers.SelectionHandler
 
 from ca.nengo.math.impl import WeightedCostApproximator
 from ca.nengo.util.impl import NEFGPUInterface, NodeThreadPool
 from ca.nengo.ui.configurable.panels import BooleanPanel, IntegerPanel
-from ca.nengo.ui.configurable.descriptors import *
-from ca.nengo.ui.configurable import *
+from ca.nengo.ui.configurable.descriptors import PBoolean, PInt
+from ca.nengo.ui.configurable import (
+    ConfigException, ConfigSchemaImpl, IConfigurable)
+from ca.nengo.ui.lib.world.handlers import SelectionHandler
 
 
 class GpuCountPanel(IntegerPanel):
@@ -68,9 +66,6 @@ class PGpuUse(PBoolean):
 
     def createInputPanel(self):
         return GpuUsePanel(self)
-
-
-from ca.nengo.ui.configurable import ConfigException
 
 
 class ParallelizationConfiguration(IConfigurable):
@@ -129,12 +124,12 @@ class ParallelizationConfiguration(IConfigurable):
 
 def make_button(icon, func, tip, **args):
     return JButton(
-        icon=ImageIcon('python/images/%s.png' % icon), 
+        icon=ImageIcon('python/images/%s.png' % icon),
         rolloverIcon=ImageIcon('python/images/%s-pressed.png' % icon),
         actionPerformed=func, toolTipText=tip,
-        borderPainted=False, focusPainted=False, 
+        borderPainted=False, focusPainted=False,
         contentAreaFilled=False, margin=java.awt.Insets(0, 0, 0, 0),
-        verticalTextPosition=AbstractButton.BOTTOM, 
+        verticalTextPosition=AbstractButton.BOTTOM,
         horizontalTextPosition=AbstractButton.CENTER, **args)
 
 def make_label_button(text, func, tip, **args):
@@ -226,7 +221,7 @@ class ToolBar(
             if net is not None and hasattr(net, 'getViewer'):
                 viewer = net.getViewer()
 
-        if (viewer is not None and 
+        if (viewer is not None and
             (viewer.isDestroyed() or
              not isinstance(viewer, ca.nengo.ui.models.viewers.NetworkViewer))):
             return None

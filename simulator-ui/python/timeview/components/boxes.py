@@ -1,11 +1,6 @@
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
+from java.awt import Color
 
 import core
-
-from math import sqrt
 
 
 class Boxes(core.DataViewComponent):
@@ -19,21 +14,21 @@ class Boxes(core.DataViewComponent):
         self.margin = 0
         self.setSize(200, 200)
         self.boxes = None
-        
+
     def tick(self, t):
         try:
             self.boxes = self.data.get(start=self.view.current_tick, count=1)[0]
         except Exception,e:
             print "error in get",e
             return
-        
+
         self.minx = 1000
         self.maxx = -1000
         self.miny = 1000
         self.maxy = -1000
-        
+
         self.convert_coords()
-        
+
         for b in self.boxes:
             x0,y0 = b[1]
             x1,y1 = b[2]
@@ -46,11 +41,11 @@ class Boxes(core.DataViewComponent):
                 self.miny = y0
             if y1 > self.maxy:
                 self.maxy = y1
-                
+
         self.xscale = self.size.width / (self.maxx - self.minx)
         self.yscale = self.size.height / (self.maxy - self.miny)
-        
-#        print (self.maxx-self.minx)*self.xscale,(self.maxy-self.miny)*self.yscale 
+
+#        print (self.maxx-self.minx)*self.xscale,(self.maxy-self.miny)*self.yscale
 #        print self.minx,self.maxx,self.xscale
 #        print self.miny,self.maxy,self.yscale
 
@@ -58,19 +53,19 @@ class Boxes(core.DataViewComponent):
         #convert euclidian points to drawing points
         minx = min([b[i][0] for b in self.boxes for i in range(1,2)])
         miny = min([-b[i][1] for b in self.boxes for i in range(1,2)])
-        
+
         def conv(pt):
             x,y = pt
             return (x-minx,-y-miny)
-        
+
         self.boxes = [[b[0],conv(b[1]),conv(b[2])] for b in self.boxes]
-                       
+
     def paintComponent(self, g):
         core.DataViewComponent.paintComponent(self, g)
 
         if self.boxes is None:
             return
-        
+
         for b in self.boxes:
             if b[0] == "-":
                 g.color = Color.black

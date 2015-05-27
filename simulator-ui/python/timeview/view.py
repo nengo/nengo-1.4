@@ -1,31 +1,21 @@
 import watcher
 import components
 import timelog
-import data
-import hrr
+
 from timeview.components import hrrgraph, neuronmap, timecontrol, viewpanel
-import nef
 
 import java
-import javax
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
-from ca.nengo.model.nef import *
-from ca.nengo.model.impl import *
-from ca.nengo.math.impl import *
-from ca.nengo.model import Node, SimulationMode, SimulationException
-from ca.nengo.model.plasticity.impl import STDPTermination
-from ca.nengo.model.neuron.impl import SpikingNeuron
-from ca.nengo.util.impl import NodeThreadPool, NEFGPUInterface
-from ca.nengo.util import MU
 
-from java.lang.System.err import println
+from javax.swing import JFrame, JMenu, JMenuItem, JPopupMenu
+from java.awt import BorderLayout, Color
+from java.awt.event import (
+    ActionListener, MouseEvent, MouseListener, MouseMotionListener)
+from ca.nengo.model.impl import FunctionInput, NetworkImpl, RealOutputImpl
+from ca.nengo.model import SimulationException
+
 from java.lang import Exception
-import traceback
+
 import math
-import shelve
 import warnings
 import time
 import os
@@ -44,7 +34,7 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
 
         self.timelog = timelog.TimeLog()
         self.network = network
-        
+
         self.watcher = watcher.Watcher(self.timelog)
         self.load_watches()
 
@@ -117,9 +107,9 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
     def process_nodes(self, nodes, popup, prefix=""):
         names = [(n.name, n) for n in nodes]
         names.sort()
-        
+
         submenus = {}
-        
+
         for i, (name, n) in enumerate(names):
             self.watcher.add_object(prefix + name, n)
 
@@ -136,7 +126,7 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                 menu = popup
                 for i,net in enumerate(netname):
                     subnet = ">".join(netname[:i+1])
-                    
+
                     if subnet in submenus:
                         menu = submenus[subnet]
                     else:
@@ -158,18 +148,18 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
         self.area.add(g)
         self.area.repaint()
         return g
-    
+
     def load_watches(self):
         watch_dir = os.path.join(os.path.dirname(__file__),"watches")
-        
+
         names = [s[:-3] for s in os.listdir(watch_dir) if (s.endswith(".py") and not s.startswith("__"))]
-        
+
         for n in names:
             module = __import__("timeview.watches." + n, fromlist=[n])
             for k in module.__dict__.keys():
                 if k.upper() == n.upper():
                     self.watcher.add_watch(module.__dict__[k]())
-                    
+
     def add_watch(self, watch):
         self.watcher.add_watch(watch)
 
@@ -288,10 +278,10 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
 
         self.clear_all()
         for name, type, data in layout:
-            
+
             name = name.replace(":", ".")
                 #this is just here for backwards compatibility, it should be removed once all the old layout files have been updated
-                
+
             if name in self.watcher.objects.keys():
                 if type is None:
                     c = self.add_item(name)
@@ -368,9 +358,9 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                         if self.requested_mode is not None:
                             self.network.mode = self.requested_mode
                             self.requested_mode = None
-                            
+
                         self.area.tick(now)
-                        
+
                     if self.requested_mode is not None:
                         self.network.mode = self.requested_mode
                         self.requested_mode = None
@@ -394,8 +384,8 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                         try:
                             sim.step(now, now + self.dt)
                         except SimulationException,se:
-                            self.close()  
-                        
+                            self.close()
+
                         self.simulating = False
                         self.force_origins()
                         now += self.dt
@@ -411,16 +401,16 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                         self.time_control.slider.value = self.timelog.tick_count
                     else:
                         self.time_control.slider.value = self.current_tick + 1
-                    
+
                     #we want to cap the data updates relative to the rendering frame rate,
                     #otherwise we're doing a bunch of data updates that don't matter (since
                     #they'll never be displayed)
                     if last_frame_time != None and last_frame_time >= self.data_update_time:
                         self.area.tick(now)
-                        self.data_update_time = last_frame_time + self.data_update_period  
-                    
+                        self.data_update_time = last_frame_time + self.data_update_period
+
                     self.area.repaint()
-                    
+
                     this_frame_time = java.lang.System.currentTimeMillis()
                     if last_frame_time is not None:
                         delta = this_frame_time - last_frame_time
@@ -429,8 +419,8 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
                             sleep = 0
                         java.lang.Thread.sleep(int(sleep))
                     last_frame_time = this_frame_time
-                    
-                    
+
+
 
         except AttributeError, error_val:
             if(not self.frame is None):
@@ -438,7 +428,7 @@ class View(MouseListener, MouseMotionListener, ActionListener, java.lang.Runnabl
 
         if sim:
           sim.endRun()
-        
+
 def make_layout_dir(dir):
     if not dir.exists():
         dir.mkdirs()
@@ -453,7 +443,7 @@ def make_layout_dir(dir):
 def save_layout_file(name, view, layout, controls):
     parent = os.path.dirname(__file__)
     parent = os.path.join(parent[:parent.index("python")], "layouts")
-    
+
     dir = java.io.File(parent)
     make_layout_dir(dir)
 
@@ -484,22 +474,22 @@ def save_layout_file(name, view, layout, controls):
 def load_layout_file(name, try_backup = True):
     #if no path specified, load path automatically based on this file's location
     parent = ""
-    if "/" not in name and "\\" not in name: 
+    if "/" not in name and "\\" not in name:
         parent = os.path.dirname(__file__)
         parent = os.path.join(parent[:parent.index("python")], "layouts")
-        
+
     fn = os.path.join(parent, name)
-    
+
     #if no extension specified, assume .layout
     if "." not in name:
         fn = fn + ".layout"
 
-    read_fail = False 
+    read_fail = False
     data = []
     if not java.io.File(fn).exists():
         warnings.warn('Could not load layout file "%s"' % fn, RuntimeWarning)
         read_fail = True
-    
+
     if not read_fail:
         try:
             f = file(fn, 'r')
@@ -511,7 +501,7 @@ def load_layout_file(name, try_backup = True):
         except SyntaxError, e:
             warnings.warn('Could not parse layout file "%s"' % fn, RuntimeWarning)
             warnings.warn(e, RuntimeWarning)
-            read_fail = True       
+            read_fail = True
         except Exception, e:
             warnings.warn('Could not parse layout file "%s"' % fn, RuntimeWarning)
             warnings.warn(e, RuntimeWarning)
@@ -536,14 +526,14 @@ def load_layout_file(name, try_backup = True):
             return result
         else:
             return None
-    
+
     # Save a backup of the layout file (but only if we are going to use it)
     if(not read_fail and try_backup):
         fp = java.io.File(fn).getCanonicalPath()
         try:
             copyfile(fp, fp + '.bak')
         except IOError:
-            pass    
+            pass
 
     return data
 

@@ -1,12 +1,8 @@
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
+from javax.swing import JLabel, JMenuItem, JPopupMenu
+from java.awt import Font
 import timeview.components.core as core
-import timeview.view
 from timeview.watches import watchtemplate
 from timeview.text import TextNode
-import java
-import javax
 
 class TextWatch(watchtemplate.WatchTemplate):
     def check(self,obj):
@@ -15,7 +11,7 @@ class TextWatch(watchtemplate.WatchTemplate):
         return obj.current_text()
     def views(self,obj):
         return [('text',TextView,dict(func=self.text,label=obj.name)),
-               ]    
+               ]
 
 class TextView(core.DataViewComponent):
     def __init__(self,view,name,func,args=(),label=None):
@@ -25,16 +21,16 @@ class TextView(core.DataViewComponent):
         self.func=func
         self.show_label=False
         self.update_label()
-        self.data=self.view.watcher.watch(name,func,args=args)        
+        self.data=self.view.watcher.watch(name,func,args=args)
         self.text_label=JLabel('',verticalAlignment=JLabel.CENTER,horizontalAlignment=JLabel.CENTER)
         self.text_label.font=Font('SansSerif',Font.BOLD,12)
         self.font_size=12
         self.add(self.text_label)
 
-        self.popup.add(JPopupMenu.Separator())        
+        self.popup.add(JPopupMenu.Separator())
         self.popup.add(JMenuItem('larger',actionPerformed=self.increase_font))
         self.popup.add(JMenuItem('smaller',actionPerformed=self.decrease_font))
-        
+
     def increase_font(self,event):
         self.font_size+=2
         self.text_label.font=Font('SansSerif',Font.BOLD,self.font_size)
@@ -42,26 +38,22 @@ class TextView(core.DataViewComponent):
         if self.font_size<7: return
         self.font_size-=2
         self.text_label.font=Font('SansSerif',Font.BOLD,self.font_size)
-            
-        
+
+
     def paintComponent(self,g):
-        core.DataViewComponent.paintComponent(self,g)        
+        core.DataViewComponent.paintComponent(self,g)
         data=self.data.get(start=self.view.current_tick,count=1)[0]
         self.text_label.setSize(self.width,self.height-self.label_offset)
         self.text_label.setLocation(0,self.label_offset)
         self.text_label.text=data
 
-        
+
     def save(self):
         info = core.DataViewComponent.save(self)
         info['font_size']=self.font_size
         return info
-    
+
     def restore(self,d):
         core.DataViewComponent.restore(self,d)
         self.font_size=d.get('font_size',12)
         self.text_label.font=Font('SansSerif',Font.BOLD,self.font_size)
-        
-
-
-     

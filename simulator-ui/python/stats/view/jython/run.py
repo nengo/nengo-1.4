@@ -1,6 +1,6 @@
 import java
-from javax.swing import *
-from java.awt import *
+from javax.swing import JCheckBox, JPanel
+from java.awt import BorderLayout
 
 import time
 
@@ -21,6 +21,5 @@ class RunPanel(JPanel, java.lang.Runnable):
                 params=self.view.selected_params()
                 print params
                 self.view.stats(**params).run(call_after=self.view.graph.update)
-            else:    
+            else:
                 time.sleep(0.1)
-

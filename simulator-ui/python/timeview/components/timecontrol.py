@@ -1,9 +1,11 @@
 import java
 import javax
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
+from javax.swing import (
+    ImageIcon, JButton, JComboBox, JFileChooser, JFrame, JLabel, JPanel,
+    JSlider, JSpinner, SpinnerNumberModel)
+from javax.swing.event import ChangeListener
+from java.awt import BorderLayout, Color, RenderingHints
+from java.awt.event import ActionListener
 
 from ca.nengo.model import SimulationMode
 
@@ -74,11 +76,11 @@ class TimeControl(JPanel, ChangeListener, ActionListener):
         pdf.maximumSize = pdf.preferredSize
         configPanel.add(pdf)
 
-        data = JPanel(layout=BorderLayout(), opaque=False)
-        data.add(JButton(Icon.data, rolloverIcon=ShadedIcon.data, toolTipText='examine data', actionPerformed=self.show_data, borderPainted=False, focusPainted=False, contentAreaFilled=False))
-        data.add(JLabel('data', horizontalAlignment=javax.swing.SwingConstants.CENTER), BorderLayout.NORTH)
-        data.maximumSize = data.preferredSize
-        configPanel.add(data)
+        self.data = JPanel(layout=BorderLayout(), opaque=False)
+        self.data.add(JButton(Icon.data, rolloverIcon=ShadedIcon.data, toolTipText='examine data', actionPerformed=self.show_data, borderPainted=False, focusPainted=False, contentAreaFilled=False))
+        self.data.add(JLabel('data', horizontalAlignment=javax.swing.SwingConstants.CENTER), BorderLayout.NORTH)
+        self.data.maximumSize = self.data.preferredSize
+        configPanel.add(self.data)
 
         mode = JPanel(layout=BorderLayout(), opaque=False)
         cb = JComboBox(['default', 'rate', 'direct'])
@@ -161,7 +163,7 @@ class TimeControl(JPanel, ChangeListener, ActionListener):
     def show_data(self, event):
         frame = JFrame('%s Data' % self.view.network.name)
         frame.visible = True
-        frame.add(data.DataPanel(self.view))
+        frame.add(self.data.DataPanel(self.view))
         frame.size = (500, 600)
 
     def forward_one_frame(self, event):
@@ -291,14 +293,14 @@ class TimeControl(JPanel, ChangeListener, ActionListener):
 
             cb.addTemplate(tp, 20, 0)
             doc.close()
-            
+
     class RoundedBorder(javax.swing.border.AbstractBorder):
         def __init__(self):
             self.color = Color(0.7, 0.7, 0.7)
-    
+
         def getBorderInsets(self, component):
             return java.awt.Insets(5, 5, 5, 5)
-    
+
         def paintBorder(self, c, g, x, y, width, height):
             g.color = self.color
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)

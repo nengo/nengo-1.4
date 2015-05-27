@@ -2,19 +2,19 @@ title='General Linear System'
 label='Linear\nSystem'
 icon='linearsystem.png'
 
-from ca.nengo.ui.configurable import *
+from ca.nengo.ui.configurable import Property, PropertyInputPanel
 from ca.nengo.ui.configurable.managers import ConfigManager
 from ca.nengo.ui.configurable.descriptors import PCouplingMatrix
 from ca.nengo.util import MU
 from ca.nengo.ui.lib.util import UserMessages
 
-from javax.swing import *
+from javax.swing import JButton, JDialog, JLabel, JTextField
 from javax.swing.event import DocumentListener
 
 class SystemMatrixInputPanel(PropertyInputPanel,DocumentListener):
     def __init__(self,property):
         PropertyInputPanel.__init__(self,property)
-        self.add(JLabel("State dimension: "))    
+        self.add(JLabel("State dimension: "))
         self.state_dim=JTextField(10)
         self.state_dim.document.addDocumentListener(self)
         self.add(self.state_dim)
@@ -44,7 +44,7 @@ class SystemMatrixInputPanel(PropertyInputPanel,DocumentListener):
                 self.matrix=None
         except:
             self.matrix=None
-        
+
     def isValueSet(self):
         return self.matrix is not None
     def getValue(self):
@@ -59,7 +59,7 @@ class SystemMatrixInputPanel(PropertyInputPanel,DocumentListener):
         self.change_dim(event)
     def removeUpdate(self,event):
         self.change_dim(event)
-    
+
 class PSystemMatrix(Property):
     matrix=None
     def createInputPanel(self):
@@ -68,7 +68,7 @@ class PSystemMatrix(Property):
         return "System Matrix"
     def getTypeClass(self):
         return PCouplingMatrix(1,1).getTypeClass()
-        
+
 description="""<html>This is a generic template for constructing a recurrent network that implements the specified dynamic linear system: dx/dt = Ax + Bu. Input Bu must be supplied after construction by adding a termination with the B matrix.</html>"""
 
 params=[
@@ -94,7 +94,7 @@ def make(net,name='System',neurons=100,A=[[0]],tau_feedback=0.1):
     A=numeric.array(A)
     assert len(A.shape)==2
     assert A.shape[0]==A.shape[1]
-    
+
     dimensions=A.shape[0]
     state=net.make(name,neurons,dimensions)
     Ap=A*tau_feedback+numeric.identity(dimensions)
@@ -121,4 +121,3 @@ def make(net,name='System',neurons=100,A=[[0]],tau_feedback=0.1):
         net.network.setMetaData("templateProjections", HashMap())
     templateproj = net.network.getMetaData("templateProjections")
     templateproj.put(name, name)
-    

@@ -1,9 +1,7 @@
 import core
 
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
+from javax.swing import JMenu, JMenuItem, JPopupMenu
+from java.awt import Color, Font
 
 
 class Item(core.DataViewComponent):

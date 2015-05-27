@@ -1,7 +1,4 @@
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
+from java.awt import Color
 
 import core
 
@@ -19,13 +16,13 @@ class ColorGrid(core.DataViewComponent):
         self.rows = rows
         self.margin = 10
         self.setSize(200, 200)
-        
+
     def tick(self, t):
         try:
-            self.grid = self.data.get(start=self.view.current_tick, count=1, dt_tau=dt_tau)[0]
+            self.grid = self.data.get(start=self.view.current_tick, count=1)[0]
         except:
             return
-        
+
         if self.rows is None:
             self.rows = int(sqrt(len(self.grid)))
 
@@ -33,7 +30,7 @@ class ColorGrid(core.DataViewComponent):
         if self.rows * self.cols < len(self.grid):
             self.cols += 1
 
-        
+
 
     def paintComponent(self, g):
         core.DataViewComponent.paintComponent(self, g)
@@ -46,7 +43,7 @@ class ColorGrid(core.DataViewComponent):
 
         if self.grid is None:
             return
-        
+
         dx = float(self.size.width - self.margin) / self.cols
         dy = float(self.size.height - self.label_offset - self.margin) / self.rows
 
@@ -60,5 +57,5 @@ class ColorGrid(core.DataViewComponent):
                     elif isinstance(dat, (list,tuple)):
                         g.color = Color(dat[0], dat[1], dat[2])
                     elif isinstance(dat, float):
-                        g.color = Color(dat, dat, dat) 
+                        g.color = Color(dat, dat, dat)
                     g.fillRect(int(x0 + dx * x), int(y0 + dy * y), int(dx + 1), int(dy + 1))

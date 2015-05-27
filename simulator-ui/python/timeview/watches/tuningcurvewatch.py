@@ -1,15 +1,8 @@
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
-import java
-
 from ca.nengo.model.nef import NEFEnsemble
 from ca.nengo.model import SimulationMode
 
-import timeview.components.core as core
 from timeview.components import Graph
 from timeview.watches import watchtemplate
-import timeview.view
 import math
 
 class TuningCurveWatch(watchtemplate.WatchTemplate):
@@ -37,7 +30,7 @@ class TuningCurveWatch(watchtemplate.WatchTemplate):
                     elif obj.dimension==2:
                         theta=xx*math.pi
                         input=math.sin(theta)*encoders[i][0]+math.cos(theta)*encoders[i][1]
-                    n.radialInput=input    
+                    n.radialInput=input
                     n.run(0,0)
                     output=n.getOrigin('AXON').getValues().getValues()[0]
                     rate.append(output)
@@ -56,17 +49,11 @@ class TuningCurveWatch(watchtemplate.WatchTemplate):
         if obj.dimension==1:
             labels[0]='%4g'%(-obj.radii[0])
             labels[pts*2]='%4g'%(obj.radii[0])
-        elif obj.dimension==2:    
+        elif obj.dimension==2:
             labels[0]='-180'
             labels[pts/2]='-90'
             labels[3*pts/2]='90'
             labels[pts*2]='180'
-        
+
         return [('tuning curves',Graph,
                  dict(func=None,label=obj.name,data=makedata,x_labels=labels,show_negative=False))]
-
-
-        
-        
-    
-    

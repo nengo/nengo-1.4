@@ -1,15 +1,14 @@
 import java
 import javax
-from javax.swing import *
-from javax.swing.event import *
-from java.awt import *
-from java.awt.event import *
+from javax.swing import JPanel
+from java.awt import Color, RenderingHints
 
 import math
 
 from timeview.components import core
 
 from ca.nengo.model.impl import NetworkImpl
+
 
 class ViewPanel(JPanel):
     def __init__(self, network):
@@ -71,15 +70,15 @@ class ViewPanel(JPanel):
             self.paintProjection(oname, tname, g)
 
             # Check to see if the termination or origin is wrapped. If it is, then use that,
-            # otherwise, just use the termination / origin itself. 
+            # otherwise, just use the termination / origin itself.
             # Note: This may or may not have unintended consequences when checking what object
-            #       the termination / origin is connected to (see next code block - 
+            #       the termination / origin is connected to (see next code block -
             #       ... isinstance(termination.node, NetworkImpl) ...)
             if hasattr(termination, 'wrappedTermination' ):
                 termination = termination.wrappedTermination
             if hasattr(origin, 'wrappedOrigin' ):
                 origin = origin.wrappedOrigin
-    
+
             if isinstance(termination.node, NetworkImpl):
                 self.paintProjection(oname, tname + ':' + termination.node.name, g)
                 if isinstance(origin.node, NetworkImpl):
@@ -99,7 +98,7 @@ class ViewPanel(JPanel):
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
         self.paintProjections(self.network, g)
-        
+
     def tick(self, t):
         for c in self.getComponents():
             if isinstance(c, core.DataViewComponent):
