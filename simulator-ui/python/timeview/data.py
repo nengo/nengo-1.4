@@ -8,7 +8,6 @@ from java.awt.event import MouseEvent, MouseListener
 from java.io import BufferedWriter, File, FileWriter
 from javax.swing.filechooser import FileFilter
 
-import view
 
 class CSVFilter(FileFilter):
     def accept(self,f):
@@ -45,8 +44,9 @@ class DataPanel(JPanel,MouseListener):
 
 
     def make_controls(self):
+        from timeview.components.timecontrol import Icon, ShadedIcon
         panel=JPanel(background=self.background)
-        panel.add(JButton(view.Icon.refresh,actionPerformed=self.refresh,rolloverIcon=view.ShadedIcon.refresh,toolTipText='refresh',borderPainted=False,focusPainted=False,contentAreaFilled=False))
+        panel.add(JButton(Icon.refresh,actionPerformed=self.refresh,rolloverIcon=ShadedIcon.refresh,toolTipText='refresh',borderPainted=False,focusPainted=False,contentAreaFilled=False))
 
         filter=JPanel(layout=BorderLayout(),opaque=False)
         self.filter = JSpinner(SpinnerNumberModel(self.view.tau_filter,0,0.5,0.01),stateChanged=self.refresh)
@@ -62,7 +62,7 @@ class DataPanel(JPanel,MouseListener):
         decimals.maximumSize=decimals.preferredSize
         panel.add(decimals)
 
-        panel.add(JButton(view.Icon.save,actionPerformed=self.save,rolloverIcon=view.ShadedIcon.save,toolTipText='save',borderPainted=False,focusPainted=False,contentAreaFilled=False))
+        panel.add(JButton(Icon.save,actionPerformed=self.save,rolloverIcon=ShadedIcon.save,toolTipText='save',borderPainted=False,focusPainted=False,contentAreaFilled=False))
 
         return panel
 

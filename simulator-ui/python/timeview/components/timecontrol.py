@@ -8,7 +8,7 @@ from java.awt import BorderLayout, Color, RenderingHints
 from java.awt.event import ActionListener
 
 from ca.nengo.model import SimulationMode
-
+import timeview.data
 import os
 
 # for save_pdf
@@ -163,7 +163,7 @@ class TimeControl(JPanel, ChangeListener, ActionListener):
     def show_data(self, event):
         frame = JFrame('%s Data' % self.view.network.name)
         frame.visible = True
-        frame.add(self.data.DataPanel(self.view))
+        frame.add(timeview.data.DataPanel(self.view))
         frame.size = (500, 600)
 
     def forward_one_frame(self, event):
