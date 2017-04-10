@@ -1,101 +1,110 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="nengo">
-    <property environment="env"/>
-    <property file="build.properties"/>
-    <path id="classpath.simulator">
-        <pathelement location="${dest.build}"/>
-    	<fileset dir="${src.lib}">
-    		<include name="*.jar"/>
-    	</fileset>
-    </path>
-	<path id="classpath.test">
-		<path refid="classpath.simulator"/>
-		<pathelement location="${dest.test}"/>
-	</path>
+  <property environment="env"/>
+  <property file="build.properties"/>
+  <path id="classpath.simulator">
+    <pathelement location="${dest.build}"/>
+    <fileset dir="${src.lib}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+  <path id="classpath.test">
+    <path refid="classpath.simulator"/>
+    <pathelement location="${dest.test}"/>
+  </path>
 
-    <target name="init">
-    	<mkdir dir="${dest.artifacts}"/>
-    	<mkdir dir="${dest.build}"/>
-		<mkdir dir="${dest.test}"/>
-        <copy includeemptydirs="false" todir="${dest.build}">
-            <fileset dir="${src.main}">
-                <exclude name="**/*.launch"/>
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
-        <copy includeemptydirs="false" todir="${dest.build}">
-            <fileset dir="${src.resources}">
-                <exclude name="**/*.launch"/>
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
-        <copy includeemptydirs="false" todir="${dest.test}">
-            <fileset dir="${src.test}">
-                <exclude name="**/*.launch"/>
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
-    </target>
-    
-    <target name="clean">
-    	<delete dir="${dest.artifacts}"/>
-        <delete dir="${dest.build}"/>
-    	<delete dir="${dest.test}"/>
-    </target>
-	
-    <target description="Build simulator. Produces .class files in the ${dest.build} directory."
-			depends="init" name="build">
-        <javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.build}" source="${java.source}" target="${java.target}">
-            <src path="${src.main}"/>
-            <classpath refid="classpath.simulator"/>
-        	<compilerarg value="-Xlint"/>
-        </javac>
-    </target>
-	
-	<target description="Generate JavaDoc." name="javadoc">
-		<delete dir="${dest.artifacts.javadoc}"/>
-		<mkdir dir="${dest.artifacts.javadoc}"/>
-		<javadoc sourcepath="${src.main}"
-			destdir="${dest.artifacts.javadoc}"
-			author="false"
-			version="false"
-			stylesheetfile="${src.javadoc.css}"
-			windowtitle="Nengo Java API Documentation" >
-			<header>
-				<![CDATA[<a href="http://www.nengo.ca" TARGET="_top">Nengo.ca</a>]]>
-			</header>
-		</javadoc>
-	</target>
-	
-	<target description="Run JUnit tests and produce reports."
-			depends="init,build" name="test">
-		<delete dir="${dest.artifacts.junit.xml}"/>
-		<delete dir="${dest.artifacts.junit.html}"/>
-		<mkdir dir="${dest.artifacts.junit.xml}"/>
-		<mkdir dir="${dest.artifacts.junit.html}"/>
-		<javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.test}" source="${java.source}" target="${java.target}">
-	        <src path="${src.test}"/>
-            <classpath refid="classpath.test"/>
-			<compilerarg value="-Xlint"/>
-        </javac>
-		<junit fork="yes" printsummary="no" haltonfailure="no">
-			<batchtest fork="yes" todir="${dest.artifacts.junit.xml}" >
-				<fileset dir="${dest.test}">
-			    	<include name="**/*Test.class" />
-			    </fileset>
-			</batchtest>
-			<formatter type="xml"/>
-			<classpath refid="classpath.test"/>
-		</junit>
-		<junitreport todir="${dest.artifacts.junit.html}">
-			<fileset dir="${dest.artifacts.junit.xml}">
-		    	<include name="TEST-*.xml" />
-		    </fileset>
-		    <report todir="${dest.artifacts.junit.html}" />
-		</junitreport>
-	</target>
-	
-	<target description="Generate all artifacts: javadoc and junit tests." name="all"
-			depends="javadoc,test" />
+  <target name="init">
+    <mkdir dir="${dest.artifacts}"/>
+    <mkdir dir="${dest.build}"/>
+    <mkdir dir="${dest.test}"/>
+    <copy includeemptydirs="false" todir="${dest.build}">
+      <fileset dir="${src.main}">
+        <exclude name="**/*.launch"/>
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+    <copy includeemptydirs="false" todir="${dest.build}">
+      <fileset dir="${src.resources}">
+        <exclude name="**/*.launch"/>
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+    <copy includeemptydirs="false" todir="${dest.test}">
+      <fileset dir="${src.test}">
+        <exclude name="**/*.launch"/>
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="clean">
+    <delete dir="${dest.artifacts}"/>
+    <delete dir="${dest.build}"/>
+    <delete dir="${dest.test}"/>
+  </target>
+
+  <target description="Build simulator. Produces .class files in the ${dest.build} directory."
+          depends="init" name="build">
+    <javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.build}" source="${java.source}" target="${java.target}">
+      <src path="${src.main}"/>
+      <classpath refid="classpath.simulator"/>
+      <compilerarg value="-Xlint"/>
+    </javac>
+  </target>
+
+  <target description="Generate JavaDoc." name="javadoc">
+    <delete dir="${dest.artifacts.javadoc}"/>
+    <mkdir dir="${dest.artifacts.javadoc}"/>
+    <javadoc sourcepath="${src.main}"
+             destdir="${dest.artifacts.javadoc}"
+             author="false"
+             version="false"
+             stylesheetfile="${src.javadoc.css}"
+             windowtitle="Nengo Java API Documentation" >
+      <header>
+        <![CDATA[<a href="http://www.nengo.ca" TARGET="_top">Nengo.ca</a>]]>
+      </header>
+    </javadoc>
+  </target>
+
+  <target description="Run JUnit tests and produce reports."
+          depends="init,build" name="test">
+    <delete dir="${dest.artifacts.junit.html}"/>
+    <delete dir="${dest.artifacts.junit.xml}"/>
+    <mkdir dir="${dest.artifacts.junit.html}"/>
+    <mkdir dir="${dest.artifacts.junit.xml}"/>
+    <javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.test}" source="${java.source}" target="${java.target}">
+      <src path="${src.test}"/>
+      <classpath refid="classpath.test"/>
+      <compilerarg value="-Xlint"/>
+    </javac>
+    <junit fork="yes" haltonfailure="no">
+      <classpath refid="classpath.test"/>
+      <formatter type="xml"/>
+      <batchtest fork="yes" todir="${dest.artifacts.junit.xml}" >
+        <fileset dir="${dest.test}">
+          <include name="**/*Test.class" />
+        </fileset>
+      </batchtest>
+    </junit>
+    <junitreport todir="${dest.artifacts.junit.html}">
+      <fileset dir="${dest.artifacts.junit.xml}" />
+      <report todir="${dest.artifacts.junit.html}" />
+    </junitreport>
+    <concat>
+      <fileset file="${dest.artifacts.junit.html}/overview-summary.html" />
+      <filterchain>
+        <linecontainsregexp>
+          <regexp pattern='title="Display all tests"' />
+        </linecontainsregexp>
+        <tokenfilter>
+          <replaceregex pattern='&lt;td&gt;&lt;a title="Display all tests" href="all-tests.html"&gt;(\d+)&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a title="Display all failures" href="alltests-fails.html"&gt;(\d+)&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a title="Display all errors" href="alltests-errors.html"&gt;(\d+).*$' replace="Run: \1, Failed: \2, Errors: \3" />
+        </tokenfilter>
+      </filterchain>
+    </concat>
+    <fail message="test(s) failed" if="test.failure" />
+  </target>
+
+  <target description="Generate all artifacts: javadoc and junit tests." name="all"
+          depends="javadoc,test" />
 </project>
-

@@ -1,0 +1,34 @@
+language: java
+sudo: false
+addons:
+  apt:
+    packages:
+      - lib32ncurses5
+      - lib32z1
+
+env:
+  global:
+    - DIST="false"
+
+
+matrix:
+  include:
+    - jdk: openjdk6
+    - jdk: openjdk7
+    - jdk: oraclejdk7
+    - jdk: oraclejdk8
+
+script:
+  - cd simulator-ui
+  - ant clean
+  - ant dist
+  - cd ..
+
+deploy:
+  provider: releases
+  api_key: "$GH_TOKEN"
+  file: "nengo-latest.zip"
+  skip_cleanup: true
+  on:
+    jdk: oraclejdk7
+    tags: true

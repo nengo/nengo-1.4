@@ -1,227 +1,227 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="nengo-ui">
-    <property environment="env"/>
-    <property name="dir.simulator" value="../simulator"/>
-	<property file="${dir.simulator}/build.properties"/>
-	<path id="classpath.simulator">
-        <pathelement location="${dir.simulator}/${dest.build}"/>
-    	<fileset dir="${dir.simulator}/${src.lib}">
-    		<include name="*.jar"/>
-    	</fileset>
-	</path>
-    <path id="classpath.simulator-ui">
-    	<path refid="classpath.simulator"/>
-    	<pathelement location="${dest.build}"/>
-    	<fileset dir="${src.lib}">
-    		<include name="*.jar"/>
-    	</fileset>
-    </path>
-	
-    <target name="init">
-    	<mkdir dir="${dest.artifacts}"/>
-        <mkdir dir="${dest.build}"/>
-        <copy includeemptydirs="false" todir="${dest.build}">
-            <fileset dir="${src.main}">
-                <exclude name="**/*.launch"/>
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
-    </target>
-	
-    <target name="clean">
-    	<delete dir="${dest.artifacts}"/>
-        <delete dir="${dest.build}"/>
-    </target>
-	
-    <target name="build-simulator">
-        <ant dir="${dir.simulator}" inheritAll="false" target="build" />
-    </target>
-	
-	<target name="test-simulator">
-	    <ant dir="${dir.simulator}" inheritAll="false" target="test" />
-	</target>
-	
-	<target name="javadoc-simulator">
-	    <ant dir="${dir.simulator}" inheritAll="false" target="javadoc" />
-	</target>
-	
-    <target description="Build simulator-ui. Produces .class files in the ${dest.build} directory."
-			depends="init,build-simulator" name="build">
-        <javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.build}" source="${java.source}" target="${java.target}">
-            <src path="${src.main}"/>
-            <classpath refid="classpath.simulator-ui"/>
-        	<compilerarg value="-Xlint"/>
-        </javac>
-	</target>
-	
-	<target description="Generate JavaDoc." name="javadoc">
-		<mkdir dir="${dest.artifacts.javadoc}"/>
-		<javadoc sourcepath="${src.main}"
-			destdir="${dest.artifacts.javadoc}"
-			author="false"
-			version="false"
-			stylesheetfile="${dir.simulator}/${src.javadoc.css}"
-			windowtitle="Nengo GUI API Documentation"/>
-	</target>
-	
-	<target description="Generate Sphinx documentation." name="sphinx">
-		<mkdir dir="${dest.artifacts.sphinx}"/>
-		<exec executable="make" dir="${src.sphinx}">
-			<arg value="html"/>
-		</exec>
-		<exec executable="make" dir="${src.sphinx}">
-			<arg value="latex"/>
-		</exec>
-        <exec executable="make" dir="${dest.artifacts.sphinx}/latex">
-            <arg value="LATEXOPTS='--interaction=nonstopmode'"/>
-        </exec>
-	</target>
-	
-	<target description="Generate all artifacts: javadoc and sphinx." name="all"
-		depends="javadoc,sphinx" />
-	
-	<target description="Create a distribution folder. Requires that git is installed and working."
-		depends="clean,build,test-simulator,javadoc-simulator" name="dist">
-    	<exec executable="git" spawn="false" dir="${basedir}" outputproperty="buildhash">
-    	    <arg line="rev-parse --short HEAD"/>
-    	</exec>
-		<property name="dist.dir" value="../nengo-${buildhash}"/>
-		<copy includeemptydirs="false" todir="${dest.build}">
-	        <fileset dir="${dir.simulator}/${dest.build}">
-	            <exclude name="**/*.launch"/>
-	            <exclude name="**/*.java"/>
-	        </fileset>
-	    </copy>
-		<delete includeEmptyDirs="true" removeNotFollowedSymlinks="true" quiet="true">
-		    <fileset dir="${dist.dir}" erroronmissingdir="false"
-		    	followsymlinks="false" defaultexcludes="false" />
-	    </delete>
-		<mkdir dir="${dist.dir}"/>
-		<jar destfile="${dist.dir}/nengo-${buildhash}.jar" basedir="${dest.build}">
-	    	<manifest>
-		    	<attribute name="Main-Class" value="ca.nengo.ui.NengoLauncher" />
-			  	<attribute name="Built-By" value="${user.name}"/>
-			  	<attribute name="Implementation-Vendor" value="Centre for Theoretical Neuroscience @ UWaterloo"/>
-			  	<attribute name="Implementation-Title" value="Nengo Graphical Simulator"/>
-			  	<attribute name="Implementation-Version" value="Build ${buildhash}"/>
-	    	</manifest>
-		</jar>
-		<mkdir dir="${dist.dir}/api"/>
-		<mkdir dir="${dist.dir}/api/docs"/>
-		<mkdir dir="${dist.dir}/api/src"/>
-		<copy includeemptydirs="false" todir="${dist.dir}/api/docs">
-			<fileset dir="${dir.simulator}/${dest.artifacts.javadoc}"/>
-		</copy>
-		<copy includeemptydirs="false" todir="${dist.dir}/api/src">
-			<fileset dir="${dir.simulator}/${src.main}"/>
-		</copy>
-		<copy includeemptydirs="false" todir="${dist.dir}">
-			<fileset dir=".">
-				<include name="external/**"/>
-				<include name="images/**"/>
-				<include name="python/**"/>
-				<include name="${src.lib}/**"/>
-			</fileset>
-			<fileset dir="${dir.simulator}">
-				<include name="${src.lib}/**"/>
-			</fileset>
-			<fileset dir="${src.dist}"/>
-		</copy>
-		
-		<replace dir="${dist.dir}" token="BUILDNUMBER" value="${buildhash}">
-			<include name="nengo"/>
-            <include name="nengo-cl"/>
-            <include name="javaviz-server"/>
-			<include name="nengo.bat"/>
-            <include name="nengo-cl.bat"/>
-            <include name="javaviz-server.bat"/>
-			<include name="lib/build/launch-nengo.xml"/>
-            <include name="lib/build/launch-nengo-cl.xml"/>
-		</replace>
-		
-        <!-- Get a list of all libraries -->
-        <fileset dir="${dist.dir}" id="distlibs">
-            <include name="${src.lib}/*.jar"/>
-        </fileset>
-    
-        <pathconvert targetos="unix" property="libs.unix" refid="distlibs">
-            <chainedmapper>
-            	<flattenmapper />
-            	<globmapper from="*" to="lib/*"/>
-            </chainedmapper>
-        </pathconvert>
-		<replace dir="${dist.dir}" token="LIBS" value="${libs.unix}">
-		    <include name="nengo"/>
-		    <include name="nengo-cl"/>
-		    <include name="javaviz-server"/>
-	    </replace>
+  <property environment="env"/>
+  <property name="dir.simulator" value="../simulator"/>
+  <property file="${dir.simulator}/build.properties"/>
+  <path id="classpath.simulator">
+    <pathelement location="${dir.simulator}/${dest.build}"/>
+    <fileset dir="${dir.simulator}/${src.lib}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+  <path id="classpath.simulator-ui">
+    <path refid="classpath.simulator"/>
+    <pathelement location="${dest.build}"/>
+    <fileset dir="${src.lib}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
 
-        <pathconvert targetos="windows" property="libs.windows" refid="distlibs">
-            <chainedmapper>
-                <flattenmapper />
-                <globmapper from="*" to="lib/*"/>
-            </chainedmapper>
-        </pathconvert>
-		<replace dir="${dist.dir}" token="LIBS" value="${libs.windows}">
-		    <include name="nengo.bat"/>
-		    <include name="nengo-cl.bat"/>
-		    <include name="javaviz-server.bat"/>
-		</replace>
+  <target name="init">
+    <mkdir dir="${dest.artifacts}"/>
+    <mkdir dir="${dest.build}"/>
+    <copy includeemptydirs="false" todir="${dest.build}">
+      <fileset dir="${src.main}">
+        <exclude name="**/*.launch"/>
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+  </target>
 
-		<pathconvert pathsep="\n" property="libs.xml" refid="distlibs">
-            <chainedmapper>
-                <flattenmapper />
-                <globmapper from="*" to="lib/*"/>
-                <globmapper from="*" to="    &lt;cp&gt;*&lt;/cp&gt;"/>
-            </chainedmapper>
-        </pathconvert>
-        <replace dir="${dist.dir}" token="LIBS" value="${libs.xml}">
-            <include name="lib/build/launch-nengo.xml"/>
-            <include name="lib/build/launch-nengo-cl.xml"/>
-        </replace>
+  <target name="clean">
+    <delete dir="${dest.artifacts}"/>
+    <delete dir="${dest.build}"/>
+  </target>
 
-        <taskdef name="launch4j"
-            classname="net.sf.launch4j.ant.Launch4jTask"
-            classpath="${dist.dir}/lib/build/launch4j.jar:${dist.dir}/lib/build/lib/xstream.jar"/>
-		<chmod perm="a+x" verbose="true">
-		    <fileset dir="${dist.dir}/lib/build/bin">
-                <include name="ld"/>
-                <include name="windres"/>
-            </fileset>
-        </chmod>
-        <launch4j configFile="${dist.dir}/lib/build/launch-nengo.xml" 
-        	outfile="${dist.dir}/nengo.exe"/>
-        <launch4j configFile="${dist.dir}/lib/build/launch-nengo-cl.xml"
-        	outfile="${dist.dir}/nengo-cl.exe"/>
-		<delete dir="${dist.dir}/lib/build"/>
+  <target name="build-simulator">
+    <ant dir="${dir.simulator}" inheritAll="false" target="build" />
+  </target>
 
-		<chmod perm="a+x" verbose="true">
-			<fileset dir="${dist.dir}">
-				<include name="nengo"/>
-				<include name="nengo-cl"/>
-				<include name="javaviz-server"/>
-				<include name="external/pseudoInverse"/>
-			</fileset>
-		</chmod>
-		<exec executable="zip" dir="..">
-			<arg line="-qr nengo-latest nengo-${buildhash}"/>
-		</exec>
-	</target>
-	
-	<target description="Moves Javadoc and Sphinx documentation to appropriate places on CTNSRV."
-		name="publish-artifacts" depends="javadoc-simulator,sphinx">
-		<delete includeemptydirs="true" failonerror="false">
-			<fileset dir="${dest.publish.javadoc}" includes="**/*"/>
-		</delete>
-		<copy includeemptydirs="false" todir="${dest.publish.javadoc}">
-	    	<fileset dir="${dir.simulator}/${dest.artifacts.javadoc}"/>
-	  	</copy>
-		
-		<delete includeemptydirs="true" failonerror="false">
-			<fileset dir="${dest.publish.sphinx}" includes="**/*"/>
-		</delete>
-		<copy includeemptydirs="false" todir="${dest.publish.sphinx}">
-		    <fileset dir="${dest.artifacts.sphinx}"/>
-		</copy>
-	</target>
+  <target name="test-simulator">
+    <ant dir="${dir.simulator}" inheritAll="false" target="test" />
+  </target>
+
+  <target name="javadoc-simulator">
+    <ant dir="${dir.simulator}" inheritAll="false" target="javadoc" />
+  </target>
+
+  <target description="Build simulator-ui. Produces .class files in the ${dest.build} directory."
+          depends="init,build-simulator" name="build">
+    <javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.build}" source="${java.source}" target="${java.target}">
+      <src path="${src.main}"/>
+      <classpath refid="classpath.simulator-ui"/>
+      <compilerarg value="-Xlint"/>
+    </javac>
+  </target>
+
+  <target description="Generate JavaDoc." name="javadoc">
+    <mkdir dir="${dest.artifacts.javadoc}"/>
+    <javadoc sourcepath="${src.main}"
+             destdir="${dest.artifacts.javadoc}"
+             author="false"
+             version="false"
+             stylesheetfile="${dir.simulator}/${src.javadoc.css}"
+             windowtitle="Nengo GUI API Documentation"/>
+  </target>
+
+  <target description="Generate Sphinx documentation." name="sphinx">
+    <mkdir dir="${dest.artifacts.sphinx}"/>
+    <exec executable="make" dir="${src.sphinx}">
+      <arg value="html"/>
+    </exec>
+    <exec executable="make" dir="${src.sphinx}">
+      <arg value="latex"/>
+    </exec>
+    <exec executable="make" dir="${dest.artifacts.sphinx}/latex">
+      <arg value="LATEXOPTS='--interaction=nonstopmode'"/>
+    </exec>
+  </target>
+
+  <target description="Generate all artifacts: javadoc and sphinx." name="all"
+          depends="javadoc,sphinx" />
+
+  <target description="Create a distribution folder. Requires that git is installed and working."
+          depends="clean,build,test-simulator,javadoc-simulator" name="dist">
+    <exec executable="git" spawn="false" dir="${basedir}" outputproperty="buildhash">
+      <arg line="rev-parse --short HEAD"/>
+    </exec>
+    <property name="dist.dir" value="../nengo-${buildhash}"/>
+    <copy includeemptydirs="false" todir="${dest.build}">
+      <fileset dir="${dir.simulator}/${dest.build}">
+        <exclude name="**/*.launch"/>
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+    <delete includeEmptyDirs="true" removeNotFollowedSymlinks="true" quiet="true">
+      <fileset dir="${dist.dir}" erroronmissingdir="false"
+               followsymlinks="false" defaultexcludes="false" />
+    </delete>
+    <mkdir dir="${dist.dir}"/>
+    <jar destfile="${dist.dir}/nengo-${buildhash}.jar" basedir="${dest.build}">
+      <manifest>
+        <attribute name="Main-Class" value="ca.nengo.ui.NengoLauncher" />
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Implementation-Vendor" value="Centre for Theoretical Neuroscience @ UWaterloo"/>
+        <attribute name="Implementation-Title" value="Nengo Graphical Simulator"/>
+        <attribute name="Implementation-Version" value="Build ${buildhash}"/>
+      </manifest>
+    </jar>
+    <mkdir dir="${dist.dir}/api"/>
+    <mkdir dir="${dist.dir}/api/docs"/>
+    <mkdir dir="${dist.dir}/api/src"/>
+    <copy includeemptydirs="false" todir="${dist.dir}/api/docs">
+      <fileset dir="${dir.simulator}/${dest.artifacts.javadoc}"/>
+    </copy>
+    <copy includeemptydirs="false" todir="${dist.dir}/api/src">
+      <fileset dir="${dir.simulator}/${src.main}"/>
+    </copy>
+    <copy includeemptydirs="false" todir="${dist.dir}">
+      <fileset dir=".">
+        <include name="external/**"/>
+        <include name="images/**"/>
+        <include name="python/**"/>
+        <include name="${src.lib}/**"/>
+      </fileset>
+      <fileset dir="${dir.simulator}">
+        <include name="${src.lib}/**"/>
+      </fileset>
+      <fileset dir="${src.dist}"/>
+    </copy>
+
+    <replace dir="${dist.dir}" token="BUILDNUMBER" value="${buildhash}">
+      <include name="nengo"/>
+      <include name="nengo-cl"/>
+      <include name="javaviz-server"/>
+      <include name="nengo.bat"/>
+      <include name="nengo-cl.bat"/>
+      <include name="javaviz-server.bat"/>
+      <include name="lib/build/launch-nengo.xml"/>
+      <include name="lib/build/launch-nengo-cl.xml"/>
+    </replace>
+
+    <!-- Get a list of all libraries -->
+    <fileset dir="${dist.dir}" id="distlibs">
+      <include name="${src.lib}/*.jar"/>
+    </fileset>
+
+    <pathconvert targetos="unix" property="libs.unix" refid="distlibs">
+      <chainedmapper>
+        <flattenmapper />
+        <globmapper from="*" to="lib/*"/>
+      </chainedmapper>
+    </pathconvert>
+    <replace dir="${dist.dir}" token="LIBS" value="${libs.unix}">
+      <include name="nengo"/>
+      <include name="nengo-cl"/>
+      <include name="javaviz-server"/>
+    </replace>
+
+    <pathconvert targetos="windows" property="libs.windows" refid="distlibs">
+      <chainedmapper>
+        <flattenmapper />
+        <globmapper from="*" to="lib/*"/>
+      </chainedmapper>
+    </pathconvert>
+    <replace dir="${dist.dir}" token="LIBS" value="${libs.windows}">
+      <include name="nengo.bat"/>
+      <include name="nengo-cl.bat"/>
+      <include name="javaviz-server.bat"/>
+    </replace>
+
+    <pathconvert pathsep="\n" property="libs.xml" refid="distlibs">
+      <chainedmapper>
+        <flattenmapper />
+        <globmapper from="*" to="lib/*"/>
+        <globmapper from="*" to="    &lt;cp&gt;*&lt;/cp&gt;"/>
+      </chainedmapper>
+    </pathconvert>
+    <replace dir="${dist.dir}" token="LIBS" value="${libs.xml}">
+      <include name="lib/build/launch-nengo.xml"/>
+      <include name="lib/build/launch-nengo-cl.xml"/>
+    </replace>
+
+    <taskdef name="launch4j"
+             classname="net.sf.launch4j.ant.Launch4jTask"
+             classpath="${dist.dir}/lib/build/launch4j.jar:${dist.dir}/lib/build/lib/xstream.jar"/>
+    <chmod perm="a+x" verbose="true">
+      <fileset dir="${dist.dir}/lib/build/bin">
+        <include name="ld"/>
+        <include name="windres"/>
+      </fileset>
+    </chmod>
+    <launch4j configFile="${dist.dir}/lib/build/launch-nengo.xml"
+              outfile="${dist.dir}/nengo.exe"/>
+    <launch4j configFile="${dist.dir}/lib/build/launch-nengo-cl.xml"
+              outfile="${dist.dir}/nengo-cl.exe"/>
+    <delete dir="${dist.dir}/lib/build"/>
+
+    <chmod perm="a+x" verbose="true">
+      <fileset dir="${dist.dir}">
+        <include name="nengo"/>
+        <include name="nengo-cl"/>
+        <include name="javaviz-server"/>
+        <include name="external/pseudoInverse"/>
+      </fileset>
+    </chmod>
+    <exec executable="zip" dir="..">
+      <arg line="-qr nengo-latest nengo-${buildhash}"/>
+    </exec>
+  </target>
+
+  <target description="Moves Javadoc and Sphinx documentation to appropriate places on CTNSRV."
+          name="publish-artifacts" depends="javadoc-simulator,sphinx">
+    <delete includeemptydirs="true" failonerror="false">
+      <fileset dir="${dest.publish.javadoc}" includes="**/*"/>
+    </delete>
+    <copy includeemptydirs="false" todir="${dest.publish.javadoc}">
+      <fileset dir="${dir.simulator}/${dest.artifacts.javadoc}"/>
+    </copy>
+
+    <delete includeemptydirs="true" failonerror="false">
+      <fileset dir="${dest.publish.sphinx}" includes="**/*"/>
+    </delete>
+    <copy includeemptydirs="false" todir="${dest.publish.sphinx}">
+      <fileset dir="${dest.artifacts.sphinx}"/>
+    </copy>
+  </target>
 </project>
