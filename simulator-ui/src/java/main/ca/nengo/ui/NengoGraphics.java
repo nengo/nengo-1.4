@@ -114,7 +114,7 @@ import ca.nengo.util.Environment;
 
 /**
  * Top level instance of the NeoGraphics application
- * 
+ *
  * @author Shu Wu
  */
 /**
@@ -126,7 +126,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     /**
      * Nengo version number, no real rhyme or reason to it
      */
-    public static final double VERSION = 1.4;
+    public static final String VERSION = "1.4.0";
 
     /**
      * String used in the UI to identify Nengo
@@ -828,7 +828,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
     /**
      * TODO
-     * 
+     *
      * @author TODO
      */
     public class ToggleScriptPane extends StandardAction {
@@ -1028,7 +1028,7 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
 
 /**
  * Runs the closest network to the currently selected obj
- * 
+ *
  * @author Shu Wu
  */
 class RunNetworkAction extends StandardAction {
@@ -1059,7 +1059,7 @@ class RunNetworkAction extends StandardAction {
 
 /**
  * Saves the closest network to the currently selected object
- * 
+ *
  * @author Shu Wu
  */
 class SaveNetworkAction extends StandardAction {
@@ -1088,7 +1088,7 @@ class SaveNetworkAction extends StandardAction {
 
 /**
  * Generates a script for the highest network including the selected object
- * 
+ *
  * @author Chris Eliasmith
  */
 class GenerateScriptAction extends StandardAction {
