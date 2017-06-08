@@ -52,21 +52,6 @@
     </javac>
   </target>
 
-  <target description="Generate JavaDoc." name="javadoc">
-    <delete dir="${dest.artifacts.javadoc}"/>
-    <mkdir dir="${dest.artifacts.javadoc}"/>
-    <javadoc sourcepath="${src.main}"
-             destdir="${dest.artifacts.javadoc}"
-             author="false"
-             version="false"
-             stylesheetfile="${src.javadoc.css}"
-             windowtitle="Nengo Java API Documentation" >
-      <header>
-        <![CDATA[<a href="http://www.nengo.ca" TARGET="_top">Nengo.ca</a>]]>
-      </header>
-    </javadoc>
-  </target>
-
   <target description="Run JUnit tests and produce reports."
           depends="init,build" name="test">
     <delete dir="${dest.artifacts.junit.html}"/>
@@ -105,6 +90,6 @@
     <fail message="test(s) failed" if="test.failure" />
   </target>
 
-  <target description="Generate all artifacts: javadoc and junit tests." name="all"
-          depends="javadoc,test" />
+  <target description="Generate all artifacts and run junit tests." name="all"
+          depends="test" />
 </project>

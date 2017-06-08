@@ -6,6 +6,8 @@ nengo-*
 nengo-latest.zip
 NengoModels
 
+_build/
+
 .metadata/*
 simulator-ui/commandhistory.dat
 

@@ -41,10 +41,6 @@
     <ant dir="${dir.simulator}" inheritAll="false" target="test" />
   </target>
 
-  <target name="javadoc-simulator">
-    <ant dir="${dir.simulator}" inheritAll="false" target="javadoc" />
-  </target>
-
   <target description="Build simulator-ui. Produces .class files in the ${dest.build} directory."
           depends="init,build-simulator" name="build">
     <javac debug="true" debuglevel="${java.debuglevel}" destdir="${dest.build}" source="${java.source}" target="${java.target}">
@@ -54,34 +50,8 @@
     </javac>
   </target>
 
-  <target description="Generate JavaDoc." name="javadoc">
-    <mkdir dir="${dest.artifacts.javadoc}"/>
-    <javadoc sourcepath="${src.main}"
-             destdir="${dest.artifacts.javadoc}"
-             author="false"
-             version="false"
-             stylesheetfile="${dir.simulator}/${src.javadoc.css}"
-             windowtitle="Nengo GUI API Documentation"/>
-  </target>
-
-  <target description="Generate Sphinx documentation." name="sphinx">
-    <mkdir dir="${dest.artifacts.sphinx}"/>
-    <exec executable="make" dir="${src.sphinx}">
-      <arg value="html"/>
-    </exec>
-    <exec executable="make" dir="${src.sphinx}">
-      <arg value="latex"/>
-    </exec>
-    <exec executable="make" dir="${dest.artifacts.sphinx}/latex">
-      <arg value="LATEXOPTS='--interaction=nonstopmode'"/>
-    </exec>
-  </target>
-
-  <target description="Generate all artifacts: javadoc and sphinx." name="all"
-          depends="javadoc,sphinx" />
-
   <target description="Create a distribution folder. Requires that git is installed and working."
-          depends="clean,build,test-simulator,javadoc-simulator" name="dist">
+          depends="clean,build,test-simulator" name="dist">
     <exec executable="git" spawn="false" dir="${basedir}" outputproperty="buildhash">
       <arg line="rev-parse --short HEAD"/>
     </exec>
@@ -107,11 +77,7 @@
       </manifest>
     </jar>
     <mkdir dir="${dist.dir}/api"/>
-    <mkdir dir="${dist.dir}/api/docs"/>
     <mkdir dir="${dist.dir}/api/src"/>
-    <copy includeemptydirs="false" todir="${dist.dir}/api/docs">
-      <fileset dir="${dir.simulator}/${dest.artifacts.javadoc}"/>
-    </copy>
     <copy includeemptydirs="false" todir="${dist.dir}/api/src">
       <fileset dir="${dir.simulator}/${src.main}"/>
     </copy>
@@ -208,20 +174,4 @@
     </exec>
   </target>
 
-  <target description="Moves Javadoc and Sphinx documentation to appropriate places on CTNSRV."
-          name="publish-artifacts" depends="javadoc-simulator,sphinx">
-    <delete includeemptydirs="true" failonerror="false">
-      <fileset dir="${dest.publish.javadoc}" includes="**/*"/>
-    </delete>
-    <copy includeemptydirs="false" todir="${dest.publish.javadoc}">
-      <fileset dir="${dir.simulator}/${dest.artifacts.javadoc}"/>
-    </copy>
-
-    <delete includeemptydirs="true" failonerror="false">
-      <fileset dir="${dest.publish.sphinx}" includes="**/*"/>
-    </delete>
-    <copy includeemptydirs="false" todir="${dest.publish.sphinx}">
-      <fileset dir="${dest.artifacts.sphinx}"/>
-    </copy>
-  </target>
 </project>
