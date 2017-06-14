@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 
+import os
+import sys
+
 import guzzle_sphinx_theme
 
+sys.path.insert(0, os.path.abspath('../simulator-ui/python'))
+sys.path.insert(0, os.path.abspath('../simulator-ui/python/nef'))
+
 extensions = [
+    "sphinx.ext.autodoc",
     "sphinx.ext.githubpages",
     "sphinx.ext.mathjax",
     "sphinx.ext.todo",
@@ -14,6 +21,7 @@ source_suffix = ".rst"
 master_doc = "index"
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 suppress_warnings = ['image.nonlocal_uri']
+autodoc_mock_imports = ['ca', 'com', 'java', '_javax', 'numeric']
 
 project = "Nengo 1.4"
 copyright = ("2006-2017, Bryan Tripp & Centre for "
@@ -25,10 +33,13 @@ release = "1.4"
 language = None
 
 todo_include_todos = True
+autoclass_content = "both"
+todo_include_todos = True
+autodoc_member_order = "bysource"
 
 # HTML theming
 pygments_style = "sphinx"
-templates_path = []
+templates_path = ['_templates']
 html_static_path = []
 
 html_theme_path = guzzle_sphinx_theme.html_theme_path()

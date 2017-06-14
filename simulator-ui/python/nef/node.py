@@ -1,5 +1,5 @@
 from ca.nengo.model import Termination, Origin, Probeable, SimulationMode, Units
-import ca.nengo.model.Node
+from ca.nengo.model import Node as JavaNode
 from ca.nengo.model.impl import BasicOrigin, RealOutputImpl
 from ca.nengo.util import VisiblyMutableUtils
 import java
@@ -16,7 +16,7 @@ class NodeTermination(Termination):
         self._modulatory = False
         self.setDimensions(dimensions)
     def getName(self):
-        return self._name        
+        return self._name
     def setDimensions(self, dimensions):
         self._values = [0]*dimensions
         self._filtered_values = [0]*dimensions
@@ -47,12 +47,12 @@ class NodeTermination(Termination):
         v = self.getOutput()
         if self.tau < dt or dt == 0 or self.tau <= 0:
             self._filtered_values = v
-        else:    
+        else:
             decay = math.exp(-dt / self.tau)
             for i in range(self._dimensions):
                 x = self._filtered_values[i]
                 self._filtered_values[i] = x * decay + v[i] * (1 - decay)
-                
+
     def get(self):
         return self._filtered_values
 
@@ -67,14 +67,14 @@ class NodeOrigin(BasicOrigin):
         if len(value) != self.dimensions:
             raise Exception('Expected vector of length %d, not %d'%
                         (self.dimensions, len(value)))
-        self._value = value    
+        self._value = value
     def run(self, start, end):
         self.values = RealOutputImpl(self._value, Units.UNK, end)
 
 
-class Node(ca.nengo.model.Node, Probeable):
+class Node(JavaNode, Probeable):
     """A Node allows you to put arbitary code as part of a Nengo model.
-        
+
     This object has Origins and Terminations which can be used just like
     any other Nengo component.  Arbitrary code can be run every time step,
     making this useful for simulating sensory systems (reading data
@@ -82,11 +82,11 @@ class Node(ca.nengo.model.Node, Probeable):
     a file or driving a robot, for example), or even parts of the brain
     that we don't want a full neural model for (symbolic reasoning or
     declarative memory, for example).
-    
+
     Behaviour, inputs, and outputs are defined by subclassing Node.  For
     example, the following code creates a node that takes a single
     input and outputs the square of that input::
-    
+
       class SquaringNode(nef.Node):
           def __init__(self, name, dimensions=1):
               nef.Node.__init__(self, name)
@@ -94,23 +94,23 @@ class Node(ca.nengo.model.Node, Probeable):
               self.output = self.make_output('output', dimensions=dimensions)
           def tick(self):
               self.output.set([x**2 for x in self.input.get()])
-              
+
       square = net.add(SquaringNode('square'))
       net.connect('A', square.getTermination('input'))
       net.connect('square.getOrigin('output'), 'B')
-      
+
     The current time can be accessed via ``self.t``.  This value will be the
     time for the beginning of the current time step.  The end of the current
     time step is ``self.t_end``::
-    
+
       class TimeNode(nef.Node):
           def tick(self):
               print 'Time:',self.t
-              
+
     You can also define a ``start`` method and use generators as a convenient
     way to make functions over time.  For example, to make a Node that will
     produce a random output that changes every 0.1 seconds, do the following::
-    
+
         class YieldNode(nef.Node):
           def __init__(self, name):
               nef.Node.__init__(self, name)
@@ -121,10 +121,10 @@ class Node(ca.nengo.model.Node, Probeable):
                   self.output.set([random.uniform(-1,1)])
                   yield 0.1   # waits for 0.1 seconds before continuing
     """
-                  
+
     def __init__(self, name):
         """
-        :param string name: the name of the created node          
+        :param string name: the name of the created node
         """
         self._name = name
         self.listeners = []
@@ -134,26 +134,26 @@ class Node(ca.nengo.model.Node, Probeable):
         self.setMode(SimulationMode.DEFAULT)
         self.t_end = 0
         self.t = 0
-        
+
         self._use_generator = hasattr(self, 'start') and callable(self.start)
         self._generator = None
 
     def make_output(self, name, dimensions):
         """Defines a new output for the Node.
-        
+
         :param string name: the name of the output, for use when connecting
         :param int dimensions: the dimensionality of the output
         """
         o = NodeOrigin(name, self, dimensions)
         self.addOrigin(o)
         return o
-        
+
     def make_input(self, name, dimensions, pstc=0):
         """Defines a new input for the Node.
 
         :param string name: the name of the termination
         :param int dimensions: the dimensionality of the input
-        :param float pstc: the time constant of the post-synaptic filter to apply        
+        :param float pstc: the time constant of the post-synaptic filter to apply
         """
         t=NodeTermination(name, self, tau=pstc, dimensions=dimensions)
         self.addTermination(t)
@@ -161,18 +161,18 @@ class Node(ca.nengo.model.Node, Probeable):
 
     def tick(self):
         """The main control function that defines how the Node works.
-        
+
         This will be called every time step, and should get() data from the
-        inputs (if any) and set() data on the outputs (if any).        
+        inputs (if any) and set() data on the outputs (if any).
         """
         pass
 
     def init(self):
         """Initialize the node.
-        
+
         Override this to initialize any internal variables.  This will
         also be called whenever the simulation is reset::
-        
+
           class DelayNode(nef.Node):
               def __init__(self, name, steps, dimensions):
                   super(self, name)
@@ -184,11 +184,11 @@ class Node(ca.nengo.model.Node, Probeable):
                   self.delay = [[0]*dimensions for i in range(self.steps)]
               def tick(self):
                   self.output.set(self.delay[0])
-                  self.delay = self.delay[1:] + [self.input.get()] 
-        """        
+                  self.delay = self.delay[1:] + [self.input.get()]
+        """
         pass
 
-    # the following functions implement the basic interface needed to be a Node        
+    # the following functions implement the basic interface needed to be a Node
     def getName(self):
         return self._name
     def setName(self, name):
@@ -202,7 +202,7 @@ class Node(ca.nengo.model.Node, Probeable):
             origin.reset()
         self._use_generator = hasattr(self, 'start') and callable(self.start)
         self._generator = None
-        self.init()    
+        self.init()
 
     def addChangeListener(self, listener):
         self.listeners.append(listener)
@@ -210,18 +210,18 @@ class Node(ca.nengo.model.Node, Probeable):
         self.listeners.remove(listener)
 
     def run(self, start, end):
-        if start < self.t: 
+        if start < self.t:
             self.reset()
         self.t = start
         self.t_end = end
         for t in self.getTerminations():
             t.run(start, end)
-        
+
         if self._use_generator:
             if self._generator is None:
                 self._generator = self.start()
                 self._generator_time = 0
-                if self._generator is None: 
+                if self._generator is None:
                     self._use_generator = False  # just in case start() isn't
                                                  # a generator
         if self._use_generator:
@@ -230,10 +230,10 @@ class Node(ca.nengo.model.Node, Probeable):
                 if time is None:
                     self._use_generator = False
                 else:
-                    self._generator_time += time    
+                    self._generator_time += time
 
         self.tick()
-                    
+
         for o in self.getOrigins():
             o.run(start, end)
 
@@ -270,6 +270,6 @@ class Node(ca.nengo.model.Node, Probeable):
 
     def listStates(self):
         return self._states
-        
+
     def getChildren(self):
         return None
