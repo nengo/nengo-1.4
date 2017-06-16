@@ -1,17 +1,16 @@
 import nef
 
-net=nef.Network('Oscillator') #Create the network object
+# Create the network object
+net = nef.Network('Oscillator')
 
-net.make_input('input',[1,0],
-    zero_after_time=0.1) #Create a controllable input function with a 
-                         #starting value of 1 and zero, then make it go 
-                         #to zero after .1s
-                         
-net.make('A',200,2) #Make a population with 200 neurons, 2 dimensions
+# Create a controllable input function to kick off the oscillator
+net.make_input('input', [1, 0], zero_after_time=0.1)
 
-net.connect('input','A')
-net.connect('A','A',[[1,1],[-1,1]],pstc=0.1) #Recurrently connect the population 
-                                         #with the connection matrix for a 
-                                         #simple harmonic oscillator mapped 
-                                         #to neurons with the NEF
+# Make a population with 200 neurons, 2 dimensions
+net.make('A', 200, 2)
+
+net.connect('input', 'A')
+# Recurrently connect A with the connection matrix for an oscillator
+net.connect('A', 'A', [[1, 1], [-1, 1]], pstc=0.1)
+
 net.add_to_nengo()

@@ -1,16 +1,18 @@
 import nef
 import nps
 
-D=5
-net=nef.Network('Basal Ganglia') #Create the network object
+D = 5
 
-net.make_input('input',[0]*D) #Create a controllable input function 
-                              #with a starting value of 0 for each of D
-                              #dimensions
-net.make('output',1,D,mode='direct')  
-                 #Make a population with 100 neurons, 5 dimensions, and set 
-                 #the simulation mode to direct
-nps.basalganglia.make_basal_ganglia(net,'input','output',D,same_neurons=False,
-    neurons=50)  #Make a basal ganglia model with 50 neurons per action
+# Create the network object
+net = nef.Network('Basal Ganglia')
+
+# Create a controllable input function with starting value all zeros
+net.make_input('input', [0] * D)
+
+# Make a direct mode population with 100 neurons and 5 dimensions
+net.make('output', 1, D, mode='direct')
+
+# Make a basal ganglia model with 50 neurons per action
+nps.basalganglia.make_basal_ganglia(
+    net, 'input', 'output', D, same_neurons=False, neurons=50)
 net.add_to_nengo()
-

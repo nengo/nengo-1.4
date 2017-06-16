@@ -1,20 +1,19 @@
 import nef
 
-net=nef.Network('Single Neuron')      # Create the network
+# Create the network
+net = nef.Network('Single Neuron')
 
-net.make_input('input',[-0.45])       # Create a controllable input
-                                      #   with a starting value of -.45
-                                      
-net.make('neuron',neurons=1,dimensions=1,      # Make 1 neuron representing
-    max_rate=(100,100),intercept=(-0.5,-0.5),  #  1 dimension, with a maximum
-    encoders=[[1]],noise=3)                    #  firing rate of 100, with a
-                                               #  tuning curve x-intercept of 
-                                               #  -0.5, encoder of 1 (i.e. it
-                                               #  responds more to positive
-                                               #  values) and a noise of
-                                               #  variance 3
-    
-net.connect('input','neuron')         # Connect the input to the neuron
+# Create a controllable input with a starting value of -0.45
+net.make_input('input', [-0.45])
+
+net.make('neuron',
+         neurons=1,              # Make 1 neuron
+         dimensions=1,           # representing 1 dimension
+         max_rate=(100, 100),    # with a maximum firing rate of 100
+         intercept=(-0.5, -0.5), # with an x-intercept of -0.5
+         encoders=[[1]],         # with an encoder of 1
+         noise=3)                # with noise of variance 3
+
+# Connect the input to the neuron
+net.connect('input', 'neuron')
 net.add_to_nengo()
-
-

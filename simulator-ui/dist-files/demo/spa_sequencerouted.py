@@ -1,38 +1,41 @@
 from spa import *
 
-D=16
 
-class Rules: #Define the rules by specifying the start state and the 
-             #desired next state
-    def start(vision='START'):
+# Define the rules by specifying the start state and the desired next state
+class Rules:
+
+    def start(self, vision='START'):
         set(state=vision)
-    def A(state='A'): #e.g. If in state A
-        set(state='B') # then go to state B
-    def B(state='B'):
+
+    def A(self, state='A'):  # If in state A...
+        set(state='B')  # then go to state B
+
+    def B(self, state='B'):
         set(state='C')
-    def C(state='C'):
+
+    def C(self, state='C'):
         set(state='D')
-    def D(state='D'):
+
+    def D(self, state='D'):
         set(state='E')
-    def E(state='E'):
+
+    def E(self, state='E'):
         set(state='A')
-    
 
 
-class Routing(SPA): #Define an SPA model (cortex, basal ganglia, thalamus)
-    dimensions=16
+# Define an SPA model (cortex, basal ganglia, thalamus)
+class Routing(SPA):
+    dimensions = 16
+    # Working memory (recurrent network) object (i.e., Buffer)
+    state = Buffer()
+    # Cortical network with no recurrence (no memory, just transient states)
+    vision = Buffer(feedback=0)
+    # A basal ganglia with the prespecified set of rules
+    BG = BasalGanglia(Rules())
+    # A thalamus for that basal ganglia (so it uses the same rules)
+    thal = Thalamus(BG)
+    # Define an input; set the input to 'vision' to 0.8*START+D for 100 ms
+    input = Input(0.1, vision='0.8*START+D')
 
-    state=Buffer() #Create a working memory (recurrent network) 
-                   #object: i.e. a Buffer
-    vision=Buffer(feedback=0) #Create a cortical network object with no 
-                              #recurrence (so no memory properties, just 
-                              #transient states)
-    BG=BasalGanglia(Rules) #Create a basal ganglia with the prespecified 
-                           #set of rules
-    thal=Thalamus(BG) # Create a thalamus for that basal ganglia (so it 
-                      # uses the same rules)
 
-    input=Input(0.1,vision='0.8*START+D') #Define an input; set the input 
-                                       #to state 0.8*START+D for 100 ms
-
-model=Routing()
+model = Routing()

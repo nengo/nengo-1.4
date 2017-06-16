@@ -1,15 +1,27 @@
-Arm Control
-============================
-*Purpose*: This demo shows an example of having an interaction between a neural and non-neural dynamical simulation.
+Arm control
+===========
 
-*Comments*: The majority of the simulation is a non-neural dynamical simulation, with just one crucial population being neural.  That population is plotted in the visualizer, as are the generated control signals.  The control signals are used to drive the arm which is run in the physics simulator.
+**Purpose**:
+This demo shows an example of
+having an interaction between
+a neural and non-neural dynamical simulation.
 
-*Usage*: When you run the network, it will reach to the target (red ball).  If you change refX and refY, that will move the ball, and the arm will reach for the new target location.
+**Comments**:
+The majority of the simulation is
+a non-neural dynamical simulation,
+with just one crucial population being neural.
+That population is plotted in the visualizer,
+as are the generated control signals.
+The control signals are used to drive the arm
+which is run in the physics simulator.
 
-*Output*: See the screen capture below.
+**Usage**:
+When you run the network, it will reach to the target (red ball).
+If you change ``refX`` and ``refY``,
+that will move the ball,
+and the arm will reach for the new target location.
 
 .. image:: images/armcontrol.png
-
-*Code*:
+   :width: 100%
 
 .. literalinclude:: ../../simulator-ui/dist-files/demo/armcontrol.py

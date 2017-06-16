@@ -1,13 +1,14 @@
 import nef
 
-net=nef.Network('Many Neurons')       # Create the network
-net.make_input('input',[-0.45])       # Create a controllable input
-                                      #   with a starting value of -.45
+# Create the network
+net = nef.Network('Many neurons')
 
-net.make('neurons',neurons=100,       # Make a population of 100 neurons, 
-           dimensions=1,noise=1)      #  representing 1 dimensions with random
-                                      #  injected input noise of variance 1
+# Create a controllable input with a starting value of -.45
+net.make_input('input', [-0.45])
 
-net.connect('input','neurons')        # Connect the input to the neuron
+# Make a 1-D population of 100 neurons, with injected noise variance 1
+net.make('neurons', neurons=100, dimensions=1, noise=1)
+
+# Connect the input to the neuron
+net.connect('input', 'neurons')
 net.add_to_nengo()
-
