@@ -38,3 +38,9 @@ to see the effects of "leaky" integration.
    :width: 100%
 
 .. literalinclude:: ../../simulator-ui/dist-files/demo/controlledintegrator2.py
+
+.. topic:: Video:
+
+   .. raw:: html
+
+      <iframe width="100%" height="400" src="https://www.youtube.com/embed/MzeeAkQ7SOU" frameborder="0" allowfullscreen></iframe>

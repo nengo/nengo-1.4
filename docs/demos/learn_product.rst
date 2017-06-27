@@ -36,3 +36,9 @@ does the output go away from zero
    :width: 100%
 
 .. literalinclude:: ../../simulator-ui/dist-files/demo/learn_product.py
+
+.. topic:: Video:
+
+   .. raw:: html
+
+      <iframe width="100%" height="400" src="https://www.youtube.com/embed/m0gAQaCq8TU" frameborder="0" allowfullscreen></iframe>

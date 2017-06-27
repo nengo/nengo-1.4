@@ -24,3 +24,9 @@ one dimension in the output.
    :width: 100%
 
 .. literalinclude:: ../../simulator-ui/dist-files/demo/combining.py
+
+.. topic:: Video:
+
+   .. raw:: html
+
+      <iframe width="100%" height="400" src="https://www.youtube.com/embed/P8zHjvYK_Uo" frameborder="0" allowfullscreen></iframe>

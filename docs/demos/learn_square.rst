@@ -39,3 +39,9 @@ should hit zero at about the same time.
    :width: 100%
 
 .. literalinclude:: ../../simulator-ui/dist-files/demo/learn_square.py
+
+.. topic:: Video:
+
+   .. raw:: html
+
+      <iframe width="100%" height="400" src="https://www.youtube.com/embed/H-19crZIvIk" frameborder="0" allowfullscreen></iframe>

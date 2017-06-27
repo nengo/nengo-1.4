@@ -57,3 +57,9 @@ are included in the graph.
    :width: 100%
 
 .. literalinclude:: ../../simulator-ui/dist-files/demo/convolve.py
+
+.. topic:: Video:
+
+   .. raw:: html
+
+      <iframe width="100%" height="400" src="https://www.youtube.com/embed/4UqN8jqIWjc" frameborder="0" allowfullscreen></iframe>

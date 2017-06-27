@@ -25,3 +25,9 @@ and motor commands to the wheels.
    :width: 100%
 
 .. literalinclude:: ../../simulator-ui/dist-files/demo/vehicle.py
+
+.. topic:: Video:
+
+   .. raw:: html
+
+      <iframe width="100%" height="400" src="https://www.youtube.com/embed/8w9LrrFkqq8" frameborder="0" allowfullscreen></iframe>

@@ -29,3 +29,9 @@ through synaptic connections.
    :width: 100%
 
 .. literalinclude:: ../../simulator-ui/dist-files/demo/communication.py
+
+.. topic:: Video:
+
+   .. raw:: html
+
+      <iframe width="100%" height="400" src="https://www.youtube.com/embed/thGJ73_Q7X4" frameborder="0" allowfullscreen></iframe>

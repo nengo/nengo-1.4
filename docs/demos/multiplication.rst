@@ -32,3 +32,9 @@ and watch the output slope go down as you move the other input up.
    :width: 100%
 
 .. literalinclude:: ../../simulator-ui/dist-files/demo/multiplication.py
+
+.. topic:: Video:
+
+   .. raw:: html
+
+      <iframe width="100%" height="400" src="https://www.youtube.com/embed/XLjgKjnGNAQ" frameborder="0" allowfullscreen></iframe>

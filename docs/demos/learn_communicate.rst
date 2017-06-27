@@ -57,3 +57,9 @@ you need to re-run the script.
    :width: 100%
 
 .. literalinclude:: ../../simulator-ui/dist-files/demo/learn_communicate.py
+
+.. topic:: Video:
+
+   .. raw:: html
+
+      <iframe width="100%" height="400" src="https://www.youtube.com/embed/NSrxsWm_fkc" frameborder="0" allowfullscreen></iframe>

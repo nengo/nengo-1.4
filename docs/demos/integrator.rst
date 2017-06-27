@@ -27,3 +27,9 @@ to perform useful computations (e.g., soft normalization).
    :width: 100%
 
 .. literalinclude:: ../../simulator-ui/dist-files/demo/integrator.py
+
+.. topic:: Video:
+
+   .. raw:: html
+
+      <iframe width="100%" height="400" src="https://www.youtube.com/embed/O1V0-7QMQeI" frameborder="0" allowfullscreen></iframe>

@@ -1,5 +1,6 @@
+*****
 Demos
-=====
+*****
 
 .. warning::
    Nengo 1.4 is no longer actively maintained.
@@ -54,7 +55,7 @@ More sophisticated examples can be found
 in the Model Archive at http://models.nengo.ca.
 
 Introductory demos
-------------------
+==================
 
 .. toctree::
    :maxdepth: 1
@@ -65,7 +66,7 @@ Introductory demos
    2drepresentation
 
 Simple transformations
-----------------------
+======================
 
 .. toctree::
    :maxdepth: 1
@@ -78,7 +79,7 @@ Simple transformations
    convolve
 
 Dynamics
---------
+========
 
 .. toctree::
    :maxdepth: 1
@@ -92,7 +93,7 @@ Dynamics
 .. _bg-demos:
 
 Basal Ganglia based simulations
--------------------------------
+===============================
 
 .. toctree::
    :maxdepth: 1
@@ -105,7 +106,7 @@ Basal Ganglia based simulations
    question_control
 
 Learning
---------
+========
 
 .. toctree::
    :maxdepth: 1
@@ -115,7 +116,7 @@ Learning
    learn_square
 
 Miscellaneous
--------------
+=============
 
 .. toctree::
    :maxdepth: 1

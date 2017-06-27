@@ -40,7 +40,7 @@ autodoc_member_order = "bysource"
 # HTML theming
 pygments_style = "sphinx"
 templates_path = ['_templates']
-html_static_path = []
+html_static_path = ['_static']
 
 html_theme_path = guzzle_sphinx_theme.html_theme_path()
 html_theme = "guzzle_sphinx_theme"

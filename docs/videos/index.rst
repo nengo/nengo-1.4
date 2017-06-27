@@ -1,6 +1,6 @@
-*****************
-Written tutorials
-*****************
+***************
+Video tutorials
+***************
 
 .. warning::
    Nengo 1.4 is no longer actively maintained.
@@ -12,10 +12,10 @@ Written tutorials
    <http://pythonhosted.org/nengo/converting.html>`_.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   1-representation
-   2-linear-transformation
-   3-nonlinear-transformation
-   4-dynamics
-   5-cognitive
+   1-construction
+   2-workspace
+   3-simulation
+   4-moreplots
+   5-scripting

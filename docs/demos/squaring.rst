@@ -23,3 +23,9 @@ will approximately trace a quadratic curve in the output.
    :width: 100%
 
 .. literalinclude:: ../../simulator-ui/dist-files/demo/squaring.py
+
+.. topic:: Video:
+
+   .. raw:: html
+
+      <iframe width="100%" height="400" src="https://www.youtube.com/embed/rje217cSxkY" frameborder="0" allowfullscreen></iframe>

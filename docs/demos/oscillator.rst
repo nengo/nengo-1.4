@@ -39,3 +39,9 @@ to be slightly greater than identity.
 You will get a sine and cosine in the 2D output.
 
 .. literalinclude:: ../../simulator-ui/dist-files/demo/oscillator.py
+
+.. topic:: Video:
+
+   .. raw:: html
+
+      <iframe width="100%" height="400" src="https://www.youtube.com/embed/RiJSgNeh4aE" frameborder="0" allowfullscreen></iframe>
