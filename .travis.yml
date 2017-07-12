@@ -10,7 +10,6 @@ env:
   global:
     - DIST="false"
 
-
 matrix:
   include:
     - jdk: openjdk6
@@ -23,12 +22,34 @@ script:
   - ant clean
   - ant dist
   - cd ..
+  - if [[ $TRAVIS_BRANCH == 'master' && $JAVA_HOME == *"java-7-oracle"* ]]; then
+      wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
+      bash miniconda.sh -b -p "$HOME/miniconda";
+      export PATH="$HOME/miniconda/bin:$PATH";
+      conda config --set always_yes yes --set changeps1 no;
+      conda update -q conda;
+      conda info -a;
+      conda create -q -n test python=2.7 pip;
+      source activate test;
+      pip install -r docs/requirements.txt;
+      sphinx-build -W docs docs/_build;
+    fi
 
 deploy:
-  provider: releases
-  api_key: "$GH_TOKEN"
-  file: "nengo-latest.zip"
-  skip_cleanup: true
-  on:
-    jdk: oraclejdk7
-    tags: true
+  - provider: releases
+    api_key: "$GH_TOKEN"
+    file: "nengo-latest.zip"
+    skip_cleanup: true
+    on:
+      branch: master
+      jdk: oraclejdk7
+      tags: true
+  - provider: pages
+    skip_cleanup: true
+    github_token: "$GH_TOKEN"
+    local_dir: docs/_build
+    target_branch: gh-pages
+    on:
+      branch: master
+      jdk: oraclejdk7
+      tags: true
