@@ -33,23 +33,18 @@ script:
       source activate test;
       pip install -r docs/requirements.txt;
       sphinx-build -W docs docs/_build;
+      export DATE=$(date '+%Y-%m-%d %T');
+      git config --global user.email "travis@travis-ci.org";
+      git config --global user.name "TravisCI";
+      ghp-import -m "Last update at $DATE" -b gh-pages docs/_build;
+      git push -fq "https://$GH_TOKEN@github.com/nengo/nengo_1.4.git" gh-pages;
     fi
 
 deploy:
-  - provider: releases
-    api_key: "$GH_TOKEN"
-    file: "nengo-latest.zip"
-    skip_cleanup: true
-    on:
-      branch: master
-      jdk: oraclejdk7
-      tags: true
-  - provider: pages
-    skip_cleanup: true
-    github_token: "$GH_TOKEN"
-    local_dir: docs/_build
-    target_branch: gh-pages
-    on:
-      branch: master
-      jdk: oraclejdk7
-      tags: true
+  provider: releases
+  api_key: "$GH_TOKEN"
+  file: "nengo-latest.zip"
+  skip_cleanup: true
+  on:
+    jdk: oraclejdk7
+    tags: true

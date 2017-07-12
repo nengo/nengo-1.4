@@ -28,7 +28,7 @@ copyright = ("2006-2017, Bryan Tripp & Centre for "
              "Theoretical Neuroscience, University of Waterloo")
 author = ("Bryan Tripp & Centre for Theoretical Neuroscience, "
           "University of Waterloo")
-version = "1.4.0"
+version = "1.4.1"
 release = "1.4"
 language = None
 

@@ -124,9 +124,9 @@ public class NengoGraphics extends AppFrame implements NodeContainer {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Nengo version number, no real rhyme or reason to it
+     * Nengo version number
      */
-    public static final String VERSION = "1.4.0";
+    public static final String VERSION = "1.4.1";
 
     /**
      * String used in the UI to identify Nengo
