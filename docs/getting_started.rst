@@ -4,7 +4,7 @@ Getting started
 
 .. warning::
    Nengo 1.4 is no longer actively maintained.
-   Please use `Nengo 2.0 <https://nengo.github.io/>`_ instead.
+   Please use `Nengo 2.0 <http://www.nengo.ai/>`_ instead.
 
 Installing Nengo 1.4
 ====================

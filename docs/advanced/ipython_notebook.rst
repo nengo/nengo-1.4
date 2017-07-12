@@ -8,7 +8,7 @@ Integrating with IPython Notebook
    Some of the instructions below will still work,
    but will likely take some effort to translate to Jupyter.
 
-   We recommend you upgrade to `Nengo 2.0 <https://nengo.github.io/>`_ instead
+   We recommend you upgrade to `Nengo 2.0 <http://www.nengo.ai/>`_ instead
    if you are interested in working with Nengo models
    in a Jupyter notebook environment.
 
