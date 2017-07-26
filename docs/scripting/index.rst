@@ -9,7 +9,7 @@ Scripting
    If you have written models in Nengo 1.4 and wish to
    update those modesl to work in Nengo 2.0, see
    `this model conversion guide
-   <http://pythonhosted.org/nengo/converting.html>`_.
+   <http://www.nengo.ai/nengo/converting.html>`_.
 
 This documentation describes the scripting libraries
 available for use in Nengo.
