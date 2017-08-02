@@ -29,7 +29,7 @@ matrix operations found in Matlab.
 
 For detailed instructions on installing these tools
 on all operating systems, `go here
-<http://www.nengo.ai/download.html#installing-python-and-numpy>`_.
+<https://www.nengo.ai/download.html#installing-python-and-numpy>`_.
 
 .. note:: Nengo 1.4 is only tested with Python 2.7.
           Python 3.x may work, but if you run into problems,
