@@ -37,7 +37,7 @@ script:
       git config --global user.email "travis@travis-ci.org";
       git config --global user.name "TravisCI";
       ghp-import -m "Last update at $DATE" -b gh-pages docs/_build;
-      git push -fq "https://$GH_TOKEN@github.com/nengo/nengo_1.4.git" gh-pages;
+      git push -fq "https://$GH_TOKEN@github.com/nengo/nengo-1.4.git" gh-pages;
     fi
 
 deploy:

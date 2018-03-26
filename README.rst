@@ -39,13 +39,13 @@ Eclipse version 3.7.2 (and hopefully other versions too!)
 
    .. code:: bash
 
-      git clone https://github.com/nengo/nengo_1.4.git
+      git clone https://github.com/nengo/nengo-1.4.git
 
 2. Now start the Eclipse IDE in the nengo root directory.
 
    .. code:: bash
 
-      cd nengo_1.4
+      cd nengo-1.4
       eclipse
 
 3. If this is the first time you are running Eclipse,

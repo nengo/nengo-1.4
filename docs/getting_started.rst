@@ -14,7 +14,7 @@ The only requirement is that you have `Java <http://java.com>`_
 installed on your computer.
 
 To download Nengo, download the ``nengo-latest.zip`` file
-from https://github.com/nengo/nengo_1.4/releases.
+from https://github.com/nengo/nengo-1.4/releases.
 
 To install Nengo, unzip the file to a directory of your choosing.
 

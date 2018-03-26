@@ -47,7 +47,7 @@ html_theme = "guzzle_sphinx_theme"
 
 html_theme_options = {
     "project_nav_name": "Nengo 1.4",
-    "base_url": "https://www.nengo.ai/nengo_1.4",
+    "base_url": "https://www.nengo.ai/nengo-1.4",
 }
 
 # Other builders
@@ -70,7 +70,7 @@ latex_documents = [
 
 man_pages = [
     # (source start file, name, description, authors, manual section).
-    (master_doc, "nengo_1.4", "Nengo 1.4 Documentation", [author], 1)
+    (master_doc, "nengo-1.4", "Nengo 1.4 Documentation", [author], 1)
 ]
 
 texinfo_documents = [
