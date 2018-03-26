@@ -1,0 +1,289 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>DefaultFunctionInterpreter &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="DefaultFunctionInterpreterTest" href="DefaultFunctionInterpreterTest.html" />
+    <link rel="prev" title="ConvolutionTest" href="ConvolutionTest.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="DefaultFunctionInterpreterTest.html" title="DefaultFunctionInterpreterTest"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ConvolutionTest.html" title="ConvolutionTest"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.math.impl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.math.impl</a></li>
+              
+              <li>DefaultFunctionInterpreter</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="defaultfunctioninterpreter">
+<h1>DefaultFunctionInterpreter<a class="headerlink" href="#defaultfunctioninterpreter" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.math.impl.DefaultFunctionInterpreter">
+public class <code class="descname">DefaultFunctionInterpreter</code> implements <a class="reference internal" href="../FunctionInterpreter.html#ca.nengo.math.FunctionInterpreter" title="ca.nengo.math.FunctionInterpreter">FunctionInterpreter</a><a class="headerlink" href="#ca.nengo.math.impl.DefaultFunctionInterpreter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default implementation of FunctionInterpreter. This implementation produces PostfixFunctions.</p>
+<p>TODO: faster Functions could be produced by compiling expressions into Java classes.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>DefaultFunctionInterpreter<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.math.impl.DefaultFunctionInterpreter.DefaultFunctionInterpreter()">
+public <code class="descname">DefaultFunctionInterpreter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.DefaultFunctionInterpreter.DefaultFunctionInterpreter()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes data structures TODO: Make this a static list or something, why are we doing this for each function</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="getpostfixlist">
+<h3>getPostfixList<a class="headerlink" href="#getpostfixlist" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.DefaultFunctionInterpreter.getPostfixList(String)">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/List.html" title="java.util.List">List</a>&lt;<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html" title="java.io.Serializable">Serializable</a>&gt; <code class="descname">getPostfixList</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> expression</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.DefaultFunctionInterpreter.getPostfixList(String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>expression</strong> – Mathematical expression, as in parse(…)</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">List of operators and operands in postfix order</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getregisteredfunctions">
+<h3>getRegisteredFunctions<a class="headerlink" href="#getregisteredfunctions" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.DefaultFunctionInterpreter.getRegisteredFunctions()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/Map.html" title="java.util.Map">Map</a>&lt;<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a>, <a class="reference internal" href="../Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a>&gt; <code class="descname">getRegisteredFunctions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.DefaultFunctionInterpreter.getRegisteredFunctions()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="parse">
+<h3>parse<a class="headerlink" href="#parse" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.DefaultFunctionInterpreter.parse(String, int)">
+public <a class="reference internal" href="../Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a> <code class="descname">parse</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> expression</em>, int<em> dimension</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.DefaultFunctionInterpreter.parse(String, int)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.math.FunctionInterpreter.parse(java.lang.String,int)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="registerfunction">
+<h3>registerFunction<a class="headerlink" href="#registerfunction" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.DefaultFunctionInterpreter.registerFunction(String, Function)">
+public void <code class="descname">registerFunction</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a><em> function</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.DefaultFunctionInterpreter.registerFunction(String, Function)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.math.FunctionInterpreter.registerFunction(java.lang.String,ca.nengo.math.Function)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="removeregisteredfunction">
+<h3>removeRegisteredFunction<a class="headerlink" href="#removeregisteredfunction" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.DefaultFunctionInterpreter.removeRegisteredFunction(String)">
+public void <code class="descname">removeRegisteredFunction</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.DefaultFunctionInterpreter.removeRegisteredFunction(String)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="sharedinstance">
+<h3>sharedInstance<a class="headerlink" href="#sharedinstance" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.DefaultFunctionInterpreter.sharedInstance()">
+public static synchronized <a class="reference internal" href="#ca.nengo.math.impl.DefaultFunctionInterpreter" title="ca.nengo.math.impl.DefaultFunctionInterpreter">DefaultFunctionInterpreter</a> <code class="descname">sharedInstance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.DefaultFunctionInterpreter.sharedInstance()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">A singleton instance of DefaultFunctionInterpreter</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="ConvolutionTest.html" title="previous chapter (use the left arrow)">ConvolutionTest</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="DefaultFunctionInterpreterTest.html" title="next chapter (use the right arrow)">DefaultFunctionInterpreterTest</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="DefaultFunctionInterpreterTest.html" title="DefaultFunctionInterpreterTest"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ConvolutionTest.html" title="ConvolutionTest"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.math.impl</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

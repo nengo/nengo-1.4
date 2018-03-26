@@ -1,0 +1,638 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>NetworkArrayImpl &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="NetworkArrayImpl.ArrayOrigin" href="NetworkArrayImpl-ArrayOrigin.html" />
+    <link rel="prev" title="MockNode" href="MockNode.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="NetworkArrayImpl-ArrayOrigin.html" title="NetworkArrayImpl.ArrayOrigin"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="MockNode.html" title="MockNode"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.model.impl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.model.impl</a></li>
+              
+              <li>NetworkArrayImpl</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="networkarrayimpl">
+<h1>NetworkArrayImpl<a class="headerlink" href="#networkarrayimpl" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl">
+public class <code class="descname">NetworkArrayImpl</code> extends <a class="reference internal" href="NetworkImpl.html#ca.nengo.model.impl.NetworkImpl" title="ca.nengo.model.impl.NetworkImpl">NetworkImpl</a><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default implementation of Network Array.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Xuan Choo, Daniel Rasmussen</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>NetworkArrayImpl<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.NetworkArrayImpl(String, NEFEnsembleImpl[])">
+public <code class="descname">NetworkArrayImpl</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../nef/impl/NEFEnsembleImpl.html#ca.nengo.model.nef.impl.NEFEnsembleImpl" title="ca.nengo.model.nef.impl.NEFEnsembleImpl">NEFEnsembleImpl</a>[]<em> nodes</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.NetworkArrayImpl(String, NEFEnsembleImpl[])" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a network holding an array of nodes. An ‘X’ Origin is automatically created which concatenates the values of each internal element’s ‘X’ Origin. This object is meant to be created using <a class="reference internal" href="../../../../../python-api/nef/Network.html#nef.Network.make_array" title="nef.Network.make_array"><code class="xref py py-func docutils literal"><span class="pre">nef.Network.make_array()</span></code></a>, allowing for the efficient creation of neural groups that can represent large vectors. For example, the following code creates a NetworkArray consisting of 50 ensembles of 1000 neurons, each of which represents 10 dimensions, resulting in a total of 500 dimensions represented:: net=nef.Network(‘Example Array’) A=net.make_array(‘A’,neurons=1000,length=50,dimensions=10,quick=True) The resulting NetworkArray object can be treated like a normal ensemble, except for the fact that when computing nonlinear functions, you cannot use values from different ensembles in the computation, as per NEF theory.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – The name of the NetworkArray to create</li>
+<li><strong>nodes</strong> – The ca.nengo.model.nef.NEFEnsemble nodes to combine together</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>StructuralException</strong> – </li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="adddecodedorigin">
+<h3>addDecodedOrigin<a class="headerlink" href="#adddecodedorigin" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addDecodedOrigin(String, Function[], String)">
+public <a class="reference internal" href="../Origin.html#ca.nengo.model.Origin" title="ca.nengo.model.Origin">Origin</a> <code class="descname">addDecodedOrigin</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../../math/Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a>[]<em> functions</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> nodeOrigin</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addDecodedOrigin(String, Function[], String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new Origin. A new origin is created on each of the ensembles, and these are grouped together to create an output. This method uses the same signature as ca.nengo.model.nef.NEFEnsemble.addDecodedOrigin()</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – The name of the newly created origin</li>
+<li><strong>functions</strong> – A list of ca.nengo.math.Function objects to approximate at this origin</li>
+<li><strong>nodeOrigin</strong> – Name of the base Origin to use to build this function approximation (this will always be ‘AXON’ for spike-based synapses)</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – </li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Origin that encapsulates all of the internal node origins</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>addDecodedOrigin<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addDecodedOrigin(String, Function[], String, boolean)">
+public <a class="reference internal" href="../Origin.html#ca.nengo.model.Origin" title="ca.nengo.model.Origin">Origin</a> <code class="descname">addDecodedOrigin</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../../math/Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a>[]<em> functions</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> nodeOrigin</em>, boolean<em> splitFunctions</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addDecodedOrigin(String, Function[], String, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new origin by splitting the given functions across the nodes. This method uses the same signature as ca.nengo.model.nef.NEFEnsemble.addDecodedOrigin()</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – The name of the newly created origin</li>
+<li><strong>functions</strong> – A list of ca.nengo.math.Function objects to approximate at this origin</li>
+<li><strong>nodeOrigin</strong> – Name of the base Origin to use to build this function approximation (this will always be ‘AXON’ for spike-based synapses)</li>
+<li><strong>splitFunctions</strong> – True if the functions should be split across the nodes, otherwise this behaves the same as the default addDecodedOrigin</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – </li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Origin that encapsulates all of the internal node origins</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="adddecodedtermination">
+<h3>addDecodedTermination<a class="headerlink" href="#adddecodedtermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addDecodedTermination(String, float[][], float)">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addDecodedTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> matrix</em>, float<em> tauPSC</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addDecodedTermination(String, float[][], float)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new decoded termination. A new termination is created on each of the ensembles, which are then grouped together.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – The name of the newly created termination</li>
+<li><strong>matrix</strong> – Transformation matrix which defines a linear map on incoming information, onto the space of vectors that can be represented by this NetworkArray. The first dimension is taken as matrix columns, and must have the same length as the Origin that will be connected to this Termination. The second dimension is taken as matrix rows, and must have the same length as the encoders of this NEFEnsemble.</li>
+<li><strong>tauPSC</strong> – Post-synaptic time constant</li>
+<li><strong>modulatory</strong> – Boolean value that is False for normal connections, True for modulatory connections (which adjust neural properties rather than the input current)</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – </li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Termination that encapsulates all of the internal node terminations</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>addDecodedTermination<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addDecodedTermination(String, float[][], float, boolean)">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addDecodedTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> matrix</em>, float<em> tauPSC</em>, boolean<em> modulatory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addDecodedTermination(String, float[][], float, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="addindextermination">
+<h3>addIndexTermination<a class="headerlink" href="#addindextermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addIndexTermination(String, float[][], float)">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addIndexTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> matrix</em>, float<em> tauPSC</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addIndexTermination(String, float[][], float)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new termination. A new termination is created on the specified ensembles, which are then grouped together. This termination does not use NEF-style encoders; instead, the matrix is the actual connection weight matrix. Often used for adding an inhibitory connection that can turn off selected ensembles within the array (by setting <em>matrix</em> to be all -10, for example).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>string</strong> – name: the name of the newly created origin</li>
+<li><strong>matrix</strong> – synaptic connection weight matrix (NxM where M is the total number of neurons in the ensembles to be connected)</li>
+<li><strong>float</strong> – tauPSC: post-synaptic time constant</li>
+<li><strong>boolean</strong> – isModulatory: False for normal connections, True for modulatory connections (which adjust neural properties rather than the input current)</li>
+<li><strong>index</strong> – The indexes of the ensembles to connect to. If set to None, this function behaves exactly like addTermination().</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">the new termination</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3>addIndexTermination<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addIndexTermination(String, float[][], float, boolean)">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addIndexTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> matrix</em>, float<em> tauPSC</em>, boolean<em> isModulatory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addIndexTermination(String, float[][], float, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id5">
+<h3>addIndexTermination<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addIndexTermination(String, float[][], float, int[])">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addIndexTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> matrix</em>, float<em> tauPSC</em>, int[]<em> index</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addIndexTermination(String, float[][], float, int[])" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id6">
+<h3>addIndexTermination<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addIndexTermination(String, float[][], float, boolean, int[])">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addIndexTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> matrix</em>, float<em> tauPSC</em>, boolean<em> isModulatory</em>, int[]<em> index</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addIndexTermination(String, float[][], float, boolean, int[])" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="addnode">
+<h3>addNode<a class="headerlink" href="#addnode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addNode(Node)">
+public void <code class="descname">addNode</code><span class="sig-paren">(</span><a class="reference internal" href="../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> node</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addNode(Node)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Network.addNode(ca.nengo.model.Node)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="addplastictermination">
+<h3>addPlasticTermination<a class="headerlink" href="#addplastictermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addPlasticTermination(String, float[][], float, float[][])">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addPlasticTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> weights</em>, float<em> tauPSC</em>, float[][]<em> decoders</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addPlasticTermination(String, float[][], float, float[][])" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id7">
+<h3>addPlasticTermination<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addPlasticTermination(String, float[][], float, float[][], WeightFunc)">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addPlasticTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> weights</em>, float<em> tauPSC</em>, float[][]<em> decoders</em>, <a class="reference internal" href="NetworkArrayImpl-WeightFunc.html#ca.nengo.model.impl.NetworkArrayImpl.WeightFunc" title="ca.nengo.model.impl.NetworkArrayImpl.WeightFunc">WeightFunc</a><em> weightFunc</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addPlasticTermination(String, float[][], float, float[][], WeightFunc)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new plastic termination. A new termination is created on each of the ensembles, which are then grouped together.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – The name of the newly created PES termination</li>
+<li><strong>weights</strong> – Synaptic connection weight matrix (NxM where N is the total number of neurons in the NetworkArray)</li>
+<li><strong>tauPSC</strong> – Post-synaptic time constant (which adjust neural properties rather than the input current)</li>
+<li><strong>weightFunc</strong> – object wrapping a function that consumes a weight matrix and returns a modified weight matrix</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – </li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Termination that encapsulates all of the internal node terminations</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="addtermination">
+<h3>addTermination<a class="headerlink" href="#addtermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addTermination(String, float[][], float)">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> matrix</em>, float<em> tauPSC</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addTermination(String, float[][], float)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new termination. A new termination is created on each of the ensembles, which are then grouped together. This termination does not use NEF-style encoders; instead, the matrix is the actual connection weight matrix. Often used for adding an inhibitory connection that can turn off the whole array (by setting <em>matrix</em> to be all -10, for example).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – The name of the newly created termination</li>
+<li><strong>weights</strong> – Synaptic connection weight matrix (NxM where N is the total number of neurons in the NetworkArray)</li>
+<li><strong>tauPSC</strong> – Post-synaptic time constant</li>
+<li><strong>modulatory</strong> – Boolean value that is False for normal connections, True for modulatory connections (which adjust neural properties rather than the input current)</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – </li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Termination that encapsulates all of the internal node terminations</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id8">
+<h3>addTermination<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addTermination(String, float[][], float, boolean)">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> weights</em>, float<em> tauPSC</em>, boolean<em> modulatory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addTermination(String, float[][], float, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id9">
+<h3>addTermination<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addTermination(String, float[][][], float)">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][][]<em> matrix</em>, float<em> tauPSC</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addTermination(String, float[][][], float)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new termination. A new termination is created on each of the ensembles, which are then grouped together. This termination does not use NEF-style encoders; instead, the matrix is the actual connection weight matrix. Often used for adding an inhibitory connection that can turn off the whole array (by setting <em>matrix</em> to be all -10, for example).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – The name of the newly created termination</li>
+<li><strong>weights</strong> – Synaptic connection weight matrix (LxNxM where L is the number of nodes in the array, N is the number of neurons in each node, and M is the dimensionality of each node)</li>
+<li><strong>tauPSC</strong> – Post-synaptic time constant</li>
+<li><strong>modulatory</strong> – Boolean value that is False for normal connections, True for modulatory connections (which adjust neural properties rather than the input current)</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – </li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Termination that encapsulates all of the internal node terminations</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id10">
+<h3>addTermination<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.addTermination(String, float[][][], float, boolean)">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][][]<em> weights</em>, float<em> tauPSC</em>, boolean<em> modulatory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.addTermination(String, float[][][], float, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="clone">
+<h3>clone<a class="headerlink" href="#clone" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.clone()">
+public <a class="reference internal" href="#ca.nengo.model.impl.NetworkArrayImpl" title="ca.nengo.model.impl.NetworkArrayImpl">NetworkArrayImpl</a> <code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.clone()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="createensembleorigin">
+<h3>createEnsembleOrigin<a class="headerlink" href="#createensembleorigin" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.createEnsembleOrigin(String)">
+public void <code class="descname">createEnsembleOrigin</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.createEnsembleOrigin(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an Origin that concatenates the values of internal Origins.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – The name of the Origin to create. Each internal node must already have an Origin with that name.</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – </li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="exposeaxons">
+<h3>exposeAxons<a class="headerlink" href="#exposeaxons" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.exposeAxons()">
+public void <code class="descname">exposeAxons</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.exposeAxons()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exposes the AXON terminations of each ensemble in the network.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="getdimension">
+<h3>getDimension<a class="headerlink" href="#getdimension" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.getDimension()">
+public int <code class="descname">getDimension</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.getDimension()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../nef/NEFEnsemble.html#ca.nengo.model.nef.NEFEnsemble.getDimension()" title="ca.nengo.model.nef.NEFEnsemble.getDimension()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsemble.getDimension()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getencoders">
+<h3>getEncoders<a class="headerlink" href="#getencoders" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.getEncoders()">
+public float[][] <code class="descname">getEncoders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.getEncoders()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the encoders for the whole network array (the encoders of each population within the array concatenated together).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">encoders of each neuron in the network array</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="gethistory">
+<h3>getHistory<a class="headerlink" href="#gethistory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.getHistory(String)">
+public <a class="reference internal" href="../../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a> <code class="descname">getHistory</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> stateName</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.getHistory(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Probeable.getHistory(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getneurons">
+<h3>getNeurons<a class="headerlink" href="#getneurons" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.getNeurons()">
+public int <code class="descname">getNeurons</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.getNeurons()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getnodedimension">
+<h3>getNodeDimension<a class="headerlink" href="#getnodedimension" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.getNodeDimension()">
+public int[] <code class="descname">getNodeDimension</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.getNodeDimension()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getnodes">
+<h3>getNodes<a class="headerlink" href="#getnodes" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.getNodes()">
+public <a class="reference internal" href="../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>[] <code class="descname">getNodes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.getNodes()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the nodes in the proper order from the network array. The NetworkImpl version of this function relies on the nodeMap object which is sometimes out of order.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">the nodes in this network array</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getterminations">
+<h3>getTerminations<a class="headerlink" href="#getterminations" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.getTerminations()">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a>[] <code class="descname">getTerminations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.getTerminations()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Network.getTerminations()</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="learn">
+<h3>learn<a class="headerlink" href="#learn" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.learn(String, String, float)">
+public void <code class="descname">learn</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> learnTerm</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> modTerm</em>, float<em> rate</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.learn(String, String, float)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets learning parameters on learned terminations in the array.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>learnTerm</strong> – name of the learned termination</li>
+<li><strong>modTerm</strong> – name of the modulatory termination</li>
+<li><strong>rate</strong> – learning rate</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id11">
+<h3>learn<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.learn(String, String, float, boolean)">
+public void <code class="descname">learn</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> learnTerm</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> modTerm</em>, float<em> rate</em>, boolean<em> oja</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.learn(String, String, float, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets learning parameters on learned terminations in the array.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>learnTerm</strong> – name of the learned termination</li>
+<li><strong>modTerm</strong> – name of the modulatory termination</li>
+<li><strong>rate</strong> – learning rate</li>
+<li><strong>oja</strong> – whether or not to use Oja smoothing</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="liststates">
+<h3>listStates<a class="headerlink" href="#liststates" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.listStates()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/Properties.html" title="java.util.Properties">Properties</a> <code class="descname">listStates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.listStates()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../Probeable.html#ca.nengo.model.Probeable.listStates()" title="ca.nengo.model.Probeable.listStates()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Probeable.listStates()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="releasememory">
+<h3>releaseMemory<a class="headerlink" href="#releasememory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.releaseMemory()">
+public void <code class="descname">releaseMemory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.releaseMemory()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Releases memory of all ensembles in the network.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="setlearning">
+<h3>setLearning<a class="headerlink" href="#setlearning" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.NetworkArrayImpl.setLearning(boolean)">
+public void <code class="descname">setLearning</code><span class="sig-paren">(</span>boolean<em> learn</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.NetworkArrayImpl.setLearning(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets learning on/off for all ensembles in the network.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>learn</strong> – true if the ensembles are learning, else false</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="MockNode.html" title="previous chapter (use the left arrow)">MockNode</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="NetworkArrayImpl-ArrayOrigin.html" title="next chapter (use the right arrow)">NetworkArrayImpl.ArrayOrigin</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="NetworkArrayImpl-ArrayOrigin.html" title="NetworkArrayImpl.ArrayOrigin"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="MockNode.html" title="MockNode"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.model.impl</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

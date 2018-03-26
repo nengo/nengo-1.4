@@ -1,0 +1,248 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Controlled oscillator &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Basal Ganglia" href="basalganglia.html" />
+    <link rel="prev" title="A simple harmonic oscillator" href="oscillator.html" />
+<link rel="stylesheet" type="text/css" href="../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="basalganglia.html" title="Basal Ganglia"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="oscillator.html" title="A simple harmonic oscillator"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Demos</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Demos</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#introductory-demos">Introductory demos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#simple-transformations">Simple transformations</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#dynamics">Dynamics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#basal-ganglia-based-simulations">Basal Ganglia based simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#learning">Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../scripting/index.html">Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Demos</a></li>
+              
+              <li>Controlled oscillator</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="controlled-oscillator">
+<h1>Controlled oscillator<a class="headerlink" href="#controlled-oscillator" title="Permalink to this headline">¶</a></h1>
+<p><strong>Purpose</strong>:
+This demo implements a controlled two-dimensional oscillator.</p>
+<p><strong>Comments</strong>:
+This is functionally analogous
+to the controlled integrator, but in a 2D space.
+The available slider allows the frequency
+to be directly controlled, to be negative or positive.
+This behavior maps directly to
+the differential equation used
+to describe a simple harmonic oscillator
+(i.e., <span class="math">\(\dot{x}(t) = Ax(t) + Bu(t)\)</span>
+where <code class="docutils literal"><span class="pre">A</span> <span class="pre">=</span> <span class="pre">[[0,</span> <span class="pre">freq],</span> <span class="pre">[-freq,</span> <span class="pre">0]]</span></code>).
+The control in this circuit changes
+the <code class="docutils literal"><span class="pre">freq</span></code> variable in that equation.</p>
+<p><strong>Usage</strong>:
+When you run this demo,
+it will automatically put in a step function
+on the input to start the oscillator moving.
+You can see where it is in phase space
+in the XY plot
+(if you want to see that over time,
+right-click on the Oscillator population
+and select X-&gt;value).
+You can change the frequency of rotation
+by moving the visible slider.
+Positive values rotate clockwise and negative values counter-clockwise.</p>
+<a class="reference internal image-reference" href="../_images/controlledoscillator.png"><img alt="../_images/controlledoscillator.png" src="../_images/controlledoscillator.png" style="width: 100%;" /></a>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nef</span>
+
+<span class="n">speed</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># Base frequency of oscillation</span>
+<span class="n">tau</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># Recurrent time constant</span>
+
+<span class="n">net</span> <span class="o">=</span> <span class="n">nef</span><span class="o">.</span><span class="n">Network</span><span class="p">(</span><span class="s1">&#39;Controlled oscillator&#39;</span><span class="p">)</span>
+
+<span class="c1"># Kick it to get it going</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make_input</span><span class="p">(</span><span class="s1">&#39;Start&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">zero_after_time</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+<span class="c1"># Control the speed interactively</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make_input</span><span class="p">(</span><span class="s1">&#39;Speed&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Make two populations, one for freq control, and one the oscillator</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;Oscillator&#39;</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">1.7</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;SpeedNeurons&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Connect the elements of the network</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;Start&#39;</span><span class="p">,</span> <span class="s1">&#39;Oscillator&#39;</span><span class="p">,</span> <span class="n">index_post</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;Speed&#39;</span><span class="p">,</span> <span class="s1">&#39;SpeedNeurons&#39;</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;SpeedNeurons&#39;</span><span class="p">,</span> <span class="s1">&#39;Oscillator&#39;</span><span class="p">,</span> <span class="n">index_post</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="c1"># Define the nonlinear interactions in the state space of the oscillator</span>
+<span class="k">def</span> <span class="nf">controlled_path</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">speed</span> <span class="o">*</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">speed</span> <span class="o">*</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;Oscillator&#39;</span><span class="p">,</span> <span class="s1">&#39;Oscillator&#39;</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">controlled_path</span><span class="p">,</span> <span class="n">pstc</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">add_to_nengo</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="oscillator.html" title="previous chapter (use the left arrow)">A simple harmonic oscillator</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="basalganglia.html" title="next chapter (use the right arrow)">Basal Ganglia</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="basalganglia.html" title="Basal Ganglia"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="oscillator.html" title="A simple harmonic oscillator"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Demos</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

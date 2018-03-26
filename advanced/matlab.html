@@ -1,0 +1,322 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Running Nengo in Matlab &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Generating large ensembles" href="large_ensembles.html" />
+    <link rel="prev" title="Running experiments" href="experiments.html" />
+<link rel="stylesheet" type="text/css" href="../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="large_ensembles.html" title="Generating large ensembles"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="experiments.html" title="Running experiments"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Advanced usage</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/index.html">Demos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scripting/index.html">Scripting</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Advanced usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="layout.html">Interactive plots layout files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dragndrop.html">Creating a drag and drop template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="experiments.html">Running experiments</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Running Nengo in Matlab</a></li>
+<li class="toctree-l2"><a class="reference internal" href="large_ensembles.html">Generating large ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gpu.html">Accelerating simulations with GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipython_notebook.html">Integrating with IPython Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Advanced usage</a></li>
+              
+              <li>Running Nengo in Matlab</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="running-nengo-in-matlab">
+<h1>Running Nengo in Matlab<a class="headerlink" href="#running-nengo-in-matlab" title="Permalink to this headline">¶</a></h1>
+<p>Since Nengo is a Java application,
+it can be directly embedded within Matlab.
+This allows for stimuli and data analysis
+to be performed within Matlab,
+which may be more familiar to some users.</p>
+<p>There are several steps to setting up Nengo to run within Matlab.</p>
+<div class="section" id="set-up-your-matlab-classpath">
+<h2>1. Set up your Matlab classpath<a class="headerlink" href="#set-up-your-matlab-classpath" title="Permalink to this headline">¶</a></h2>
+<p>Matlab needs to know where to find
+all the Java files needed for running Nengo.
+You do this by adding the names of all the <code class="docutils literal"><span class="pre">.jar</span></code> files
+to Matlab’s <code class="docutils literal"><span class="pre">classpath.txt</span></code> file.
+You can edit this file from within Matlab
+by entering <code class="docutils literal"><span class="pre">edit</span> <span class="pre">classpath.txt</span></code> in the command prompt.</p>
+<p>You need to add a bunch of lines
+to the end of this file that list all the <code class="docutils literal"><span class="pre">.jar</span></code> files
+found in your installation of Nengo and their full path.
+For example, if you unzipped <code class="docutils literal"><span class="pre">nengo-latest.zip</span></code>
+to <code class="docutils literal"><span class="pre">D:\Code\Nengo</span></code>, you would add the following lines:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">nengo</span><span class="o">-</span><span class="mi">8</span><span class="n">d22507</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">colt</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">commons</span><span class="o">-</span><span class="n">collections</span><span class="o">-</span><span class="mf">3.2</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">formsrt</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">itextpdf</span><span class="o">-</span><span class="mf">5.3</span><span class="o">.</span><span class="mf">4.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">Jama</span><span class="o">-</span><span class="mf">1.0</span><span class="o">.</span><span class="mf">2.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">jayatana</span><span class="o">-</span><span class="mf">1.2</span><span class="o">.</span><span class="mf">4.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">jbullet</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">jcommon</span><span class="o">-</span><span class="mf">1.0</span><span class="o">.</span><span class="mf">0.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">jfreechart</span><span class="o">-</span><span class="mf">1.0</span><span class="o">.</span><span class="mf">1.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">jgrapht</span><span class="o">-</span><span class="n">jdk1</span><span class="o">.</span><span class="mi">5</span><span class="o">-</span><span class="mf">0.7</span><span class="o">.</span><span class="mf">3.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">jmatio</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">jnumeric</span><span class="o">-</span><span class="mf">0.1</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">jpct</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">jung</span><span class="o">-</span><span class="mf">1.7</span><span class="o">.</span><span class="mf">6.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">junit</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">jython</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">log4j</span><span class="o">-</span><span class="mf">1.2</span><span class="o">.</span><span class="mf">16.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">macify</span><span class="o">-</span><span class="mf">1.4</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">piccolo</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">piccolox</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">qdox</span><span class="o">-</span><span class="mf">1.6</span><span class="o">.</span><span class="mf">3.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">ssj</span><span class="o">.</span><span class="n">jar</span>
+<span class="n">D</span><span class="p">:</span>\<span class="n">Code</span>\<span class="n">Nengo</span>\<span class="n">lib</span>\<span class="n">vecmath</span><span class="o">.</span><span class="n">jar</span>
+</pre></div>
+</div>
+<p>This is technically all that needs to be done
+to run Nengo inside Matlab.
+Once you restart Matlab, you should be able to do:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ca.nengo.model.impl.</span><span class="o">*</span><span class="p">;</span>
+<span class="n">network</span> <span class="o">=</span> <span class="n">NetworkImpl</span><span class="p">();</span>
+<span class="n">network</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>All the basic functionality of Nengo is exposed in this way.</p>
+<p>You may also want to increase the memory available to Java.
+To do this, create a file called <cite>java.opts</cite>
+in the Matlab startup directory with the following text in it:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">Xmx1500m</span>
+</pre></div>
+</div>
+<p>This will give Java a maximum of 1500 MB (1.5 GB) of memory.</p>
+</div>
+<div class="section" id="connecting-python-and-matlab">
+<h2>2. Connecting Python and Matlab<a class="headerlink" href="#connecting-python-and-matlab" title="Permalink to this headline">¶</a></h2>
+<p>Since we’re used to creating models
+using the Python scripting system,
+we want to do the same in Matlab.
+To set this up, we do the following in Matlab:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">org.python.util.</span><span class="o">*</span><span class="p">;</span>
+<span class="n">python</span> <span class="o">=</span> <span class="n">PythonInterpreter</span><span class="p">();</span>
+<span class="n">python</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span><span class="s1">&#39;import sys; sys.path.append(&quot;Nengo/python&quot;)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The path specified on the last line
+must be your path to the <code class="docutils literal"><span class="pre">python</span></code> directory
+in your Nengo installation.</p>
+<p>You can now run the same Python scripts
+that you can in the Nengo scripting system:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span><span class="o">.</span><span class="n">execfile</span><span class="p">(</span><span class="s1">&#39;addition.py&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or, if the file is in another directory:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span><span class="o">.</span><span class="n">execfile</span><span class="p">(</span><span class="s1">&#39;Nengo\demo</span><span class="se">\a</span><span class="s1">ddition.py&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can also execute single python commands like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span><span class="s1">&#39;net.view(play=0.5)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-a-simulation-and-gathering-data">
+<h2>3. Running a simulation and gathering data<a class="headerlink" href="#running-a-simulation-and-gathering-data" title="Permalink to this headline">¶</a></h2>
+<p>However, what we really want to do
+is use Matlab to run a simulation,
+and gather whatever data we need.
+Here is how we can do that.</p>
+<p>First, we need to know how to get access
+to objects created in the Python script.
+For example, if we made an ensemble called C
+with <code class="docutils literal"><span class="pre">C</span> <span class="pre">=</span> <span class="pre">net.make('C',</span> <span class="pre">100,</span> <span class="pre">1)</span></code> in the script,
+we can get this object in Matlab as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">C</span> <span class="o">=</span> <span class="n">javaMethod</span><span class="p">(</span><span class="s1">&#39;__tojava__&#39;</span><span class="p">,</span> <span class="n">python</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">),</span> <span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">Class</span><span class="o">.</span><span class="n">forName</span><span class="p">(</span><span class="s1">&#39;java.lang.Object&#39;</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>Now we can get the value of its origin by something like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">C</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getValues</span><span class="p">()</span><span class="o">.</span><span class="n">getValues</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>With this in mind, the following Matlab code
+runs a simulation and gathers the output from C’s X origin</p>
+<div class="code matlab highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span><span class="o">.</span><span class="n">execfile</span><span class="p">(</span><span class="s1">&#39;addition.py&#39;</span><span class="p">);</span>
+
+<span class="o">%</span> <span class="n">get</span> <span class="n">the</span> <span class="n">ensemble</span> <span class="s1">&#39;C&#39;</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">javaMethod</span><span class="p">(</span><span class="s1">&#39;__tojava__&#39;</span><span class="p">,</span> <span class="n">python</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">),</span> <span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">Class</span><span class="o">.</span><span class="n">forName</span><span class="p">(</span><span class="s1">&#39;java.lang.Object&#39;</span><span class="p">));</span>
+
+<span class="o">%</span> <span class="n">run</span> <span class="n">the</span> <span class="n">simulation</span>
+<span class="n">t</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">;</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">waitbar</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Running simulation...&#39;</span><span class="p">);</span>
+<span class="k">while</span><span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">waitbar</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">sprintf</span><span class="p">(</span><span class="s1">&#39;net.network.simulator.run(</span><span class="si">%f</span><span class="s1">,</span><span class="si">%f</span><span class="s1">,</span><span class="si">%f</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="n">dt</span><span class="p">,</span> <span class="n">dt</span><span class="p">);</span>
+    <span class="n">python</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span><span class="n">command</span><span class="p">);</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span> <span class="n">C</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getValues</span><span class="p">()</span><span class="o">.</span><span class="n">getValues</span><span class="p">()];</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">dt</span><span class="p">;</span>
+<span class="n">end</span>
+<span class="n">close</span><span class="p">(</span><span class="n">w</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="experiments.html" title="previous chapter (use the left arrow)">Running experiments</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="large_ensembles.html" title="next chapter (use the right arrow)">Generating large ensembles</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="large_ensembles.html" title="Generating large ensembles"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="experiments.html" title="Running experiments"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Advanced usage</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

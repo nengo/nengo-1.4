@@ -1,0 +1,323 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Running experiments &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Running Nengo in Matlab" href="matlab.html" />
+    <link rel="prev" title="Creating a drag and drop template" href="dragndrop.html" />
+<link rel="stylesheet" type="text/css" href="../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="matlab.html" title="Running Nengo in Matlab"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dragndrop.html" title="Creating a drag and drop template"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Advanced usage</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/index.html">Demos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scripting/index.html">Scripting</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Advanced usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="layout.html">Interactive plots layout files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dragndrop.html">Creating a drag and drop template</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Running experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matlab.html">Running Nengo in Matlab</a></li>
+<li class="toctree-l2"><a class="reference internal" href="large_ensembles.html">Generating large ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gpu.html">Accelerating simulations with GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ipython_notebook.html">Integrating with IPython Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Advanced usage</a></li>
+              
+              <li>Running experiments</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="running-experiments">
+<h1>Running experiments<a class="headerlink" href="#running-experiments" title="Permalink to this headline">¶</a></h1>
+<p>Once a model has been designed,
+we often want to run controllable experiments
+to gather statistics about the performance of the model.
+As an example,
+we may want to read the input data from a file
+and save the corresponding outputs to a separate file.
+This allows us to automate the process of running these simulations,
+rather than using the interactive plots viewer.</p>
+<div class="section" id="inputs">
+<h2>Inputs<a class="headerlink" href="#inputs" title="Permalink to this headline">¶</a></h2>
+<p>Input can be provided for the simulation
+using the <a class="reference internal" href="../python-api/nef/SimpleNode.html#nef.SimpleNode" title="nef.SimpleNode"><code class="xref py py-class docutils literal"><span class="pre">nef.SimpleNode</span></code></a> approach,
+covered in more detail in <a class="reference internal" href="../scripting/simplenodes.html"><span class="doc">Adding arbitary code to a model</span></a>.
+Here, we create an origin
+that has a fixed set of input stimuli,
+and shows each one for 100 milliseconds each:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">inputs</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="n">steps_per_input</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="k">class</span> <span class="nc">Input</span><span class="p">(</span><span class="n">nef</span><span class="o">.</span><span class="n">SimpleNode</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">origin_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="c1"># find time step we are on</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">/</span> <span class="n">dt</span><span class="p">))</span>
+        <span class="c1"># find stimulus to show</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">step</span> <span class="o">/</span> <span class="n">steps_per_input</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inputs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This origin will cycle through
+the values <code class="docutils literal"><span class="pre">1,</span> <span class="pre">1</span></code>, <code class="docutils literal"><span class="pre">1,</span> <span class="pre">-1</span></code>, <code class="docutils literal"><span class="pre">-1,</span> <span class="pre">-1</span></code>, and <code class="docutils literal"><span class="pre">-1,</span> <span class="pre">1</span></code>,
+presenting each for 0.1 seconds.
+Instead of manually specifying the inputs,
+we could also have read these values from a file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">inputs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;inputs.csv&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+    <span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="outputs">
+<h2>Outputs<a class="headerlink" href="#outputs" title="Permalink to this headline">¶</a></h2>
+<p>When running experiments,
+we often don’t want the complete record
+of every output the network makes over time.
+Instead, we’re interested in what it is doing at specific points.
+For this case,
+we want to find out what the model’s output is
+for each of the inputs.
+In particular, we want its output value
+just before we change the input to the next one in the list.
+The following code will collect these values
+and save them to a file called <code class="docutils literal"><span class="pre">experiments.csv</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Output</span><span class="p">(</span><span class="n">nef</span><span class="o">.</span><span class="n">SimpleNode</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">termination_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pstc</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">/</span> <span class="n">dt</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="n">steps_per_input</span> <span class="o">==</span> <span class="p">(</span><span class="n">steps_per_input</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">file</span><span class="p">(</span><span class="s1">&#39;experiment.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;a+&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">,</span><span class="si">%1.3f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">step</span> <span class="o">/</span> <span class="n">steps_per_input</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="connecting-the-model">
+<h2>Connecting the model<a class="headerlink" href="#connecting-the-model" title="Permalink to this headline">¶</a></h2>
+<p>For this particular example,
+here is a model that simply computes the product of its inputs.
+The inputs to the model are
+connected to the <code class="docutils literal"><span class="pre">Input</span></code> node
+and the outputs go to the <code class="docutils literal"><span class="pre">Output</span></code> node to be saved:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">nef</span><span class="o">.</span><span class="n">Network</span><span class="p">(</span><span class="s1">&#39;Experiment example&#39;</span><span class="p">)</span>
+<span class="nb">input</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Input</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">))</span>  <span class="c1"># create the input node</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Output</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">))</span>  <span class="c1"># create the output node</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">),</span> <span class="s1">&#39;A&#39;</span><span class="p">)</span>  <span class="c1"># connect the input</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;save&#39;</span><span class="p">))</span>  <span class="c1"># connect the output</span>
+
+<span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">multiply</span><span class="p">)</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">add_to_nengo</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-the-simulation">
+<h2>Running the simulation<a class="headerlink" href="#running-the-simulation" title="Permalink to this headline">¶</a></h2>
+<p>The model so far
+should run successfully within Nengo
+using the standard approach of opening the interactive plots
+and clicking the run button.
+However, we can also have the model automatically run
+right from within the script.
+This bypasses the visual display, making it run faster.
+The following commands run the simulation for 2 seconds
+(this is 2 simulated seconds, of course –
+the actual time needed to run the simulation
+is dependent on your computer’s speed
+and the complexity of the network):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The parameter indicates how long
+to run the simulation for,
+and you can also optionally specify the time step
+(defaults to <code class="docutils literal"><span class="pre">dt=0.001</span></code>).</p>
+<p>As an alternative method,
+you can also run the simulation like this,
+producing an equivalent result:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="n">t</span> <span class="o">&lt;=</span> <span class="mf">2.0</span><span class="p">:</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="c1"># insert any code you want to run every 0.1 seconds here</span>
+    <span class="n">t</span> <span class="o">+=</span> <span class="n">dt</span>
+</pre></div>
+</div>
+<p>With either approach,
+the simulation will be automatically run when you run the script.</p>
+<p>With these approaches,
+you can even run a script
+without using the Nengo user interface at all.
+Instead, you run the model from the command line.
+Instead of running <code class="docutils literal"><span class="pre">nengo</span></code> (or <code class="docutils literal"><span class="pre">nengo.bat</span></code> on Windows),
+you would do:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">nengo</span><span class="o">-</span><span class="n">cl</span> <span class="n">experiment</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>This will run the <code class="docutils literal"><span class="pre">experiment.py</span></code> script.</p>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="dragndrop.html" title="previous chapter (use the left arrow)">Creating a drag and drop template</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="matlab.html" title="next chapter (use the right arrow)">Running Nengo in Matlab</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="matlab.html" title="Running Nengo in Matlab"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dragndrop.html" title="Creating a drag and drop template"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Advanced usage</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

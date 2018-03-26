@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>NengoClipboard &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="NengoClipboard.ClipboardListener" href="NengoClipboard-ClipboardListener.html" />
+    <link rel="prev" title="FileExtensionFilter" href="FileExtensionFilter.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="NengoClipboard-ClipboardListener.html" title="NengoClipboard.ClipboardListener"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="FileExtensionFilter.html" title="FileExtensionFilter"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.ui.util</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../packages.html">simulator-ui</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.ui.util</a></li>
+              
+              <li>NengoClipboard</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="nengoclipboard">
+<h1>NengoClipboard<a class="headerlink" href="#nengoclipboard" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.ui.util.NengoClipboard">
+public class <code class="descname">NengoClipboard</code><a class="headerlink" href="#ca.nengo.ui.util.NengoClipboard" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="listeners">
+<h3>listeners<a class="headerlink" href="#listeners" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.util.NengoClipboard.listeners">
+ <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/LinkedList.html" title="java.util.LinkedList">LinkedList</a>&lt;<a class="reference internal" href="NengoClipboard-ClipboardListener.html#ca.nengo.ui.util.NengoClipboard.ClipboardListener" title="ca.nengo.ui.util.NengoClipboard.ClipboardListener">ClipboardListener</a>&gt; <code class="descname">listeners</code><a class="headerlink" href="#ca.nengo.ui.util.NengoClipboard.listeners" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="addclipboardlistener">
+<h3>addClipboardListener<a class="headerlink" href="#addclipboardlistener" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.util.NengoClipboard.addClipboardListener(ClipboardListener)">
+public void <code class="descname">addClipboardListener</code><span class="sig-paren">(</span><a class="reference internal" href="NengoClipboard-ClipboardListener.html#ca.nengo.ui.util.NengoClipboard.ClipboardListener" title="ca.nengo.ui.util.NengoClipboard.ClipboardListener">ClipboardListener</a><em> listener</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.util.NengoClipboard.addClipboardListener(ClipboardListener)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getcontents">
+<h3>getContents<a class="headerlink" href="#getcontents" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.util.NengoClipboard.getContents()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html" title="java.util.ArrayList">ArrayList</a>&lt;<a class="reference internal" href="../../../../../simulator-api/ca/nengo/model/Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>&gt; <code class="descname">getContents</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.util.NengoClipboard.getContents()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getcontentsnames">
+<h3>getContentsNames<a class="headerlink" href="#getcontentsnames" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.util.NengoClipboard.getContentsNames()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html" title="java.util.ArrayList">ArrayList</a>&lt;<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a>&gt; <code class="descname">getContentsNames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.util.NengoClipboard.getContentsNames()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getoffsets">
+<h3>getOffsets<a class="headerlink" href="#getoffsets" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.util.NengoClipboard.getOffsets()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html" title="java.util.ArrayList">ArrayList</a>&lt;<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Point2D.html" title="java.awt.geom.Point2D">Point2D</a>&gt; <code class="descname">getOffsets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.util.NengoClipboard.getOffsets()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getsourceworld">
+<h3>getSourceWorld<a class="headerlink" href="#getsourceworld" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.util.NengoClipboard.getSourceWorld()">
+public <a class="reference internal" href="../lib/world/piccolo/WorldImpl.html#ca.nengo.ui.lib.world.piccolo.WorldImpl" title="ca.nengo.ui.lib.world.piccolo.WorldImpl">WorldImpl</a> <code class="descname">getSourceWorld</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.util.NengoClipboard.getSourceWorld()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="hascontents">
+<h3>hasContents<a class="headerlink" href="#hascontents" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.util.NengoClipboard.hasContents()">
+public boolean <code class="descname">hasContents</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.util.NengoClipboard.hasContents()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="removeclipboardlistener">
+<h3>removeClipboardListener<a class="headerlink" href="#removeclipboardlistener" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.util.NengoClipboard.removeClipboardListener(ClipboardListener)">
+public void <code class="descname">removeClipboardListener</code><span class="sig-paren">(</span><a class="reference internal" href="NengoClipboard-ClipboardListener.html#ca.nengo.ui.util.NengoClipboard.ClipboardListener" title="ca.nengo.ui.util.NengoClipboard.ClipboardListener">ClipboardListener</a><em> listener</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.util.NengoClipboard.removeClipboardListener(ClipboardListener)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setcontents">
+<h3>setContents<a class="headerlink" href="#setcontents" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.util.NengoClipboard.setContents(ArrayList, ArrayList)">
+public void <code class="descname">setContents</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html" title="java.util.ArrayList">ArrayList</a>&lt;<a class="reference internal" href="../../../../../simulator-api/ca/nengo/model/Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>&gt;<em> nodes</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html" title="java.util.ArrayList">ArrayList</a>&lt;<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Point2D.html" title="java.awt.geom.Point2D">Point2D</a>&gt;<em> objOffsets</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.util.NengoClipboard.setContents(ArrayList, ArrayList)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id1">
+<h3>setContents<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.util.NengoClipboard.setContents(ArrayList, ArrayList, WorldImpl)">
+public void <code class="descname">setContents</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html" title="java.util.ArrayList">ArrayList</a>&lt;<a class="reference internal" href="../../../../../simulator-api/ca/nengo/model/Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>&gt;<em> nodes</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html" title="java.util.ArrayList">ArrayList</a>&lt;<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Point2D.html" title="java.awt.geom.Point2D">Point2D</a>&gt;<em> objOffsets</em>, <a class="reference internal" href="../lib/world/piccolo/WorldImpl.html#ca.nengo.ui.lib.world.piccolo.WorldImpl" title="ca.nengo.ui.lib.world.piccolo.WorldImpl">WorldImpl</a><em> srcWorld</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.util.NengoClipboard.setContents(ArrayList, ArrayList, WorldImpl)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="FileExtensionFilter.html" title="previous chapter (use the left arrow)">FileExtensionFilter</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="NengoClipboard-ClipboardListener.html" title="next chapter (use the right arrow)">NengoClipboard.ClipboardListener</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="NengoClipboard-ClipboardListener.html" title="NengoClipboard.ClipboardListener"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="FileExtensionFilter.html" title="FileExtensionFilter"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.ui.util</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

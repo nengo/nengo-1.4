@@ -1,0 +1,628 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Arm control &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Scripting" href="../scripting/index.html" />
+    <link rel="prev" title="Simple vehicle" href="vehicle.html" />
+<link rel="stylesheet" type="text/css" href="../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../scripting/index.html" title="Scripting"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="vehicle.html" title="Simple vehicle"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Demos</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Demos</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#introductory-demos">Introductory demos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#simple-transformations">Simple transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#dynamics">Dynamics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#basal-ganglia-based-simulations">Basal Ganglia based simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#learning">Learning</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../scripting/index.html">Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Demos</a></li>
+              
+              <li>Arm control</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="arm-control">
+<h1>Arm control<a class="headerlink" href="#arm-control" title="Permalink to this headline">¶</a></h1>
+<p><strong>Purpose</strong>:
+This demo shows an example of
+having an interaction between
+a neural and non-neural dynamical simulation.</p>
+<p><strong>Comments</strong>:
+The majority of the simulation is
+a non-neural dynamical simulation,
+with just one crucial population being neural.
+That population is plotted in the visualizer,
+as are the generated control signals.
+The control signals are used to drive the arm
+which is run in the physics simulator.</p>
+<p><strong>Usage</strong>:
+When you run the network, it will reach to the target (red ball).
+If you change <code class="docutils literal"><span class="pre">refX</span></code> and <code class="docutils literal"><span class="pre">refY</span></code>,
+that will move the ball,
+and the arm will reach for the new target location.</p>
+<a class="reference internal image-reference" href="../_images/armcontrol.png"><img alt="../_images/armcontrol.png" src="../_images/armcontrol.png" style="width: 100%;" /></a>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">generators</span>
+
+<span class="kn">import</span> <span class="nn">java</span>
+<span class="kn">from</span> <span class="nn">java.awt</span> <span class="k">import</span> <span class="n">Color</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">ccm</span>
+<span class="kn">from</span> <span class="nn">com.bulletphysics</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">com.bulletphysics.linearmath</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">com.bulletphysics.dynamics.constraintsolver</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">space</span>
+
+<span class="kn">from</span> <span class="nn">ca.nengo.math.impl</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ca.nengo.model.plasticity.impl</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ca.nengo.util</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ca.nengo.plot</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">nef</span>
+
+<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">pi</span>
+<span class="kn">from</span> <span class="nn">com.threed.jpct</span> <span class="k">import</span> <span class="n">SimpleVector</span>
+<span class="kn">from</span> <span class="nn">com.bulletphysics.linearmath</span> <span class="k">import</span> <span class="n">Transform</span>
+<span class="kn">from</span> <span class="nn">javax.vecmath</span> <span class="k">import</span> <span class="n">Vector3f</span>
+
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">pstc</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+<span class="n">net</span> <span class="o">=</span> <span class="n">nef</span><span class="o">.</span><span class="n">Network</span><span class="p">(</span><span class="s1">&#39;Simple arm controller&#39;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">getShoulder</span><span class="p">(</span><span class="n">ca</span><span class="o">.</span><span class="n">nengo</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># make sure we&#39;re in the unit circle</span>
+        <span class="k">if</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">/</span> <span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="n">L1</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span>
+        <span class="n">L2</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span>
+        <span class="n">EPS</span> <span class="o">=</span> <span class="mf">1e-10</span>
+        <span class="c1"># law of cosines</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">L1</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">L2</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">L1</span> <span class="o">*</span> <span class="n">L2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">L1</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">L2</span> <span class="o">**</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">D</span> <span class="o">=</span> <span class="o">-</span><span class="n">D</span>
+
+        <span class="c1"># find elbow down angles from shoulder to elbow</span>
+
+        <span class="c1">#java.lang.System.out.println(&quot;x: %f   y:%f&quot;%(x,y))</span>
+        <span class="k">if</span> <span class="n">D</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">D</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">elbow</span> <span class="o">=</span> <span class="n">acos</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">elbow</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">L1</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">L2</span><span class="o">**</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">elbow</span> <span class="o">=</span> <span class="n">pi</span> <span class="o">-</span> <span class="n">elbow</span>
+
+        <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">y</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">+</span><span class="n">EPS</span>
+
+        <span class="n">inside</span> <span class="o">=</span> <span class="n">L2</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">elbow</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">inside</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">inside</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">inside</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">inside</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># magic numbers from matlab</span>
+            <span class="n">shoulder</span> <span class="o">=</span> <span class="mf">1.5708</span> <span class="o">-</span> <span class="n">asin</span><span class="p">(</span><span class="n">inside</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shoulder</span> <span class="o">=</span> <span class="n">atan</span><span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">asin</span><span class="p">(</span><span class="n">inside</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">shoulder</span> <span class="o">=</span> <span class="n">shoulder</span> <span class="o">+</span> <span class="n">pi</span>
+
+        <span class="k">return</span> <span class="n">shoulder</span>
+
+    <span class="k">def</span> <span class="nf">getDimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">2</span>
+
+
+<span class="k">class</span> <span class="nc">getElbow</span><span class="p">(</span><span class="n">ca</span><span class="o">.</span><span class="n">nengo</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># make sure we&#39;re in the unit circle</span>
+        <span class="k">if</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">/</span> <span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">L1</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span>
+        <span class="n">L2</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span>
+        <span class="c1"># law of cosines</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">L1</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">L2</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">L1</span> <span class="o">*</span> <span class="n">L2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">L1</span> <span class="o">**</span> <span class="mi">2</span><span class="o">+</span> <span class="n">L2</span> <span class="o">**</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">D</span> <span class="o">=</span> <span class="o">-</span><span class="n">D</span>
+
+        <span class="c1"># find elbow down angles from shoulder to elbow</span>
+        <span class="k">if</span> <span class="n">D</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">D</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">elbow</span> <span class="o">=</span> <span class="n">acos</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">elbow</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">L1</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">L2</span> <span class="o">**</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">elbow</span> <span class="o">=</span> <span class="n">pi</span> <span class="o">-</span> <span class="n">elbow</span>
+
+        <span class="k">return</span> <span class="n">elbow</span>
+
+    <span class="k">def</span> <span class="nf">getDimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">2</span>
+
+
+<span class="k">class</span> <span class="nc">getX</span><span class="p">(</span><span class="n">ca</span><span class="o">.</span><span class="n">nengo</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">shoulder</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">elbow</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">L1</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span>
+        <span class="n">L2</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span>
+
+        <span class="k">return</span> <span class="n">L1</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">shoulder</span><span class="p">)</span><span class="o">+</span><span class="n">L2</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">shoulder</span><span class="o">+</span><span class="n">elbow</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">getDimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">2</span>
+
+<span class="k">class</span> <span class="nc">getY</span><span class="p">(</span><span class="n">ca</span><span class="o">.</span><span class="n">nengo</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="n">shoulder</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">elbow</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">L1</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span>
+        <span class="n">L2</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span>
+
+        <span class="k">return</span> <span class="n">L1</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">shoulder</span><span class="p">)</span> <span class="o">+</span> <span class="n">L2</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">shoulder</span> <span class="o">+</span> <span class="n">elbow</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">getDimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">2</span>
+
+<span class="c1"># input functions</span>
+<span class="n">refX</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">make_input</span><span class="p">(</span><span class="s1">&#39;refX&#39;</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">refY</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">make_input</span><span class="p">(</span><span class="s1">&#39;refY&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">Tfunc</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">make_input</span><span class="p">(</span><span class="s1">&#39;T matrix&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">make_input</span><span class="p">(</span><span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># neural populations</span>
+<span class="n">convertXY</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;convert XY&quot;</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">convertAngles</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;convert Angles&quot;</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">funcT</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;funcT&quot;</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">FX</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;FX&quot;</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="c1"># calculate 2D control signal</span>
+<span class="n">controlV</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;control signal v&quot;</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1"># calculates joint torque control signal</span>
+<span class="n">controlU</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;control signal u&quot;</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">quick</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># add terminations</span>
+<span class="n">convertXY</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;refXY&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">convertAngles</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;shoulder&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">convertAngles</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;elbow&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="n">FX</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;inputFs&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="p">],</span> <span class="n">pstc</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">FX</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;X1&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">FX</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;X2&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">FX</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;X3&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">FX</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;X4&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="p">],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="n">funcT</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span>
+    <span class="s1">&#39;shoulderRef&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">funcT</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span>
+    <span class="s1">&#39;elbowRef&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">funcT</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span>
+    <span class="s1">&#39;shoulder&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">funcT</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span>
+    <span class="s1">&#39;elbow&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">funcT</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;inputTs&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="p">],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="n">controlV</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;inputCurrentX&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">controlV</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;inputCurrentY&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">controlV</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;inputRefX&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">controlV</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;inputRefY&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="n">controlU</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;inputFuncT1&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">controlU</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;inputFuncT2&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">controlU</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;inputFX1&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">controlU</span><span class="o">.</span><span class="n">addDecodedTermination</span><span class="p">(</span><span class="s1">&#39;inputFX2&#39;</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">pstc</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># add origins</span>
+<span class="n">interpreter</span> <span class="o">=</span> <span class="n">DefaultFunctionInterpreter</span><span class="p">()</span>
+
+<span class="n">convertXY</span><span class="o">.</span><span class="n">addDecodedOrigin</span><span class="p">(</span><span class="s1">&#39;elbowRef&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">getElbow</span><span class="p">()],</span> <span class="s2">&quot;AXON&quot;</span><span class="p">)</span>
+<span class="n">convertXY</span><span class="o">.</span><span class="n">addDecodedOrigin</span><span class="p">(</span><span class="s1">&#39;shoulderRef&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">getShoulder</span><span class="p">()],</span> <span class="s2">&quot;AXON&quot;</span><span class="p">)</span>
+
+<span class="n">convertAngles</span><span class="o">.</span><span class="n">addDecodedOrigin</span><span class="p">(</span><span class="s1">&#39;currentX&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">getX</span><span class="p">()],</span> <span class="s2">&quot;AXON&quot;</span><span class="p">)</span>
+<span class="n">convertAngles</span><span class="o">.</span><span class="n">addDecodedOrigin</span><span class="p">(</span><span class="s1">&#39;currentY&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">getY</span><span class="p">()],</span> <span class="s2">&quot;AXON&quot;</span><span class="p">)</span>
+
+<span class="n">FX</span><span class="o">.</span><span class="n">addDecodedOrigin</span><span class="p">(</span><span class="s1">&#39;FX1&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="n">interpreter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;x0 * x8 + x1 * x9 + x2 * x10 + x3 * x11&quot;</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="p">],</span> <span class="s2">&quot;AXON&quot;</span><span class="p">)</span>
+<span class="n">FX</span><span class="o">.</span><span class="n">addDecodedOrigin</span><span class="p">(</span><span class="s1">&#39;FX2&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="n">interpreter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;x4 * x8 + x5 * x9 + x6 * x10 + x7 * x11&quot;</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="p">],</span> <span class="s2">&quot;AXON&quot;</span><span class="p">)</span>
+
+<span class="n">funcT</span><span class="o">.</span><span class="n">addDecodedOrigin</span><span class="p">(</span>
+    <span class="s1">&#39;funcT1&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">interpreter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;x0 * x2 + x1 * x3&quot;</span><span class="p">,</span> <span class="mi">6</span><span class="p">)],</span> <span class="s2">&quot;AXON&quot;</span><span class="p">)</span>
+<span class="n">funcT</span><span class="o">.</span><span class="n">addDecodedOrigin</span><span class="p">(</span>
+    <span class="s1">&#39;funcT2&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">interpreter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;x0 * x4 + x1 * x5&quot;</span><span class="p">,</span> <span class="mi">6</span><span class="p">)],</span> <span class="s2">&quot;AXON&quot;</span><span class="p">)</span>
+
+<span class="n">controlU</span><span class="o">.</span><span class="n">addDecodedOrigin</span><span class="p">(</span><span class="s1">&#39;u1&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">interpreter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;x0&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],</span> <span class="s2">&quot;AXON&quot;</span><span class="p">)</span>
+<span class="n">controlU</span><span class="o">.</span><span class="n">addDecodedOrigin</span><span class="p">(</span><span class="s1">&#39;u2&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">interpreter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;x1&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],</span> <span class="s2">&quot;AXON&quot;</span><span class="p">)</span>
+
+<span class="c1"># add projections</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">controlV</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">),</span> <span class="n">convertXY</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;refXY&#39;</span><span class="p">))</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">refX</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;origin&#39;</span><span class="p">),</span> <span class="n">controlV</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;inputRefX&#39;</span><span class="p">))</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">refY</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;origin&#39;</span><span class="p">),</span> <span class="n">controlV</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;inputRefY&#39;</span><span class="p">))</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">convertAngles</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;currentX&#39;</span><span class="p">),</span>
+            <span class="n">controlV</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;inputCurrentX&#39;</span><span class="p">))</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">convertAngles</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;currentY&#39;</span><span class="p">),</span>
+            <span class="n">controlV</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;inputCurrentY&#39;</span><span class="p">))</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;origin&#39;</span><span class="p">),</span> <span class="n">FX</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;inputFs&#39;</span><span class="p">))</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">convertXY</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;shoulderRef&#39;</span><span class="p">),</span>
+            <span class="n">funcT</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;shoulderRef&#39;</span><span class="p">))</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">convertXY</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;elbowRef&#39;</span><span class="p">),</span> <span class="n">funcT</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;elbowRef&#39;</span><span class="p">))</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">Tfunc</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;origin&#39;</span><span class="p">),</span> <span class="n">funcT</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;inputTs&#39;</span><span class="p">))</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">funcT</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;funcT1&#39;</span><span class="p">),</span> <span class="n">controlU</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;inputFuncT1&#39;</span><span class="p">))</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">funcT</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;funcT2&#39;</span><span class="p">),</span> <span class="n">controlU</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;inputFuncT2&#39;</span><span class="p">))</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">FX</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;FX1&#39;</span><span class="p">),</span> <span class="n">controlU</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;inputFX1&#39;</span><span class="p">))</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">FX</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;FX2&#39;</span><span class="p">),</span> <span class="n">controlU</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;inputFX2&#39;</span><span class="p">))</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">add_to_nengo</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">Room</span><span class="p">(</span><span class="n">space</span><span class="o">.</span><span class="n">Room</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">space</span><span class="o">.</span><span class="n">Room</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span>
+                            <span class="n">gravity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                            <span class="n">color</span><span class="o">=</span><span class="p">[</span>
+                                <span class="n">Color</span><span class="p">(</span><span class="mh">0xFFFFFF</span><span class="p">),</span>
+                                <span class="n">Color</span><span class="p">(</span><span class="mh">0xFFFFFF</span><span class="p">),</span>
+                                <span class="n">Color</span><span class="p">(</span><span class="mh">0xEEEEEE</span><span class="p">),</span>
+                               <span class="n">Color</span><span class="p">(</span><span class="mh">0xDDDDDD</span><span class="p">),</span>
+                                <span class="n">Color</span><span class="p">(</span><span class="mh">0xCCCCCC</span><span class="p">),</span>
+                                <span class="n">Color</span><span class="p">(</span><span class="mh">0xBBBBBB</span><span class="p">)</span>
+                            <span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">space</span><span class="o">.</span><span class="n">Sphere</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">Color</span><span class="p">(</span><span class="mh">0xFF0000</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">torso</span> <span class="o">=</span> <span class="n">space</span><span class="o">.</span><span class="n">Box</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span>
+                          <span class="n">mass</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span>
+                          <span class="n">draw_as_cylinder</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">color</span><span class="o">=</span><span class="n">Color</span><span class="p">(</span><span class="mh">0x4444FF</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">torso</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">upperarm</span> <span class="o">=</span> <span class="n">space</span><span class="o">.</span><span class="n">Box</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span>
+                                  <span class="n">mass</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                                  <span class="n">draw_as_cylinder</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                  <span class="n">color</span><span class="o">=</span><span class="n">Color</span><span class="p">(</span><span class="mh">0x8888FF</span><span class="p">),</span>
+                                  <span class="n">overdraw_radius</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span>
+                                  <span class="n">overdraw_length</span><span class="o">=</span><span class="mf">1.2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">upperarm</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upperarm</span><span class="o">.</span><span class="n">add_sphere_at</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">Color</span><span class="p">(</span><span class="mh">0x4444FF</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upperarm</span><span class="o">.</span><span class="n">add_sphere_at</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">Color</span><span class="p">(</span><span class="mh">0x4444FF</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lowerarm</span> <span class="o">=</span> <span class="n">space</span><span class="o">.</span><span class="n">Box</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span>
+                                  <span class="n">mass</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                                  <span class="n">draw_as_cylinder</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                  <span class="n">color</span><span class="o">=</span><span class="n">Color</span><span class="p">(</span><span class="mh">0x8888FF</span><span class="p">),</span>
+                                  <span class="n">overdraw_radius</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span>
+                                  <span class="n">overdraw_length</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lowerarm</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">shoulder</span> <span class="o">=</span> <span class="n">HingeConstraint</span><span class="p">(</span><span class="n">torso</span><span class="o">.</span><span class="n">physics</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">upperarm</span><span class="o">.</span><span class="n">physics</span><span class="p">,</span>
+                                        <span class="n">Vector3f</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                                        <span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                                        <span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                                        <span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">elbow</span> <span class="o">=</span> <span class="n">HingeConstraint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">upperarm</span><span class="o">.</span><span class="n">physics</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">lowerarm</span><span class="o">.</span><span class="n">physics</span><span class="p">,</span>
+                                    <span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                                    <span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                                    <span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                                    <span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">shoulder</span><span class="o">.</span><span class="n">setLimit</span><span class="p">(</span><span class="o">-</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="o">.</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elbow</span><span class="o">.</span><span class="n">setLimit</span><span class="p">(</span><span class="o">-</span><span class="n">pi</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">addConstraint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elbow</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">addConstraint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shoulder</span><span class="p">)</span>
+
+        <span class="c1"># self.upperarm.physics.applyTorqueImpulse(Vector3f(0, 0, 300))</span>
+        <span class="c1"># self.lowerarm.physics.applyTorqueImpulse(Vector3f(0, 0, 300))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sch</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">space</span><span class="o">.</span><span class="n">Room</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="p">,))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_neurons</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hinge1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shoulder</span><span class="o">.</span><span class="n">hingeAngle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hinge2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elbow</span><span class="o">.</span><span class="n">hingeAngle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upperarm</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">setSleepingThresholds</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lowerarm</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">setSleepingThresholds</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update_neurons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.0003</span>
+            <span class="n">m1</span> <span class="o">=</span> <span class="n">controlU</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;u1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getValues</span><span class="p">()</span><span class="o">.</span><span class="n">getValues</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span>
+            <span class="n">m2</span> <span class="o">=</span> <span class="n">controlU</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;u2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getValues</span><span class="p">()</span><span class="o">.</span><span class="n">getValues</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span>
+            <span class="n">v1</span> <span class="o">=</span> <span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">v2</span> <span class="o">=</span> <span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># java.lang.System.out.println(&quot;m1: %f   m2:%f&quot;%(m1,m2))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">upperarm</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">applyTorqueImpulse</span><span class="p">(</span><span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">m1</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lowerarm</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">applyTorqueImpulse</span><span class="p">(</span><span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">m2</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">hinge1</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shoulder</span><span class="o">.</span><span class="n">hingeAngle</span> <span class="o">-</span> <span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hinge2</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">elbow</span><span class="o">.</span><span class="n">hingeAngle</span>
+            <span class="c1"># java.lang.System.out.println(&quot;angle1: %f, angle2: %f&quot;, % (</span>
+            <span class="c1">#     self.hinge1, self.hinge2))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">upperarm</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">getAngularVelocity</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lowerarm</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">getAngularVelocity</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+
+            <span class="c1"># put bounds on the velocity possible</span>
+            <span class="k">if</span> <span class="n">v1</span><span class="o">.</span><span class="n">z</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">upperarm</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">setAngularVelocity</span><span class="p">(</span><span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">v1</span><span class="o">.</span><span class="n">z</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">upperarm</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">setAngularVelocity</span><span class="p">(</span><span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">v2</span><span class="o">.</span><span class="n">z</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lowerarm</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">setAngularVelocity</span><span class="p">(</span><span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">v2</span><span class="o">.</span><span class="n">z</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lowerarm</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">setAngularVelocity</span><span class="p">(</span><span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">upperarm</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">getAngularVelocity</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lowerarm</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">getAngularVelocity</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+
+            <span class="n">wt</span> <span class="o">=</span> <span class="n">Transform</span><span class="p">()</span>
+            <span class="c1"># self.target.physics.motionState.getWorldTransform(wt)</span>
+            <span class="n">wt</span><span class="o">.</span><span class="n">setIdentity</span><span class="p">()</span>
+
+            <span class="n">tx</span> <span class="o">=</span> <span class="n">controlV</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;inputRefX&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">input</span>
+            <span class="k">if</span> <span class="n">tx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">wt</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">tx</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.7</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">wt</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mf">0.7</span>
+            <span class="n">ty</span> <span class="o">=</span> <span class="n">controlV</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;inputRefY&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">input</span>
+            <span class="k">if</span> <span class="n">ty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">wt</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">ty</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">wt</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mf">0.1</span>
+            <span class="n">wt</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="mi">2</span>
+
+            <span class="n">ms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">motionState</span>
+            <span class="n">ms</span><span class="o">.</span><span class="n">worldTransform</span> <span class="o">=</span> <span class="n">wt</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">physics</span><span class="o">.</span><span class="n">motionState</span> <span class="o">=</span> <span class="n">ms</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">vel1</span> <span class="o">=</span> <span class="n">v1</span><span class="o">.</span><span class="n">z</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vel2</span> <span class="o">=</span> <span class="n">v2</span><span class="o">.</span><span class="n">z</span>
+
+            <span class="k">yield</span> <span class="mf">0.0001</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">ccm</span><span class="o">.</span><span class="n">nengo</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">Room</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+<span class="c1"># need to make hinge1, hinge2, vel1, and vel external nodes and hook up</span>
+<span class="c1"># the output to the FX matrix</span>
+<span class="n">r</span><span class="o">.</span><span class="n">exposeOrigin</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;hinge1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;origin&#39;</span><span class="p">),</span> <span class="s1">&#39;shoulderAngle&#39;</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">exposeOrigin</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;hinge2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;origin&#39;</span><span class="p">),</span> <span class="s1">&#39;elbowAngle&#39;</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">exposeOrigin</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;vel1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;origin&#39;</span><span class="p">),</span> <span class="s1">&#39;shoulderVel&#39;</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">exposeOrigin</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;vel2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;origin&#39;</span><span class="p">),</span> <span class="s1">&#39;elbowVel&#39;</span><span class="p">)</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;shoulderAngle&#39;</span><span class="p">),</span> <span class="n">FX</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;X1&#39;</span><span class="p">))</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;elbowAngle&#39;</span><span class="p">),</span> <span class="n">FX</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;X2&#39;</span><span class="p">))</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;shoulderVel&#39;</span><span class="p">),</span> <span class="n">FX</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;X3&#39;</span><span class="p">))</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;elbowVel&#39;</span><span class="p">),</span> <span class="n">FX</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;X4&#39;</span><span class="p">))</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;shoulderAngle&#39;</span><span class="p">),</span>
+            <span class="n">convertAngles</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;shoulder&#39;</span><span class="p">))</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;elbowAngle&#39;</span><span class="p">),</span> <span class="n">convertAngles</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;elbow&#39;</span><span class="p">))</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;shoulderAngle&#39;</span><span class="p">),</span> <span class="n">funcT</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;shoulder&#39;</span><span class="p">))</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;elbowAngle&#39;</span><span class="p">),</span> <span class="n">funcT</span><span class="o">.</span><span class="n">getTermination</span><span class="p">(</span><span class="s1">&#39;elbow&#39;</span><span class="p">))</span>
+
+<span class="c1"># put everything in direct mode</span>
+<span class="n">net</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">setMode</span><span class="p">(</span><span class="n">ca</span><span class="o">.</span><span class="n">nengo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">SimulationMode</span><span class="o">.</span><span class="n">DIRECT</span><span class="p">)</span>
+<span class="c1"># except the last population</span>
+<span class="n">controlU</span><span class="o">.</span><span class="n">setMode</span><span class="p">(</span><span class="n">ca</span><span class="o">.</span><span class="n">nengo</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">SimulationMode</span><span class="o">.</span><span class="n">DEFAULT</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="vehicle.html" title="previous chapter (use the left arrow)">Simple vehicle</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="../scripting/index.html" title="next chapter (use the right arrow)">Scripting</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../scripting/index.html" title="Scripting"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="vehicle.html" title="Simple vehicle"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Demos</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

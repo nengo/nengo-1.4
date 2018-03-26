@@ -1,0 +1,376 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>3. Nonlinear transformations &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4. Feedback and dynamics" href="4-dynamics.html" />
+    <link rel="prev" title="2. Linear transformations" href="2-linear-transformation.html" />
+<link rel="stylesheet" type="text/css" href="../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="4-dynamics.html" title="4. Feedback and dynamics"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="2-linear-transformation.html" title="2. Linear transformations"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Written tutorials</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Written tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="1-representation.html">1. One-dimensional representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2-linear-transformation.html">2. Linear transformations</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">3. Nonlinear transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4-dynamics.html">4. Feedback and dynamics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="5-cognitive.html">5. Cognitive models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/index.html">Demos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scripting/index.html">Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Written tutorials</a></li>
+              
+              <li>3. Nonlinear transformations</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="nonlinear-transformations">
+<h1>3. Nonlinear transformations<a class="headerlink" href="#nonlinear-transformations" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="functions-of-one-variable">
+<h2>Functions of one variable<a class="headerlink" href="#functions-of-one-variable" title="Permalink to this headline">¶</a></h2>
+<p>We now turn to creating nonlinear transformations in Nengo.
+The main idea here is that instead of using the X origin,
+we will create a new origin
+that estimates some arbitrary function of X.
+This will allow us to estimate any desired function.</p>
+<p>The accuracy of this estimate will, of course,
+be dependent on the properties of the neurons,
+and the function being estimated.</p>
+<p>For one-dimensional ensembles,
+we can calculate various 1-dimensional functions:</p>
+<ul class="simple">
+<li><span class="math">\(f(x) = x^2\)</span></li>
+<li><span class="math">\(f(x) = \theta(x)\)</span> (thresholding)</li>
+<li><span class="math">\(f(x) = \sqrt{x}\)</span></li>
+</ul>
+<p>To perform a nonlinear operation, we need to define a new origin
+since the X origin always uses <span class="math">\(f(x) = x\)</span>.</p>
+<ul class="simple">
+<li>Create a new ensemble that is one-dimensional,
+with 100 neurons, and a radius of 1.</li>
+<li>Create a function input that is a Constant Function
+with the value set to 0.5.</li>
+<li>Create a termination on the ensemble
+and connect the function input to it.</li>
+</ul>
+<p>Next, we will create a new origin
+that will estimate the square of the value.
+To do this:</p>
+<ul>
+<li><p class="first">Drag the Origin icon from the sidebar onto the ensemble.</p>
+</li>
+<li><p class="first">Set the name to <code class="docutils literal"><span class="pre">square</span></code>.</p>
+</li>
+<li><p class="first">Click on Set Functions.</p>
+</li>
+<li><p class="first">Select User-defined Function and click Set.</p>
+</li>
+<li><p class="first">For the Expression, enter <code class="docutils literal"><span class="pre">x0</span> <span class="pre">*</span> <span class="pre">x0</span></code>.</p>
+<p>We refer to the value as <code class="docutils literal"><span class="pre">x0</span></code> because
+when we extend this to multiple dimensions,
+we will refer to each dimension as <code class="docutils literal"><span class="pre">x0</span></code>, <code class="docutils literal"><span class="pre">x1</span></code>, <code class="docutils literal"><span class="pre">x2</span></code>, and so on.</p>
+</li>
+<li><p class="first">Press OK, OK, and OK.</p>
+</li>
+</ul>
+<p>You can now generate a plot that shows
+how good the ensemble is at calculating the nonlinearity.
+Right-click on the ensemble
+and select Plot -&gt; Plot distortion:square.</p>
+<img alt="../_images/p3-9b.png" src="../_images/p3-9b.png" />
+<ul>
+<li><p class="first">Start Interactive Plots.</p>
+</li>
+<li><p class="first">Right-click on the input and select “control”
+so you can adjust it while the model runs.</p>
+</li>
+<li><p class="first">Right-click on the ensemble and select “square-&gt;value”.</p>
+</li>
+<li><p class="first">For comparison, right-click on the ensemble and select “X-&gt;value”.
+This is the standard value graph that
+shows the value being represented by this ensemble.</p>
+</li>
+<li><p class="first">Press Play to run the simulation.</p>
+<p>With the default input of 0.5, the squared value should be near 0.25.
+Use the control to adjust the input.
+The output should be the square of the input.</p>
+</li>
+</ul>
+<img alt="../_images/p3-101.png" src="../_images/p3-101.png" />
+<p>You can also run this example by opening <code class="docutils literal"><span class="pre">demo/squaring.py</span></code>.</p>
+</div>
+<div class="section" id="functions-of-multiple-variables">
+<h2>Functions of multiple variables<a class="headerlink" href="#functions-of-multiple-variables" title="Permalink to this headline">¶</a></h2>
+<p>Since X (the value being represented by an ensemble)
+can also be multidimensional,
+we can also calculate these sorts of functions</p>
+<ul class="simple">
+<li><span class="math">\(f(x) = x_0 * x_1\)</span></li>
+<li><span class="math">\(f(x) = max(x_0, x_1)\)</span></li>
+</ul>
+<p>To begin, let’s create two ensembles and two function inputs.
+These will represent the two values we wish to multiply together.</p>
+<ul class="simple">
+<li>Create two new ensembles that are one-dimensional,
+use 100 neurons and have a radius of 10
+(so they can represent values between -10 and 10).</li>
+<li>Create two function inputs that emit the constant values 8 and 5.</li>
+<li>Create two terminations, one on each of the ensembles.
+Use the time constant 0.01 (AMPA).</li>
+</ul>
+<img alt="../_images/p3-1.png" src="../_images/p3-1.png" />
+<ul>
+<li><p class="first">Create a two-dimensional ensemble with a radius of 15 called Combined.</p>
+<p>Since it needs to represent multiple values,
+increase the number of neurons it contains to 200.</p>
+</li>
+<li><p class="first">Add two terminations to Combined.</p>
+<ul class="simple">
+<li>For both, the input dimensions are 1.</li>
+<li>For the first one, use Set Weights
+to set the transformation to <code class="docutils literal"><span class="pre">[1</span> <span class="pre">0]</span></code>.</li>
+<li>For the second one, use Set Weights
+to set the transformation to <code class="docutils literal"><span class="pre">[0</span> <span class="pre">1]</span></code>.</li>
+</ul>
+</li>
+<li><p class="first">Connect the two other ensembles to the Combined one.</p>
+</li>
+</ul>
+<img alt="../_images/p3-2.png" src="../_images/p3-2.png" />
+<ul class="simple">
+<li>Create an ensemble to represent the result.
+Set the radius to 100, since it will need to represent values
+from -100 to 100 (i.e., <code class="docutils literal"><span class="pre">max(10</span> <span class="pre">*</span> <span class="pre">10)</span></code>).</li>
+<li>Create a one-dimensional termination with a weight of 1
+on the result ensemble.</li>
+</ul>
+<img alt="../_images/p3-3.png" src="../_images/p3-3.png" />
+<p>Now we need to create a new origin
+that will estimate the product
+between the two values stored in the combined ensemble.</p>
+<ul>
+<li><p class="first">Drag the Origin icon onto the Combined ensemble.</p>
+</li>
+<li><p class="first">Set the name to <code class="docutils literal"><span class="pre">product</span></code>.</p>
+</li>
+<li><p class="first">Set Output dimensions to 1.</p>
+<img alt="../_images/p3-4.png" src="../_images/p3-4.png" />
+</li>
+<li><p class="first">Click on Set Functions.</p>
+</li>
+<li><p class="first">Select “User-defined Function” and press Set.</p>
+<img alt="../_images/p3-5.png" src="../_images/p3-5.png" />
+</li>
+<li><p class="first">For the Expression, enter <code class="docutils literal"><span class="pre">x0</span> <span class="pre">*</span> <span class="pre">x1</span></code></p>
+<img alt="../_images/p3-6.png" src="../_images/p3-6.png" />
+</li>
+<li><p class="first">Press OK, OK, and OK to finish creating the origin.</p>
+</li>
+<li><p class="first">Connect the new origin to the termination on the result ensemble.</p>
+</li>
+</ul>
+<img alt="../_images/p3-7.png" src="../_images/p3-7.png" />
+<ul>
+<li><p class="first">Run the simulation with Interactive Plots,
+and view the appropriate graphs.</p>
+<p>The result should be approximately 40.</p>
+</li>
+<li><p class="first">Adjust the input controls to multiple different numbers together</p>
+</li>
+</ul>
+<img alt="../_images/p3-102.png" src="../_images/p3-102.png" />
+<p>You can also run this example by opening <code class="docutils literal"><span class="pre">demo/multiplication.py</span></code>.</p>
+</div>
+<div class="section" id="combined-approaches">
+<h2>Combined approaches<a class="headerlink" href="#combined-approaches" title="Permalink to this headline">¶</a></h2>
+<p>We can combine these two approaches
+in order to compute more complex funxtions,
+such as <span class="math">\(x^2 y\)</span>.</p>
+<ul>
+<li><p class="first">Drag an Origin onto the ensemble
+representing the first of the two values.</p>
+<p>Give it the name “square”, set its output dimensions to 1,
+and press Set Functions.</p>
+</li>
+<li><p class="first">As before, select the User-defined Function and press Set.</p>
+</li>
+<li><p class="first">Set the Expression to be <code class="docutils literal"><span class="pre">x0</span> <span class="pre">*</span> <span class="pre">x0</span></code>.</p>
+</li>
+<li><p class="first">Press OK, OK, and OK to finish creating the origin.</p>
+</li>
+</ul>
+<p>This new origin will calculate the square of the value
+represented by this ensemble.</p>
+<p>If you connect this new origin to the Combined ensemble
+instead of the standard X origin,
+the network will calculate <span class="math">\(x^2 y\)</span> instead of <span class="math">\(xy\)</span>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To remove the X origin projection,
+drag it away from the Combined population.
+Right-click the end of the line and select “Remove”
+to delete the projection altogether.</p>
+</div>
+<img alt="../_images/p3-9a.png" src="../_images/p3-9a.png" />
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="2-linear-transformation.html" title="previous chapter (use the left arrow)">2. Linear transformations</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="4-dynamics.html" title="next chapter (use the right arrow)">4. Feedback and dynamics</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="4-dynamics.html" title="4. Feedback and dynamics"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="2-linear-transformation.html" title="2. Linear transformations"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Written tutorials</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

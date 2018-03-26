@@ -1,0 +1,560 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>DecodedTermination &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+    <link rel="next" title="DefaultExpressModel" href="DefaultExpressModel.html" />
+    <link rel="prev" title="DecodedOriginTest" href="DecodedOriginTest.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="DefaultExpressModel.html" title="DefaultExpressModel"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="DecodedOriginTest.html" title="DecodedOriginTest"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.model.nef.impl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.model.nef.impl</a></li>
+              
+              <li>DecodedTermination</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="decodedtermination">
+<h1>DecodedTermination<a class="headerlink" href="#decodedtermination" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination">
+public class <code class="descname">DecodedTermination</code> implements <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a>, <a class="reference internal" href="../../Resettable.html#ca.nengo.model.Resettable" title="ca.nengo.model.Resettable">Resettable</a>, <a class="reference internal" href="../../Probeable.html#ca.nengo.model.Probeable" title="ca.nengo.model.Probeable">Probeable</a><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Termination of decoded state vectors onto an NEFEnsemble. A DecodedTermination performs a linear transformation on incoming vectors, mapping them into the space of the NEFEnsemble to which this Termination belongs. A DecodedTermination also applies linear PSC dynamics (typically exponential decay) to the resulting vector.</p>
+<p>Non-linear dynamics are not allowed at this level. This is because the vector input to an NEFEnsemble only has meaning in terms of the decomposition of synaptic weights into decoding vectors, transformation matrix, and encoding vectors. Linear PSC dynamics actually apply to currents, but if everything is linear we can re-order the dynamics and the encoders for convenience (so that the dynamics seem to operate on the state vectors). In contrast, non-linear dynamics must be modeled within each Neuron, because all inputs to a non-linear dynamical process must be taken into account before the effect of any single input is known.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="output">
+<h3>OUTPUT<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.OUTPUT">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">OUTPUT</code><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.OUTPUT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of Probeable output state.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>DecodedTermination<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.DecodedTermination(Node, String, float[][], LinearSystem, Integrator)">
+public <code class="descname">DecodedTermination</code><span class="sig-paren">(</span><a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> node</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> transform</em>, <a class="reference internal" href="../../../dynamics/LinearSystem.html#ca.nengo.dynamics.LinearSystem" title="ca.nengo.dynamics.LinearSystem">LinearSystem</a><em> dynamics</em>, <a class="reference internal" href="../../../dynamics/Integrator.html#ca.nengo.dynamics.Integrator" title="ca.nengo.dynamics.Integrator">Integrator</a><em> integrator</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.DecodedTermination(Node, String, float[][], LinearSystem, Integrator)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>node</strong> – The parent Node</li>
+<li><strong>name</strong> – The name of this Termination</li>
+<li><strong>transform</strong> – A matrix that maps input (which has the dimension of this Termination) onto the state space represented by the NEFEnsemble to which the Termination belongs</li>
+<li><strong>dynamics</strong> – Post-synaptic current dynamics (single-input single-output). Time-varying dynamics are OK, but non-linear dynamics don’t make sense here, because other Terminations may input onto the same neurons.</li>
+<li><strong>integrator</strong> – Numerical integrator with which to solve dynamics</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>StructuralException</strong> – If dynamics are not SISO or given transform is not a matrix</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="clone">
+<h3>clone<a class="headerlink" href="#clone" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.clone()">
+public <a class="reference internal" href="#ca.nengo.model.nef.impl.DecodedTermination" title="ca.nengo.model.nef.impl.DecodedTermination">DecodedTermination</a> <code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.clone()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>clone<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.clone(Node)">
+public <a class="reference internal" href="#ca.nengo.model.nef.impl.DecodedTermination" title="ca.nengo.model.nef.impl.DecodedTermination">DecodedTermination</a> <code class="descname">clone</code><span class="sig-paren">(</span><a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> node</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.clone(Node)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getdimensions">
+<h3>getDimensions<a class="headerlink" href="#getdimensions" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.getDimensions()">
+public int <code class="descname">getDimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.getDimensions()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination.getDimensions()" title="ca.nengo.model.Termination.getDimensions()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Termination.getDimensions()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getdynamics">
+<h3>getDynamics<a class="headerlink" href="#getdynamics" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.getDynamics()">
+public <a class="reference internal" href="../../../dynamics/LinearSystem.html#ca.nengo.dynamics.LinearSystem" title="ca.nengo.dynamics.LinearSystem">LinearSystem</a> <code class="descname">getDynamics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.getDynamics()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">The dynamics that govern each dimension of this Termination. Changing the properties of the return value will change dynamics of all dimensions, effective next run time.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="gethistory">
+<h3>getHistory<a class="headerlink" href="#gethistory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.getHistory(String)">
+public <a class="reference internal" href="../../../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a> <code class="descname">getHistory</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> stateName</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.getHistory(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Probeable.getHistory(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getinitialstate">
+<h3>getInitialState<a class="headerlink" href="#getinitialstate" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.getInitialState()">
+public float[][] <code class="descname">getInitialState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.getInitialState()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Initial states of dynamics (one row per output dimension)</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getinput">
+<h3>getInput<a class="headerlink" href="#getinput" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.getInput()">
+public <a class="reference internal" href="../../RealOutput.html#ca.nengo.model.RealOutput" title="ca.nengo.model.RealOutput">RealOutput</a> <code class="descname">getInput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.getInput()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Latest input to Termination (pre transform and dynamics)</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getmodulatory">
+<h3>getModulatory<a class="headerlink" href="#getmodulatory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.getModulatory()">
+public boolean <code class="descname">getModulatory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.getModulatory()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination.getModulatory()" title="ca.nengo.model.Termination.getModulatory()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Termination.getModulatory()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getname">
+<h3>getName<a class="headerlink" href="#getname" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.getName()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.getName()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination.getName()" title="ca.nengo.model.Termination.getName()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Termination.getName()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getnode">
+<h3>getNode<a class="headerlink" href="#getnode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.getNode()">
+public <a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a> <code class="descname">getNode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.getNode()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination.getNode()" title="ca.nengo.model.Termination.getNode()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Termination.getNode()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getoutput">
+<h3>getOutput<a class="headerlink" href="#getoutput" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.getOutput()">
+public float[] <code class="descname">getOutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.getOutput()" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method should be called after run(…).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Output of dynamical system – of interest at end of run(…)</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getscaling">
+<h3>getScaling<a class="headerlink" href="#getscaling" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.getScaling()">
+public <a class="reference internal" href="#ca.nengo.model.nef.impl.DecodedTermination" title="ca.nengo.model.nef.impl.DecodedTermination">DecodedTermination</a> <code class="descname">getScaling</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.getScaling()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Termination used for scaling?</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getstaticbias">
+<h3>getStaticBias<a class="headerlink" href="#getstaticbias" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.getStaticBias()">
+public float[] <code class="descname">getStaticBias</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.getStaticBias()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Static bias vector (a copy)</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="gettau">
+<h3>getTau<a class="headerlink" href="#gettau" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.getTau()">
+public float <code class="descname">getTau</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.getTau()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Slowest time constant of dynamics, if dynamics are LTI, otherwise 0</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="gettransform">
+<h3>getTransform<a class="headerlink" href="#gettransform" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.getTransform()">
+public float[][] <code class="descname">getTransform</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.getTransform()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">The matrix that maps input (which has the dimension of this Termination) onto the state space represented by the NEFEnsemble to which the Termination belongs</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="liststates">
+<h3>listStates<a class="headerlink" href="#liststates" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.listStates()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/Properties.html" title="java.util.Properties">Properties</a> <code class="descname">listStates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.listStates()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Probeable.html#ca.nengo.model.Probeable.listStates()" title="ca.nengo.model.Probeable.listStates()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Probeable.listStates()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="reset">
+<h3>reset<a class="headerlink" href="#reset" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.reset(boolean)">
+public void <code class="descname">reset</code><span class="sig-paren">(</span>boolean<em> randomize</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.reset(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Resettable.html#ca.nengo.model.Resettable.reset(boolean)" title="ca.nengo.model.Resettable.reset(boolean)"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Resettable.reset(boolean)</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="run">
+<h3>run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.run(float, float)">
+public void <code class="descname">run</code><span class="sig-paren">(</span>float<em> startTime</em>, float<em> endTime</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.run(float, float)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>startTime</strong> – Simulation time at which running is to start</li>
+<li><strong>endTime</strong> – Simulation time at which running is to end</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setdynamics">
+<h3>setDynamics<a class="headerlink" href="#setdynamics" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.setDynamics(LinearSystem)">
+public void <code class="descname">setDynamics</code><span class="sig-paren">(</span><a class="reference internal" href="../../../dynamics/LinearSystem.html#ca.nengo.dynamics.LinearSystem" title="ca.nengo.dynamics.LinearSystem">LinearSystem</a><em> dynamics</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.setDynamics(LinearSystem)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>dynamics</strong> – New dynamics for each dimension of this Termination (effective immediately). This method uses a clone of the given dynamics.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setinitialstate">
+<h3>setInitialState<a class="headerlink" href="#setinitialstate" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.setInitialState(float[][])">
+public void <code class="descname">setInitialState</code><span class="sig-paren">(</span>float[][]<em> state</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.setInitialState(float[][])" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>state</strong> – Initial state of dynamics (dimension of termination output X dimension of dynamics state)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setmodulatory">
+<h3>setModulatory<a class="headerlink" href="#setmodulatory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.setModulatory(boolean)">
+public void <code class="descname">setModulatory</code><span class="sig-paren">(</span>boolean<em> modulatory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.setModulatory(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination.setModulatory(boolean)" title="ca.nengo.model.Termination.setModulatory(boolean)"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Termination.setModulatory(boolean)</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setnode">
+<h3>setNode<a class="headerlink" href="#setnode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.setNode(Node)">
+protected void <code class="descname">setNode</code><span class="sig-paren">(</span><a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> node</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.setNode(Node)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setscaling">
+<h3>setScaling<a class="headerlink" href="#setscaling" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.setScaling(DecodedTermination)">
+public void <code class="descname">setScaling</code><span class="sig-paren">(</span><a class="reference internal" href="#ca.nengo.model.nef.impl.DecodedTermination" title="ca.nengo.model.nef.impl.DecodedTermination">DecodedTermination</a><em> t</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.setScaling(DecodedTermination)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>t</strong> – Termination to use for scaling?</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setstaticbias">
+<h3>setStaticBias<a class="headerlink" href="#setstaticbias" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.setStaticBias(float[])">
+public void <code class="descname">setStaticBias</code><span class="sig-paren">(</span>float[]<em> bias</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.setStaticBias(float[])" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>bias</strong> – Intrinsic bias that is added to inputs to this termination</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="settau">
+<h3>setTau<a class="headerlink" href="#settau" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.setTau(float)">
+public void <code class="descname">setTau</code><span class="sig-paren">(</span>float<em> tau</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.setTau(float)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>tau</strong> – New time constant to replace current slowest time constant of dynamics</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="../../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – if the dynamics of this Termination are not LTI in controllable canonical form</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="settransform">
+<h3>setTransform<a class="headerlink" href="#settransform" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.setTransform(float[][])">
+public void <code class="descname">setTransform</code><span class="sig-paren">(</span>float[][]<em> transform</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.setTransform(float[][])" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>transform</strong> – New transform</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="../../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – If the transform is not a matrix or has the wrong size</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setvalues">
+<h3>setValues<a class="headerlink" href="#setvalues" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedTermination.setValues(InstantaneousOutput)">
+public void <code class="descname">setValues</code><span class="sig-paren">(</span><a class="reference internal" href="../../InstantaneousOutput.html#ca.nengo.model.InstantaneousOutput" title="ca.nengo.model.InstantaneousOutput">InstantaneousOutput</a><em> values</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedTermination.setValues(InstantaneousOutput)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>values</strong> – Only RealOutput is accepted.</li>
+</ul>
+</dd>
+</dl>
+<p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Termination.setValues(ca.nengo.model.InstantaneousOutput)</span></code></p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="DecodedOriginTest.html" title="previous chapter (use the left arrow)">DecodedOriginTest</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="DefaultExpressModel.html" title="next chapter (use the right arrow)">DefaultExpressModel</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="DefaultExpressModel.html" title="DefaultExpressModel"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="DecodedOriginTest.html" title="DecodedOriginTest"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.model.nef.impl</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

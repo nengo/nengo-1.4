@@ -1,0 +1,390 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>WeightedCostApproximator &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="WeightedCostApproximator.Factory" href="WeightedCostApproximator-Factory.html" />
+    <link rel="prev" title="TimeSeriesFunctionTest" href="TimeSeriesFunctionTest.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="WeightedCostApproximator-Factory.html" title="WeightedCostApproximator.Factory"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="TimeSeriesFunctionTest.html" title="TimeSeriesFunctionTest"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.math.impl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.math.impl</a></li>
+              
+              <li>WeightedCostApproximator</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="weightedcostapproximator">
+<h1>WeightedCostApproximator<a class="headerlink" href="#weightedcostapproximator" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator">
+public class <code class="descname">WeightedCostApproximator</code> implements <a class="reference internal" href="../LinearApproximator.html#ca.nengo.math.LinearApproximator" title="ca.nengo.math.LinearApproximator">LinearApproximator</a><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator" title="Permalink to this definition">¶</a></dt>
+<dd><p>A LinearApproximator in which error is evaluated at a fixed set of points, and the cost function that is minimized is a weighted integral of squared error.</p>
+<p>Uses the Moore-Penrose pseudoinverse.</p>
+<p>TODO: test</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>WeightedCostApproximator<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator.WeightedCostApproximator(float[][], float[][], Function, float, int, boolean)">
+public <code class="descname">WeightedCostApproximator</code><span class="sig-paren">(</span>float[][]<em> evaluationPoints</em>, float[][]<em> values</em>, <a class="reference internal" href="../Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a><em> costFunction</em>, float<em> noise</em>, int<em> nSV</em>, boolean<em> quiet</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator.WeightedCostApproximator(float[][], float[][], Function, float, int, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>evaluationPoints</strong> – Points at which error is evaluated (should be uniformly distributed, as the sum of error at these points is treated as an integral over the domain of interest). Examples include vector inputs to an ensemble, or different points in time within different simulation regimes.</li>
+<li><strong>values</strong> – The values of whatever functions are being combined, at the evaluationPoints. Commonly neuron firing rates. The first dimension makes up the list of functions, and the second the values of these functions at each evaluation point.</li>
+<li><strong>costFunction</strong> – A cost function that weights squared error over the domain of evaluation points</li>
+<li><strong>noise</strong> – Standard deviation of Gaussian noise to add to values (to reduce sensitivity to simulation noise) as a proportion of the maximum absolute value over all values</li>
+<li><strong>nSV</strong> – Number of singular values to keep from the singular value decomposition (SVD)</li>
+<li><strong>quiet</strong> – Turn off logging?</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>WeightedCostApproximator<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator.WeightedCostApproximator(float[][][], float[][][], Function, float, int, boolean)">
+public <code class="descname">WeightedCostApproximator</code><span class="sig-paren">(</span>float[][][]<em> evaluationSignals</em>, float[][][]<em> values</em>, <a class="reference internal" href="../Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a><em> costFunction</em>, float<em> noise</em>, int<em> nSV</em>, boolean<em> quiet</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator.WeightedCostApproximator(float[][][], float[][][], Function, float, int, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>evaluationSignals</strong> – Signals over which error is evaluated. First dimension is for each evaluation signal. Second dimension is for the dimensions of each signal. Third dimension is the value of the signal dimension over time.</li>
+<li><strong>values</strong> – The values of whatever functions are being combined, over the evaluation signals. Commonly neuron firing rates. The first dimension makes up the list of functions, the second the values of these functions for each evaluation signal, and the third the value of the function over time.</li>
+<li><strong>costFunction</strong> – A cost function that weights squared error over the domain of evaluation points</li>
+<li><strong>noise</strong> – Standard deviation of Gaussian noise to add to values (to reduce sensitivity to simulation noise) as a proportion of the maximum absolute value over all values</li>
+<li><strong>nSV</strong> – Number of singular values to keep from the singular value decomposition (SVD)</li>
+<li><strong>quiet</strong> – Turn off logging?</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>WeightedCostApproximator<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator.WeightedCostApproximator(float[][], float[][], Function, float, int)">
+public <code class="descname">WeightedCostApproximator</code><span class="sig-paren">(</span>float[][]<em> evaluationPoints</em>, float[][]<em> values</em>, <a class="reference internal" href="../Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a><em> costFunction</em>, float<em> noise</em>, int<em> nSV</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator.WeightedCostApproximator(float[][], float[][], Function, float, int)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>evaluationPoints</strong> – Points at which error is evaluated (should be uniformly distributed, as the sum of error at these points is treated as an integral over the domain of interest). Examples include vector inputs to an ensemble, or different points in time within different simulation regimes.</li>
+<li><strong>values</strong> – The values of whatever functions are being combined, at the evaluationPoints. Commonly neuron firing rates. The first dimension makes up the list of functions, and the second the values of these functions at each evaluation point.</li>
+<li><strong>costFunction</strong> – A cost function that weights squared error over the domain of evaluation points</li>
+<li><strong>noise</strong> – Standard deviation of Gaussian noise to add to values (to reduce sensitivity to simulation noise) as a proportion of the maximum absolute value over all values</li>
+<li><strong>nSV</strong> – Number of singular values to keep from the singular value decomposition (SVD)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="canusegpu">
+<h3>canUseGPU<a class="headerlink" href="#canusegpu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator.canUseGPU()">
+public static boolean <code class="descname">canUseGPU</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator.canUseGPU()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="clone">
+<h3>clone<a class="headerlink" href="#clone" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator.clone()">
+public <a class="reference internal" href="../LinearApproximator.html#ca.nengo.math.LinearApproximator" title="ca.nengo.math.LinearApproximator">LinearApproximator</a> <code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator.clone()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="findcoefficients">
+<h3>findCoefficients<a class="headerlink" href="#findcoefficients" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator.findCoefficients(Function)">
+public float[] <code class="descname">findCoefficients</code><span class="sig-paren">(</span><a class="reference internal" href="../Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a><em> target</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator.findCoefficients(Function)" title="Permalink to this definition">¶</a></dt>
+<dd><p>This implementation is adapted from Eliasmith &amp; Anderson, 2003, appendix A.</p>
+<p>It solves PHI = GAMMA” UPSILON, where ” denotes pseudoinverse, UPSILON_i = &lt; cost(x) x a_i(x) &gt;, and GAMMA_ij = &lt; cost(x) a_i(x) a_j(x) &gt;. &lt;&gt; denotes integration (the sum over eval points).</p>
+<p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.math.LinearApproximator.findCoefficients(ca.nengo.math.Function)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3>findCoefficients<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator.findCoefficients(float[])">
+public float[] <code class="descname">findCoefficients</code><span class="sig-paren">(</span>float[]<em> targetSignal</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator.findCoefficients(float[])" title="Permalink to this definition">¶</a></dt>
+<dd><p>Similar to findCoefficients(ca.nengo.math.Function), but finds coefficients for a target signal (over time) rather than a target function.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>targetSignal</strong> – signal over time that the coefficients should fit to</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">coefficients (weights on the output of each neuron)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getevalpoints">
+<h3>getEvalPoints<a class="headerlink" href="#getevalpoints" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator.getEvalPoints()">
+public float[][] <code class="descname">getEvalPoints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator.getEvalPoints()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../LinearApproximator.html#ca.nengo.math.LinearApproximator.getEvalPoints()" title="ca.nengo.math.LinearApproximator.getEvalPoints()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.math.LinearApproximator.getEvalPoints()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getgpuerrormessage">
+<h3>getGPUErrorMessage<a class="headerlink" href="#getgpuerrormessage" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator.getGPUErrorMessage()">
+public static <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getGPUErrorMessage</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator.getGPUErrorMessage()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getusegpu">
+<h3>getUseGPU<a class="headerlink" href="#getusegpu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator.getUseGPU()">
+public static boolean <code class="descname">getUseGPU</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator.getUseGPU()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Using the GPU?</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getvalues">
+<h3>getValues<a class="headerlink" href="#getvalues" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator.getValues()">
+public float[][] <code class="descname">getValues</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator.getValues()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../LinearApproximator.html#ca.nengo.math.LinearApproximator.getValues()" title="ca.nengo.math.LinearApproximator.getValues()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.math.LinearApproximator.getValues()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="pseudoinverse">
+<h3>pseudoInverse<a class="headerlink" href="#pseudoinverse" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator.pseudoInverse(double[][], float, int)">
+public double[][] <code class="descname">pseudoInverse</code><span class="sig-paren">(</span>double[][]<em> matrix</em>, float<em> minSV</em>, int<em> nSV</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator.pseudoInverse(double[][], float, int)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override this method to use a different pseudoinverse implementation (eg clustered).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>matrix</strong> – Any matrix</li>
+<li><strong>minSV</strong> – Hint as to smallest singular value to use</li>
+<li><strong>nSV</strong> – Max number of singular values to use</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">The pseudoinverse of the given matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setusegpu">
+<h3>setUseGPU<a class="headerlink" href="#setusegpu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.WeightedCostApproximator.setUseGPU(boolean)">
+public static void <code class="descname">setUseGPU</code><span class="sig-paren">(</span>boolean<em> use</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.WeightedCostApproximator.setUseGPU(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>use</strong> – Use the GPU?</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="TimeSeriesFunctionTest.html" title="previous chapter (use the left arrow)">TimeSeriesFunctionTest</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="WeightedCostApproximator-Factory.html" title="next chapter (use the right arrow)">WeightedCostApproximator.Factory</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="WeightedCostApproximator-Factory.html" title="WeightedCostApproximator.Factory"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="TimeSeriesFunctionTest.html" title="TimeSeriesFunctionTest"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.math.impl</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

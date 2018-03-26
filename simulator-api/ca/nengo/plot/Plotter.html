@@ -1,0 +1,601 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Plotter &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="PlotterFunctional" href="PlotterFunctional.html" />
+    <link rel="prev" title="ca.nengo.plot" href="package-index.html" />
+<link rel="stylesheet" type="text/css" href="../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="PlotterFunctional.html" title="PlotterFunctional"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="package-index.html" title="ca.nengo.plot"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.plot</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.plot</a></li>
+              
+              <li>Plotter</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="plotter">
+<h1>Plotter<a class="headerlink" href="#plotter" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.plot.Plotter">
+public abstract class <code class="descname">Plotter</code><a class="headerlink" href="#ca.nengo.plot.Plotter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Factory for frequently-used plots.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Plotter<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.plot.Plotter.Plotter()">
+public <code class="descname">Plotter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.Plotter()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="closeall">
+<h3>closeAll<a class="headerlink" href="#closeall" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.closeAll()">
+public static void <code class="descname">closeAll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.closeAll()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close all open plots</p>
+</dd></dl>
+
+</div>
+<div class="section" id="createframe">
+<h3>createFrame<a class="headerlink" href="#createframe" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.createFrame()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/javax/swing/JFrame.html" title="javax.swing.JFrame">JFrame</a> <code class="descname">createFrame</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.createFrame()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">A new JFrame to hold a plot</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="doplot">
+<h3>doPlot<a class="headerlink" href="#doplot" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.doPlot(TimeSeries, String)">
+public abstract void <code class="descname">doPlot</code><span class="sig-paren">(</span><a class="reference internal" href="../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a><em> series</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.doPlot(TimeSeries, String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>series</strong> – TimeSeries to plot</li>
+<li><strong>title</strong> – Plot title</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>doPlot<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.doPlot(TimeSeries, TimeSeries, String)">
+public abstract void <code class="descname">doPlot</code><span class="sig-paren">(</span><a class="reference internal" href="../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a><em> ideal</em>, <a class="reference internal" href="../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a><em> actual</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.doPlot(TimeSeries, TimeSeries, String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>ideal</strong> – Ideal time series</li>
+<li><strong>actual</strong> – Actual time series</li>
+<li><strong>title</strong> – Plot title</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>doPlot<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.doPlot(List, List, String)">
+public abstract void <code class="descname">doPlot</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/List.html" title="java.util.List">List</a>&lt;<a class="reference internal" href="../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a>&gt;<em> series</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/List.html" title="java.util.List">List</a>&lt;<a class="reference internal" href="../util/SpikePattern.html#ca.nengo.util.SpikePattern" title="ca.nengo.util.SpikePattern">SpikePattern</a>&gt;<em> patterns</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.doPlot(List, List, String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>series</strong> – A list of TimeSeries to plot (can be null if none)</li>
+<li><strong>patterns</strong> – A list of SpikePatterns to plot (can be null if none)</li>
+<li><strong>title</strong> – Plot title</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3>doPlot<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.doPlot(NEFEnsemble, String)">
+public abstract void <code class="descname">doPlot</code><span class="sig-paren">(</span><a class="reference internal" href="../model/nef/NEFEnsemble.html#ca.nengo.model.nef.NEFEnsemble" title="ca.nengo.model.nef.NEFEnsemble">NEFEnsemble</a><em> ensemble</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> origin</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.doPlot(NEFEnsemble, String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>ensemble</strong> – NEFEnsemble from which origin arises</li>
+<li><strong>origin</strong> – Name of origin (must be a DecodedOrigin, not one derived from a combination of neuron origins)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id5">
+<h3>doPlot<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.doPlot(NEFEnsemble)">
+public abstract void <code class="descname">doPlot</code><span class="sig-paren">(</span><a class="reference internal" href="../model/nef/NEFEnsemble.html#ca.nengo.model.nef.NEFEnsemble" title="ca.nengo.model.nef.NEFEnsemble">NEFEnsemble</a><em> ensemble</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.doPlot(NEFEnsemble)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>ensemble</strong> – An NEFEnsemble</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id6">
+<h3>doPlot<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.doPlot(SpikePattern)">
+public abstract void <code class="descname">doPlot</code><span class="sig-paren">(</span><a class="reference internal" href="../util/SpikePattern.html#ca.nengo.util.SpikePattern" title="ca.nengo.util.SpikePattern">SpikePattern</a><em> pattern</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.doPlot(SpikePattern)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>pattern</strong> – A SpikePattern for which to plot a raster</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id7">
+<h3>doPlot<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.doPlot(Function, float, float, float, String)">
+public abstract void <code class="descname">doPlot</code><span class="sig-paren">(</span><a class="reference internal" href="../math/Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a><em> function</em>, float<em> start</em>, float<em> increment</em>, float<em> end</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.doPlot(Function, float, float, float, String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>function</strong> – Function to plot</li>
+<li><strong>start</strong> – Minimum of input range</li>
+<li><strong>increment</strong> – Size of incrememnt along input range</li>
+<li><strong>end</strong> – Maximum of input range</li>
+<li><strong>title</strong> – Display title of plot</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id8">
+<h3>doPlot<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.doPlot(float[], String)">
+public abstract void <code class="descname">doPlot</code><span class="sig-paren">(</span>float[]<em> vector</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.doPlot(float[], String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>vector</strong> – Vector of points to plot</li>
+<li><strong>title</strong> – Display title of plot</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id9">
+<h3>doPlot<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.doPlot(float[], float[], String)">
+public abstract void <code class="descname">doPlot</code><span class="sig-paren">(</span>float[]<em> domain</em>, float[]<em> vector</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.doPlot(float[], float[], String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>domain</strong> – Vector of domain values</li>
+<li><strong>vector</strong> – Vector of range values</li>
+<li><strong>title</strong> – Display title of plot</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="filter">
+<h3>filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.filter(TimeSeries, float)">
+public static <a class="reference internal" href="../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a> <code class="descname">filter</code><span class="sig-paren">(</span><a class="reference internal" href="../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a><em> series</em>, float<em> tauFilter</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.filter(TimeSeries, float)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>series</strong> – A TimeSeries to which to apply a 1-D linear filter</li>
+<li><strong>tauFilter</strong> – Filter time constant</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Filtered TimeSeries</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="plot">
+<h3>plot<a class="headerlink" href="#plot" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.plot(TimeSeries, String)">
+public static void <code class="descname">plot</code><span class="sig-paren">(</span><a class="reference internal" href="../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a><em> series</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.plot(TimeSeries, String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static convenience method for producing a TimeSeries plot.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>series</strong> – TimeSeries to plot</li>
+<li><strong>title</strong> – Plot title</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id10">
+<h3>plot<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.plot(TimeSeries, float, String)">
+public static void <code class="descname">plot</code><span class="sig-paren">(</span><a class="reference internal" href="../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a><em> series</em>, float<em> tauFilter</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.plot(TimeSeries, float, String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>As plot(TimeSeries) but series is filtered before plotting. This is useful when plotting NEFEnsemble output (which may consist of spikes) in a manner more similar to the way it would appear within post-synaptic neurons.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>series</strong> – TimeSeries to plot</li>
+<li><strong>tauFilter</strong> – Time constant of display filter (s)</li>
+<li><strong>title</strong> – Plot title</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id11">
+<h3>plot<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.plot(TimeSeries, TimeSeries, String)">
+public static void <code class="descname">plot</code><span class="sig-paren">(</span><a class="reference internal" href="../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a><em> ideal</em>, <a class="reference internal" href="../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a><em> actual</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.plot(TimeSeries, TimeSeries, String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots ideal and actual TimeSeries’ together.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>ideal</strong> – Ideal time series</li>
+<li><strong>actual</strong> – Actual time series</li>
+<li><strong>title</strong> – Plot title</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id12">
+<h3>plot<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.plot(List, List, String)">
+public static void <code class="descname">plot</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/List.html" title="java.util.List">List</a>&lt;<a class="reference internal" href="../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a>&gt;<em> series</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/List.html" title="java.util.List">List</a>&lt;<a class="reference internal" href="../util/SpikePattern.html#ca.nengo.util.SpikePattern" title="ca.nengo.util.SpikePattern">SpikePattern</a>&gt;<em> patterns</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.plot(List, List, String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots multiple TimeSeries and/or SpikePatterns together in the same plot.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>series</strong> – A list of TimeSeries to plot (can be null if none)</li>
+<li><strong>patterns</strong> – A list of SpikePatterns to plot (can be null if none)</li>
+<li><strong>title</strong> – Plot title</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id13">
+<h3>plot<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.plot(TimeSeries, TimeSeries, float, String)">
+public static void <code class="descname">plot</code><span class="sig-paren">(</span><a class="reference internal" href="../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a><em> ideal</em>, <a class="reference internal" href="../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a><em> actual</em>, float<em> tauFilter</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.plot(TimeSeries, TimeSeries, float, String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots ideal and actual TimeSeries’ together, with each series filtered before plotting.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>ideal</strong> – Ideal time series</li>
+<li><strong>actual</strong> – Actual time series</li>
+<li><strong>tauFilter</strong> – Time constant of display filter (s)</li>
+<li><strong>title</strong> – Plot title</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id14">
+<h3>plot<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.plot(NEFEnsemble, String)">
+public static void <code class="descname">plot</code><span class="sig-paren">(</span><a class="reference internal" href="../model/nef/NEFEnsemble.html#ca.nengo.model.nef.NEFEnsemble" title="ca.nengo.model.nef.NEFEnsemble">NEFEnsemble</a><em> ensemble</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> origin</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.plot(NEFEnsemble, String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static convenience method for producing a decoding error plot of an NEFEnsemble origin.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>ensemble</strong> – NEFEnsemble from which origin arises</li>
+<li><strong>origin</strong> – Name of origin (must be a DecodedOrigin, not one derived from a combination of neuron origins)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id15">
+<h3>plot<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.plot(NEFEnsemble)">
+public static void <code class="descname">plot</code><span class="sig-paren">(</span><a class="reference internal" href="../model/nef/NEFEnsemble.html#ca.nengo.model.nef.NEFEnsemble" title="ca.nengo.model.nef.NEFEnsemble">NEFEnsemble</a><em> ensemble</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.plot(NEFEnsemble)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static convenience method for producing a plot of CONSTANT_RATE responses over range of inputs.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>ensemble</strong> – An NEFEnsemble</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id16">
+<h3>plot<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.plot(SpikePattern)">
+public static void <code class="descname">plot</code><span class="sig-paren">(</span><a class="reference internal" href="../util/SpikePattern.html#ca.nengo.util.SpikePattern" title="ca.nengo.util.SpikePattern">SpikePattern</a><em> pattern</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.plot(SpikePattern)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static convenience method for plotting a spike raster.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>pattern</strong> – SpikePattern to plot</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id17">
+<h3>plot<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.plot(Function, float, float, float, String)">
+public static void <code class="descname">plot</code><span class="sig-paren">(</span><a class="reference internal" href="../math/Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a><em> function</em>, float<em> start</em>, float<em> increment</em>, float<em> end</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.plot(Function, float, float, float, String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static convenience method for plotting a Function.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>function</strong> – Function to plot</li>
+<li><strong>start</strong> – Minimum of input range</li>
+<li><strong>increment</strong> – Size of incrememnt along input range</li>
+<li><strong>end</strong> – Maximum of input range</li>
+<li><strong>title</strong> – Display title of plot</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id18">
+<h3>plot<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.plot(float[], String)">
+public static void <code class="descname">plot</code><span class="sig-paren">(</span>float[]<em> vector</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.plot(float[], String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static convenience method for plotting a vector.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>vector</strong> – Vector of points to plot</li>
+<li><strong>title</strong> – Display title of plot</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id19">
+<h3>plot<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.plot(float[], float[], String)">
+public static void <code class="descname">plot</code><span class="sig-paren">(</span>float[]<em> domain</em>, float[]<em> vector</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.plot(float[], float[], String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static convenience method for plotting a vector.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>domain</strong> – Vector of domain values</li>
+<li><strong>vector</strong> – Vector of range values</li>
+<li><strong>title</strong> – Display title of plot</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="showplot">
+<h3>showPlot<a class="headerlink" href="#showplot" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.plot.Plotter.showPlot(JPanel, String)">
+public void <code class="descname">showPlot</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/javax/swing/JPanel.html" title="javax.swing.JPanel">JPanel</a><em> plotPanel</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> title</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.plot.Plotter.showPlot(JPanel, String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display a new plot.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>plotPanel</strong> – A panel containng the plot image</li>
+<li><strong>title</strong> – The plot title</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="package-index.html" title="previous chapter (use the left arrow)">ca.nengo.plot</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="PlotterFunctional.html" title="next chapter (use the right arrow)">PlotterFunctional</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="PlotterFunctional.html" title="PlotterFunctional"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="package-index.html" title="ca.nengo.plot"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.plot</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

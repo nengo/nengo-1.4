@@ -1,0 +1,497 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Tips and tricks &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API reference" href="api.html" />
+    <link rel="prev" title="Connection weights" href="weights.html" />
+<link rel="stylesheet" type="text/css" href="../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="api.html" title="API reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="weights.html" title="Connection weights"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Scripting</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weights.html">Connection weights</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tips and tricks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Scripting</a></li>
+              
+              <li>Tips and tricks</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="tips-and-tricks">
+<h1>Tips and tricks<a class="headerlink" href="#tips-and-tricks" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="common-transformation-matrices">
+<h2>Common transformation matrices<a class="headerlink" href="#common-transformation-matrices" title="Permalink to this headline">¶</a></h2>
+<p>To simplify creating connection matrices
+for high-dimensional ensembles,
+you can use three additional parameters
+in the <a class="reference internal" href="../python-api/nef/Network.html#nef.Network.connect" title="nef.Network.connect"><code class="xref py py-func docutils literal"><span class="pre">nef.Network.connect()</span></code></a> function:
+<em>weight</em>, <em>index_pre</em>, and <em>index_post</em>.
+<em>weight</em> specifies the overall gain
+on the connection across all dimensions, and defaults to 1.
+For example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="c1"># results in a transform matrix of [[0.5, 0, 0], [0, 0.5, 0], [0, 0, 0.5]]</span>
+</pre></div>
+</div>
+<p>Note that the system by default
+assumes the identity matrix for the connection.</p>
+<p>If you don’t want the identity matrix,
+and would prefer some other connectivity,
+specify <em>index_pre</em> and <em>index_post</em>.
+These indicate which dimensions
+in the first ensemble should be mapped
+to which dimensions in the second ensemble.
+For example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">index_pre</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># results in a transform matrix of [[0, 0, 1]]</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">index_post</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># results in a transform matrix of [[1], [0], [0]]</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">index_pre</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="c1"># results in a transform matrix of [[0, 1, 0, 0], [0, 0, 1, 0]]</span>
+<span class="c1"># which makes B hold the 2nd and 3rd element of A</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">index_pre</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">index_post</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="c1"># results in a transform matrix of [[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 0]]</span>
+<span class="c1"># which makes B hold the 2nd and 3rd element of A in its first two elements</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-noise-to-the-simulation">
+<h2>Adding noise to the simulation<a class="headerlink" href="#adding-noise-to-the-simulation" title="Permalink to this headline">¶</a></h2>
+<p>To make the inputs to neurons noisy,
+you can specify an amount of noise
+and a noise frequency
+(how often a new noise value is sampled
+from the uniform distribution between -noise and +noise).
+Each neuron will sample from this distribution at this rate,
+and add the resulting value to its input current.
+The frequency defaults to 1000 Hz:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">noise_frequency</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="random-inputs">
+<h2>Random inputs<a class="headerlink" href="#random-inputs" title="Permalink to this headline">¶</a></h2>
+<p>Here is how you can convert an input
+to provide a randomly changing value,
+rather than a constant:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make_fourier_input</span><span class="p">(</span>
+    <span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will produce a randomly varying input.
+This input will consist of random sine waves
+varying from 0.1 Hz to 10 Hz,
+in 0.1 Hz increments.
+The random number seed used is 0.</p>
+</div>
+<div class="section" id="changing-modes-spiking-rate-and-direct">
+<h2>Changing modes: spiking, rate, and direct<a class="headerlink" href="#changing-modes-spiking-rate-and-direct" title="Permalink to this headline">¶</a></h2>
+<p>You can set an ensemble to be simulated with
+spiking neurons, rate neurons, or no neurons (directly).
+The default is to use spiking neurons.
+To change the mode, use the <code class="docutils literal"><span class="pre">mode</span></code> argument:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;J&#39;</span><span class="p">,</span> <span class="n">neurons</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;direct&#39;</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="n">neurons</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rate&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>One common usage of direct mode
+is to quickly test out algorithms
+without worrying about the neural implementation.
+This can be especially important
+when creating algorithms with large numbers of dimensions,
+since they would require large numbers of neurons to simulate.
+It can often be much faster
+to test the algorithm without neurons in direct mode
+before switching to a realistic neural model.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When using direct mode,
+you may want to decrease the number of neurons
+in the population to 1,
+as this makes it much faster to create the ensemble.</p>
+</div>
+</div>
+<div class="section" id="arrays-of-ensembles">
+<h2>Arrays of ensembles<a class="headerlink" href="#arrays-of-ensembles" title="Permalink to this headline">¶</a></h2>
+<p>When building models that represent large numbers of dimensions,
+it is sometimes useful to
+break an ensemble down into sub-ensembles,
+each of which represent a subset of dimensions.
+Instead of building one large ensemble to represent 100 dimensions,
+we might have 10 ensembles
+that represent 10 dimensions each,
+or 100 ensembles representing 1 dimension each.</p>
+<p>The main advantage of this is speed:
+it is much faster for the NEF methods
+to compute decoders for many small ensembles,
+rather than one big one.</p>
+<p>However, there is one large disadvantage:
+you cannot compute nonlinear functions
+that use values in two different ensembles.
+One of the core claims of the NEF
+is that we can only approximate
+nonlinear functions of two (or more) variables
+if there are neurons that respond to <em>both</em> dimensions.
+However, it is still possible
+to compute any linear function.</p>
+<p>We create an array
+by specifying its length
+and (optionally) the number of dimensions per ensemble
+(the default is 1):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make_array</span><span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="n">neurons</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also use all of the parameters
+available in <a class="reference internal" href="../python-api/nef/Network.html#nef.Network.make" title="nef.Network.make"><code class="xref py py-func docutils literal"><span class="pre">nef.Network.make()</span></code></a>
+to configure the properties of the neurons.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <em>neurons</em> parameter specifies the number of neurons
+<em>in each ensemble</em>, not the total number of neurons!</p>
+</div>
+<p>The resulting array can be used just like a normal ensemble.
+The following example makes a single 10-dimensional ensemble
+and a network array of 5 two-dimensional ensembles
+and connects one to the other:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make_array</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">neurons</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">neurons</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When computing nonlinear functions with an array,
+the function is applied to <em>each ensemble separately</em>.
+The following computes the products of five pairs of numbers,
+storing the results in a single 5-dimensional array:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make_array</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">neurons</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">neurons</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">product</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">product</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="matrix-operations">
+<h2>Matrix operations<a class="headerlink" href="#matrix-operations" title="Permalink to this headline">¶</a></h2>
+<p>To simplify the manipulation of matrices,
+we have added a version of JNumeric to Nengo.
+This allows for a syntax similar to Matlab,
+but based on the NumPy Python library.</p>
+<p>To use this for matrix manipulation,
+you will first have to convert any matrix you have
+into an array object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]]</span> <span class="c1"># old method (list of lists)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>  <span class="c1"># new method (JNumeric array)</span>
+</pre></div>
+</div>
+<p>You can also specify the storage format to be used as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]],</span> <span class="n">typecode</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Valid values for the typecode parameter are:</p>
+<ul class="last simple">
+<li><code class="docutils literal"><span class="pre">'1'</span></code> int8</li>
+<li><code class="docutils literal"><span class="pre">'s'</span></code> int16</li>
+<li><code class="docutils literal"><span class="pre">'i'</span></code> int32</li>
+<li><code class="docutils literal"><span class="pre">'l'</span></code> int64</li>
+<li><code class="docutils literal"><span class="pre">'f'</span></code> float32</li>
+<li><code class="docutils literal"><span class="pre">'d'</span></code> float64</li>
+<li><code class="docutils literal"><span class="pre">'F'</span></code> complex64</li>
+<li><code class="docutils literal"><span class="pre">'D'</span></code> complex128</li>
+</ul>
+</div>
+<p>The first important thing you can do with this array
+is use full slice syntax.
+This is the <code class="docutils literal"><span class="pre">[:]</span></code> notation used to access part of an array.
+A slice is a set of three values,
+all of which are optional.
+<code class="docutils literal"><span class="pre">[a:b:c]</span></code> means to start at index <code class="docutils literal"><span class="pre">a</span></code>,
+go to index <code class="docutils literal"><span class="pre">b</span></code> (but not include <code class="docutils literal"><span class="pre">b</span></code>),
+and have a step size of <code class="docutils literal"><span class="pre">c</span></code> between items.
+The default for <code class="docutils literal"><span class="pre">a</span></code> is 0,
+for <code class="docutils literal"><span class="pre">b</span></code> is the length of the array,
+and for <code class="docutils literal"><span class="pre">c</span></code> is 1.
+For multiple dimensions,
+we put a comma between slices for each dimension.
+The following examples are all for a 2D array.
+Note that the order of the 2nd and 3rd parameters
+are reversed from Matlab,
+and all indices start at 0.
+Additionally, negative indices can be used,
+and indicate the number of indices
+from the end (e.g., <code class="docutils literal"><span class="pre">-1</span></code> is the last index):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>        <span class="c1"># the first row</span>
+<span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>     <span class="c1"># the first row</span>
+<span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>      <span class="c1"># the first three rows</span>
+<span class="n">a</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>     <span class="c1"># the first column</span>
+<span class="n">a</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>   <span class="c1"># the first three columns</span>
+<span class="n">a</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>    <span class="c1"># the first three columns</span>
+<span class="n">a</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:]</span>    <span class="c1"># all columns from the 2nd to the end</span>
+<span class="n">a</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>   <span class="c1"># all columns except the last one</span>
+<span class="n">a</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span>      <span class="c1"># just the even-numbered rows</span>
+<span class="n">a</span><span class="p">[::</span><span class="mi">3</span><span class="p">]</span>      <span class="c1"># every third row</span>
+<span class="n">a</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>     <span class="c1"># all rows in reverse order</span>
+<span class="n">a</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">2</span><span class="p">]</span>   <span class="c1"># just the even-numbered columns</span>
+<span class="n">a</span><span class="p">[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># all columns in reverse order</span>
+<span class="n">a</span><span class="o">.</span><span class="n">T</span>         <span class="c1"># transpose</span>
+</pre></div>
+</div>
+<p>With such an array, you can perform element-wise operations as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>   <span class="c1"># element-wise addition; same as .+ in matlab</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span>   <span class="c1"># element-wise multiplication; same as .* in matlab</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>  <span class="c1"># computes cosine of all values in a</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Other functions that work on arrays include:
+<code class="docutils literal"><span class="pre">add</span></code>, <code class="docutils literal"><span class="pre">subtract</span></code>, <code class="docutils literal"><span class="pre">multiply</span></code>, <code class="docutils literal"><span class="pre">divide</span></code>, <code class="docutils literal"><span class="pre">remainder</span></code>, <code class="docutils literal"><span class="pre">power</span></code>,
+<code class="docutils literal"><span class="pre">arccos</span></code>, <code class="docutils literal"><span class="pre">arccosh</span></code>, <code class="docutils literal"><span class="pre">arcsinh</span></code>, <code class="docutils literal"><span class="pre">arctan</span></code>, <code class="docutils literal"><span class="pre">arctanh</span></code>,
+<code class="docutils literal"><span class="pre">ceil</span></code>, <code class="docutils literal"><span class="pre">floor</span></code>, <code class="docutils literal"><span class="pre">conjugate</span></code>, <code class="docutils literal"><span class="pre">imaginary</span></code>,
+<code class="docutils literal"><span class="pre">cos</span></code>, <code class="docutils literal"><span class="pre">cosh</span></code>, <code class="docutils literal"><span class="pre">sin</span></code>, <code class="docutils literal"><span class="pre">sinh</span></code>, <code class="docutils literal"><span class="pre">tan</span></code>, <code class="docutils literal"><span class="pre">tanh</span></code>,
+<code class="docutils literal"><span class="pre">exp</span></code>, <code class="docutils literal"><span class="pre">log</span></code>, <code class="docutils literal"><span class="pre">log10</span></code>, <code class="docutils literal"><span class="pre">real</span></code>, <code class="docutils literal"><span class="pre">sqrt</span></code>,
+<code class="docutils literal"><span class="pre">maximum</span></code>, <code class="docutils literal"><span class="pre">minimum</span></code>, <code class="docutils literal"><span class="pre">equal</span></code>, <code class="docutils literal"><span class="pre">not_equal</span></code>,
+<code class="docutils literal"><span class="pre">less</span></code>, <code class="docutils literal"><span class="pre">less_equal</span></code>, <code class="docutils literal"><span class="pre">greater</span></code>, <code class="docutils literal"><span class="pre">greater_equal</span></code>,
+<code class="docutils literal"><span class="pre">logical_and</span></code>, <code class="docutils literal"><span class="pre">logical_or</span></code>, <code class="docutils literal"><span class="pre">logical_xor</span></code>, <code class="docutils literal"><span class="pre">logical_not</span></code>,
+<code class="docutils literal"><span class="pre">bitwise_and</span></code>, <code class="docutils literal"><span class="pre">bitwise_or</span></code>, <code class="docutils literal"><span class="pre">bitwise_xor</span></code></p>
+</div>
+<p>You can also create particular arrays:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>     <span class="c1"># same as array(range(5)); same as array([0, 1, 2, 3, 4])</span>
+<span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># same as array(range(2, 5)); same as array([2, 3, 4])</span>
+
+<span class="n">eye</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>                      <span class="c1"># 5x5 identity matrix</span>
+<span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>                <span class="c1"># 3x2 matrix of all 1</span>
+<span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">typecode</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">)</span>  <span class="c1"># 3x2 matrix of all 1.0 (floating point values)</span>
+<span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>               <span class="c1"># 3x2 matrix of all 0</span>
+</pre></div>
+</div>
+<p>The following functions help manipulate the shape of a matrix:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span><span class="o">.</span><span class="n">shape</span>                 <span class="c1"># get the current size of the matrix</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">reshape</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>  <span class="c1"># convert to a 3x4 matrix (must already have 12 elements)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">resize</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>   <span class="c1"># convert to a 3x4 matrix (can start at any size)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">ravel</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>            <span class="c1"># convert to a 1-D vector</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">diag</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>     <span class="c1"># create a diagonal matrix with the given values</span>
+</pre></div>
+</div>
+<p>Some basic linear algebra operations are available:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">innerproduct</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">convolve</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And Fourier transforms:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">b</span> <span class="o">=</span> <span class="n">fft</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">ifft</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The following functions also exist:
+<code class="docutils literal"><span class="pre">argmax</span></code>, <code class="docutils literal"><span class="pre">argsort</span></code>, <code class="docutils literal"><span class="pre">argmin</span></code>, <code class="docutils literal"><span class="pre">asarray</span></code>, <code class="docutils literal"><span class="pre">bitwise_not</span></code>, <code class="docutils literal"><span class="pre">choose</span></code>,
+<code class="docutils literal"><span class="pre">clip</span></code>, <code class="docutils literal"><span class="pre">compress</span></code>, <code class="docutils literal"><span class="pre">concatenate</span></code>, <code class="docutils literal"><span class="pre">fromfunction</span></code>, <code class="docutils literal"><span class="pre">indices</span></code>,
+<code class="docutils literal"><span class="pre">nonzero</span></code>, <code class="docutils literal"><span class="pre">searchsorted</span></code>, <code class="docutils literal"><span class="pre">sort</span></code>, <code class="docutils literal"><span class="pre">take</span></code>, <code class="docutils literal"><span class="pre">where</span></code>,
+<code class="docutils literal"><span class="pre">tostring</span></code>, <code class="docutils literal"><span class="pre">fromstring</span></code>, <code class="docutils literal"><span class="pre">trace</span></code>, <code class="docutils literal"><span class="pre">repeat</span></code>,
+<code class="docutils literal"><span class="pre">diagonal</span></code>, <code class="docutils literal"><span class="pre">sum</span></code>, <code class="docutils literal"><span class="pre">cumsum</span></code>, <code class="docutils literal"><span class="pre">product</span></code>, <code class="docutils literal"><span class="pre">cumproduct</span></code>,
+<code class="docutils literal"><span class="pre">alltrue</span></code>, <code class="docutils literal"><span class="pre">sometrue</span></code></p>
+<p>The vast majority of the time,
+you can use these objects the same way
+you would a normal list of values
+(e.g., for specifying transformation matrices).
+If you ever need to explicitly convert one back into a list,
+you can call the <code class="docutils literal"><span class="pre">tolist</span></code> method:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>These functions are all available at the Nengo console
+and in any script called using the <code class="docutils literal"><span class="pre">run</span></code> command.
+To access them in a separate script file, do:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numeric</span> <span class="k">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="weights.html" title="previous chapter (use the left arrow)">Connection weights</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="api.html" title="next chapter (use the right arrow)">API reference</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="api.html" title="API reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="weights.html" title="Connection weights"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Scripting</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

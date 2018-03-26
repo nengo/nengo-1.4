@@ -1,0 +1,259 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Nengo 1.4 &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting started" href="getting_started.html" />
+<link rel="stylesheet" type="text/css" href="_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting started"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Nengo 1.4 1.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    #" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demos/index.html">Demos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripting/index.html">Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="#">Docs</a></li>
+              
+              <li>Nengo 1.4</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="nengo-1-4">
+<h1>Nengo 1.4<a class="headerlink" href="#nengo-1-4" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Nengo 1.4 is no longer actively maintained.
+Please use <a class="reference external" href="https://www.nengo.ai/">Nengo 2.0</a> instead.</p>
+<p class="last">If you have written models in Nengo 1.4 and wish to
+update those modesl to work in Nengo 2.0, see
+<a class="reference external" href="https://www.nengo.ai/nengo/converting.html">this model conversion guide</a>.</p>
+</div>
+<p>Nengo is a software package for simulating large-scale neural systems.</p>
+<p>To use it, you define groups of neurons in terms of what they represent,
+and then form connections between neural groups
+in terms of what computation should be performed on those representations.
+Nengo then uses the Neural Engineering Framework (NEF)
+to solve for the appropriate synaptic connection weights
+to achieve this desired computation.
+This makes it possible to produce detailed spiking neuron models
+that implement complex high-level cognitive algorithms.</p>
+<div class="topic">
+<p class="topic-title first">Demo video</p>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/q4jxI26gUtA" frameborder="0" allowfullscreen></iframe><p>This is a general demo video for Nengo,
+which shows models of motor control, cognition, and working memory,
+as well as an example of model construction in Nengo.</p>
+</div>
+<p>If you use Nengo 1.4 in a publication, please cite:</p>
+<blockquote>
+<div>Stewart, T.C., Tripp, B., Eliasmith, C. (2009).
+<a class="reference external" href="http://www.frontiersin.org/neuroinformatics/paper/10.3389/neuro.11/007.2009/">Python scripting in the Nengo simulator</a>.
+<em>Frontiers in Neuroinformatics.</em> 3(7)</div></blockquote>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installing-nengo-1-4">Installing Nengo 1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#running-the-nengo-gui">Running the Nengo GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#nengo-scripting">Nengo scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#running-nengo-from-the-command-line">Running Nengo from the command line</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="videos/index.html">Video tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="videos/1-construction.html">1. Basic network construction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="videos/2-workspace.html">2. Additional workspace features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="videos/3-simulation.html">3. Basic network simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="videos/4-moreplots.html">4. Additional interactive plot features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="videos/5-scripting.html">5. Basic scripting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Written tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1-representation.html">1. One-dimensional representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2-linear-transformation.html">2. Linear transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/3-nonlinear-transformation.html">3. Nonlinear transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/4-dynamics.html">4. Feedback and dynamics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/5-cognitive.html">5. Cognitive models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="demos/index.html">Demos</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="demos/index.html#introductory-demos">Introductory demos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/index.html#simple-transformations">Simple transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/index.html#dynamics">Dynamics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/index.html#basal-ganglia-based-simulations">Basal Ganglia based simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/index.html#learning">Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demos/index.html#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scripting/index.html">Scripting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced/layout.html">Interactive plots layout files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/dragndrop.html">Creating a drag and drop template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/experiments.html">Running experiments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/matlab.html">Running Nengo in Matlab</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/large_ensembles.html">Generating large ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/gpu.html">Accelerating simulations with GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/ipython_notebook.html">Integrating with IPython Notebook</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="getting_started.html" title="next chapter (use the right arrow)">Getting started</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting started"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Nengo 1.4 1.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

@@ -1,0 +1,378 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>LinearSynapticIntegrator &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+    <link rel="next" title="LinearSynapticIntegrator.Factory" href="LinearSynapticIntegrator-Factory.html" />
+    <link rel="prev" title="LIFSpikingNeuronTest" href="LIFSpikingNeuronTest.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="LinearSynapticIntegrator-Factory.html" title="LinearSynapticIntegrator.Factory"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="LIFSpikingNeuronTest.html" title="LIFSpikingNeuronTest"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.model.neuron.impl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.model.neuron.impl</a></li>
+              
+              <li>LinearSynapticIntegrator</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="linearsynapticintegrator">
+<h1>LinearSynapticIntegrator<a class="headerlink" href="#linearsynapticintegrator" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator">
+public class <code class="descname">LinearSynapticIntegrator</code> implements <a class="reference internal" href="../ExpandableSynapticIntegrator.html#ca.nengo.model.neuron.ExpandableSynapticIntegrator" title="ca.nengo.model.neuron.ExpandableSynapticIntegrator">ExpandableSynapticIntegrator</a><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator" title="Permalink to this definition">¶</a></dt>
+<dd><p>A basic linear <code class="docutils literal"><span class="pre">SynapticIntegrator</span></code> model.</p>
+<p>Synaptic inputs are individually weighted, passed through decaying exponential dynamics, and summed.</p>
+<p>A synaptic weight corresponds to the time integral of the current induced by one spike, or to the time integral of current induced by a real-valued input of 1 over 1 second. Thus a real-valued firing-rate input has roughly the same effect as a series spikes at the same rate. So a simulation can switch between spike and rate inputs, with minimal impact and without the need to modify synaptic weights.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>LinearSynapticIntegrator<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.LinearSynapticIntegrator(float, Units)">
+public <code class="descname">LinearSynapticIntegrator</code><span class="sig-paren">(</span>float<em> maxTimeStep</em>, <a class="reference internal" href="../../Units.html#ca.nengo.model.Units" title="ca.nengo.model.Units">Units</a><em> currentUnits</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.LinearSynapticIntegrator(float, Units)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>maxTimeStep</strong> – Maximum length of integration time step. Shorter steps may be used to better match length of run(…)</li>
+<li><strong>currentUnits</strong> – Units of current in input weights, scale, bias, and result of run(…)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>LinearSynapticIntegrator<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.LinearSynapticIntegrator()">
+public <code class="descname">LinearSynapticIntegrator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.LinearSynapticIntegrator()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defaults to max timestep 1ms and units Units.ACU.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="addtermination">
+<h3>addTermination<a class="headerlink" href="#addtermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.addTermination(String, float[], float, boolean)">
+public <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[]<em> weights</em>, float<em> tauPSC</em>, boolean<em> modulatory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.addTermination(String, float[], float, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.neuron.ExpandableSynapticIntegrator.addTermination(java.lang.String,float[],float,boolean)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>addTermination<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.addTermination(String, float[], float, float, boolean)">
+public <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[]<em> weights</em>, float<em> tauPSC</em>, float<em> delay</em>, boolean<em> modulatory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.addTermination(String, float[], float, float, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="clone">
+<h3>clone<a class="headerlink" href="#clone" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.clone()">
+public <a class="reference internal" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator" title="ca.nengo.model.neuron.impl.LinearSynapticIntegrator">LinearSynapticIntegrator</a> <code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.clone()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getcurrentunits">
+<h3>getCurrentUnits<a class="headerlink" href="#getcurrentunits" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.getCurrentUnits()">
+public <a class="reference internal" href="../../Units.html#ca.nengo.model.Units" title="ca.nengo.model.Units">Units</a> <code class="descname">getCurrentUnits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.getCurrentUnits()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Units that current is expressed in</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getmaxtimestep">
+<h3>getMaxTimeStep<a class="headerlink" href="#getmaxtimestep" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.getMaxTimeStep()">
+public float <code class="descname">getMaxTimeStep</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.getMaxTimeStep()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">maximum time step</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="gettermination">
+<h3>getTermination<a class="headerlink" href="#gettermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.getTermination(String)">
+public <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">getTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.getTermination(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.neuron.SynapticIntegrator.getTermination(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getterminations">
+<h3>getTerminations<a class="headerlink" href="#getterminations" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.getTerminations()">
+public <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a>[] <code class="descname">getTerminations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.getTerminations()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../SynapticIntegrator.html#ca.nengo.model.neuron.SynapticIntegrator.getTerminations()" title="ca.nengo.model.neuron.SynapticIntegrator.getTerminations()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.neuron.SynapticIntegrator.getTerminations()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="removetermination">
+<h3>removeTermination<a class="headerlink" href="#removetermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.removeTermination(String)">
+public <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">removeTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.removeTermination(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.neuron.ExpandableSynapticIntegrator.removeTermination(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="reset">
+<h3>reset<a class="headerlink" href="#reset" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.reset(boolean)">
+public void <code class="descname">reset</code><span class="sig-paren">(</span>boolean<em> randomize</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.reset(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Resettable.html#ca.nengo.model.Resettable.reset(boolean)" title="ca.nengo.model.Resettable.reset(boolean)"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Resettable.reset(boolean)</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="run">
+<h3>run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.run(float, float)">
+public <a class="reference internal" href="../../../util/TimeSeries1D.html#ca.nengo.util.TimeSeries1D" title="ca.nengo.util.TimeSeries1D">TimeSeries1D</a> <code class="descname">run</code><span class="sig-paren">(</span>float<em> startTime</em>, float<em> endTime</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.run(float, float)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.neuron.SynapticIntegrator.run(float,float)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setcurrentunits">
+<h3>setCurrentUnits<a class="headerlink" href="#setcurrentunits" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.setCurrentUnits(Units)">
+public void <code class="descname">setCurrentUnits</code><span class="sig-paren">(</span><a class="reference internal" href="../../Units.html#ca.nengo.model.Units" title="ca.nengo.model.Units">Units</a><em> units</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.setCurrentUnits(Units)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>units</strong> – Units that current should be expressed in</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setmaxtimestep">
+<h3>setMaxTimeStep<a class="headerlink" href="#setmaxtimestep" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.setMaxTimeStep(float)">
+public void <code class="descname">setMaxTimeStep</code><span class="sig-paren">(</span>float<em> maxTimeStep</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.setMaxTimeStep(float)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>maxTimeStep</strong> – maximum time step</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setnode">
+<h3>setNode<a class="headerlink" href="#setnode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.neuron.impl.LinearSynapticIntegrator.setNode(Node)">
+public void <code class="descname">setNode</code><span class="sig-paren">(</span><a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> node</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.neuron.impl.LinearSynapticIntegrator.setNode(Node)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>node</strong> – The parent node (Terminations need a reference to this)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="LIFSpikingNeuronTest.html" title="previous chapter (use the left arrow)">LIFSpikingNeuronTest</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="LinearSynapticIntegrator-Factory.html" title="next chapter (use the right arrow)">LinearSynapticIntegrator.Factory</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="LinearSynapticIntegrator-Factory.html" title="LinearSynapticIntegrator.Factory"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="LIFSpikingNeuronTest.html" title="LIFSpikingNeuronTest"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.model.neuron.impl</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

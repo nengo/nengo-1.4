@@ -1,0 +1,488 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>ElasticLayout &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+    <link rel="next" title="ElasticLayout.LengthFunction" href="ElasticLayout-LengthFunction.html" />
+    <link rel="prev" title="ca.nengo.ui.lib.util" href="package-index.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ElasticLayout-LengthFunction.html" title="ElasticLayout.LengthFunction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="package-index.html" title="ca.nengo.ui.lib.util"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.ui.lib.util</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../packages.html">simulator-ui</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.ui.lib.util</a></li>
+              
+              <li>ElasticLayout</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="elasticlayout">
+<h1>ElasticLayout<a class="headerlink" href="#elasticlayout" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout">
+public class <code class="descname">ElasticLayout</code> extends AbstractLayout implements LayoutMutable<a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout" title="Permalink to this definition">¶</a></dt>
+<dd><p>The SpringLayout package represents a visualization of a set of nodes. The SpringLayout, which is initialized with a Graph, assigns X/Y locations to each node. When called <code class="docutils literal"><span class="pre">relax()</span></code>, the SpringLayout moves the visualization forward one step.</p>
+<p>Modified by ShuWu to dimensionless layout</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Danyel Fisher, Joshua O’Madadhain</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="unitlengthfunction">
+<h3>UNITLENGTHFUNCTION<a class="headerlink" href="#unitlengthfunction" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.UNITLENGTHFUNCTION">
+public static final <a class="reference internal" href="ElasticLayout-LengthFunction.html#ca.nengo.ui.lib.util.ElasticLayout.LengthFunction" title="ca.nengo.ui.lib.util.ElasticLayout.LengthFunction">LengthFunction</a> <code class="descname">UNITLENGTHFUNCTION</code><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.UNITLENGTHFUNCTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="force-multiplier">
+<h3>force_multiplier<a class="headerlink" href="#force-multiplier" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.force_multiplier">
+protected double <code class="descname">force_multiplier</code><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.force_multiplier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="key">
+<h3>key<a class="headerlink" href="#key" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.key">
+ <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="java.lang.Object">Object</a> <code class="descname">key</code><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="lengthfunction">
+<h3>lengthFunction<a class="headerlink" href="#lengthfunction" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.lengthFunction">
+protected <a class="reference internal" href="ElasticLayout-LengthFunction.html#ca.nengo.ui.lib.util.ElasticLayout.LengthFunction" title="ca.nengo.ui.lib.util.ElasticLayout.LengthFunction">LengthFunction</a> <code class="descname">lengthFunction</code><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.lengthFunction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="stretch">
+<h3>stretch<a class="headerlink" href="#stretch" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.stretch">
+protected double <code class="descname">stretch</code><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.stretch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>ElasticLayout<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.ElasticLayout(Graph)">
+public <code class="descname">ElasticLayout</code><span class="sig-paren">(</span>Graph<em> g</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.ElasticLayout(Graph)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor for a SpringLayout for a raw graph with associated dimension–the input knows how big the graph is. Defaults to the unit length function.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>ElasticLayout<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.ElasticLayout(Graph, LengthFunction)">
+public <code class="descname">ElasticLayout</code><span class="sig-paren">(</span>Graph<em> g</em>, <a class="reference internal" href="ElasticLayout-LengthFunction.html#ca.nengo.ui.lib.util.ElasticLayout.LengthFunction" title="ca.nengo.ui.lib.util.ElasticLayout.LengthFunction">LengthFunction</a><em> f</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.ElasticLayout(Graph, LengthFunction)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor for a SpringLayout for a raw graph with associated component.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>g</strong> – the input Graph</li>
+<li><strong>f</strong> – the length function</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="advancepositions">
+<h3>advancePositions<a class="headerlink" href="#advancepositions" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.advancePositions()">
+public void <code class="descname">advancePositions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.advancePositions()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Relaxation step. Moves all nodes a smidge.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="calcedgelength">
+<h3>calcEdgeLength<a class="headerlink" href="#calcedgelength" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.calcEdgeLength(SpringEdgeData, LengthFunction)">
+protected void <code class="descname">calcEdgeLength</code><span class="sig-paren">(</span><a class="reference internal" href="ElasticLayout-SpringEdgeData.html#ca.nengo.ui.lib.util.ElasticLayout.SpringEdgeData" title="ca.nengo.ui.lib.util.ElasticLayout.SpringEdgeData">SpringEdgeData</a><em> sed</em>, <a class="reference internal" href="ElasticLayout-LengthFunction.html#ca.nengo.ui.lib.util.ElasticLayout.LengthFunction" title="ca.nengo.ui.lib.util.ElasticLayout.LengthFunction">LengthFunction</a><em> f</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.calcEdgeLength(SpringEdgeData, LengthFunction)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="calculaterepulsion">
+<h3>calculateRepulsion<a class="headerlink" href="#calculaterepulsion" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.calculateRepulsion()">
+protected void <code class="descname">calculateRepulsion</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.calculateRepulsion()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getavertex">
+<h3>getAVertex<a class="headerlink" href="#getavertex" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.getAVertex(Edge)">
+protected Vertex <code class="descname">getAVertex</code><span class="sig-paren">(</span><a class="reference internal" href="../objects/lines/Edge.html#ca.nengo.ui.lib.objects.lines.Edge" title="ca.nengo.ui.lib.objects.lines.Edge">Edge</a><em> e</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.getAVertex(Edge)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getforcemultiplier">
+<h3>getForceMultiplier<a class="headerlink" href="#getforcemultiplier" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.getForceMultiplier()">
+public double <code class="descname">getForceMultiplier</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.getForceMultiplier()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">the current value for the edge length force multiplier</dd>
+</dl>
+<p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">.setForceMultiplier(double)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getlength">
+<h3>getLength<a class="headerlink" href="#getlength" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.getLength(Edge)">
+public double <code class="descname">getLength</code><span class="sig-paren">(</span><a class="reference internal" href="../objects/lines/Edge.html#ca.nengo.ui.lib.objects.lines.Edge" title="ca.nengo.ui.lib.objects.lines.Edge">Edge</a><em> e</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.getLength(Edge)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getspringdata">
+<h3>getSpringData<a class="headerlink" href="#getspringdata" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.getSpringData(Edge)">
+public <a class="reference internal" href="ElasticLayout-SpringEdgeData.html#ca.nengo.ui.lib.util.ElasticLayout.SpringEdgeData" title="ca.nengo.ui.lib.util.ElasticLayout.SpringEdgeData">SpringEdgeData</a> <code class="descname">getSpringData</code><span class="sig-paren">(</span><a class="reference internal" href="../objects/lines/Edge.html#ca.nengo.ui.lib.objects.lines.Edge" title="ca.nengo.ui.lib.objects.lines.Edge">Edge</a><em> e</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.getSpringData(Edge)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>getSpringData<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.getSpringData(Vertex)">
+public <a class="reference internal" href="ElasticLayout-SpringVertexData.html#ca.nengo.ui.lib.util.ElasticLayout.SpringVertexData" title="ca.nengo.ui.lib.util.ElasticLayout.SpringVertexData">SpringVertexData</a> <code class="descname">getSpringData</code><span class="sig-paren">(</span>Vertex<em> v</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.getSpringData(Vertex)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getspringkey">
+<h3>getSpringKey<a class="headerlink" href="#getspringkey" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.getSpringKey()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="java.lang.Object">Object</a> <code class="descname">getSpringKey</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.getSpringKey()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getstatus2">
+<h3>getStatus2<a class="headerlink" href="#getstatus2" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.getStatus2()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getStatus2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.getStatus2()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the status.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="getstretch">
+<h3>getStretch<a class="headerlink" href="#getstretch" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.getStretch()">
+public double <code class="descname">getStretch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.getStretch()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">the current value for the stretch parameter</dd>
+</dl>
+<p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">.setStretch(double)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="incrementsaredone">
+<h3>incrementsAreDone<a class="headerlink" href="#incrementsaredone" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.incrementsAreDone()">
+public boolean <code class="descname">incrementsAreDone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.incrementsAreDone()" title="Permalink to this definition">¶</a></dt>
+<dd><p>For now, we pretend it never finishes.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="initialize">
+<h3>initialize<a class="headerlink" href="#initialize" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.initialize()">
+public void <code class="descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.initialize()" title="Permalink to this definition">¶</a></dt>
+<dd><p>New initializer for layout of unbounded size</p>
+</dd></dl>
+
+</div>
+<div class="section" id="initializelocation">
+<h3>initializeLocation<a class="headerlink" href="#initializelocation" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.initializeLocation(Vertex, Coordinates, Dimension)">
+protected void <code class="descname">initializeLocation</code><span class="sig-paren">(</span>Vertex<em> v</em>, Coordinates<em> coord</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/Dimension.html" title="java.awt.Dimension">Dimension</a><em> d</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.initializeLocation(Vertex, Coordinates, Dimension)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="initialize-local">
+<h3>initialize_local<a class="headerlink" href="#initialize-local" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.initialize_local()">
+protected void <code class="descname">initialize_local</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.initialize_local()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="initialize-local-vertex">
+<h3>initialize_local_vertex<a class="headerlink" href="#initialize-local-vertex" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.initialize_local_vertex(Vertex)">
+protected void <code class="descname">initialize_local_vertex</code><span class="sig-paren">(</span>Vertex<em> v</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.initialize_local_vertex(Vertex)" title="Permalink to this definition">¶</a></dt>
+<dd><p>(non-Javadoc)</p>
+<p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">edu.uci.ics.jung.visualization.AbstractLayout.initialize_local_vertex(edu.uci.ics.jung.graph.Vertex)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="isincremental">
+<h3>isIncremental<a class="headerlink" href="#isincremental" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.isIncremental()">
+public boolean <code class="descname">isIncremental</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.isIncremental()" title="Permalink to this definition">¶</a></dt>
+<dd><p>This one is an incremental visualization</p>
+</dd></dl>
+
+</div>
+<div class="section" id="movenodes">
+<h3>moveNodes<a class="headerlink" href="#movenodes" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.moveNodes()">
+protected void <code class="descname">moveNodes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.moveNodes()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="relaxedges">
+<h3>relaxEdges<a class="headerlink" href="#relaxedges" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.relaxEdges()">
+protected void <code class="descname">relaxEdges</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.relaxEdges()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setforcemultiplier">
+<h3>setForceMultiplier<a class="headerlink" href="#setforcemultiplier" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.setForceMultiplier(double)">
+public void <code class="descname">setForceMultiplier</code><span class="sig-paren">(</span>double<em> force</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.setForceMultiplier(double)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the force multiplier for this instance. This value is used to specify how strongly an edge “wants” to be its default length (higher values indicate a greater attraction for the default length), which affects how much its endpoints move at each timestep. The default value is 1/3. A value of 0 turns off any attempt by the layout to cause edges to conform to the default length. Negative values cause long edges to get longer and short edges to get shorter; use at your own risk.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="setstretch">
+<h3>setStretch<a class="headerlink" href="#setstretch" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.setStretch(double)">
+public void <code class="descname">setStretch</code><span class="sig-paren">(</span>double<em> stretch</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.setStretch(double)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the stretch parameter for this instance. This value specifies how much the degrees of an edge’s incident vertices should influence how easily the endpoints of that edge can move (that is, that edge’s tendency to change its length).</p>
+<p>The default value is 0.70. Positive values less than 1 cause high-degree vertices to move less than low-degree vertices, and values &gt; 1 cause high-degree vertices to move more than low-degree vertices. Negative values will have unpredictable and inconsistent results.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>stretch</strong> – </li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="update">
+<h3>update<a class="headerlink" href="#update" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.util.ElasticLayout.update()">
+public void <code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.util.ElasticLayout.update()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">edu.uci.ics.jung.visualization.LayoutMutable.update()</span></code></p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="package-index.html" title="previous chapter (use the left arrow)">ca.nengo.ui.lib.util</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="ElasticLayout-LengthFunction.html" title="next chapter (use the right arrow)">ElasticLayout.LengthFunction</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ElasticLayout-LengthFunction.html" title="ElasticLayout.LengthFunction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="package-index.html" title="ca.nengo.ui.lib.util"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.ui.lib.util</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Learning a communication channel &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Learning multiplication" href="learn_product.html" />
+    <link rel="prev" title="A controlled question answering network" href="question_control.html" />
+<link rel="stylesheet" type="text/css" href="../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="learn_product.html" title="Learning multiplication"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="question_control.html" title="A controlled question answering network"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Demos</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Demos</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#introductory-demos">Introductory demos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#simple-transformations">Simple transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#dynamics">Dynamics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#basal-ganglia-based-simulations">Basal Ganglia based simulations</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#learning">Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../scripting/index.html">Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Demos</a></li>
+              
+              <li>Learning a communication channel</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="learning-a-communication-channel">
+<h1>Learning a communication channel<a class="headerlink" href="#learning-a-communication-channel" title="Permalink to this headline">¶</a></h1>
+<p><strong>Purpose</strong>:
+This is the first demo showing learning in Nengo.
+It learns the same circuit constructed in the Communication channel demo.</p>
+<p><strong>Comments</strong>:
+The learned connection is the one between
+the “pre” and “post” populations.
+This learning rule used is a kind of modulated
+Hebbian-like learning (see Bekolay, 2011 for details).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The red and blue graph is a plot of the connection weights,
+which you can watch change as learning occurs
+(you may need to zoom in with the scroll wheel;
+the learning a square demo has a good example).
+Typically, the largest changes occur
+at the beginning of a simulation.
+Red indicates negative weights
+and blue indicates positive weights.</p>
+</div>
+<p><strong>Usage</strong>:
+When you run the network,
+it initially has a random white noise input injected into it.
+The input slider should move up and down randomly.
+However, learning is initially turned off,
+so there is little correlation between
+the representation of the pre and post populations.</p>
+<p><em>Turn learning on</em>:
+To allow the learning rule to work,
+you need to move the “switch” to +1.
+Because the learning rule is modulated by an error signal,
+if the error is zero, the weights won’t change.
+Once learning is on, the post will begin to track the pre.</p>
+<p><em>Monitor the error</em>:
+When the switch is 0 at the beginning of the simulation,
+there is no “error”, though there is an “actual error”.
+The difference here is that “error”
+is calculated by a neural population,
+and used by the learning rule,
+while “actual error” is computed mathematically
+and is provided for visualization purposes only.</p>
+<p><em>Repeat the experiment</em>:
+After a few simulated seconds,
+the post and pre will match well.
+You can hit the “reset” button (bottom left) to
+reset the weights to their original random values,
+and to set the switch back to zero.
+For a different random starting point,
+you need to re-run the script.</p>
+<a class="reference internal image-reference" href="../_images/learn-communicate.png"><img alt="../_images/learn-communicate.png" src="../_images/learn-communicate.png" style="width: 100%;" /></a>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">import</span> <span class="nn">nef</span>
+<span class="kn">import</span> <span class="nn">nef.templates.gate</span> <span class="k">as</span> <span class="nn">gating</span>
+<span class="kn">import</span> <span class="nn">nef.templates.learned_termination</span> <span class="k">as</span> <span class="nn">learning</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">D</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">27</span><span class="p">)</span>
+
+<span class="c1"># Create the network object</span>
+<span class="n">net</span> <span class="o">=</span> <span class="n">nef</span><span class="o">.</span><span class="n">Network</span><span class="p">(</span><span class="s1">&#39;Learn communication&#39;</span><span class="p">)</span>
+
+<span class="c1"># Create input and output populations.</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+
+<span class="c1"># Create a random white noise input function with</span>
+<span class="c1"># .1 base freq, max freq 10 rad/s, RMS of .5, and random number seed 12</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make_fourier_input</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="s1">&#39;pre&#39;</span><span class="p">)</span>
+
+<span class="c1"># Create a modulated connection between the &#39;pre&#39; and &#39;post&#39; ensembles.</span>
+<span class="n">learning</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+    <span class="n">net</span><span class="p">,</span> <span class="n">errName</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">N_err</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">preName</span><span class="o">=</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="n">postName</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span>
+
+
+<span class="c1"># Set the modulatory signal.</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">weight</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Add a gate to turn learning on and off.</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make_input</span><span class="p">(</span><span class="s1">&#39;switch&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">gating</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Gate&#39;</span><span class="p">,</span> <span class="n">gated</span><span class="o">=</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">neurons</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">pstc</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;switch&#39;</span><span class="p">,</span> <span class="s1">&#39;Gate&#39;</span><span class="p">)</span>
+
+<span class="c1"># Add another non-gated error population running in direct mode.</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;actual error&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;direct&#39;</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="s1">&#39;actual error&#39;</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="s1">&#39;actual error&#39;</span><span class="p">,</span> <span class="n">weight</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">add_to_nengo</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="topic">
+<p class="topic-title first">Video:</p>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/NSrxsWm_fkc" frameborder="0" allowfullscreen></iframe></div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="question_control.html" title="previous chapter (use the left arrow)">A controlled question answering network</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="learn_product.html" title="next chapter (use the right arrow)">Learning multiplication</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="learn_product.html" title="Learning multiplication"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="question_control.html" title="A controlled question answering network"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Demos</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

@@ -1,0 +1,519 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>DecodableEnsembleImpl &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+    <link rel="next" title="DecodedOrigin" href="DecodedOrigin.html" />
+    <link rel="prev" title="BiasTermination" href="BiasTermination.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="DecodedOrigin.html" title="DecodedOrigin"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="BiasTermination.html" title="BiasTermination"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.model.nef.impl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.model.nef.impl</a></li>
+              
+              <li>DecodableEnsembleImpl</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="decodableensembleimpl">
+<h1>DecodableEnsembleImpl<a class="headerlink" href="#decodableensembleimpl" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl">
+public class <code class="descname">DecodableEnsembleImpl</code> extends <a class="reference internal" href="../../plasticity/impl/PlasticEnsembleImpl.html#ca.nengo.model.plasticity.impl.PlasticEnsembleImpl" title="ca.nengo.model.plasticity.impl.PlasticEnsembleImpl">PlasticEnsembleImpl</a> implements <a class="reference internal" href="../DecodableEnsemble.html#ca.nengo.model.nef.DecodableEnsemble" title="ca.nengo.model.nef.DecodableEnsemble">DecodableEnsemble</a><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default implementation of DecodableEnsemble.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="mydecodedorigins">
+<h3>myDecodedOrigins<a class="headerlink" href="#mydecodedorigins" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.myDecodedOrigins">
+protected <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/Map.html" title="java.util.Map">Map</a>&lt;<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a>, <a class="reference internal" href="DecodedOrigin.html#ca.nengo.model.nef.impl.DecodedOrigin" title="ca.nengo.model.nef.impl.DecodedOrigin">DecodedOrigin</a>&gt; <code class="descname">myDecodedOrigins</code><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.myDecodedOrigins" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="mydecodedterminations">
+<h3>myDecodedTerminations<a class="headerlink" href="#mydecodedterminations" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.myDecodedTerminations">
+protected <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/Map.html" title="java.util.Map">Map</a>&lt;<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a>, <a class="reference internal" href="DecodedTermination.html#ca.nengo.model.nef.impl.DecodedTermination" title="ca.nengo.model.nef.impl.DecodedTermination">DecodedTermination</a>&gt; <code class="descname">myDecodedTerminations</code><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.myDecodedTerminations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>DecodableEnsembleImpl<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.DecodableEnsembleImpl(String, Node[], ApproximatorFactory)">
+public <code class="descname">DecodableEnsembleImpl</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>[]<em> nodes</em>, <a class="reference internal" href="../../../math/ApproximatorFactory.html#ca.nengo.math.ApproximatorFactory" title="ca.nengo.math.ApproximatorFactory">ApproximatorFactory</a><em> factory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.DecodableEnsembleImpl(String, Node[], ApproximatorFactory)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – Name of the Ensemble</li>
+<li><strong>nodes</strong> – Nodes that make up the Ensemble</li>
+<li><strong>factory</strong> – Source of LinearApproximators to use in decoding output</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>StructuralException</strong> – if super constructor fails</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="adddecodedorigin">
+<h3>addDecodedOrigin<a class="headerlink" href="#adddecodedorigin" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.addDecodedOrigin(String, Function[], String, Network, Probe, float, float)">
+public <a class="reference internal" href="../../Origin.html#ca.nengo.model.Origin" title="ca.nengo.model.Origin">Origin</a> <code class="descname">addDecodedOrigin</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../../../math/Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a>[]<em> functions</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> nodeOrigin</em>, <a class="reference internal" href="../../Network.html#ca.nengo.model.Network" title="ca.nengo.model.Network">Network</a><em> environment</em>, <a class="reference internal" href="../../../util/Probe.html#ca.nengo.util.Probe" title="ca.nengo.util.Probe">Probe</a><em> probe</em>, float<em> startTime</em>, float<em> endTime</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.addDecodedOrigin(String, Function[], String, Network, Probe, float, float)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.DecodableEnsemble.addDecodedOrigin(java.lang.String,ca.nengo.math.Function[],java.lang.String,ca.nengo.model.Network,ca.nengo.util.Probe,float,float)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>addDecodedOrigin<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.addDecodedOrigin(String, Function[], String, Network, Probe, Termination, float[][], float)">
+public <a class="reference internal" href="../../Origin.html#ca.nengo.model.Origin" title="ca.nengo.model.Origin">Origin</a> <code class="descname">addDecodedOrigin</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../../../math/Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a>[]<em> functions</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> nodeOrigin</em>, <a class="reference internal" href="../../Network.html#ca.nengo.model.Network" title="ca.nengo.model.Network">Network</a><em> environment</em>, <a class="reference internal" href="../../../util/Probe.html#ca.nengo.util.Probe" title="ca.nengo.util.Probe">Probe</a><em> probe</em>, <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a><em> termination</em>, float[][]<em> evalPoints</em>, float<em> transientTime</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.addDecodedOrigin(String, Function[], String, Network, Probe, Termination, float[][], float)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.DecodableEnsemble.addDecodedOrigin(java.lang.String,ca.nengo.math.Function[],java.lang.String,ca.nengo.model.Network,ca.nengo.util.Probe,ca.nengo.model.Termination,float[][],float)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>addDecodedOrigin<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.addDecodedOrigin(String, Function[], String, Network, Probe, Probe, float, float, float)">
+public <a class="reference internal" href="../../Origin.html#ca.nengo.model.Origin" title="ca.nengo.model.Origin">Origin</a> <code class="descname">addDecodedOrigin</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../../../math/Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a>[]<em> functions</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> nodeOrigin</em>, <a class="reference internal" href="../../Network.html#ca.nengo.model.Network" title="ca.nengo.model.Network">Network</a><em> environment</em>, <a class="reference internal" href="../../../util/Probe.html#ca.nengo.util.Probe" title="ca.nengo.util.Probe">Probe</a><em> probe</em>, <a class="reference internal" href="../../../util/Probe.html#ca.nengo.util.Probe" title="ca.nengo.util.Probe">Probe</a><em> state</em>, float<em> startTime</em>, float<em> endTime</em>, float<em> tau</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.addDecodedOrigin(String, Function[], String, Network, Probe, Probe, float, float, float)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lloyd Elliot’s decodable origin for decoding band-limited noise using a psc optimized decoder</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – Name of decoding</li>
+<li><strong>functions</strong> – 1D Functions of time which represent the meaning of the Ensemble output when it runs in the Network provided (see environment arg)</li>
+<li><strong>nodeOrigin</strong> – The name of the Node-level Origin to decode</li>
+<li><strong>environment</strong> – A Network in which the Ensemble runs (may include inputs, feedback, etc)</li>
+<li><strong>probe</strong> – A Probe that is connected to the named Node-level Origin</li>
+<li><strong>state</strong> – Another probe?</li>
+<li><strong>startTime</strong> – Simulation time at which to start</li>
+<li><strong>endTime</strong> – Simulation time at which to finish</li>
+<li><strong>tau</strong> – Time constant</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="../../SimulationException.html#ca.nengo.model.SimulationException" title="ca.nengo.model.SimulationException"><strong>SimulationException</strong></a> – if environment can’t run</li>
+<li><a class="reference internal" href="../../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – if origin name is taken</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">The added Origin</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="adddecodedtermination">
+<h3>addDecodedTermination<a class="headerlink" href="#adddecodedtermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.addDecodedTermination(String, float[][], float, boolean)">
+public <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addDecodedTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> matrix</em>, float<em> tauPSC</em>, boolean<em> isModulatory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.addDecodedTermination(String, float[][], float, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – Unique name for this Termination (in the scope of this Ensemble)</li>
+<li><strong>matrix</strong> – Transformation matrix which defines a linear map on incoming information, onto the space of vectors that can be represented by this NEFEnsemble. The first dimension is taken as matrix rows, and must have the same length as the Origin that will be connected to this Termination. The second dimension is taken as matrix columns, and must have the same length as the encoders of this NEFEnsemble. TODO: this is transposed?</li>
+<li><strong>tauPSC</strong> – Time constant of post-synaptic current decay (all Terminations have this property but it may have slightly different interpretations depending other properties of the Termination).</li>
+<li><strong>isModulatory</strong> – If true, inputs to this Termination do not drive Nodes in the Ensemble directly but may have modulatory influences (eg related to plasticity). If false, the transformation matrix output dimension must match the dimension of this Ensemble.</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="../../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – if termination name is taken</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Added Termination</p>
+</dd>
+</dl>
+<p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsemble.addDecodedTermination(java.lang.String,float[][],float,boolean)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3>addDecodedTermination<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.addDecodedTermination(String, float[][], float[], float[], float, boolean)">
+public <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addDecodedTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> matrix</em>, float[]<em> tfNumerator</em>, float[]<em> tfDenominator</em>, float<em> passthrough</em>, boolean<em> isModulatory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.addDecodedTermination(String, float[][], float[], float[], float, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – Unique name for this Termination (in the scope of this Ensemble)</li>
+<li><strong>matrix</strong> – Transformation matrix which defines a linear map on incoming information, onto the space of vectors that can be represented by this NEFEnsemble. The first dimension is taken as matrix rows, and must have the same length as the Origin that will be connected to this Termination. The second dimension is taken as matrix columns, and must have the same length as the encoders of this NEFEnsemble. TODO: this is transposed?</li>
+<li><strong>tfNumerator</strong> – Coefficients of transfer function numerator (see CanonicalModel.getRealization(…) for details)</li>
+<li><strong>tfDenominator</strong> – Coefficients of transfer function denominator</li>
+<li><strong>passthrough</strong> – How much should pass through?</li>
+<li><strong>isModulatory</strong> – Is the termination modulatory?</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="../../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – if termination name is taken</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">The added Termination</p>
+</dd>
+</dl>
+<p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsemble.addDecodedTermination(java.lang.String,float[][],float[],float[],float,boolean)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="clone">
+<h3>clone<a class="headerlink" href="#clone" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.clone()">
+public <a class="reference internal" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl" title="ca.nengo.model.nef.impl.DecodableEnsembleImpl">DecodableEnsembleImpl</a> <code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.clone()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="doneorigins">
+<h3>doneOrigins<a class="headerlink" href="#doneorigins" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.doneOrigins()">
+public void <code class="descname">doneOrigins</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.doneOrigins()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../DecodableEnsemble.html#ca.nengo.model.nef.DecodableEnsemble.doneOrigins()" title="ca.nengo.model.nef.DecodableEnsemble.doneOrigins()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.DecodableEnsemble.doneOrigins()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getapproximatorfactory">
+<h3>getApproximatorFactory<a class="headerlink" href="#getapproximatorfactory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.getApproximatorFactory()">
+public <a class="reference internal" href="../../../math/ApproximatorFactory.html#ca.nengo.math.ApproximatorFactory" title="ca.nengo.math.ApproximatorFactory">ApproximatorFactory</a> <code class="descname">getApproximatorFactory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.getApproximatorFactory()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">The source of LinearApproximators for this ensemble (used to find linear decoding vectors).</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getdecodedorigins">
+<h3>getDecodedOrigins<a class="headerlink" href="#getdecodedorigins" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.getDecodedOrigins()">
+public <a class="reference internal" href="DecodedOrigin.html#ca.nengo.model.nef.impl.DecodedOrigin" title="ca.nengo.model.nef.impl.DecodedOrigin">DecodedOrigin</a>[] <code class="descname">getDecodedOrigins</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.getDecodedOrigins()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to get decoded origins to give to GPU.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">All DecodedOrigins</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getdecodedterminations">
+<h3>getDecodedTerminations<a class="headerlink" href="#getdecodedterminations" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.getDecodedTerminations()">
+public <a class="reference internal" href="DecodedTermination.html#ca.nengo.model.nef.impl.DecodedTermination" title="ca.nengo.model.nef.impl.DecodedTermination">DecodedTermination</a>[] <code class="descname">getDecodedTerminations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.getDecodedTerminations()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to get decoded terminations to give to GPU.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">all DecodedTerminations</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="gethistory">
+<h3>getHistory<a class="headerlink" href="#gethistory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.getHistory(String)">
+public <a class="reference internal" href="../../../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a> <code class="descname">getHistory</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> stateName</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.getHistory(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Probeable.getHistory(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getorigin">
+<h3>getOrigin<a class="headerlink" href="#getorigin" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.getOrigin(String)">
+public <a class="reference internal" href="../../Origin.html#ca.nengo.model.Origin" title="ca.nengo.model.Origin">Origin</a> <code class="descname">getOrigin</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.getOrigin(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Node.getOrigin(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getorigins">
+<h3>getOrigins<a class="headerlink" href="#getorigins" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.getOrigins()">
+public <a class="reference internal" href="../../Origin.html#ca.nengo.model.Origin" title="ca.nengo.model.Origin">Origin</a>[] <code class="descname">getOrigins</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.getOrigins()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Ensemble.getOrigins()</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="gettermination">
+<h3>getTermination<a class="headerlink" href="#gettermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.getTermination(String)">
+public <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">getTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.getTermination(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Node.getTermination(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getterminations">
+<h3>getTerminations<a class="headerlink" href="#getterminations" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.getTerminations()">
+public <a class="reference internal" href="../../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a>[] <code class="descname">getTerminations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.getTerminations()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Ensemble.getTerminations()</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="liststates">
+<h3>listStates<a class="headerlink" href="#liststates" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.listStates()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/Properties.html" title="java.util.Properties">Properties</a> <code class="descname">listStates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.listStates()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Probeable.html#ca.nengo.model.Probeable.listStates()" title="ca.nengo.model.Probeable.listStates()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Probeable.listStates()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="removedecodedorigin">
+<h3>removeDecodedOrigin<a class="headerlink" href="#removedecodedorigin" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.removeDecodedOrigin(String)">
+public <a class="reference internal" href="DecodedOrigin.html#ca.nengo.model.nef.impl.DecodedOrigin" title="ca.nengo.model.nef.impl.DecodedOrigin">DecodedOrigin</a> <code class="descname">removeDecodedOrigin</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.removeDecodedOrigin(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsemble.removeDecodedTermination(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="removedecodedtermination">
+<h3>removeDecodedTermination<a class="headerlink" href="#removedecodedtermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.removeDecodedTermination(String)">
+public <a class="reference internal" href="DecodedTermination.html#ca.nengo.model.nef.impl.DecodedTermination" title="ca.nengo.model.nef.impl.DecodedTermination">DecodedTermination</a> <code class="descname">removeDecodedTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.removeDecodedTermination(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsemble.removeDecodedTermination(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="reset">
+<h3>reset<a class="headerlink" href="#reset" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.reset(boolean)">
+public void <code class="descname">reset</code><span class="sig-paren">(</span>boolean<em> randomize</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.reset(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="run">
+<h3>run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.run(float, float)">
+public void <code class="descname">run</code><span class="sig-paren">(</span>float<em> startTime</em>, float<em> endTime</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.run(float, float)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Node.run(float,float)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="settime">
+<h3>setTime<a class="headerlink" href="#settime" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.setTime(float)">
+public void <code class="descname">setTime</code><span class="sig-paren">(</span>float<em> time</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.setTime(float)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows subclasses to set the simulation time, which is used to support Probeable. This is normally set in the run() method. Subclasses that override run() without calling it should set the time.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>time</strong> – Simulation time</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="stopprobing">
+<h3>stopProbing<a class="headerlink" href="#stopprobing" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodableEnsembleImpl.stopProbing(String)">
+public void <code class="descname">stopProbing</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> stateName</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodableEnsembleImpl.stopProbing(String)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="BiasTermination.html" title="previous chapter (use the left arrow)">BiasTermination</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="DecodedOrigin.html" title="next chapter (use the right arrow)">DecodedOrigin</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="DecodedOrigin.html" title="DecodedOrigin"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="BiasTermination.html" title="BiasTermination"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.model.nef.impl</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

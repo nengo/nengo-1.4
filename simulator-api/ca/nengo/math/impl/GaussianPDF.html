@@ -1,0 +1,418 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>GaussianPDF &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="GaussianPDFTest" href="GaussianPDFTest.html" />
+    <link rel="prev" title="FunctionBasisImplTest" href="FunctionBasisImplTest.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="GaussianPDFTest.html" title="GaussianPDFTest"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="FunctionBasisImplTest.html" title="FunctionBasisImplTest"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.math.impl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.math.impl</a></li>
+              
+              <li>GaussianPDF</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="gaussianpdf">
+<h1>GaussianPDF<a class="headerlink" href="#gaussianpdf" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.math.impl.GaussianPDF">
+public class <code class="descname">GaussianPDF</code> implements <a class="reference internal" href="../PDF.html#ca.nengo.math.PDF" title="ca.nengo.math.PDF">PDF</a><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Univariate Gaussian probability density function.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>GaussianPDF<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.math.impl.GaussianPDF.GaussianPDF(float, float)">
+public <code class="descname">GaussianPDF</code><span class="sig-paren">(</span>float<em> mean</em>, float<em> variance</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.GaussianPDF(float, float)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>mean</strong> – Mean of the distribution</li>
+<li><strong>variance</strong> – Variance of the distribution</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>GaussianPDF<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.math.impl.GaussianPDF.GaussianPDF(float, float, float)">
+public <code class="descname">GaussianPDF</code><span class="sig-paren">(</span>float<em> mean</em>, float<em> variance</em>, float<em> peak</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.GaussianPDF(float, float, float)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs a scaled Gaussian with the given peak value.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>mean</strong> – Mean of the distribution</li>
+<li><strong>variance</strong> – Variance of the distribution</li>
+<li><strong>peak</strong> – Maximum value of scaled Gaussian</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>GaussianPDF<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.math.impl.GaussianPDF.GaussianPDF()">
+public <code class="descname">GaussianPDF</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.GaussianPDF()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates with default mean=0 and variance=1</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="clone">
+<h3>clone<a class="headerlink" href="#clone" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.clone()">
+public <a class="reference internal" href="../PDF.html#ca.nengo.math.PDF" title="ca.nengo.math.PDF">PDF</a> <code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.clone()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="dosample">
+<h3>doSample<a class="headerlink" href="#dosample" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.doSample()">
+public static float[] <code class="descname">doSample</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.doSample()" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is publically exposed because normal deviates are often needed, and static access allows the compiler to inline the call, which brings a small performance advantage.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Two random samples from a normal distribution (mean 0; variance 1)</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getdimension">
+<h3>getDimension<a class="headerlink" href="#getdimension" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.getDimension()">
+public int <code class="descname">getDimension</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.getDimension()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">1</dd>
+</dl>
+<p><strong>See also:</strong> <a class="reference internal" href="../Function.html#ca.nengo.math.Function.getDimension()" title="ca.nengo.math.Function.getDimension()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.math.Function.getDimension()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getmean">
+<h3>getMean<a class="headerlink" href="#getmean" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.getMean()">
+public float <code class="descname">getMean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.getMean()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Mean of the distribution</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getpeak">
+<h3>getPeak<a class="headerlink" href="#getpeak" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.getPeak()">
+public float <code class="descname">getPeak</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.getPeak()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Maximum value of scaled Gaussian</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getscalepeakwithvariance">
+<h3>getScalePeakWithVariance<a class="headerlink" href="#getscalepeakwithvariance" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.getScalePeakWithVariance()">
+public boolean <code class="descname">getScalePeakWithVariance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.getScalePeakWithVariance()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">If true, the peak of the distribution scales automatically so that the integral is 1</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getvariance">
+<h3>getVariance<a class="headerlink" href="#getvariance" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.getVariance()">
+public float <code class="descname">getVariance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.getVariance()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Variance of the distribution</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="map">
+<h3>map<a class="headerlink" href="#map" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.map(float[])">
+public float <code class="descname">map</code><span class="sig-paren">(</span>float[]<em> from</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.map(float[])" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../Function.html#ca.nengo.math.Function.map(float[])" title="ca.nengo.math.Function.map(float[])"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.math.Function.map(float[])</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="multimap">
+<h3>multiMap<a class="headerlink" href="#multimap" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.multiMap(float[][])">
+public float[] <code class="descname">multiMap</code><span class="sig-paren">(</span>float[][]<em> from</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.multiMap(float[][])" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../Function.html#ca.nengo.math.Function.multiMap(float[][])" title="ca.nengo.math.Function.multiMap(float[][])"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.math.Function.multiMap(float[][])</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="sample">
+<h3>sample<a class="headerlink" href="#sample" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.sample()">
+public float[] <code class="descname">sample</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.sample()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../PDF.html#ca.nengo.math.PDF.sample()" title="ca.nengo.math.PDF.sample()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.math.PDF.sample()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setmean">
+<h3>setMean<a class="headerlink" href="#setmean" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.setMean(float)">
+public void <code class="descname">setMean</code><span class="sig-paren">(</span>float<em> mean</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.setMean(float)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>mean</strong> – Mean of the distribution</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setpeak">
+<h3>setPeak<a class="headerlink" href="#setpeak" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.setPeak(float)">
+public void <code class="descname">setPeak</code><span class="sig-paren">(</span>float<em> peak</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.setPeak(float)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>peak</strong> – Maximum value of scaled Gaussian</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setscalepeakwithvariance">
+<h3>setScalePeakWithVariance<a class="headerlink" href="#setscalepeakwithvariance" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.setScalePeakWithVariance(boolean)">
+public void <code class="descname">setScalePeakWithVariance</code><span class="sig-paren">(</span>boolean<em> scale</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.setScalePeakWithVariance(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>scale</strong> – If true, the peak of the distribution scales automatically so that the integral is 1</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setvariance">
+<h3>setVariance<a class="headerlink" href="#setvariance" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.math.impl.GaussianPDF.setVariance(float)">
+public void <code class="descname">setVariance</code><span class="sig-paren">(</span>float<em> variance</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.math.impl.GaussianPDF.setVariance(float)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>variance</strong> – Variance of the distribution</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="FunctionBasisImplTest.html" title="previous chapter (use the left arrow)">FunctionBasisImplTest</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="GaussianPDFTest.html" title="next chapter (use the right arrow)">GaussianPDFTest</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="GaussianPDFTest.html" title="GaussianPDFTest"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="FunctionBasisImplTest.html" title="FunctionBasisImplTest"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.math.impl</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

@@ -1,0 +1,625 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>NengoGraphics &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="NengoGraphics.ConfigurationPane" href="NengoGraphics-ConfigurationPane.html" />
+    <link rel="prev" title="GenerateScriptAction" href="GenerateScriptAction.html" />
+<link rel="stylesheet" type="text/css" href="../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="NengoGraphics-ConfigurationPane.html" title="NengoGraphics.ConfigurationPane"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="GenerateScriptAction.html" title="GenerateScriptAction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.ui</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../packages.html">simulator-ui</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.ui</a></li>
+              
+              <li>NengoGraphics</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="nengographics">
+<h1>NengoGraphics<a class="headerlink" href="#nengographics" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.ui.NengoGraphics">
+public class <code class="descname">NengoGraphics</code> extends <a class="reference internal" href="lib/AppFrame.html#ca.nengo.ui.lib.AppFrame" title="ca.nengo.ui.lib.AppFrame">AppFrame</a> implements <a class="reference internal" href="models/NodeContainer.html#ca.nengo.ui.models.NodeContainer" title="ca.nengo.ui.models.NodeContainer">NodeContainer</a><a class="headerlink" href="#ca.nengo.ui.NengoGraphics" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">User</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="about">
+<h3>ABOUT<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.NengoGraphics.ABOUT">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">ABOUT</code><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.ABOUT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of Nengo to be shown in the “About” Dialog box</p>
+</dd></dl>
+
+</div>
+<div class="section" id="app-name">
+<h3>APP_NAME<a class="headerlink" href="#app-name" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.NengoGraphics.APP_NAME">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">APP_NAME</code><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.APP_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>String used in the UI to identify Nengo</p>
+</dd></dl>
+
+</div>
+<div class="section" id="configure-plane-enabled">
+<h3>CONFIGURE_PLANE_ENABLED<a class="headerlink" href="#configure-plane-enabled" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.NengoGraphics.CONFIGURE_PLANE_ENABLED">
+public static final boolean <code class="descname">CONFIGURE_PLANE_ENABLED</code><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.CONFIGURE_PLANE_ENABLED" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the configure panel in the right side? Otherwise it’s a pop-up.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="filechooser">
+<h3>FileChooser<a class="headerlink" href="#filechooser" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.NengoGraphics.FileChooser">
+public static <a class="reference internal" href="util/NeoFileChooser.html#ca.nengo.ui.util.NeoFileChooser" title="ca.nengo.ui.util.NeoFileChooser">NeoFileChooser</a> <code class="descname">FileChooser</code><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.FileChooser" title="Permalink to this definition">¶</a></dt>
+<dd><p>UI delegate object used to show the FileChooser</p>
+</dd></dl>
+
+</div>
+<div class="section" id="neonode-file-extension">
+<h3>NEONODE_FILE_EXTENSION<a class="headerlink" href="#neonode-file-extension" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.NengoGraphics.NEONODE_FILE_EXTENSION">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">NEONODE_FILE_EXTENSION</code><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.NEONODE_FILE_EXTENSION" title="Permalink to this definition">¶</a></dt>
+<dd><p>File extension for Nengo Nodes</p>
+</dd></dl>
+
+</div>
+<div class="section" id="version">
+<h3>VERSION<a class="headerlink" href="#version" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.NengoGraphics.VERSION">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">VERSION</code><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.VERSION" title="Permalink to this definition">¶</a></dt>
+<dd><p>Nengo version number, no real rhyme or reason to it</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>NengoGraphics<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.NengoGraphics.NengoGraphics()">
+public <code class="descname">NengoGraphics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.NengoGraphics()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor; displays a splash screen</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="addnodemodel">
+<h3>addNodeModel<a class="headerlink" href="#addnodemodel" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.addNodeModel(Node)">
+public <a class="reference internal" href="models/UINeoNode.html#ca.nengo.ui.models.UINeoNode" title="ca.nengo.ui.models.UINeoNode">UINeoNode</a> <code class="descname">addNodeModel</code><span class="sig-paren">(</span><a class="reference internal" href="../../../../simulator-api/ca/nengo/model/Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> node</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.addNodeModel(Node)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="models/NodeContainer.html#ca.nengo.ui.models.NodeContainer.addNodeModel(Node)" title="ca.nengo.ui.models.NodeContainer.addNodeModel(Node)"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.ui.models.NodeContainer.addNodeModel(Node)</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>addNodeModel<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.addNodeModel(Node, Double, Double)">
+public <a class="reference internal" href="models/UINeoNode.html#ca.nengo.ui.models.UINeoNode" title="ca.nengo.ui.models.UINeoNode">UINeoNode</a> <code class="descname">addNodeModel</code><span class="sig-paren">(</span><a class="reference internal" href="../../../../simulator-api/ca/nengo/model/Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> node</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/Double.html" title="java.lang.Double">Double</a><em> posX</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/Double.html" title="java.lang.Double">Double</a><em> posY</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.addNodeModel(Node, Double, Double)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="captureindataviewer">
+<h3>captureInDataViewer<a class="headerlink" href="#captureindataviewer" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.captureInDataViewer(Network)">
+public void <code class="descname">captureInDataViewer</code><span class="sig-paren">(</span><a class="reference internal" href="../../../../simulator-api/ca/nengo/model/Network.html#ca.nengo.model.Network" title="ca.nengo.model.Network">Network</a><em> network</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.captureInDataViewer(Network)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>network</strong> – TODO</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="configureobject">
+<h3>configureObject<a class="headerlink" href="#configureobject" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.configureObject(Object)">
+public void <code class="descname">configureObject</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="java.lang.Object">Object</a><em> obj</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.configureObject(Object)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>obj</strong> – Object to configure</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="constructshortcutkeys">
+<h3>constructShortcutKeys<a class="headerlink" href="#constructshortcutkeys" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.constructShortcutKeys(LinkedList)">
+protected void <code class="descname">constructShortcutKeys</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/LinkedList.html" title="java.util.LinkedList">LinkedList</a>&lt;<a class="reference internal" href="lib/misc/ShortcutKey.html#ca.nengo.ui.lib.misc.ShortcutKey" title="ca.nengo.ui.lib.misc.ShortcutKey">ShortcutKey</a>&gt;<em> shortcuts</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.constructShortcutKeys(LinkedList)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="createworld">
+<h3>createWorld<a class="headerlink" href="#createworld" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.createWorld()">
+protected <a class="reference internal" href="lib/world/elastic/ElasticWorld.html#ca.nengo.ui.lib.world.elastic.ElasticWorld" title="ca.nengo.ui.lib.world.elastic.ElasticWorld">ElasticWorld</a> <code class="descname">createWorld</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.createWorld()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="exitappframe">
+<h3>exitAppFrame<a class="headerlink" href="#exitappframe" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.exitAppFrame()">
+public void <code class="descname">exitAppFrame</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.exitAppFrame()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getaboutstring">
+<h3>getAboutString<a class="headerlink" href="#getaboutstring" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.getAboutString()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getAboutString</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.getAboutString()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getappname">
+<h3>getAppName<a class="headerlink" href="#getappname" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.getAppName()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getAppName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.getAppName()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getappwindowtitle">
+<h3>getAppWindowTitle<a class="headerlink" href="#getappwindowtitle" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.getAppWindowTitle()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getAppWindowTitle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.getAppWindowTitle()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getclipboard">
+<h3>getClipboard<a class="headerlink" href="#getclipboard" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.getClipboard()">
+public <a class="reference internal" href="util/NengoClipboard.html#ca.nengo.ui.util.NengoClipboard" title="ca.nengo.ui.util.NengoClipboard">NengoClipboard</a> <code class="descname">getClipboard</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.getClipboard()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">TODO</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getconfigpane">
+<h3>getConfigPane<a class="headerlink" href="#getconfigpane" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.getConfigPane()">
+public <a class="reference internal" href="NengoGraphics-ConfigurationPane.html#ca.nengo.ui.NengoGraphics.ConfigurationPane" title="ca.nengo.ui.NengoGraphics.ConfigurationPane">ConfigurationPane</a> <code class="descname">getConfigPane</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.getConfigPane()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">the configuration (inspector) pane</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getinstance">
+<h3>getInstance<a class="headerlink" href="#getinstance" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.getInstance()">
+public static <a class="reference internal" href="#ca.nengo.ui.NengoGraphics" title="ca.nengo.ui.NengoGraphics">NengoGraphics</a> <code class="descname">getInstance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.getInstance()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">The singleton instance of the NengoGraphics object</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getnengoworld">
+<h3>getNengoWorld<a class="headerlink" href="#getnengoworld" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.getNengoWorld()">
+protected <a class="reference internal" href="world/NengoWorld.html#ca.nengo.ui.world.NengoWorld" title="ca.nengo.ui.world.NengoWorld">NengoWorld</a> <code class="descname">getNengoWorld</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.getNengoWorld()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getnodemodel">
+<h3>getNodeModel<a class="headerlink" href="#getnodemodel" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.getNodeModel(String)">
+public <a class="reference internal" href="../../../../simulator-api/ca/nengo/model/Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a> <code class="descname">getNodeModel</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.getNodeModel(String)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getprogressindicator">
+<h3>getProgressIndicator<a class="headerlink" href="#getprogressindicator" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.getProgressIndicator()">
+public <a class="reference internal" href="util/ProgressIndicator.html#ca.nengo.ui.util.ProgressIndicator" title="ca.nengo.ui.util.ProgressIndicator">ProgressIndicator</a> <code class="descname">getProgressIndicator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.getProgressIndicator()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getpythoninterpreter">
+<h3>getPythonInterpreter<a class="headerlink" href="#getpythoninterpreter" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.getPythonInterpreter()">
+public PythonInterpreter <code class="descname">getPythonInterpreter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.getPythonInterpreter()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">TODO</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getscriptconsole">
+<h3>getScriptConsole<a class="headerlink" href="#getscriptconsole" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.getScriptConsole()">
+public <a class="reference internal" href="script/ScriptConsole.html#ca.nengo.ui.script.ScriptConsole" title="ca.nengo.ui.script.ScriptConsole">ScriptConsole</a> <code class="descname">getScriptConsole</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.getScriptConsole()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">the script console</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="initfilemenu">
+<h3>initFileMenu<a class="headerlink" href="#initfilemenu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.initFileMenu(MenuBuilder)">
+public void <code class="descname">initFileMenu</code><span class="sig-paren">(</span><a class="reference internal" href="lib/util/menus/MenuBuilder.html#ca.nengo.ui.lib.util.menus.MenuBuilder" title="ca.nengo.ui.lib.util.menus.MenuBuilder">MenuBuilder</a><em> fileMenu</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.initFileMenu(MenuBuilder)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="initlayout">
+<h3>initLayout<a class="headerlink" href="#initlayout" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.initLayout(Universe)">
+protected void <code class="descname">initLayout</code><span class="sig-paren">(</span><a class="reference internal" href="lib/world/piccolo/primitives/Universe.html#ca.nengo.ui.lib.world.piccolo.primitives.Universe" title="ca.nengo.ui.lib.world.piccolo.primitives.Universe">Universe</a><em> canvas</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.initLayout(Universe)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="initviewmenu">
+<h3>initViewMenu<a class="headerlink" href="#initviewmenu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.initViewMenu(JMenuBar)">
+public void <code class="descname">initViewMenu</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/javax/swing/JMenuBar.html" title="javax.swing.JMenuBar">JMenuBar</a><em> menuBar</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.initViewMenu(JMenuBar)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="initialize">
+<h3>initialize<a class="headerlink" href="#initialize" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.initialize()">
+protected void <code class="descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.initialize()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="isscriptconsolevisible">
+<h3>isScriptConsoleVisible<a class="headerlink" href="#isscriptconsolevisible" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.isScriptConsoleVisible()">
+public boolean <code class="descname">isScriptConsoleVisible</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.isScriptConsoleVisible()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">is the script console pane visible</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="localtoview">
+<h3>localToView<a class="headerlink" href="#localtoview" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.localToView(Point2D)">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Point2D.html" title="java.awt.geom.Point2D">Point2D</a> <code class="descname">localToView</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Point2D.html" title="java.awt.geom.Point2D">Point2D</a><em> localPoint</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.localToView(Point2D)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="prompttosavemodels">
+<h3>promptToSaveModels<a class="headerlink" href="#prompttosavemodels" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.promptToSaveModels()">
+protected boolean <code class="descname">promptToSaveModels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.promptToSaveModels()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prompt user to save models in NengoGraphics. This is most likely called right before the application is exiting.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="removenodemodel">
+<h3>removeNodeModel<a class="headerlink" href="#removenodemodel" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.removeNodeModel(Node)">
+public boolean <code class="descname">removeNodeModel</code><span class="sig-paren">(</span><a class="reference internal" href="../../../../simulator-api/ca/nengo/model/Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> node</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.removeNodeModel(Node)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>node</strong> – TODO</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">TODO</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setapplication">
+<h3>setApplication<a class="headerlink" href="#setapplication" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.setApplication(Application)">
+public void <code class="descname">setApplication</code><span class="sig-paren">(</span>Application<em> application</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.setApplication(Application)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setdataviewerpanevisible">
+<h3>setDataViewerPaneVisible<a class="headerlink" href="#setdataviewerpanevisible" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.setDataViewerPaneVisible(boolean)">
+public void <code class="descname">setDataViewerPaneVisible</code><span class="sig-paren">(</span>boolean<em> visible</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.setDataViewerPaneVisible(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>visible</strong> – TODO</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setdataviewervisible">
+<h3>setDataViewerVisible<a class="headerlink" href="#setdataviewervisible" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.setDataViewerVisible(boolean)">
+public void <code class="descname">setDataViewerVisible</code><span class="sig-paren">(</span>boolean<em> isVisible</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.setDataViewerVisible(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>isVisible</strong> – TODO</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="settemplatepanel">
+<h3>setTemplatePanel<a class="headerlink" href="#settemplatepanel" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.setTemplatePanel(JPanel)">
+public void <code class="descname">setTemplatePanel</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/javax/swing/JPanel.html" title="javax.swing.JPanel">JPanel</a><em> panel</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.setTemplatePanel(JPanel)" title="Permalink to this definition">¶</a></dt>
+<dd><p>template.py calls this function to provide a template bar</p>
+</dd></dl>
+
+</div>
+<div class="section" id="settoolbar">
+<h3>setToolbar<a class="headerlink" href="#settoolbar" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.setToolbar(JToolBar)">
+public void <code class="descname">setToolbar</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/javax/swing/JToolBar.html" title="javax.swing.JToolBar">JToolBar</a><em> bar</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.setToolbar(JToolBar)" title="Permalink to this definition">¶</a></dt>
+<dd><p>toolbar.py calls this function to provide a toolbar</p>
+</dd></dl>
+
+</div>
+<div class="section" id="toggleconfigpane">
+<h3>toggleConfigPane<a class="headerlink" href="#toggleconfigpane" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.toggleConfigPane()">
+public void <code class="descname">toggleConfigPane</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.toggleConfigPane()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="updateconfigurationpane">
+<h3>updateConfigurationPane<a class="headerlink" href="#updateconfigurationpane" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.updateConfigurationPane()">
+protected void <code class="descname">updateConfigurationPane</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.updateConfigurationPane()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="updateeditmenu">
+<h3>updateEditMenu<a class="headerlink" href="#updateeditmenu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.updateEditMenu()">
+protected void <code class="descname">updateEditMenu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.updateEditMenu()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="updaterunmenu">
+<h3>updateRunMenu<a class="headerlink" href="#updaterunmenu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.updateRunMenu()">
+protected void <code class="descname">updateRunMenu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.updateRunMenu()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="updatescriptconsole">
+<h3>updateScriptConsole<a class="headerlink" href="#updatescriptconsole" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.NengoGraphics.updateScriptConsole()">
+protected void <code class="descname">updateScriptConsole</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.NengoGraphics.updateScriptConsole()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="GenerateScriptAction.html" title="previous chapter (use the left arrow)">GenerateScriptAction</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="NengoGraphics-ConfigurationPane.html" title="next chapter (use the right arrow)">NengoGraphics.ConfigurationPane</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="NengoGraphics-ConfigurationPane.html" title="NengoGraphics.ConfigurationPane"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="GenerateScriptAction.html" title="GenerateScriptAction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.ui</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

@@ -1,0 +1,756 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>simulator-ui &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ca.nengo.ui" href="ca/nengo/ui/package-index.html" />
+    <link rel="prev" title="TimeSeriesImpl" href="../simulator-api/ca/nengo/util/impl/TimeSeriesImpl.html" />
+<link rel="stylesheet" type="text/css" href="../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ca/nengo/ui/package-index.html" title="ca.nengo.ui"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../simulator-api/ca/nengo/util/impl/TimeSeriesImpl.html" title="TimeSeriesImpl"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../scripting/api.html" accesskey="U">API reference</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../scripting/api.html">API reference</a></li>
+              
+              <li>simulator-ui</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="simulator-ui">
+<h1>simulator-ui<a class="headerlink" href="#simulator-ui" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/package-index.html">ca.nengo.ui</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/GenerateScriptAction.html">GenerateScriptAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/NengoGraphics.html">NengoGraphics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/NengoGraphics-ConfigurationPane.html">NengoGraphics.ConfigurationPane</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/NengoGraphics-ToggleScriptPane.html">NengoGraphics.ToggleScriptPane</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/NengoLauncher.html">NengoLauncher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/RunNetworkAction.html">RunNetworkAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/SaveNetworkAction.html">SaveNetworkAction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/actions/package-index.html">ca.nengo.ui.actions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/AddProbeAction.html">AddProbeAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/AddProbesAction.html">AddProbesAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/ClearAllAction.html">ClearAllAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/ConfigureAction.html">ConfigureAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/CopyAction.html">CopyAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/CreateModelAction.html">CreateModelAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/CreateModelAdvancedAction.html">CreateModelAdvancedAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/CutAction.html">CutAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/DefaultModeAction.html">DefaultModeAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/DirectModeAction.html">DirectModeAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/GeneratePDFAction.html">GeneratePDFAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/GeneratePythonScriptAction.html">GeneratePythonScriptAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/OpenNeoFileAction.html">OpenNeoFileAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/PasteAction.html">PasteAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/PlotFunctionAction.html">PlotFunctionAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/PlotFunctionNodeAction.html">PlotFunctionNodeAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/PlotSpikePattern.html">PlotSpikePattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/PlotTimeSeries.html">PlotTimeSeries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/RateModeAction.html">RateModeAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/RemoveModelAction.html">RemoveModelAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/RemoveModelsAction.html">RemoveModelsAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/RemoveObjectAction.html">RemoveObjectAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/RunInteractivePlotsAction.html">RunInteractivePlotsAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/RunSimulatorAction.html">RunSimulatorAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/RunSimulatorAction-RunSimulatorActivity.html">RunSimulatorAction.RunSimulatorActivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/actions/SaveNodeAction.html">SaveNodeAction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/audio/package-index.html">ca.nengo.ui.audio</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/audio/Clicker.html">Clicker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/brainView/package-index.html">ca.nengo.ui.brainView</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/brainView/AbstractBrainImage2D.html">AbstractBrainImage2D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/brainView/BrainData.html">BrainData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/brainView/BrainData-MyCanvas.html">BrainData.MyCanvas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/brainView/BrainFrontImage.html">BrainFrontImage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/brainView/BrainImageWrapper.html">BrainImageWrapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/brainView/BrainImageWrapper-BrainImageMouseHandler.html">BrainImageWrapper.BrainImageMouseHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/brainView/BrainSideImage.html">BrainSideImage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/brainView/BrainTopImage.html">BrainTopImage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/brainView/BrainViewStatusHandler.html">BrainViewStatusHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/brainView/BrainViewer.html">BrainViewer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/configurable/package-index.html">ca.nengo.ui.configurable</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/ConfigException.html">ConfigException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/ConfigResult.html">ConfigResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/ConfigSchema.html">ConfigSchema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/ConfigSchemaImpl.html">ConfigSchemaImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/IConfigurable.html">IConfigurable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/Property.html">Property</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/PropertyInputPanel.html">PropertyInputPanel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/UserDialogs.html">UserDialogs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/UserMultiPropDialog.html">UserMultiPropDialog</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/package-index.html">ca.nengo.ui.configurable.descriptors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/PBoolean.html">PBoolean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/PCouplingMatrix.html">PCouplingMatrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/PFloat.html">PFloat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/PFunction.html">PFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/PFunctionArray.html">PFunctionArray</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/PInt.html">PInt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/PLong.html">PLong</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/PNodeFactory.html">PNodeFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/PString.html">PString</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/PTerminationWeights.html">PTerminationWeights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/RangedConfigParam.html">RangedConfigParam</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/package-index.html">ca.nengo.ui.configurable.descriptors.functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/AbstractFn.html">AbstractFn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/ConfigurableFunction.html">ConfigurableFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/FnAdvanced.html">FnAdvanced</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/FnConstant.html">FnConstant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/FnCustom.html">FnCustom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/FnCustom-PExpression.html">FnCustom.PExpression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/FnReflective.html">FnReflective</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/InterpreterFunctionConfigurer.html">InterpreterFunctionConfigurer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/InterpreterFunctionConfigurer-FunctionDialog.html">InterpreterFunctionConfigurer.FunctionDialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/InterpreterFunctionConfigurer-FunctionDialog-NewFunctionAL.html">InterpreterFunctionConfigurer.FunctionDialog.NewFunctionAL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/InterpreterFunctionConfigurer-FunctionDialog-PreviewFunctionAL.html">InterpreterFunctionConfigurer.FunctionDialog.PreviewFunctionAL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/InterpreterFunctionConfigurer-FunctionDialog-RemoveFunctionAL.html">InterpreterFunctionConfigurer.FunctionDialog.RemoveFunctionAL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/descriptors/functions/JCustomPanel.html">JCustomPanel</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/configurable/managers/package-index.html">ca.nengo.ui.configurable.managers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/managers/ConfigDialog.html">ConfigDialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/managers/ConfigDialogClosedException.html">ConfigDialogClosedException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/managers/ConfigFilesFilter.html">ConfigFilesFilter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/managers/ConfigManager.html">ConfigManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/managers/ConfigManager-ConfigMode.html">ConfigManager.ConfigMode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/managers/ConfigTemplateDialog.html">ConfigTemplateDialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/managers/Configureable.html">Configureable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/managers/FileConfigurer.html">FileConfigurer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/managers/UserConfigurer.html">UserConfigurer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/managers/UserTemplateConfigurer.html">UserTemplateConfigurer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/managers/VerticalLayoutPanel.html">VerticalLayoutPanel</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/configurable/matrixEditor/package-index.html">ca.nengo.ui.configurable.matrixEditor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/matrixEditor/CouplingMatrix.html">CouplingMatrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/matrixEditor/CouplingMatrixImpl.html">CouplingMatrixImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/matrixEditor/MatrixEditor.html">MatrixEditor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/configurable/panels/package-index.html">ca.nengo.ui.configurable.panels</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/BooleanPanel.html">BooleanPanel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/CALIFNeuronFactory.html">CALIFNeuronFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/CLIFNeuronFactory.html">CLIFNeuronFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/CLinearNeuronFactory.html">CLinearNeuronFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/CSigmoidNeuronFactory.html">CSigmoidNeuronFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/CSpikingNeuronFactory.html">CSpikingNeuronFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/ConfigurableFunctionArray.html">ConfigurableFunctionArray</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/ConstructableNodeFactory.html">ConstructableNodeFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/CouplingMatrixPanel.html">CouplingMatrixPanel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/FloatPanel.html">FloatPanel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/FunctionArrayPanel.html">FunctionArrayPanel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/FunctionArrayPanel-EditFunctions.html">FunctionArrayPanel.EditFunctions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/FunctionPanel.html">FunctionPanel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/FunctionPanel-EditAction.html">FunctionPanel.EditAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/FunctionPanel-NewParametersAction.html">FunctionPanel.NewParametersAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/FunctionPanel-PreviewFunctionAction.html">FunctionPanel.PreviewFunctionAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/IntegerPanel.html">IntegerPanel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/LongPanel.html">LongPanel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/NodeFactoryPanel.html">NodeFactoryPanel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/PIndicatorPDF.html">PIndicatorPDF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/PListSelector.html">PListSelector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/PropertyTextPanel.html">PropertyTextPanel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/PropertyTextPanel-TextError.html">PropertyTextPanel.TextError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/PropertyTextPanel-TextFieldFocusListener.html">PropertyTextPanel.TextFieldFocusListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/StringPanel.html">StringPanel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/TerminationWeightsInputPanel.html">TerminationWeightsInputPanel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/configurable/panels/TerminationWeightsInputPanel-EditMatrixAction.html">TerminationWeightsInputPanel.EditMatrixAction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/dataList/package-index.html">ca.nengo.ui.dataList</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/DataListView.html">DataListView</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/DataPath.html">DataPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/DataTreeNode.html">DataTreeNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/ExportAction.html">ExportAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/ExportDelimitedFileAction.html">ExportDelimitedFileAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/ExportFileChooser.html">ExportFileChooser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/ExportMatlabAction.html">ExportMatlabAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/ExtensionFileFilter.html">ExtensionFileFilter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/NaturalOrderComparator.html">NaturalOrderComparator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/NengoTreeNode.html">NengoTreeNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/PlotNodesAction.html">PlotNodesAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/ProbeDataExpandedNode.html">ProbeDataExpandedNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/ProbeDataNode.html">ProbeDataNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/ProbePlotHelper.html">ProbePlotHelper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/RenameAction.html">RenameAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/SimulatorDataModel.html">SimulatorDataModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/SortableMutableTreeNode.html">SortableMutableTreeNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/SpikePatternNode.html">SpikePatternNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/TimeSeriesNode.html">TimeSeriesNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dataList/TimeSeriesNode-ExtractDimenmsions.html">TimeSeriesNode.ExtractDimenmsions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/dev/package-index.html">ca.nengo.ui.dev</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dev/BrainViewExample.html">BrainViewExample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dev/ExampleRunner.html">ExampleRunner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dev/FuzzyLogicExample.html">FuzzyLogicExample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/dev/GFuzzyLogicExample.html">GFuzzyLogicExample</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/package-index.html">ca.nengo.ui.lib</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame.html">AppFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-AboutAction.html">AppFrame.AboutAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-CloseAllPlots.html">AppFrame.CloseAllPlots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-HideDebugMemory.html">AppFrame.HideDebugMemory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-HighQualityAction.html">AppFrame.HighQualityAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-LowQualityAction.html">AppFrame.LowQualityAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-MediumQualityAction.html">AppFrame.MediumQualityAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-MinimizeAllWindows.html">AppFrame.MinimizeAllWindows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-MyWindowListener.html">AppFrame.MyWindowListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-RedoAction.html">AppFrame.RedoAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-ShowDebugMemory.html">AppFrame.ShowDebugMemory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-SwitchToNavigationMode.html">AppFrame.SwitchToNavigationMode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-SwitchToSelectionMode.html">AppFrame.SwitchToSelectionMode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-TipsAction.html">AppFrame.TipsAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-TurnOffFullScreen.html">AppFrame.TurnOffFullScreen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-TurnOffGrid.html">AppFrame.TurnOffGrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-TurnOffTooltips.html">AppFrame.TurnOffTooltips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-TurnOnFullScreen.html">AppFrame.TurnOnFullScreen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-TurnOnGrid.html">AppFrame.TurnOnGrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-TurnOnTooltips.html">AppFrame.TurnOnTooltips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AppFrame-UndoAction.html">AppFrame.UndoAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AuxillarySplitPane.html">AuxillarySplitPane</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AuxillarySplitPane-HideButtonListener.html">AuxillarySplitPane.HideButtonListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/AuxillarySplitPane-Orientation.html">AuxillarySplitPane.Orientation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/UserPreferences.html">UserPreferences</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/Style/package-index.html">ca.nengo.ui.lib.Style</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/Style/NengoStyle.html">NengoStyle</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/actions/package-index.html">ca.nengo.ui.lib.actions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/ActionException.html">ActionException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/DisabledAction.html">DisabledAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/DragAction.html">DragAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/ExitAction.html">ExitAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/LayoutAction.html">LayoutAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/ObjectState.html">ObjectState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/OpenURLAction.html">OpenURLAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/RemoveObjectsAction.html">RemoveObjectsAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/ReversableAction.html">ReversableAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/ReversableActionManager.html">ReversableActionManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/SetSplitPaneVisibleAction.html">SetSplitPaneVisibleAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/StandardAction.html">StandardAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/StandardAction-RunThreadType.html">StandardAction.RunThreadType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/StandardAction-SwingAction.html">StandardAction.SwingAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/UserCancelledException.html">UserCancelledException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/actions/ZoomToFitAction.html">ZoomToFitAction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/exceptions/package-index.html">ca.nengo.ui.lib.exceptions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/exceptions/UIException.html">UIException</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/misc/package-index.html">ca.nengo.ui.lib.misc</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/misc/PointSerializable.html">PointSerializable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/misc/ShortcutKey.html">ShortcutKey</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/misc/WorldLayout.html">WorldLayout</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/objects/activities/package-index.html">ca.nengo.ui.lib.objects.activities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/activities/TrackedAction.html">TrackedAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/activities/TrackedStatusMsg.html">TrackedStatusMsg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/activities/TransientMessage.html">TransientMessage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/activities/TransientStatusMessage.html">TransientStatusMessage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/objects/lines/package-index.html">ca.nengo.ui.lib.objects.lines</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/lines/CreateLineEndHandler.html">CreateLineEndHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/lines/DestroyListener.html">DestroyListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/lines/Edge.html">Edge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/lines/ILineTermination.html">ILineTermination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/lines/LineConnector.html">LineConnector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/lines/LineOriginIcon.html">LineOriginIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/lines/LineTerminationIcon.html">LineTerminationIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/lines/LineWell.html">LineWell</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/objects/models/package-index.html">ca.nengo.ui.lib.objects.models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/models/ModelObject.html">ModelObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/objects/models/ModelObject-ModelListener.html">ModelObject.ModelListener</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/util/package-index.html">ca.nengo.ui.lib.util</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/util/ElasticLayout.html">ElasticLayout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/util/ElasticLayout-LengthFunction.html">ElasticLayout.LengthFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/util/ElasticLayout-SpringDimensionChecker.html">ElasticLayout.SpringDimensionChecker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/util/ElasticLayout-SpringEdgeData.html">ElasticLayout.SpringEdgeData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/util/ElasticLayout-SpringVertexData.html">ElasticLayout.SpringVertexData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/util/ElasticLayout-UnitLengthFunction.html">ElasticLayout.UnitLengthFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/util/UIEnvironment.html">UIEnvironment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/util/UserMessages.html">UserMessages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/util/UserMessages-DialogException.html">UserMessages.DialogException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/util/Util.html">Util</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/util/menus/package-index.html">ca.nengo.ui.lib.util.menus</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/util/menus/AbstractMenuBuilder.html">AbstractMenuBuilder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/util/menus/MenuBuilder.html">MenuBuilder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/util/menus/PopupMenuBuilder.html">PopupMenuBuilder</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/world/package-index.html">ca.nengo.ui.lib.world</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/Destroyable.html">Destroyable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/Droppable.html">Droppable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/DroppableX.html">DroppableX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/Interactable.html">Interactable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/NamedObject.html">NamedObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/ObjectSet.html">ObjectSet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/PaintContext.html">PaintContext</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/Searchable.html">Searchable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/Searchable-SearchValuePair.html">Searchable.SearchValuePair</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/World.html">World</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/WorldLayer.html">WorldLayer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/WorldObject.html">WorldObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/WorldObject-ChildListener.html">WorldObject.ChildListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/WorldObject-Listener.html">WorldObject.Listener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/WorldObject-Property.html">WorldObject.Property</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/WorldSky.html">WorldSky</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/world/activities/package-index.html">ca.nengo.ui.lib.world.activities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/activities/Fader.html">Fader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/activities/Pulsator.html">Pulsator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/package-index.html">ca.nengo.ui.lib.world.elastic</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/Anchor.html">Anchor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/ElasticEdge.html">ElasticEdge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/ElasticGround.html">ElasticGround</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/ElasticGround-UpdateGraphResult.html">ElasticGround.UpdateGraphResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/ElasticLayoutRunner.html">ElasticLayoutRunner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/ElasticLayoutRunner-ElasticLengthFunction.html">ElasticLayoutRunner.ElasticLengthFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/ElasticObject.html">ElasticObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/ElasticVertex.html">ElasticVertex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/ElasticWorld.html">ElasticWorld</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/ElasticWorld-DoJungLayout.html">ElasticWorld.DoJungLayout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/ElasticWorld-JungLayoutAction.html">ElasticWorld.JungLayoutAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/ElasticWorld-SetElasticLayoutAction.html">ElasticWorld.SetElasticLayoutAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/FeedForwardLayout.html">FeedForwardLayout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/SetLayoutBoundsAction.html">SetLayoutBoundsAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/StretchedFeedForwardLayout.html">StretchedFeedForwardLayout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/elastic/StretchedFeedForwardLayout-VoidVertex.html">StretchedFeedForwardLayout.VoidVertex</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/package-index.html">ca.nengo.ui.lib.world.handlers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/AbstractPickHandler.html">AbstractPickHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/AbstractPickHandler-Timer.html">AbstractPickHandler.Timer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/AbstractStatusHandler.html">AbstractStatusHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/EventConsumer.html">EventConsumer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/KeyboardFocusHandler.html">KeyboardFocusHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/KeyboardHandler.html">KeyboardHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/MouseHandler.html">MouseHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/PanEventHandler.html">PanEventHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/ScrollZoomHandler.html">ScrollZoomHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/SelectionHandler.html">SelectionHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/SelectionHandler-BoundsFilter.html">SelectionHandler.BoundsFilter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/SelectionHandler-SelectionListener.html">SelectionHandler.SelectionListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/TooltipPickHandler.html">TooltipPickHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/handlers/TopWorldStatusHandler.html">TopWorldStatusHandler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/package-index.html">ca.nengo.ui.lib.world.piccolo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/GroundNode.html">GroundNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/PiccoloChangeListener.html">PiccoloChangeListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/WorldGroundImpl.html">WorldGroundImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/WorldGroundImpl-ChildFilter.html">WorldGroundImpl.ChildFilter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/WorldImpl.html">WorldImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/WorldImpl-CloseAllWindows.html">WorldImpl.CloseAllWindows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/WorldImpl-MinimizeAllWindows.html">WorldImpl.MinimizeAllWindows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/WorldLayerImpl.html">WorldLayerImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/WorldObjectImpl.html">WorldObjectImpl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/WorldObjectImpl-ListenerAdapter.html">WorldObjectImpl.ListenerAdapter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/WorldSkyImpl.html">WorldSkyImpl</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/package-index.html">ca.nengo.ui.lib.world.piccolo.objects</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/AbstractButton.html">AbstractButton</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/AbstractButton-ButtonState.html">AbstractButton.ButtonState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/Border.html">Border</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/BoundsHandle.html">BoundsHandle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/Button.html">Button</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/ButtonStateHandler.html">ButtonStateHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/HandCursorHandler.html">HandCursorHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/MenuBar.html">MenuBar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/RectangleEdgeNode.html">RectangleEdgeNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/RectangularEdge.html">RectangularEdge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/SelectionBorder.html">SelectionBorder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/TextButton.html">TextButton</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/TooltipWrapper.html">TooltipWrapper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/Window.html">Window</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/Window-MenuBarHandler.html">Window.MenuBarHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/Window-WindowState.html">Window.WindowState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/Wrapper.html">Wrapper</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/icons/package-index.html">ca.nengo.ui.lib.world.piccolo.objects.icons</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/icons/ArrowIcon.html">ArrowIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/icons/CloseIcon.html">CloseIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/icons/LayoutIconBase.html">LayoutIconBase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/icons/LoadIcon.html">LoadIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/icons/MaximizeIcon.html">MaximizeIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/icons/MinimizeIcon.html">MinimizeIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/icons/RestoreIcon.html">RestoreIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/icons/SaveIcon.html">SaveIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/icons/WindowIconBase.html">WindowIconBase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/objects/icons/ZoomIcon.html">ZoomIcon</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/package-index.html">ca.nengo.ui.lib.world.piccolo.primitives</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/CameraPropertyChangeListener.html">CameraPropertyChangeListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/Image.html">Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/PXCamera.html">PXCamera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/PXEdge.html">PXEdge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/PXEdge-EdgeShape.html">PXEdge.EdgeShape</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/PXEdge-EdgeState.html">PXEdge.EdgeState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/PXGrid.html">PXGrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/PXImage.html">PXImage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/PXLayer.html">PXLayer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/PXNode.html">PXNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/PXNode-TransformChangeListener.html">PXNode.TransformChangeListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/PXPath.html">PXPath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/PXText.html">PXText</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/Path.html">Path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/PiccoloNodeInWorld.html">PiccoloNodeInWorld</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/PointerTriangle.html">PointerTriangle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/Text.html">Text</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/Universe.html">Universe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/lib/world/piccolo/primitives/Universe-TextLayoutListener.html">Universe.TextLayoutListener</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/models/package-index.html">ca.nengo.ui.models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/ModelsContextMenu.html">ModelsContextMenu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/NodeContainer.html">NodeContainer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/NodeContainer-ContainerException.html">NodeContainer.ContainerException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/UIModels.html">UIModels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/UINeoModel.html">UINeoModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/UINeoNode.html">UINeoNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/UINeoNode-HideAllOandTAction.html">UINeoNode.HideAllOandTAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/UINeoNode-RenameNodeAction.html">UINeoNode.RenameNodeAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/UINeoNode-ShowAllOandTAction.html">UINeoNode.ShowAllOandTAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/UINeoNode-ShowOriginAction.html">UINeoNode.ShowOriginAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/UINeoNode-ShowTerminationAction.html">UINeoNode.ShowTerminationAction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/models/constructors/package-index.html">ca.nengo.ui.models.constructors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/AbstractConstructable.html">AbstractConstructable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/CDecodedOrigin.html">CDecodedOrigin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/CDecodedTermination.html">CDecodedTermination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/CFunctionInput.html">CFunctionInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/CNEFEnsemble.html">CNEFEnsemble</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/CNetwork.html">CNetwork</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/ConstructableNode.html">ConstructableNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/ModelFactory.html">ModelFactory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/OriginInputPanel.html">OriginInputPanel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/OriginSelector.html">OriginSelector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/PApproximator.html">PApproximator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/PEncodingDistribution.html">PEncodingDistribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/PEncodingDistribution-Slider.html">PEncodingDistribution.Slider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/PSign.html">PSign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/ProjectionConstructor.html">ProjectionConstructor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/Sign.html">Sign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/constructors/SignItem.html">SignItem</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/models/icons/package-index.html">ca.nengo.ui.models.icons</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/icons/EnsembleIcon.html">EnsembleIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/icons/FunctionInputIcon.html">FunctionInputIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/icons/IconImage.html">IconImage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/icons/IconImageNode.html">IconImageNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/icons/ModelIcon.html">ModelIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/icons/NetworkIcon.html">NetworkIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/icons/NodeContainerIcon.html">NodeContainerIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/icons/NodeIcon.html">NodeIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/icons/ProbeIcon.html">ProbeIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/icons/Triangle.html">Triangle</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/models/nodes/package-index.html">ca.nengo.ui.models.nodes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/UIEnsemble.html">UIEnsemble</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/UIEnsemble-StartCollectSpikes.html">UIEnsemble.StartCollectSpikes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/UIEnsemble-StopCollectSpikes.html">UIEnsemble.StopCollectSpikes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/UIFunctionInput.html">UIFunctionInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/UIGenericNode.html">UIGenericNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/UINEFEnsemble.html">UINEFEnsemble</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/UINEFEnsemble-AddDecodedOriginAction.html">UINEFEnsemble.AddDecodedOriginAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/UINEFEnsemble-AddDecodedTerminationAction.html">UINEFEnsemble.AddDecodedTerminationAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/UINEFEnsemble-PlotDecodedOriginDistortion.html">UINEFEnsemble.PlotDecodedOriginDistortion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/UINEFEnsemble-PlotDecodedOriginMSE.html">UINEFEnsemble.PlotDecodedOriginMSE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/UINetwork.html">UINetwork</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/UINeuron.html">UINeuron</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/UINodeViewable.html">UINodeViewable</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/package-index.html">ca.nengo.ui.models.nodes.widgets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/ExposedIcon.html">ExposedIcon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UIDecodedOrigin.html">UIDecodedOrigin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UIDecodedTermination.html">UIDecodedTermination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UIGenericOrigin.html">UIGenericOrigin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UIGenericTermination.html">UIGenericTermination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UINetworkTermination.html">UINetworkTermination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UIOrigin.html">UIOrigin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UIProbe.html">UIProbe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UIProjection.html">UIProjection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UIProjectionWell.html">UIProjectionWell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UIProjectionWell-RemoveProjectionListener.html">UIProjectionWell.RemoveProjectionListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UISpikeProbe.html">UISpikeProbe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UIStateProbe.html">UIStateProbe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UIStateProbe-ExportToMatlabAction.html">UIStateProbe.ExportToMatlabAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UITermination.html">UITermination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/UITermination-DisconnectAction.html">UITermination.DisconnectAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/Widget.html">Widget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/Widget-ExposeAction.html">Widget.ExposeAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/Widget-HideWidgetAction.html">Widget.HideWidgetAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/Widget-ShowWidgetAction.html">Widget.ShowWidgetAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/nodes/widgets/Widget-UnExposeAction.html">Widget.UnExposeAction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/models/tooltips/package-index.html">ca.nengo.ui.models.tooltips</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/tooltips/ITooltipPart.html">ITooltipPart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/tooltips/Tooltip.html">Tooltip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/tooltips/TooltipBuilder.html">TooltipBuilder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/tooltips/TooltipProperty.html">TooltipProperty</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/tooltips/TooltipTitle.html">TooltipTitle</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/models/viewers/package-index.html">ca.nengo.ui.models.viewers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/viewers/EnsembleViewer.html">EnsembleViewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/viewers/NetworkViewer.html">NetworkViewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/viewers/NetworkViewer-RestoreLayout.html">NetworkViewer.RestoreLayout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/viewers/NetworkViewer-SaveLayout.html">NetworkViewer.SaveLayout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/viewers/NetworkViewer-SetOTVisiblityAction.html">NetworkViewer.SetOTVisiblityAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/viewers/NodeLayout.html">NodeLayout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/viewers/NodeViewer.html">NodeViewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/viewers/NodeViewer-SortMode.html">NodeViewer.SortMode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/viewers/NodeViewer-SortNodesAction.html">NodeViewer.SortNodesAction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/viewers/NodeViewer-ZoomToFitActivity.html">NodeViewer.ZoomToFitActivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/viewers/NodeViewerStatus.html">NodeViewerStatus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/viewers/PointSerializable.html">PointSerializable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/models/viewers/ShowHideHandler.html">ShowHideHandler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/script/package-index.html">ca.nengo.ui.script</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/script/CallChainCompletor.html">CallChainCompletor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/script/CommandCompletor.html">CommandCompletor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/script/HistoryCompletor.html">HistoryCompletor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/script/ScriptConsole.html">ScriptConsole</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/test/package-index.html">ca.nengo.ui.test</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/test/CopyAndPasteTest.html">CopyAndPasteTest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/test/DataViewerTest.html">DataViewerTest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/test/DataViewerTest2.html">DataViewerTest2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/test/IntegratorExample.html">IntegratorExample</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/test/NetworkViewerMemoryTest.html">NetworkViewerMemoryTest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/test/NetworkViewerTest.html">NetworkViewerTest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/test/TestUtil.html">TestUtil</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/util/package-index.html">ca.nengo.ui.util</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/util/AllNeoFiles.html">AllNeoFiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/util/BreakTraceFunction.html">BreakTraceFunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/util/DialogPlotter.html">DialogPlotter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/util/FileExtensionFilter.html">FileExtensionFilter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/util/NengoClipboard.html">NengoClipboard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/util/NengoClipboard-ClipboardListener.html">NengoClipboard.ClipboardListener</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/util/NengoConfigManager.html">NengoConfigManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/util/NengoConfigManager-UserProperties.html">NengoConfigManager.UserProperties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/util/NeoFileChooser.html">NeoFileChooser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/util/ProgressIndicator.html">ProgressIndicator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/util/ScriptInterruptException.html">ScriptInterruptException</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/util/ScriptWorldWrapper.html">ScriptWorldWrapper</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ca/nengo/ui/world/package-index.html">ca.nengo.ui.world</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ca/nengo/ui/world/NengoWorld.html">NengoWorld</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="../simulator-api/ca/nengo/util/impl/TimeSeriesImpl.html" title="previous chapter (use the left arrow)">TimeSeriesImpl</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="ca/nengo/ui/package-index.html" title="next chapter (use the right arrow)">ca.nengo.ui</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ca/nengo/ui/package-index.html" title="ca.nengo.ui"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../simulator-api/ca/nengo/util/impl/TimeSeriesImpl.html" title="TimeSeriesImpl"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../scripting/api.html" >API reference</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

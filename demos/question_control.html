@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>A controlled question answering network &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Learning a communication channel" href="learn_communicate.html" />
+    <link rel="prev" title="A question answering network with memory" href="question_memory.html" />
+<link rel="stylesheet" type="text/css" href="../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="learn_communicate.html" title="Learning a communication channel"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="question_memory.html" title="A question answering network with memory"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Demos</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Demos</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#introductory-demos">Introductory demos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#simple-transformations">Simple transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#dynamics">Dynamics</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#basal-ganglia-based-simulations">Basal Ganglia based simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#learning">Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../scripting/index.html">Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Demos</a></li>
+              
+              <li>A controlled question answering network</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="a-controlled-question-answering-network">
+<h1>A controlled question answering network<a class="headerlink" href="#a-controlled-question-answering-network" title="Permalink to this headline">¶</a></h1>
+<p><strong>Purpose</strong>:
+This demo performs question answering
+based on storing items in a working memory,
+while under control of a basal ganglia.</p>
+<p><strong>Comments</strong>:
+This example is very much like
+the question answering with memory demo
+(it would be good to read that first).
+However, both the information to bind
+and the questions to answer
+come in through the same visual channel.
+The basal ganglia decides
+what to do with the information in the visual channel
+based on its content
+(i.e., whether it is a statement or a question).</p>
+<p><strong>Usage</strong>:
+When you run the network,
+it will start by binding “RED” and “CIRCLE”
+and then binding “BLUE” and “SQUARE”
+so the memory essentially has “RED*CIRCLE + BLUE*SQUARE”.
+It does this because it is told that
+“RED*CIRCLE” is a STATEMENT
+(i.e., “RED*CIRCLE+STATEMENT” in the code), as is BLUE*SQUARE.
+Then it is presented with something like “QUESTION+RED”
+(i.e., “What is red?”).
+The basal ganglia then reroutes that input
+to be compared to what is in working memory
+and the result shows up in the motor channel.</p>
+<a class="reference internal image-reference" href="../_images/question_control.png"><img alt="../_images/question_control.png" src="../_images/question_control.png" style="width: 100%;" /></a>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">import</span> <span class="nn">hrr</span>
+<span class="kn">import</span> <span class="nn">nef</span>
+<span class="kn">import</span> <span class="nn">nef.convolution</span>
+<span class="kn">import</span> <span class="nn">nps</span>
+
+<span class="n">D</span> <span class="o">=</span> <span class="mi">16</span>  <span class="c1"># number of dimensions for representations</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># number of neurons per dimension</span>
+
+<span class="c1"># semantic pointers do not work well with small numbers of dimensions.</span>
+<span class="c1"># To keep this example model small enough to be easily run, we have lowered</span>
+<span class="c1"># the number of dimensions (D) to 16 and chosen a random number seed for</span>
+<span class="c1"># which this model works well.</span>
+
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">17</span>
+<span class="n">net</span> <span class="o">=</span> <span class="n">nef</span><span class="o">.</span><span class="n">Network</span><span class="p">(</span><span class="s1">&#39;Question answering with control&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+<span class="c1"># Make a simple node to generate interesting input for the network</span>
+<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+<span class="n">vocab</span> <span class="o">=</span> <span class="n">hrr</span><span class="o">.</span><span class="n">Vocabulary</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">max_similarity</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Input</span><span class="p">(</span><span class="n">nef</span><span class="o">.</span><span class="n">SimpleNode</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zero</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">D</span>
+        <span class="n">nef</span><span class="o">.</span><span class="n">SimpleNode</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">RED_CIRCLE</span> <span class="o">=</span> <span class="n">vocab</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">&#39;STATEMENT+RED*CIRCLE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">BLUE_SQUARE</span> <span class="o">=</span> <span class="n">vocab</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">&#39;STATEMENT+BLUE*SQUARE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">RED</span> <span class="o">=</span> <span class="n">vocab</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">&#39;QUESTION+RED&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SQUARE</span> <span class="o">=</span> <span class="n">vocab</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">&#39;QUESTION+SQUARE&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">v</span>
+
+    <span class="k">def</span> <span class="nf">origin_x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="mf">0.1</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">&lt;</span> <span class="mf">0.3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RED_CIRCLE</span>
+        <span class="k">elif</span> <span class="mf">0.35</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">BLUE_SQUARE</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="ow">and</span> <span class="mf">0.2</span> <span class="o">&lt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">%</span> <span class="mf">0.6</span> <span class="o">&lt;</span> <span class="mf">0.4</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RED</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="ow">and</span> <span class="mf">0.4</span> <span class="o">&lt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">%</span> <span class="mf">0.6</span> <span class="o">&lt;</span> <span class="mf">0.6</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">SQUARE</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero</span>
+
+
+<span class="c1"># Add the input to the network</span>
+<span class="n">inv</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="s1">&#39;inv&#39;</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">inv</span><span class="p">)</span>
+
+<span class="c1"># This is an older way of implementing SPA using the nps code directly</span>
+<span class="n">prods</span> <span class="o">=</span> <span class="n">nps</span><span class="o">.</span><span class="n">ProductionSet</span><span class="p">()</span>
+<span class="n">prods</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">visual</span><span class="o">=</span><span class="s1">&#39;STATEMENT&#39;</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">visual_to_wm</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">prods</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">visual</span><span class="o">=</span><span class="s1">&#39;QUESTION&#39;</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">wm_deconv_visual_to_motor</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+<span class="n">subdim</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">nps</span><span class="o">.</span><span class="n">NPS</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">prods</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span>
+                <span class="n">direct_convolution</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">direct_buffer</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;visual&#39;</span><span class="p">],</span>
+                <span class="n">neurons_buffer</span><span class="o">=</span><span class="n">N</span> <span class="o">/</span> <span class="n">subdim</span><span class="p">,</span>
+                <span class="n">subdimensions</span><span class="o">=</span><span class="n">subdim</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_buffer_feedback</span><span class="p">(</span><span class="n">wm</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pstc</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">inv</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">),</span> <span class="s1">&#39;buffer_visual&#39;</span><span class="p">)</span>
+
+<span class="c1"># Rename objects for display purposes</span>
+<span class="n">net</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;prod&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;thalamus&#39;</span>
+<span class="n">net</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;buffer_visual&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;visual&#39;</span>
+<span class="n">net</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;buffer_wm&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;memory&#39;</span>
+<span class="n">net</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;buffer_motor&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;motor&#39;</span>
+<span class="n">net</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;channel_visual_to_wm&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;channel&#39;</span>
+<span class="n">net</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;wm_deconv_visual_to_motor&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+<span class="n">net</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;gate_visual_wm&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;gate1&#39;</span>
+<span class="n">net</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="s1">&#39;gate_wm_visual_motor&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;gate2&#39;</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">add_to_nengo</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="question_memory.html" title="previous chapter (use the left arrow)">A question answering network with memory</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="learn_communicate.html" title="next chapter (use the right arrow)">Learning a communication channel</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="learn_communicate.html" title="Learning a communication channel"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="question_memory.html" title="A question answering network with memory"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Demos</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

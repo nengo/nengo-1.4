@@ -1,0 +1,520 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>5. Cognitive models &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Demos" href="../demos/index.html" />
+    <link rel="prev" title="4. Feedback and dynamics" href="4-dynamics.html" />
+<link rel="stylesheet" type="text/css" href="../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../demos/index.html" title="Demos"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="4-dynamics.html" title="4. Feedback and dynamics"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Written tutorials</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Written tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="1-representation.html">1. One-dimensional representation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2-linear-transformation.html">2. Linear transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3-nonlinear-transformation.html">3. Nonlinear transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4-dynamics.html">4. Feedback and dynamics</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">5. Cognitive models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/index.html">Demos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scripting/index.html">Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Written tutorials</a></li>
+              
+              <li>5. Cognitive models</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="cognitive-models">
+<h1>5. Cognitive models<a class="headerlink" href="#cognitive-models" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="larger-systems">
+<h2>Larger systems<a class="headerlink" href="#larger-systems" title="Permalink to this headline">¶</a></h2>
+<p>So far, we’ve seen how to implement various basic components:</p>
+<ul class="simple">
+<li>representations</li>
+<li>linear transformation</li>
+<li>nonlinear transformation</li>
+<li>feedback</li>
+</ul>
+<p>It is possible to use these components
+to build full cognitive models using spiking neurons
+(see <a class="reference external" href="http://nengo.ca/build-a-brain">http://nengo.ca/build-a-brain</a>)
+that are:</p>
+<ul class="simple">
+<li>constrained by the actual properties
+of real neurons in real brains
+(numbers of neurons, connectivity, neurotransmitters)</li>
+<li>able to produce behavioural predictions
+in terms of timing, accuracy, lesion effects, drug treatments,
+and more.</li>
+</ul>
+<p>Some simple examples of this are available in the demo directory.</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">demo/armcontrol.py</span></code> takes an existing
+engineering control model for what angles
+to move joints to to place the hand at a particular position.</li>
+</ul>
+<img alt="../_images/p5-101.png" src="../_images/p5-101.png" />
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">demo/vehicle.py</span></code> connects range sensors
+to opposite motors on a wheeled robot.</li>
+</ul>
+<img alt="../_images/p5-102.png" src="../_images/p5-102.png" />
+</div>
+<div class="section" id="binding-semantic-pointers-sps">
+<h2>Binding Semantic Pointers (SPs)<a class="headerlink" href="#binding-semantic-pointers-sps" title="Permalink to this headline">¶</a></h2>
+<p>We want to manipulate sophisticated representational states;
+this is the purpose of describing
+the Semantic Pointer Architecture
+(<a class="reference external" href="http://nengo.ca/build-a-brain">SPA</a>)</p>
+<p>The main operation to manipulate representations
+in the SPA is circular convolution (for binding).
+Let’s explore a binding circuit for semantic pointers.</p>
+<ul>
+<li><p class="first">Open the <code class="docutils literal"><span class="pre">demo/convolve.py</span></code> demo.</p>
+</li>
+<li><p class="first">Input: Two semantic pointers (high-dimensional vectors)</p>
+</li>
+<li><p class="first">Output: One semantic pointer (binding the original two)</p>
+</li>
+<li><p class="first">Implementation: element-wise multiplication of DFT
+(i.e., circular convolution)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There is a drag and drop template for this operation.</p>
+</div>
+</li>
+</ul>
+<img alt="../_images/p5-201.png" src="../_images/p5-201.png" />
+<p>To deal with high-dimensional vectors,
+we don’t want to have to set each individual value for each vector.
+That would require 100 controls
+to configure a single 100-dimensional vector.</p>
+<p>Nengo Interactive Plots has
+a specialized “semantic pointer” graph
+for these high-dimensional cases.</p>
+<p>Instead of showing the value of each element in the vector
+(as with a normal graph),
+it shows the similarity between the currently represented vector
+and all the known vectors.
+“How much like CAT is this? How much like DOG?
+How much like RED? How much like TRIANGLE?”</p>
+<p>You can configure which comparisons are shown using the right-click menu.
+You can also use it to _set_ the contents of a neural group
+by right-clicking and choosing “set value”.
+This will force the neurons to represent the given semantic pointer.
+You can go back to normal behaviour by selecting “release value”.</p>
+<ul class="simple">
+<li>Use the right-click menu to set the input values to “a” and “b”.
+The output should be similar to “a * b”.</li>
+</ul>
+<p>This shows that the network is capable
+of computing the circular convolution operation,
+which binds two semantic pointers to create a third one.</p>
+<ul class="simple">
+<li>Use the right-click menu to set the input values to “a” and “~a * b”.
+The output should be similar to “b”.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">‘~’ is an approximate inverse operator.</p>
+</div>
+<p>This shows that convolution can be used
+to transform representations via binding and unbinding,
+since “a * (~a * b)” is approximately “b”.</p>
+</div>
+<div class="section" id="control-and-action-selection-basal-ganglia">
+<h2>Control and action selection: Basal Ganglia<a class="headerlink" href="#control-and-action-selection-basal-ganglia" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Much of what follows is a summary of Chapter 5
+of “How to Build a Brain,”
+and can be constructed using the drag and drop templates
+in Nengo (specifically, Basal Ganglia, BG Rule,
+Thalamus, Binding, Gate, and Integrator).
+Also see <a class="reference internal" href="../demos/index.html#bg-demos"><span class="std std-ref">these demos</span></a>.</p>
+</div>
+<p>Pretty much every cognitive model
+has an action selection component with these features:</p>
+<ul class="simple">
+<li>Out of many possible things you could do right now, pick one.</li>
+<li>Usually mapped on to the basal ganglia.</li>
+<li>Some sort of winner-take-all calculation based on
+how suitable the various possible actions are to the current situation.</li>
+</ul>
+<p>First, let’s introduce the problem of action selection.</p>
+<ul>
+<li><p class="first">Input: A vector representing how good each action is
+(for example, [0.2, 0.3, 0.9, 0.1, 0.7])</p>
+</li>
+<li><p class="first">Output: Which action to take ([0, 0, 1, 0, 0])</p>
+<p>In fact, the output from the basal ganglia is inhibitory,
+so the output is more like [1, 1, 0, 1, 1]</p>
+</li>
+</ul>
+<p>We could try doing it as a direct function. However:</p>
+<ul class="simple">
+<li>The winner-take-all function is highly nonlinear.</li>
+<li>We are likely to get low accuracy.</li>
+</ul>
+<p>We could do it by setting up inhibitory interconnections.</p>
+<ul class="simple">
+<li>Looks similar to the integrator,
+but any value above zero would also act to decrease the others.</li>
+<li>Often used in non-spiking neural networks
+(e.g., PDP++) to do k-winner-take-all.</li>
+</ul>
+<p>However, you have to wait for the network to settle,
+so it can be rather slow.</p>
+<p>In Nengo, we use the Basal Ganglia model proposed in
+Gurney, Prescott, &amp; Redgrave (2001).
+The drag-and-drop BG templates use this model.</p>
+<img alt="../_images/p5-103.png" src="../_images/p5-103.png" />
+<p>Each component computes the following function:</p>
+<img alt="../_images/p5-104.png" src="../_images/p5-104.png" />
+<p>Their model uses unrealistic rate neurons
+with that function for an output.
+We can use populations of spiking neurons and compute that function.
+We can also use correct timing values for the neurotransmitters involved.</p>
+<ul class="simple">
+<li>Open the <code class="docutils literal"><span class="pre">demo/basalganglia.py</span></code> demo.</li>
+<li>Adjust the input controls to change
+the five utility values being selected between.</li>
+<li>The graph shows the output from the basal ganglia
+(each line shows a different action).</li>
+<li>The selected action is the one set to zero.</li>
+</ul>
+<img alt="../_images/p5-105.png" src="../_images/p5-105.png" />
+<p>Comparisons to neural data:</p>
+<ul class="simple">
+<li>Ryan &amp; Clark, 1991 stimulated regions
+in medial orbitofrontal cortex,
+measured from GPi,
+and saw how long it takes for a response to occur.</li>
+</ul>
+<img alt="../_images/p5-106.png" src="../_images/p5-106.png" />
+<p>To replicate these results:</p>
+<ul>
+<li><p class="first">Set the inputs to [0, 0, 0.6, 0, 0].</p>
+</li>
+<li><p class="first">Run simulation for a bit, then pause it.</p>
+</li>
+<li><p class="first">Set the inputs to [0, 0, 0.6, 1, 0].</p>
+</li>
+<li><p class="first">Continue the simulation.</p>
+</li>
+<li><p class="first">Measure how long it takes for the neurons
+corresponding to the fourth action to stop firing.</p>
+<img alt="../_images/p5-107.png" src="../_images/p5-107.png" />
+</li>
+<li><p class="first">In rats: 14 – 17 ms.
+In our model: 14 ms
+(or more if the injected current isn’t extremely large).</p>
+<img alt="../_images/p5-108.png" src="../_images/p5-108.png" />
+</li>
+</ul>
+<p>For more details, see <a class="reference external" href="http://compneuro.uwaterloo.ca/publications/stewart2010.html">Stewart et al., 2010</a>.</p>
+</div>
+<div class="section" id="sequences-of-actions">
+<h2>Sequences of actions<a class="headerlink" href="#sequences-of-actions" title="Permalink to this headline">¶</a></h2>
+<p>To do something useful with the action selection system we need two things:</p>
+<ul class="simple">
+<li>A way to determine the utility of each action given the current context.</li>
+<li>A way to take the output from the action selection
+and have it affect behaviour.</li>
+</ul>
+<p>We do this using the representations of the semantic pointer architecture:</p>
+<ul class="simple">
+<li>Any cognitive state is represented as
+a high-dimensional vector (a semantic pointer).</li>
+<li>Working memory stores semantic pointers (using an integrator).</li>
+<li>We calculate the utility of an action by
+computing the dot product between the current state
+and the state for the action
+(i.e., the IF portion of an IF-THEN production rule)<ul>
+<li>This is a linear operation, so we can directly compute it
+using the connection weights
+between the cortex and the basal ganglia.</li>
+</ul>
+</li>
+<li>The THEN portion of a rule says what semantic pointers
+to send to what areas of the brain.
+This is again a linear operation
+that can be computed on the output
+of the thalamus using the output from the basal ganglia.</li>
+</ul>
+<p>A simple example is available as a demo.</p>
+<ul class="simple">
+<li>Open the <code class="docutils literal"><span class="pre">demo/sequence.py</span></code> demo.</li>
+<li>Five possible states: A, B, C, D, and E.</li>
+<li>Rules for IF A THEN B, IF B THEN C, IF C THEN D,
+IF D THEN E, IF E THEN A.</li>
+<li>Five <em>production rules</em> (semantic pointer mappings)
+cycling through the five states.</li>
+</ul>
+<img alt="../_images/p5-109.png" src="../_images/p5-109.png" />
+<p>You can set the contents of working memory
+in Interactive Plots by opening an SP graph,
+right-clicking on it,
+and choosing “set value”
+(use “release value” to allow the model to change the contents).</p>
+<p>Cycle time is around 40 ms,
+slightly faster than the standard 50 ms value
+used in ACT-R, Soar, EPIC, and others.</p>
+<p>The cycle time is primarily determined by
+the time constant for the neurotransmitter GABA.</p>
+<img alt="../_images/p5-110.png" src="../_images/p5-110.png" />
+</div>
+<div class="section" id="routing-of-information">
+<h2>Routing of information<a class="headerlink" href="#routing-of-information" title="Permalink to this headline">¶</a></h2>
+<p>What about more complex actions?</p>
+<ul class="simple">
+<li>Same model as above,
+but we want visual input to be able to control
+where we start the sequence.</li>
+<li>Simple approach: add a visual buffer and connect it to the working memory.</li>
+</ul>
+<p>Open the <code class="docutils literal"><span class="pre">demo/sequencenogate.py</span></code> demo.</p>
+<img alt="../_images/p5-113.png" src="../_images/p5-113.png" />
+<p>The problem with this model is:</p>
+<ul class="simple">
+<li>If this connection always exists,
+then the visual input will always override what’s in working memory.
+This connection needs to be controllable.</li>
+</ul>
+<p>To solve this problem, we:</p>
+<ul class="simple">
+<li>Actions need to be able to control
+the flow of information between cortical areas.</li>
+<li>Instead of sending a particular SP to working memory,
+we need “IF X THEN transfer the pattern
+in cortex area Y to cortex area Z”?</li>
+<li>In this case, we add a rule that says
+“IF it contains a letter,
+transfer the data from the visual area to working memory”</li>
+<li>We make the utility of the rule lower
+than the utility of the sequence rules
+so that it will only transfer that information (open that gate)
+when no other action applies.</li>
+</ul>
+<p>Open the <code class="docutils literal"><span class="pre">demo/sequencerouted.py</span></code> demo to see this solution.</p>
+<img alt="../_images/p5-112.png" src="../_images/p5-112.png" />
+<p>The pattern in the visual buffer
+is successfully transferred to working memory,
+then the sequence is continued from that letter.</p>
+<img alt="../_images/p5-111.png" src="../_images/p5-111.png" />
+<p>It takes longer (60 – 70 ms)
+for these more complex productions to occur.</p>
+</div>
+<div class="section" id="question-answering">
+<h2>Question answering<a class="headerlink" href="#question-answering" title="Permalink to this headline">¶</a></h2>
+<p>The control signal in the previous network
+can also be another semantic pointer that
+binds and unbinds the contents of the visual buffer
+(instead of just a gating signal).</p>
+<p>This more flexible control does not add processing time,
+and allows processing the representations while routing them.
+This allows us to perform arbitrary symbol manipulation
+such as “take the contents of buffer X, unbind it with buffer Y,
+and place the results in buffer Z”.</p>
+<p>Consider the example of question answering.</p>
+<ul>
+<li><p class="first">The system is presented with a statement such as
+“red triangle and blue circle”.</p>
+<ul>
+<li><p class="first">A semantic pointer representing this statement
+is placed in the visual cortical area:</p>
+<p><code class="docutils literal"><span class="pre">statement</span> <span class="pre">+</span> <span class="pre">red</span> <span class="pre">*</span> <span class="pre">triangle</span> <span class="pre">+</span> <span class="pre">blue</span> <span class="pre">*</span> <span class="pre">circle</span></code>.</p>
+</li>
+<li><p class="first"><code class="docutils literal"><span class="pre">statement</span></code> is removed after a period of time.</p>
+</li>
+</ul>
+</li>
+<li><p class="first">Now a question is presented, such as “What was Red?”</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">question</span> <span class="pre">+</span> <span class="pre">red</span></code> is presented
+to the same visual cortical area as before.</li>
+<li>The goal is to place the correct answer
+in a motor cortex area (in this case, “triangle”).</li>
+</ul>
+</li>
+<li><p class="first">This is achieved by creating two action rules:</p>
+<ul class="simple">
+<li>If a statement is in the visual area,
+move it to working memory (as in the previous example).</li>
+<li>If a question is in the visual area,
+unbind it with working memory and place the result in the motor area.</li>
+</ul>
+</li>
+</ul>
+<p>This model can be seen in the demo <code class="docutils literal"><span class="pre">demo/question.py</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This example requires a much larger simulation
+than any of the others in this tutorial
+(more than 50,000 neurons).
+If you run this script, Nengo may take a long time (hours!)
+to solve for the decoders and neural connection weights needed.</p>
+</div>
+<img alt="../_images/p5-202.png" src="../_images/p5-202.png" />
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="4-dynamics.html" title="previous chapter (use the left arrow)">4. Feedback and dynamics</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="../demos/index.html" title="next chapter (use the right arrow)">Demos</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../demos/index.html" title="Demos"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="4-dynamics.html" title="4. Feedback and dynamics"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Written tutorials</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

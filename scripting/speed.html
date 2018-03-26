@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Speeding up network creation &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Connection weights" href="weights.html" />
+    <link rel="prev" title="Adding arbitary code to a model" href="simplenodes.html" />
+<link rel="stylesheet" type="text/css" href="../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="weights.html" title="Connection weights"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="simplenodes.html" title="Adding arbitary code to a model"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Scripting</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tips.html">Tips and tricks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Scripting</a></li>
+              
+              <li>Speeding up network creation</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="speeding-up-network-creation">
+<h1>Speeding up network creation<a class="headerlink" href="#speeding-up-network-creation" title="Permalink to this headline">¶</a></h1>
+<p>Whenever Nengo creates an ensemble,
+it needs to compute a set of decoders.
+This is done via the NEF method of least-squares minimization.
+For large ensembles (~500 neurons or more),
+this can take some time,
+since it needs to invert an <span class="math">\(N \times N\)</span> matrix.</p>
+<p>By deault, an ensemble consists of neurons with
+randomly generated encoders, intercepts, and maximum firing rates
+(within the specified ranges).
+This means that a new set of decoders
+must be computed for every new ensemble.
+However, if we specify a random number seed,
+all of these parameters will be consistent:
+that is, if we run the script again
+and re-create the same ensemble
+with the same random number seed,
+Nengo can detect this and re-use the previously computed decoders.
+This greatly speeds up running the script.
+(Of course, the first time the script is run,
+it will still take the same amount of time).</p>
+<p>There are two ways to specify the random number seed.
+The first is to set the <code class="docutils literal"><span class="pre">fixed_seed</span></code> parameter when creating the Network:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="s1">&#39;My network&#39;</span><span class="p">,</span> <span class="n">fixed_seed</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This tells Nengo to use the random seed <code class="docutils literal"><span class="pre">5</span></code>
+for every single ensemble that is created within this network.
+In other words, if you now do the following:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="n">neurons</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="n">neurons</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>then the neurons within ensembles A and B will be <em>identical</em>.
+This will also be true for ensembles within a <code class="docutils literal"><span class="pre">NetworkArray</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make_array</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will create an array of ten identical ensembles.</p>
+<div class="section" id="avoiding-identical-ensembles">
+<h2>Avoiding identical ensembles<a class="headerlink" href="#avoiding-identical-ensembles" title="Permalink to this headline">¶</a></h2>
+<p>Using <code class="docutils literal"><span class="pre">fixed_seed</span></code> allows you to make networks very quickly,
+since Nengo takes advantage of these identical ensembles
+and does not need to re-compute decoders.
+However, it leads to neurally implausible models,
+since neurons are not identical in this way.
+As an alternative,
+you can use the second way of specifying seeds,
+the <code class="docutils literal"><span class="pre">seed</span></code> parameter:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="s1">&#39;My network&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With this approach,
+Nengo will create a new seed for every ensemble
+based on your initial seed value.
+There will be no identical ensembles in your model.
+However, if you re-run your script,
+Nengo will re-generate exactly the same neurons,
+and so will be able to re-use the previously computed decoders.</p>
+</div>
+<div class="section" id="sharing-consistent-models">
+<h2>Sharing consistent models<a class="headerlink" href="#sharing-consistent-models" title="Permalink to this headline">¶</a></h2>
+<p>A useful side-effect of the <code class="docutils literal"><span class="pre">seed</span></code> parameter
+is that it allows us to be sure that <em>exactly</em> the same model
+is generated on different computers.
+That is, if you build a model and set a specific seed,
+then other researchers can run that same script
+and will get exactly the same model as you created.
+In this way we can ensure consistent performance.</p>
+</div>
+<div class="section" id="individual-differences">
+<h2>Individual differences<a class="headerlink" href="#individual-differences" title="Permalink to this headline">¶</a></h2>
+<p>One way to think about the <code class="docutils literal"><span class="pre">seed</span></code> parameter
+is as a way to generate neural models with individual differences.
+The same script run with a different <code class="docutils literal"><span class="pre">seed</span></code> value
+will create a slightly different model,
+due to the low-level neural differences.
+This may affect the overall behaviour.</p>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="simplenodes.html" title="previous chapter (use the left arrow)">Adding arbitary code to a model</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="weights.html" title="next chapter (use the right arrow)">Connection weights</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="weights.html" title="Connection weights"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="simplenodes.html" title="Adding arbitary code to a model"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Scripting</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

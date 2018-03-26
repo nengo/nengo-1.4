@@ -1,0 +1,341 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>5. Basic scripting &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Written tutorials" href="../tutorials/index.html" />
+    <link rel="prev" title="4. Additional interactive plot features" href="4-moreplots.html" />
+<link rel="stylesheet" type="text/css" href="../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../tutorials/index.html" title="Written tutorials"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="4-moreplots.html" title="4. Additional interactive plot features"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Video tutorials</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Video tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="1-construction.html">1. Basic network construction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2-workspace.html">2. Additional workspace features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3-simulation.html">3. Basic network simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4-moreplots.html">4. Additional interactive plot features</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">5. Basic scripting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/index.html">Demos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scripting/index.html">Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Video tutorials</a></li>
+              
+              <li>5. Basic scripting</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="basic-scripting">
+<h1>5. Basic scripting<a class="headerlink" href="#basic-scripting" title="Permalink to this headline">¶</a></h1>
+<p>An example of basic scripting in Nengo.
+The example network is a neural integrator.</p>
+<ul class="simple">
+<li><a class="reference internal" href="../scripting/index.html"><span class="doc">Scripting documentation</span></a></li>
+</ul>
+<iframe width="100%" height="480" src="http://www.youtube.com/embed/8TldkRu2EPg" frameborder="0" allowfullscreen></iframe><div class="section" id="transcript">
+<h2>Transcript<a class="headerlink" href="#transcript" title="Permalink to this headline">¶</a></h2>
+<p>In this tutorial we will be looking at scripting in Nengo.</p>
+<p>And so I’m going to be constructing a neural integrator
+in this Python file called myscript.py.
+We use the python scripting language for all Nengo scripts.</p>
+<p>I will begin by importing the NEF package.
+The first thing I then need to do is create a Network.
+I do this by calling the nef.Network function.
+I need to give the Network a name,
+so I will call it MyIntegrator.</p>
+<p>Now we’ve created the network object
+and we can begin to call functions
+on that object to put things in the network.
+So for instance, I will start by creating an input.
+So I say the variable input will be equal
+to the results of the make_input function.
+I will simply call it ‘input’,
+and give it an initial constant value of 0.
+Nevertheless when we run that object in the network,
+we will be able to call up a slider
+and change that value on the fly in Interactive Plots.</p>
+<p>The next thing I need to do is to add some neurons to this Network.
+So, I will call the make function
+and assign the results to the variable A.
+We need to define some parameters for the make function.
+First, we need to give it a name,
+and then tell it how many neurons and the number of dimensions.
+I will also set the quick value equal to true.</p>
+<p>After running the script the first time,
+setting quick to true will cause the script
+to load the population of already created neurons.
+In a network like this one, with only 100 neurons,
+this won’t make much difference.
+However, with very large numbers of neurons,
+the time to create a population can be significant,
+so setting quick to true
+can save a lot of time compiling the network.</p>
+<p>There are many other parameters
+that can also go into defining a population of neurons,
+such as the maximum firing rates, membrane time constant, and so on.
+If you want to know what those parameters are,
+you basically have two options.</p>
+<p>The first is to look directly at the code.
+Here, this is the code for the make function.
+As you can see this is found in your Nengo install directory
+under the /python/nef subdirectory.
+The file is called nef_core.py which defines
+many of the critical functions for making networks in scripts.
+Down below, you can see all of the different parameters that can be set,
+and they are also documented in detail in the code itself.</p>
+<p>If you prefer not to read the code,
+you can also go to the Nengo website.
+In the Nengo website, in the documentation section,
+there is a section on scripting.
+At the very bottom of that page,
+many of the core classes in the scripting packages are listed.
+If you click on any of these,
+you will be taken to a formatted documentation page
+that provides a listing of all of the various classes, functions, and so on.
+For instance, the nef.Network package is there, and we can look into it.
+Here you see all of the various parameters for the constructor listed.
+As well, you can scroll down and find
+the other functions defined on the class,
+and all of the parameters with descriptions listed.
+Here, for instance is make_input,
+which we called earlier in our script.
+And as you can see there are many, many other functions
+that are useful for making networks,
+but haven’t been included in this brief scripting tutorial.</p>
+<p>In any case, let us return to the script that we’re writing.
+As you will recall, we’ve now defined a population of 100 neurons called A.
+We need to actually drive those neurons somehow,
+so I’m going to do my first connection.
+I’m going to connect the input we created to the A population.
+And, I’m going to indicate how much weight
+that input should be given as it drives those neurons.
+This is essentially a gain factor
+that determines how much the input is multiplied by
+before being encoded by the neurons.</p>
+<p>And then I will also tell it
+what kind of temporal dynamics to give the input.
+We call this the PTSC, which is how we define dynamics in general.
+I’m going to give it a time constant of 100 milliseconds.
+So essentially, the input will be filtered
+by a low-pass filter with a 100 millisecond decay.</p>
+<p>Of course the neurons are not talking to
+any other neurons at this point,
+they are simply being driven by the input.
+Because we are constructing an integrator,
+the connections we want to perform are actually quite simple.
+Specifically, we want the population of neurons to talk to itself.
+That is, we want to define lateral, or recurrent, connections
+that will take the information currently
+encoded by the population and project that to itself in the future,
+so it can ‘remember’ its own value.
+Any driving input will thus be added
+to the current value being encoded by the neurons.</p>
+<p>I will use the same PTSC as before: 100 milliseconds.
+You will notice that I did not define a weight in this case.
+That is because the scripting system will assume
+connections have a weight of 1 if it is not specified.
+Because the integrator is attempting
+to perfectly remember its current state,
+this is the appropriate weight.
+The derivation of this is found in papers
+that are linked from our website.</p>
+<p>The last thing I need to do
+is add all of these objects to the GUI,
+so we can see them and manipulate them further if we want to.
+I will now save that script.
+And I can go over to the Nengo GUI.</p>
+<p>I will click on the folder,
+find my script, and double click on it to load it into the GUI.
+You can see that we now have an integrator network
+that has been added into the workspace.
+We have the input we defined, and a population of neurons.
+We can now run Interactive Plots
+to see if it acts like an integrator as expected.</p>
+<p>When we open interactive plots for the first time on a new network,
+just the network elements are shown, connected as defined in the GUI.
+It doesn’t provide any data plots yet.
+But, as I mentioned, we can right-click and pull up a controller,
+so we can play with the input.
+And we can right click on the population
+and take a look at perhaps a spike raster,
+which defaults to
+showing a small percentage of the neurons in the population.
+And perhaps we would like to see
+the decoded values of the cells as well.</p>
+<p>Things are a bit cluttered, so let me re-arrange things.
+That’s better.
+Now we can click play to watch the network run.
+Hopefully with no input there will not be too much drift.
+Now I will give a bit of input,
+and you see that it will integrate that value.
+And if I take the input back to zero,
+it should stop integrating and hold the value it has so far,
+thus acting like a kind of memory.
+And we can see it’s doing exactly that kind of behaviour.</p>
+<p>So, that concludes
+this very brief introduction to the use of scripting.
+I highly recommend taking a look at the website for more details.
+And if you have any questions,
+please feel free to use our mailing lists.
+Thank you.</p>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="4-moreplots.html" title="previous chapter (use the left arrow)">4. Additional interactive plot features</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="../tutorials/index.html" title="next chapter (use the right arrow)">Written tutorials</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../tutorials/index.html" title="Written tutorials"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="4-moreplots.html" title="4. Additional interactive plot features"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Video tutorials</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

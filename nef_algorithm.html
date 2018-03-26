@@ -1,0 +1,470 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>The NEF Algorithm &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Integrating with IPython Notebook" href="advanced/ipython_notebook.html" />
+<link rel="stylesheet" type="text/css" href="_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="advanced/ipython_notebook.html" title="Integrating with IPython Notebook"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Nengo 1.4 1.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demos/index.html">Demos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripting/index.html">Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="index.html">Docs</a></li>
+              
+              <li>The NEF Algorithm</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="the-nef-algorithm">
+<h1>The NEF Algorithm<a class="headerlink" href="#the-nef-algorithm" title="Permalink to this headline">¶</a></h1>
+<p>While Nengo provides
+a flexible, general-purpose approach to neural modelling,
+it is sometimes useful to get a complete look
+at exactly what is going on “under the hood”.
+The theory behind the Neural Engineering Framework is
+developed at length in <a class="reference external" href="http://www.amazon.com/Neural-Engineering-Representation-Neurobiological-Computational/dp/0262550601">Eliasmith &amp; Anderson, 2003: “Neural Engineering”</a>,
+and a short summary is available in
+<a class="reference external" href="http://compneuro.uwaterloo.ca/publications/stewart2012d.html">Stewart, 2012: “A Technical Overview of the
+Neural Engineering Framework</a>.</p>
+<p>However, for some people, the best description of an algorithm
+is the code itself.
+With that in mind, the following is
+a complete implementation of the NEF
+for the special case of two one-dimensional populations
+with a single connection between them.
+You can adjust the function being computed,
+the input to the system,
+and various neural parameters.
+In it written in Python, and requires NumPy (for the matrix inversion)
+and Matplotlib (to produce graphs of the output).</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># A Minimal Example of the Neural Engineering Framework</span>
+<span class="c1">#</span>
+<span class="c1"># The NEF is a method for building large-scale neural models using realistic</span>
+<span class="c1"># neurons.  It is a neural compiler: you specify the high-level computations</span>
+<span class="c1"># the model needs to compute, and the properties of the neurons themselves,</span>
+<span class="c1"># and the NEF determines the neural connections needed to perform those</span>
+<span class="c1"># operations.</span>
+<span class="c1">#</span>
+<span class="c1"># The standard software for building NEF models is Nengo (http://nengo.ca).</span>
+<span class="c1"># Nengo is a cross-platform Java application that provides both a drag-and-drop</span>
+<span class="c1"># graphical user environment and a Python scripting interface for</span>
+<span class="c1"># creating these neural models.  It has been used to model a wide variety of</span>
+<span class="c1"># behaviour, including motor control, visual attention, serial recall, action</span>
+<span class="c1"># selection, working memory, attractor networks, inductive reasoning, path</span>
+<span class="c1"># integration, and planning with problem solving.</span>
+<span class="c1">#</span>
+<span class="c1"># However, given the complexity of Nengo, and due to the fact that this is a</span>
+<span class="c1"># fairly non-standard approach to neural modelling, we feel it is also useful</span>
+<span class="c1"># to have a simple example that shows exactly how the NEF works, from</span>
+<span class="c1"># beginning to end.  That is the goal of this script.</span>
+<span class="c1">#</span>
+<span class="c1"># This script shows how to build a simple feed-forward network of leaky</span>
+<span class="c1"># integrate-and-fire neurons where each population encodes a one-dimensional</span>
+<span class="c1"># value and the connection weights between the populations are optimized to</span>
+<span class="c1"># compute some arbitrary function.  This same approach is used in Nengo,</span>
+<span class="c1"># extended to multi-dimensional representation, multiple populations of</span>
+<span class="c1"># neurons, and recurrent connections.</span>
+<span class="c1">#</span>
+<span class="c1"># To change the input to the system, change &#39;input&#39;</span>
+<span class="c1"># To change the function computed by the weights, change &#39;function&#39;</span>
+<span class="c1">#</span>
+<span class="c1"># The size of the populations and their neural properties can also be adjusted</span>
+<span class="c1"># by changing the parameters below.</span>
+<span class="c1">#</span>
+<span class="c1"># This script requires Python (http://www.python.org/) and Numpy</span>
+<span class="c1"># (http://numpy.scipy.org/) to run, and Matplotlib (http://matplotlib.org/) to</span>
+<span class="c1"># produce the output graphs.</span>
+<span class="c1">#</span>
+<span class="c1"># For more information on the Neural Engineering Framework and the Nengo</span>
+<span class="c1"># software, please see http://nengo.ca</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="c1">#################################################</span>
+<span class="c1"># Parameters</span>
+<span class="c1">#################################################</span>
+
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.001</span>        <span class="c1"># simulation time step</span>
+<span class="n">t_rc</span> <span class="o">=</span> <span class="mf">0.02</span>       <span class="c1"># membrane RC time constant</span>
+<span class="n">t_ref</span> <span class="o">=</span> <span class="mf">0.002</span>     <span class="c1"># refractory period</span>
+<span class="n">t_pstc</span> <span class="o">=</span> <span class="mf">0.1</span>      <span class="c1"># post-synaptic time constant</span>
+<span class="n">N_A</span> <span class="o">=</span> <span class="mi">50</span>          <span class="c1"># number of neurons in first population</span>
+<span class="n">N_B</span> <span class="o">=</span> <span class="mi">40</span>          <span class="c1"># number of neurons in second population</span>
+<span class="n">N_samples</span> <span class="o">=</span> <span class="mi">100</span>   <span class="c1"># number of sample points to use when finding decoders</span>
+<span class="n">rate_A</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">75</span>   <span class="c1"># range of maximum firing rates for population A</span>
+<span class="n">rate_B</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span>  <span class="c1"># range of maximum firing rates for population B</span>
+
+
+<span class="c1"># the input to the system over time</span>
+<span class="k">def</span> <span class="nf">input</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+
+<span class="c1"># the function to compute between A and B</span>
+<span class="k">def</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
+
+
+<span class="c1">#################################################</span>
+<span class="c1"># Step 1: Initialization</span>
+<span class="c1">#################################################</span>
+
+<span class="c1"># create random encoders for the two populations</span>
+<span class="n">encoder_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_A</span><span class="p">)]</span>
+<span class="n">encoder_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_B</span><span class="p">)]</span>
+
+<span class="k">def</span> <span class="nf">gen_gain_bias</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">intercept_low</span><span class="p">,</span> <span class="n">intercept_high</span><span class="p">,</span> <span class="n">rate_low</span><span class="p">,</span> <span class="n">rate_high</span><span class="p">):</span>
+    <span class="n">gain</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bias</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+        <span class="c1"># desired intercept (x value for which the neuron starts firing</span>
+        <span class="n">intercept</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">intercept_low</span><span class="p">,</span> <span class="n">intercept_high</span><span class="p">)</span>
+        <span class="c1"># desired maximum rate (firing rate when x is maximum)</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">rate_low</span><span class="p">,</span> <span class="n">rate_high</span><span class="p">)</span>
+
+        <span class="c1"># this algorithm is specific to LIF neurons, but should</span>
+        <span class="c1"># generate gain and bias values to produce the desired</span>
+        <span class="c1"># intercept and rate</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">t_ref</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">rate</span><span class="p">))</span> <span class="o">/</span> <span class="n">t_rc</span><span class="p">))</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">intercept</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">g</span> <span class="o">*</span> <span class="n">intercept</span>
+        <span class="n">gain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+        <span class="n">bias</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gain</span><span class="p">,</span> <span class="n">bias</span>
+
+<span class="c1"># random gain and bias for the two populations</span>
+<span class="n">gain_A</span><span class="p">,</span> <span class="n">bias_A</span> <span class="o">=</span> <span class="n">gen_gain_bias</span><span class="p">(</span><span class="n">N_A</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">rate_A</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rate_A</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">gain_B</span><span class="p">,</span> <span class="n">bias_B</span> <span class="o">=</span> <span class="n">gen_gain_bias</span><span class="p">(</span><span class="n">N_B</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">rate_B</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rate_B</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+
+<span class="c1"># a simple leaky integrate-and-fire model, scaled so that</span>
+<span class="c1"># v = 0 is resting voltage and v = 1 is the firing threshold</span>
+<span class="k">def</span> <span class="nf">run_neurons</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">ref</span><span class="p">):</span>
+    <span class="n">spikes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)):</span>
+        <span class="c1"># the LIF voltage change equation</span>
+        <span class="n">dV</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="n">t_rc</span>
+        <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dV</span>
+        <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># don&#39;t allow voltage to go below 0</span>
+            <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">ref</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># if we are in our refractory period</span>
+            <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># keep voltage at zero and</span>
+            <span class="n">ref</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">dt</span>  <span class="c1"># decrease the refractory period</span>
+
+        <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># if we have hit threshold</span>
+            <span class="n">spikes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># spike</span>
+            <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># reset the voltage</span>
+            <span class="n">ref</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">t_ref</span>  <span class="c1"># and set the refractory period</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">spikes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">spikes</span>
+
+
+<span class="c1"># measure the spike rate of a whole population for a given represented value x</span>
+<span class="k">def</span> <span class="nf">compute_response</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">time_limit</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="p">)</span>  <span class="c1"># number of neurons</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">N</span>  <span class="c1"># voltage</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">N</span>  <span class="c1"># refractory period</span>
+
+    <span class="c1"># compute input corresponding to x</span>
+    <span class="nb">input</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="nb">input</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">encoder</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">gain</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">bias</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># randomize the initial voltage level</span>
+
+    <span class="n">count</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">N</span>  <span class="c1"># spike count for each neuron</span>
+
+    <span class="c1"># feed the input into the population for a given amount of time</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">time_limit</span><span class="p">:</span>
+        <span class="n">spikes</span> <span class="o">=</span> <span class="n">run_neurons</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spikes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">s</span><span class="p">:</span>
+                <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">t</span> <span class="o">+=</span> <span class="n">dt</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">c</span> <span class="o">/</span> <span class="n">time_limit</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">count</span><span class="p">]</span>  <span class="c1"># return the spike rate (in Hz)</span>
+
+
+<span class="c1"># compute the tuning curves for a population</span>
+<span class="k">def</span> <span class="nf">compute_tuning_curves</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">bias</span><span class="p">):</span>
+    <span class="c1"># generate a set of x values to sample at</span>
+    <span class="n">x_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">N_samples</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_samples</span><span class="p">)]</span>
+
+    <span class="c1"># build up a matrix of neural responses to each input (i.e. tuning curves)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x_values</span><span class="p">:</span>
+        <span class="n">A</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">compute_response</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">bias</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">x_values</span><span class="p">,</span> <span class="n">A</span>
+
+
+<span class="c1"># compute decoders</span>
+<span class="k">def</span> <span class="nf">compute_decoder</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">):</span>
+    <span class="c1"># get the tuning curves</span>
+    <span class="n">x_values</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="n">compute_tuning_curves</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">bias</span><span class="p">)</span>
+
+    <span class="c1"># get the desired decoded value for each sample point</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x_values</span><span class="p">])</span>
+
+    <span class="c1"># find the optimum linear decoder</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">Gamma</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">Upsilon</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="n">Ginv</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">Gamma</span><span class="p">)</span>
+    <span class="n">decoder</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Ginv</span><span class="p">,</span> <span class="n">Upsilon</span><span class="p">)</span> <span class="o">/</span> <span class="n">dt</span>
+    <span class="k">return</span> <span class="n">decoder</span>
+
+<span class="c1"># find the decoders for A and B</span>
+<span class="n">decoder_A</span> <span class="o">=</span> <span class="n">compute_decoder</span><span class="p">(</span><span class="n">encoder_A</span><span class="p">,</span> <span class="n">gain_A</span><span class="p">,</span> <span class="n">bias_A</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">)</span>
+<span class="n">decoder_B</span> <span class="o">=</span> <span class="n">compute_decoder</span><span class="p">(</span><span class="n">encoder_B</span><span class="p">,</span> <span class="n">gain_B</span><span class="p">,</span> <span class="n">bias_B</span><span class="p">)</span>
+
+<span class="c1"># compute the weight matrix</span>
+<span class="n">weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">decoder_A</span><span class="p">,</span> <span class="p">[</span><span class="n">encoder_B</span><span class="p">])</span>
+
+<span class="c1">#################################################</span>
+<span class="c1"># Step 2: Running the simulation</span>
+<span class="c1">#################################################</span>
+
+<span class="n">v_A</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">N_A</span>      <span class="c1"># voltage for population A</span>
+<span class="n">ref_A</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">N_A</span>    <span class="c1"># refractory period for population A</span>
+<span class="n">input_A</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">N_A</span>  <span class="c1"># input for population A</span>
+
+<span class="n">v_B</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">N_B</span>      <span class="c1"># voltage for population B</span>
+<span class="n">ref_B</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span><span class="o">*</span><span class="n">N_B</span>      <span class="c1"># refractory period for population B</span>
+<span class="n">input_B</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">N_B</span>  <span class="c1"># input for population B</span>
+
+<span class="c1"># scaling factor for the post-synaptic filter</span>
+<span class="n">pstc_scale</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">dt</span> <span class="o">/</span> <span class="n">t_pstc</span><span class="p">)</span>
+
+<span class="c1"># for storing simulation data to plot afterward</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">ideal</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">output</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># the decoded output value from population B</span>
+<span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="mf">10.0</span><span class="p">:</span>
+    <span class="c1"># call the input function to determine the input value</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+    <span class="c1"># convert the input value into an input for each neuron</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_A</span><span class="p">):</span>
+        <span class="n">input_A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">encoder_A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">gain_A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">bias_A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="c1"># run population A and determine which neurons spike</span>
+    <span class="n">spikes_A</span> <span class="o">=</span> <span class="n">run_neurons</span><span class="p">(</span><span class="n">input_A</span><span class="p">,</span> <span class="n">v_A</span><span class="p">,</span> <span class="n">ref_A</span><span class="p">)</span>
+
+    <span class="c1"># decay all of the inputs (implementing the post-synaptic filter)</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_B</span><span class="p">):</span>
+        <span class="n">input_B</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">pstc_scale</span><span class="p">)</span>
+    <span class="c1"># for each neuron that spikes, increase the input current</span>
+    <span class="c1"># of all the neurons it is connected to by the synaptic</span>
+    <span class="c1"># connection weight</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spikes_A</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">s</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_B</span><span class="p">):</span>
+                <span class="n">input_B</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">weights</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">pstc_scale</span>
+
+    <span class="c1"># compute the total input into each neuron in population B</span>
+    <span class="c1"># (taking into account gain and bias)</span>
+    <span class="n">total_B</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">N_B</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_B</span><span class="p">):</span>
+        <span class="n">total_B</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">gain_B</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">input_B</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">bias_B</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+    <span class="c1"># run population B and determine which neurons spike</span>
+    <span class="n">spikes_B</span> <span class="o">=</span> <span class="n">run_neurons</span><span class="p">(</span><span class="n">total_B</span><span class="p">,</span> <span class="n">v_B</span><span class="p">,</span> <span class="n">ref_B</span><span class="p">)</span>
+
+    <span class="c1"># for each neuron in B that spikes, update our decoded value</span>
+    <span class="c1"># (also applying the same post-synaptic filter)</span>
+    <span class="n">output</span> <span class="o">*=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">pstc_scale</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spikes_B</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">s</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="n">decoder_B</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">pstc_scale</span>
+
+    <span class="nb">print</span> <span class="n">t</span><span class="p">,</span> <span class="n">output</span>
+    <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+    <span class="n">ideal</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">t</span> <span class="o">+=</span> <span class="n">dt</span>
+
+
+<span class="c1">#################################################</span>
+<span class="c1"># Step 3: Plot the results</span>
+<span class="c1">#################################################</span>
+
+<span class="n">x</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="n">compute_tuning_curves</span><span class="p">(</span><span class="n">encoder_A</span><span class="p">,</span> <span class="n">gain_A</span><span class="p">,</span> <span class="n">bias_A</span><span class="p">)</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="n">compute_tuning_curves</span><span class="p">(</span><span class="n">encoder_B</span><span class="p">,</span> <span class="n">gain_B</span><span class="p">,</span> <span class="n">bias_B</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Tuning curves for population A&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Tuning curves for population B&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;input&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">ideal</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;ideal&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Simulation results&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="advanced/ipython_notebook.html" title="previous chapter (use the left arrow)">Integrating with IPython Notebook</a>
+      </div>
+    
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="advanced/ipython_notebook.html" title="Integrating with IPython Notebook"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Nengo 1.4 1.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

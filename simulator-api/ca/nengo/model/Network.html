@@ -1,0 +1,569 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Network &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Node" href="Node.html" />
+    <link rel="prev" title="InstantaneousOutput" href="InstantaneousOutput.html" />
+<link rel="stylesheet" type="text/css" href="../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Node.html" title="Node"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="InstantaneousOutput.html" title="InstantaneousOutput"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.model</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.model</a></li>
+              
+              <li>Network</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="network">
+<h1>Network<a class="headerlink" href="#network" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.model.Network">
+public interface <code class="descname">Network</code> extends <a class="reference internal" href="Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>, <a class="reference internal" href="Probeable.html#ca.nengo.model.Probeable" title="ca.nengo.model.Probeable">Probeable</a><a class="headerlink" href="#ca.nengo.model.Network" title="Permalink to this definition">¶</a></dt>
+<dd><p>A neural circuit, consisting of Nodes such as Ensembles and ExternalInputs. A Network is the usual object of a simulation. If you are new to this code, what you probably want to do is create some Neurons, group them into Ensembles, connect the Ensembles in a Network, and run the Network in a Simulator.</p>
+<p>Note: Multiple steps are needed to add a Projection between Ensembles. First, an Origin must be created on the presynaptic Ensemble, and a Termination with the same dimensionality must be created on the post-synaptic Ensemble. Then the Origin and Termination can be connected with the method addProjection(Origin, Termination). We don’t do this in one step (ie automatically create the necessary Origin and Termination as needed) because there are various ways of doing so, and in fact some types of Origins and Terminations can only be created in the course of constructing the Ensemble. Creation of an Origin or Termination can also be a complex process. Rather than try to abstract these varied procedures into something that can be driven from the Network level, we just assume here that the necessary Origins and Terminations exist, and provide a method for connecting them.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="addnode">
+<h3>addNode<a class="headerlink" href="#addnode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.addNode(Node)">
+public void <code class="descname">addNode</code><span class="sig-paren">(</span><a class="reference internal" href="Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> node</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.addNode(Node)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>node</strong> – Node to add to the Network</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – if the Network already contains a Node of the same name</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="addprojection">
+<h3>addProjection<a class="headerlink" href="#addprojection" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.addProjection(Origin, Termination)">
+public <a class="reference internal" href="Projection.html#ca.nengo.model.Projection" title="ca.nengo.model.Projection">Projection</a> <code class="descname">addProjection</code><span class="sig-paren">(</span><a class="reference internal" href="Origin.html#ca.nengo.model.Origin" title="ca.nengo.model.Origin">Origin</a><em> origin</em>, <a class="reference internal" href="Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a><em> termination</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.addProjection(Origin, Termination)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects an Origin to a Termination. Origins and Terminations belong to Ensembles (or ExternalInputs). Both the Origin and Termination must be set up before calling this method. The way to do this will depend on the Ensemble.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>origin</strong> – Origin (data source) of Projection.</li>
+<li><strong>termination</strong> – Termination (data destination) of Projection.</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – if the given Origin and Termination have different dimensions, or if there is already an Origin connected to the given Termination (note that an Origin can project to multiple Terminations though).</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">The created Projection</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="addsteplistener">
+<h3>addStepListener<a class="headerlink" href="#addsteplistener" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.addStepListener(StepListener)">
+public void <code class="descname">addStepListener</code><span class="sig-paren">(</span><a class="reference internal" href="StepListener.html#ca.nengo.model.StepListener" title="ca.nengo.model.StepListener">StepListener</a><em> listener</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.addStepListener(StepListener)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="exposeorigin">
+<h3>exposeOrigin<a class="headerlink" href="#exposeorigin" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.exposeOrigin(Origin, String)">
+public void <code class="descname">exposeOrigin</code><span class="sig-paren">(</span><a class="reference internal" href="Origin.html#ca.nengo.model.Origin" title="ca.nengo.model.Origin">Origin</a><em> origin</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.exposeOrigin(Origin, String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Declares the given Origin as available for connection outside the Network via getOrigins(). This Origin should not be connected within this Network.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>origin</strong> – An Origin within this Network that is to connect to something outside this Network</li>
+<li><strong>name</strong> – Name of the Origin as it will appear outside this Network</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="exposestate">
+<h3>exposeState<a class="headerlink" href="#exposestate" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.exposeState(Probeable, String, String)">
+public void <code class="descname">exposeState</code><span class="sig-paren">(</span><a class="reference internal" href="Probeable.html#ca.nengo.model.Probeable" title="ca.nengo.model.Probeable">Probeable</a><em> probeable</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> stateName</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.exposeState(Probeable, String, String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Declares the given Probeable state as being available for Probing from outside this Network.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>probeable</strong> – A Probeable within this Network.</li>
+<li><strong>stateName</strong> – A state of the given Probeable</li>
+<li><strong>name</strong> – A new name with which to access this state via Network.getHistory</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – if Probeable not in the Network</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="exposetermination">
+<h3>exposeTermination<a class="headerlink" href="#exposetermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.exposeTermination(Termination, String)">
+public void <code class="descname">exposeTermination</code><span class="sig-paren">(</span><a class="reference internal" href="Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a><em> termination</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.exposeTermination(Termination, String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Declares the given Termination as available for connection from outside the Network via getTerminations(). This Termination should not be connected within this Network.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>termination</strong> – A Termination within this Network that is to connect to something outside this Network</li>
+<li><strong>name</strong> – Name of the Termination as it will appear outside this Network</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="firesteplisteners">
+<h3>fireStepListeners<a class="headerlink" href="#firesteplisteners" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.fireStepListeners(float)">
+public void <code class="descname">fireStepListeners</code><span class="sig-paren">(</span>float<em> time</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.fireStepListeners(float)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getexposedoriginname">
+<h3>getExposedOriginName<a class="headerlink" href="#getexposedoriginname" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.getExposedOriginName(Origin)">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getExposedOriginName</code><span class="sig-paren">(</span><a class="reference internal" href="Origin.html#ca.nengo.model.Origin" title="ca.nengo.model.Origin">Origin</a><em> insideOrigin</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.getExposedOriginName(Origin)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>insideOrigin</strong> – Origin inside the network</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Name of the exposed origin given the inner origin. null if no such origin is exposed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getexposedterminationname">
+<h3>getExposedTerminationName<a class="headerlink" href="#getexposedterminationname" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.getExposedTerminationName(Termination)">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getExposedTerminationName</code><span class="sig-paren">(</span><a class="reference internal" href="Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a><em> insideTermination</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.getExposedTerminationName(Termination)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>insideTermination</strong> – Termination inside the network</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Name of the exposed termination given the inner termination or null if no such termination is exposed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getmetadata">
+<h3>getMetaData<a class="headerlink" href="#getmetadata" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.getMetaData(String)">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="java.lang.Object">Object</a> <code class="descname">getMetaData</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> key</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.getMetaData(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Metadata is non-critical information about the Network (eg UI layout) that the user doesn’t access directly. (Note: if there is a need for user-accessible metadata, Network could extend Configurable, but this doesn’t seem to be necessary.)</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>key</strong> – Name of a metadata item</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Value of a metadata item</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getnode">
+<h3>getNode<a class="headerlink" href="#getnode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.getNode(String)">
+public <a class="reference internal" href="Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a> <code class="descname">getNode</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.getNode(String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – Name of Node to remove</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – if named Node does not exist in network</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Named node</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getnodes">
+<h3>getNodes<a class="headerlink" href="#getnodes" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.getNodes()">
+public <a class="reference internal" href="Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>[] <code class="descname">getNodes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.getNodes()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">All the Nodes in the Network</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getprojections">
+<h3>getProjections<a class="headerlink" href="#getprojections" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.getProjections()">
+public <a class="reference internal" href="Projection.html#ca.nengo.model.Projection" title="ca.nengo.model.Projection">Projection</a>[] <code class="descname">getProjections</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.getProjections()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">All Projections in this Network</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getsimulator">
+<h3>getSimulator<a class="headerlink" href="#getsimulator" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.getSimulator()">
+public <a class="reference internal" href="../sim/Simulator.html#ca.nengo.sim.Simulator" title="ca.nengo.sim.Simulator">Simulator</a> <code class="descname">getSimulator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.getSimulator()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">The Simulator used to run this Network</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="hideorigin">
+<h3>hideOrigin<a class="headerlink" href="#hideorigin" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.hideOrigin(String)">
+public void <code class="descname">hideOrigin</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.hideOrigin(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Undoes exposeOrigin(x, x, name).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – Name of Origin to unexpose.</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – if Origin does not exist</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="hidestate">
+<h3>hideState<a class="headerlink" href="#hidestate" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.hideState(String)">
+public void <code class="descname">hideState</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.hideState(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Undoes exposeState(x, x, name).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Name of state to unexpose.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="hidetermination">
+<h3>hideTermination<a class="headerlink" href="#hidetermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.hideTermination(String)">
+public void <code class="descname">hideTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.hideTermination(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Undoes exposeTermination(x, x, name).</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Name of Termination to unexpose.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="removenode">
+<h3>removeNode<a class="headerlink" href="#removenode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.removeNode(String)">
+public void <code class="descname">removeNode</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.removeNode(String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – Name of Node to remove</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – if named Node does not exist in network</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="removeprojection">
+<h3>removeProjection<a class="headerlink" href="#removeprojection" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.removeProjection(Termination)">
+public void <code class="descname">removeProjection</code><span class="sig-paren">(</span><a class="reference internal" href="Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a><em> termination</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.removeProjection(Termination)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>termination</strong> – Termination of Projection to remove</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – if there exists no Projection between the specified Origin and Termination</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="removesteplistener">
+<h3>removeStepListener<a class="headerlink" href="#removesteplistener" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.removeStepListener(StepListener)">
+public void <code class="descname">removeStepListener</code><span class="sig-paren">(</span><a class="reference internal" href="StepListener.html#ca.nengo.model.StepListener" title="ca.nengo.model.StepListener">StepListener</a><em> listener</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.removeStepListener(StepListener)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setmetadata">
+<h3>setMetaData<a class="headerlink" href="#setmetadata" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.setMetaData(String, Object)">
+public void <code class="descname">setMetaData</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> key</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="java.lang.Object">Object</a><em> value</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.setMetaData(String, Object)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>key</strong> – Name of a metadata item</li>
+<li><strong>value</strong> – Value of the named metadata item</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setsimulator">
+<h3>setSimulator<a class="headerlink" href="#setsimulator" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.setSimulator(Simulator)">
+public void <code class="descname">setSimulator</code><span class="sig-paren">(</span><a class="reference internal" href="../sim/Simulator.html#ca.nengo.sim.Simulator" title="ca.nengo.sim.Simulator">Simulator</a><em> simulator</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.setSimulator(Simulator)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>simulator</strong> – The Simulator used to run this Network</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="topostscript">
+<h3>toPostScript<a class="headerlink" href="#topostscript" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.Network.toPostScript(HashMap)">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">toPostScript</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html" title="java.util.HashMap">HashMap</a>&lt;<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="java.lang.Object">Object</a>&gt;<em> scriptData</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.Network.toPostScript(HashMap)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>scriptData</strong> – Map of class parent and prefix data for generating python script</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="../util/ScriptGenException.html#ca.nengo.util.ScriptGenException" title="ca.nengo.util.ScriptGenException"><strong>ScriptGenException</strong></a> – if the node cannot be generated in script</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Python script for generating special or template ensembles and terminations in the network</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="InstantaneousOutput.html" title="previous chapter (use the left arrow)">InstantaneousOutput</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="Node.html" title="next chapter (use the right arrow)">Node</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Node.html" title="Node"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="InstantaneousOutput.html" title="InstantaneousOutput"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.model</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

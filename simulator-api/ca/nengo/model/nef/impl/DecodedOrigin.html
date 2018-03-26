@@ -1,0 +1,672 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>DecodedOrigin &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+    <link rel="next" title="DecodedOriginTest" href="DecodedOriginTest.html" />
+    <link rel="prev" title="DecodableEnsembleImpl" href="DecodableEnsembleImpl.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="DecodedOriginTest.html" title="DecodedOriginTest"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="DecodableEnsembleImpl.html" title="DecodableEnsembleImpl"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.model.nef.impl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.model.nef.impl</a></li>
+              
+              <li>DecodedOrigin</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="decodedorigin">
+<h1>DecodedOrigin<a class="headerlink" href="#decodedorigin" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin">
+public class <code class="descname">DecodedOrigin</code> implements <a class="reference internal" href="../../Origin.html#ca.nengo.model.Origin" title="ca.nengo.model.Origin">Origin</a>, <a class="reference internal" href="../../Resettable.html#ca.nengo.model.Resettable" title="ca.nengo.model.Resettable">Resettable</a>, <a class="reference internal" href="../../SimulationMode.html#ca.nengo.model.SimulationMode" title="ca.nengo.model.SimulationMode">SimulationMode</a>.<a class="reference internal" href="../../SimulationMode-ModeConfigurable.html#ca.nengo.model.SimulationMode.ModeConfigurable" title="ca.nengo.model.SimulationMode.ModeConfigurable">ModeConfigurable</a>, <a class="reference internal" href="../../Noise.html#ca.nengo.model.Noise" title="ca.nengo.model.Noise">Noise</a>.<a class="reference internal" href="../../Noise-Noisy.html#ca.nengo.model.Noise.Noisy" title="ca.nengo.model.Noise.Noisy">Noisy</a>, <a class="reference internal" href="../../../config/Configurable.html#ca.nengo.config.Configurable" title="ca.nengo.config.Configurable">Configurable</a>, <a class="reference internal" href="../../plasticity/ShortTermPlastic.html#ca.nengo.model.plasticity.ShortTermPlastic" title="ca.nengo.model.plasticity.ShortTermPlastic">ShortTermPlastic</a><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin" title="Permalink to this definition">¶</a></dt>
+<dd><p>An Origin of functions of the state variables of an NEFEnsemble. TODO: how do units fit in. define in constructor? ignore? TODO: select nodes make up decoded origin</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>DecodedOrigin<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.DecodedOrigin(Node, String, Node[], String, Function[], LinearApproximator)">
+public <code class="descname">DecodedOrigin</code><span class="sig-paren">(</span><a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> node</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>[]<em> nodes</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> nodeOrigin</em>, <a class="reference internal" href="../../../math/Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a>[]<em> functions</em>, <a class="reference internal" href="../../../math/LinearApproximator.html#ca.nengo.math.LinearApproximator" title="ca.nengo.math.LinearApproximator">LinearApproximator</a><em> approximator</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.DecodedOrigin(Node, String, Node[], String, Function[], LinearApproximator)" title="Permalink to this definition">¶</a></dt>
+<dd><p>With this constructor, decoding vectors are generated using default settings.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>node</strong> – The parent Node</li>
+<li><strong>name</strong> – Name of this Origin</li>
+<li><strong>nodes</strong> – Nodes that belong to the NEFEnsemble from which this Origin arises</li>
+<li><strong>nodeOrigin</strong> – Name of the Origin on each given node from which output is to be decoded</li>
+<li><strong>functions</strong> – Output Functions on the vector that is represented by the NEFEnsemble (one Function per dimension of output). For example if the Origin is to output x1*x2, where the ensemble represents [x1 x1], then one 2D function would be needed in this list. The input dimension of each function must be the same as the dimension of the state vector represented by this ensemble.</li>
+<li><strong>approximator</strong> – A LinearApproximator that can be used to approximate new functions as a weighted sum of the node outputs.</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>StructuralException</strong> – if functions do not all have the same input dimension (we don’t check against the state dimension at this point)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>DecodedOrigin<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.DecodedOrigin(Node, String, Node[], String, Function[], float[][], int)">
+public <code class="descname">DecodedOrigin</code><span class="sig-paren">(</span><a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> node</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>[]<em> nodes</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> nodeOrigin</em>, <a class="reference internal" href="../../../math/Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a>[]<em> functions</em>, float[][]<em> decoders</em>, int<em> dummy</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.DecodedOrigin(Node, String, Node[], String, Function[], float[][], int)" title="Permalink to this definition">¶</a></dt>
+<dd><p>With this constructor decoding vectors are specified by the caller.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>node</strong> – The parent Node</li>
+<li><strong>name</strong> – As in other constructor</li>
+<li><strong>nodes</strong> – As in other constructor</li>
+<li><strong>nodeOrigin</strong> – Name of the Origin on each given node from which output is to be decoded</li>
+<li><strong>functions</strong> – As in other constructor</li>
+<li><strong>decoders</strong> – Decoding vectors which are scaled by the main output of each Node, and then summed, to estimate the same function of the ensembles state vector that is defined by the ‘functions’ arg. The ‘functions’ arg is still needed, because in DIRECT SimulationMode, these functions are used directly. The ‘decoders’ arg allows the caller to provide decoders that are generated with non-default methods or parameters (eg an unusual number of singular values). Must be a matrix with one row per Node and one column per function.</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>StructuralException</strong> – If dimensions.length != neurons.length, decoders is not a matrix (ie all elements with same length), or if the number of columns in decoders is not equal to the number of functions</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>DecodedOrigin<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.DecodedOrigin(Node, String, Node[], String, TimeSeries, LinearApproximator)">
+public <code class="descname">DecodedOrigin</code><span class="sig-paren">(</span><a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> node</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>[]<em> nodes</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> nodeOrigin</em>, <a class="reference internal" href="../../../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a><em> targetSignal</em>, <a class="reference internal" href="../../../math/LinearApproximator.html#ca.nengo.math.LinearApproximator" title="ca.nengo.math.LinearApproximator">LinearApproximator</a><em> approximator</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.DecodedOrigin(Node, String, Node[], String, TimeSeries, LinearApproximator)" title="Permalink to this definition">¶</a></dt>
+<dd><p>With this constructor the target is a signal over time rather than a function.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>node</strong> – The parent Node</li>
+<li><strong>name</strong> – As in other constructor</li>
+<li><strong>nodes</strong> – As in other constructor</li>
+<li><strong>nodeOrigin</strong> – Name of the Origin on each given node from which output is to be decoded</li>
+<li><strong>targetSignal</strong> – Signal over time that this origin should produce.</li>
+<li><strong>approximator</strong> – A LinearApproximator that can be used to approximate new signals as a weighted sum of the node outputs.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="clone">
+<h3>clone<a class="headerlink" href="#clone" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.clone()">
+public <a class="reference internal" href="#ca.nengo.model.nef.impl.DecodedOrigin" title="ca.nengo.model.nef.impl.DecodedOrigin">DecodedOrigin</a> <code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.clone()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3>clone<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.clone(Node)">
+public <a class="reference internal" href="#ca.nengo.model.nef.impl.DecodedOrigin" title="ca.nengo.model.nef.impl.DecodedOrigin">DecodedOrigin</a> <code class="descname">clone</code><span class="sig-paren">(</span><a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> node</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.clone(Node)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getconfiguration">
+<h3>getConfiguration<a class="headerlink" href="#getconfiguration" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getConfiguration()">
+public <a class="reference internal" href="../../../config/Configuration.html#ca.nengo.config.Configuration" title="ca.nengo.config.Configuration">Configuration</a> <code class="descname">getConfiguration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getConfiguration()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../../config/Configurable.html#ca.nengo.config.Configurable.getConfiguration()" title="ca.nengo.config.Configurable.getConfiguration()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.config.Configurable.getConfiguration()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getdecoders">
+<h3>getDecoders<a class="headerlink" href="#getdecoders" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getDecoders()">
+public float[][] <code class="descname">getDecoders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getDecoders()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Decoding vectors for each Node</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getdimensions">
+<h3>getDimensions<a class="headerlink" href="#getdimensions" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getDimensions()">
+public int <code class="descname">getDimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getDimensions()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Origin.html#ca.nengo.model.Origin.getDimensions()" title="ca.nengo.model.Origin.getDimensions()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Origin.getDimensions()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="geterror">
+<h3>getError<a class="headerlink" href="#geterror" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getError()">
+public float[] <code class="descname">getError</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getError()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Mean-squared error of this origin over 500 randomly selected points</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id5">
+<h3>getError<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getError(int)">
+public float[] <code class="descname">getError</code><span class="sig-paren">(</span>int<em> samples</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getError(int)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>samples</strong> – The number of input vectors the error is sampled over</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Mean-squared error of this origin over randomly selected points</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getexpressmodel">
+<h3>getExpressModel<a class="headerlink" href="#getexpressmodel" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getExpressModel()">
+public <a class="reference internal" href="../ExpressModel.html#ca.nengo.model.nef.ExpressModel" title="ca.nengo.model.nef.ExpressModel">ExpressModel</a> <code class="descname">getExpressModel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getExpressModel()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Simplified model of deviations from DIRECT mode that are associated with spiking simulations</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getfunctions">
+<h3>getFunctions<a class="headerlink" href="#getfunctions" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getFunctions()">
+public <a class="reference internal" href="../../../math/Function.html#ca.nengo.math.Function" title="ca.nengo.math.Function">Function</a>[] <code class="descname">getFunctions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getFunctions()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">List of Functions approximated by this DecodedOrigin</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getmode">
+<h3>getMode<a class="headerlink" href="#getmode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getMode()">
+public <a class="reference internal" href="../../SimulationMode.html#ca.nengo.model.SimulationMode" title="ca.nengo.model.SimulationMode">SimulationMode</a> <code class="descname">getMode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getMode()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">The mode in which the Ensemble is currently running.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getname">
+<h3>getName<a class="headerlink" href="#getname" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getName()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getName()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Origin.html#ca.nengo.model.Origin.getName()" title="ca.nengo.model.Origin.getName()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Origin.getName()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getnode">
+<h3>getNode<a class="headerlink" href="#getnode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getNode()">
+public <a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a> <code class="descname">getNode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getNode()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Origin.html#ca.nengo.model.Origin.getNode()" title="ca.nengo.model.Origin.getNode()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Origin.getNode()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getnodeorigin">
+<h3>getNodeOrigin<a class="headerlink" href="#getnodeorigin" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getNodeOrigin()">
+protected <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getNodeOrigin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getNodeOrigin()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Name of Node-level Origin on which this DecodedOrigin is based</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getnoise">
+<h3>getNoise<a class="headerlink" href="#getnoise" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getNoise()">
+public <a class="reference internal" href="../../Noise.html#ca.nengo.model.Noise" title="ca.nengo.model.Noise">Noise</a> <code class="descname">getNoise</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getNoise()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Noise with which output of this Origin is corrupted</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getrequiredoncpu">
+<h3>getRequiredOnCPU<a class="headerlink" href="#getrequiredoncpu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getRequiredOnCPU()">
+public boolean <code class="descname">getRequiredOnCPU</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getRequiredOnCPU()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getstpdynamics">
+<h3>getSTPDynamics<a class="headerlink" href="#getstpdynamics" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getSTPDynamics()">
+public <a class="reference internal" href="../../../dynamics/DynamicalSystem.html#ca.nengo.dynamics.DynamicalSystem" title="ca.nengo.dynamics.DynamicalSystem">DynamicalSystem</a> <code class="descname">getSTPDynamics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getSTPDynamics()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../plasticity/ShortTermPlastic.html#ca.nengo.model.plasticity.ShortTermPlastic.getSTPDynamics()" title="ca.nengo.model.plasticity.ShortTermPlastic.getSTPDynamics()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.plasticity.ShortTermPlastic.getSTPDynamics()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id6">
+<h3>getSTPDynamics<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getSTPDynamics(int)">
+public <a class="reference internal" href="../../../dynamics/DynamicalSystem.html#ca.nengo.dynamics.DynamicalSystem" title="ca.nengo.dynamics.DynamicalSystem">DynamicalSystem</a> <code class="descname">getSTPDynamics</code><span class="sig-paren">(</span>int<em> i</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getSTPDynamics(int)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides access to copy of dynamics for an individual node, to allow node-by-node parameterization.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>i</strong> – Node number</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Dynamics of short-term plasticity for the specified node</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getstphistory">
+<h3>getSTPHistory<a class="headerlink" href="#getstphistory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getSTPHistory()">
+protected <a class="reference internal" href="../../../util/TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a> <code class="descname">getSTPHistory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getSTPHistory()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getvalues">
+<h3>getValues<a class="headerlink" href="#getvalues" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.getValues()">
+public <a class="reference internal" href="../../InstantaneousOutput.html#ca.nengo.model.InstantaneousOutput" title="ca.nengo.model.InstantaneousOutput">InstantaneousOutput</a> <code class="descname">getValues</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.getValues()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Origin.html#ca.nengo.model.Origin.getValues()" title="ca.nengo.model.Origin.getValues()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Origin.getValues()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="rebuilddecoder">
+<h3>rebuildDecoder<a class="headerlink" href="#rebuilddecoder" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.rebuildDecoder(LinearApproximator)">
+public void <code class="descname">rebuildDecoder</code><span class="sig-paren">(</span><a class="reference internal" href="../../../math/LinearApproximator.html#ca.nengo.math.LinearApproximator" title="ca.nengo.math.LinearApproximator">LinearApproximator</a><em> approximator</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.rebuildDecoder(LinearApproximator)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recalculates the decoders</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>approximator</strong> – approximator?</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="redefinenodes">
+<h3>redefineNodes<a class="headerlink" href="#redefinenodes" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.redefineNodes(Node[], LinearApproximator)">
+public void <code class="descname">redefineNodes</code><span class="sig-paren">(</span><a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>[]<em> nodes</em>, <a class="reference internal" href="../../../math/LinearApproximator.html#ca.nengo.math.LinearApproximator" title="ca.nengo.math.LinearApproximator">LinearApproximator</a><em> approximator</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.redefineNodes(Node[], LinearApproximator)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes the set of nodes and recalculates the decoders</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>nodes</strong> – Nodes to replace existing nodes</li>
+<li><strong>approximator</strong> – approximator?</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="rescaledecoders">
+<h3>rescaleDecoders<a class="headerlink" href="#rescaledecoders" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.rescaleDecoders(float[])">
+public void <code class="descname">rescaleDecoders</code><span class="sig-paren">(</span>float[]<em> scale</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.rescaleDecoders(float[])" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescales the decoders. Useful if the radius changes but you don’t want to regenerate the decoders.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>scale</strong> – vector to multiply each decoder by</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="reset">
+<h3>reset<a class="headerlink" href="#reset" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.reset(boolean)">
+public void <code class="descname">reset</code><span class="sig-paren">(</span>boolean<em> randomize</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.reset(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../../Resettable.html#ca.nengo.model.Resettable.reset(boolean)" title="ca.nengo.model.Resettable.reset(boolean)"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Resettable.reset(boolean)</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="run">
+<h3>run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.run(float[], float, float)">
+public void <code class="descname">run</code><span class="sig-paren">(</span>float[]<em> state</em>, float<em> startTime</em>, float<em> endTime</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.run(float[], float, float)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Must be called at each time step after Nodes are run and before getValues().</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>state</strong> – Idealized state (as defined by inputs) which can be fed into (idealized) functions that make up the Origin, when it is running in DIRECT mode. This is not used in other modes, and can be null.</li>
+<li><strong>startTime</strong> – simulation time of timestep onset</li>
+<li><strong>endTime</strong> – simulation time of timestep end</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="../../SimulationException.html#ca.nengo.model.SimulationException" title="ca.nengo.model.SimulationException"><strong>SimulationException</strong></a> – If the given state is not of the expected dimension (ie the input dimension of the functions provided in the constructor)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setdecoders">
+<h3>setDecoders<a class="headerlink" href="#setdecoders" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.setDecoders(float[][])">
+public void <code class="descname">setDecoders</code><span class="sig-paren">(</span>float[][]<em> decoders</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.setDecoders(float[][])" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>decoders</strong> – New decoding vectors (row per Node)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setexpressmodel">
+<h3>setExpressModel<a class="headerlink" href="#setexpressmodel" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.setExpressModel(ExpressModel)">
+public void <code class="descname">setExpressModel</code><span class="sig-paren">(</span><a class="reference internal" href="../ExpressModel.html#ca.nengo.model.nef.ExpressModel" title="ca.nengo.model.nef.ExpressModel">ExpressModel</a><em> em</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.setExpressModel(ExpressModel)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>em</strong> – Simplified model of deviations from DIRECT mode that are associated with spiking simulations</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setmode">
+<h3>setMode<a class="headerlink" href="#setmode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.setMode(SimulationMode)">
+public void <code class="descname">setMode</code><span class="sig-paren">(</span><a class="reference internal" href="../../SimulationMode.html#ca.nengo.model.SimulationMode" title="ca.nengo.model.SimulationMode">SimulationMode</a><em> mode</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.setMode(SimulationMode)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>mode</strong> – Requested simulation mode</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setnoise">
+<h3>setNoise<a class="headerlink" href="#setnoise" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.setNoise(Noise)">
+public void <code class="descname">setNoise</code><span class="sig-paren">(</span><a class="reference internal" href="../../Noise.html#ca.nengo.model.Noise" title="ca.nengo.model.Noise">Noise</a><em> noise</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.setNoise(Noise)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>noise</strong> – New output noise model (defaults to no noise)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setnoises">
+<h3>setNoises<a class="headerlink" href="#setnoises" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.setNoises(Noise[])">
+public void <code class="descname">setNoises</code><span class="sig-paren">(</span><a class="reference internal" href="../../Noise.html#ca.nengo.model.Noise" title="ca.nengo.model.Noise">Noise</a>[]<em> noises</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.setNoises(Noise[])" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>noises</strong> – New output noise model for each dimension of output</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="../../SimulationException.html#ca.nengo.model.SimulationException" title="ca.nengo.model.SimulationException"><strong>SimulationException</strong></a> – </li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setrequiredoncpu">
+<h3>setRequiredOnCPU<a class="headerlink" href="#setrequiredoncpu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.setRequiredOnCPU(boolean)">
+public void <code class="descname">setRequiredOnCPU</code><span class="sig-paren">(</span>boolean<em> val</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.setRequiredOnCPU(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setstpdynamics">
+<h3>setSTPDynamics<a class="headerlink" href="#setstpdynamics" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.setSTPDynamics(DynamicalSystem)">
+public void <code class="descname">setSTPDynamics</code><span class="sig-paren">(</span><a class="reference internal" href="../../../dynamics/DynamicalSystem.html#ca.nengo.dynamics.DynamicalSystem" title="ca.nengo.dynamics.DynamicalSystem">DynamicalSystem</a><em> dynamics</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.setSTPDynamics(DynamicalSystem)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.plasticity.ShortTermPlastic.setSTPDynamics(ca.nengo.dynamics.DynamicalSystem)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setvalues">
+<h3>setValues<a class="headerlink" href="#setvalues" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.setValues(InstantaneousOutput)">
+public void <code class="descname">setValues</code><span class="sig-paren">(</span><a class="reference internal" href="../../InstantaneousOutput.html#ca.nengo.model.InstantaneousOutput" title="ca.nengo.model.InstantaneousOutput">InstantaneousOutput</a><em> val</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.setValues(InstantaneousOutput)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Origin.setValues()</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id7">
+<h3>setValues<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.DecodedOrigin.setValues(RealOutput)">
+public void <code class="descname">setValues</code><span class="sig-paren">(</span><a class="reference internal" href="../../RealOutput.html#ca.nengo.model.RealOutput" title="ca.nengo.model.RealOutput">RealOutput</a><em> ro</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.DecodedOrigin.setValues(RealOutput)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>ro</strong> – Values to be set</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="DecodableEnsembleImpl.html" title="previous chapter (use the left arrow)">DecodableEnsembleImpl</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="DecodedOriginTest.html" title="next chapter (use the right arrow)">DecodedOriginTest</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="DecodedOriginTest.html" title="DecodedOriginTest"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="DecodableEnsembleImpl.html" title="DecodableEnsembleImpl"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.model.nef.impl</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

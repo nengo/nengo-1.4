@@ -1,0 +1,385 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>UINodeViewable &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+    <link rel="next" title="ca.nengo.ui.models.nodes.widgets" href="widgets/package-index.html" />
+    <link rel="prev" title="UINeuron" href="UINeuron.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="widgets/package-index.html" title="ca.nengo.ui.models.nodes.widgets"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="UINeuron.html" title="UINeuron"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.ui.models.nodes</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../packages.html">simulator-ui</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.ui.models.nodes</a></li>
+              
+              <li>UINodeViewable</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="uinodeviewable">
+<h1>UINodeViewable<a class="headerlink" href="#uinodeviewable" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable">
+public abstract class <code class="descname">UINodeViewable</code> extends <a class="reference internal" href="../UINeoNode.html#ca.nengo.ui.models.UINeoNode" title="ca.nengo.ui.models.UINeoNode">UINeoNode</a><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable" title="Permalink to this definition">¶</a></dt>
+<dd><p>UI Wrapper for Node Containers such as Ensembles and Networks.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Shu</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>UINodeViewable<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.UINodeViewable(Node)">
+public <code class="descname">UINodeViewable</code><span class="sig-paren">(</span><a class="reference internal" href="../../../../../../simulator-api/ca/nengo/model/Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a><em> model</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.UINodeViewable(Node)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="closeviewer">
+<h3>closeViewer<a class="headerlink" href="#closeviewer" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.closeViewer()">
+public void <code class="descname">closeViewer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.closeViewer()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the viewer Window</p>
+</dd></dl>
+
+</div>
+<div class="section" id="constructtooltips">
+<h3>constructTooltips<a class="headerlink" href="#constructtooltips" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.constructTooltips(TooltipBuilder)">
+protected void <code class="descname">constructTooltips</code><span class="sig-paren">(</span><a class="reference internal" href="../tooltips/TooltipBuilder.html#ca.nengo.ui.models.tooltips.TooltipBuilder" title="ca.nengo.ui.models.tooltips.TooltipBuilder">TooltipBuilder</a><em> tooltips</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.constructTooltips(TooltipBuilder)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="createbrainviewer">
+<h3>createBrainViewer<a class="headerlink" href="#createbrainviewer" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.createBrainViewer()">
+public void <code class="descname">createBrainViewer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.createBrainViewer()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens a new instance of Brain View</p>
+</dd></dl>
+
+</div>
+<div class="section" id="createviewerinstance">
+<h3>createViewerInstance<a class="headerlink" href="#createviewerinstance" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.createViewerInstance()">
+protected abstract <a class="reference internal" href="../viewers/NodeViewer.html#ca.nengo.ui.models.viewers.NodeViewer" title="ca.nengo.ui.models.viewers.NodeViewer">NodeViewer</a> <code class="descname">createViewerInstance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.createViewerInstance()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new Viewer</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Viewer created</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="detachviewfrommodel">
+<h3>detachViewFromModel<a class="headerlink" href="#detachviewfrommodel" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.detachViewFromModel()">
+public void <code class="descname">detachViewFromModel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.detachViewFromModel()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="doubleclicked">
+<h3>doubleClicked<a class="headerlink" href="#doubleclicked" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.doubleClicked()">
+public void <code class="descname">doubleClicked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.doubleClicked()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getdimensionality">
+<h3>getDimensionality<a class="headerlink" href="#getdimensionality" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.getDimensionality()">
+public abstract int <code class="descname">getDimensionality</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.getDimensionality()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Number of dimensions in this population contained by the Model</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getnodescount">
+<h3>getNodesCount<a class="headerlink" href="#getnodescount" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.getNodesCount()">
+public abstract int <code class="descname">getNodesCount</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.getNodesCount()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Number of nodes contained by the Model</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getviewer">
+<h3>getViewer<a class="headerlink" href="#getviewer" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.getViewer()">
+public <a class="reference internal" href="../viewers/NodeViewer.html#ca.nengo.ui.models.viewers.NodeViewer" title="ca.nengo.ui.models.viewers.NodeViewer">NodeViewer</a> <code class="descname">getViewer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.getViewer()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Container Viewer</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getviewerwindow">
+<h3>getViewerWindow<a class="headerlink" href="#getviewerwindow" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.getViewerWindow()">
+protected <a class="reference internal" href="../../lib/world/piccolo/objects/Window.html#ca.nengo.ui.lib.world.piccolo.objects.Window" title="ca.nengo.ui.lib.world.piccolo.objects.Window">Window</a> <code class="descname">getViewerWindow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.getViewerWindow()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Viewer Window</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="initialize">
+<h3>initialize<a class="headerlink" href="#initialize" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.initialize()">
+protected void <code class="descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.initialize()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="isviewerwindowvisible">
+<h3>isViewerWindowVisible<a class="headerlink" href="#isviewerwindowvisible" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.isViewerWindowVisible()">
+public boolean <code class="descname">isViewerWindowVisible</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.isViewerWindowVisible()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="moveviewerwindowtofront">
+<h3>moveViewerWindowToFront<a class="headerlink" href="#moveviewerwindowtofront" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.moveViewerWindowToFront()">
+public void <code class="descname">moveViewerWindowToFront</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.moveViewerWindowToFront()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="openviewer">
+<h3>openViewer<a class="headerlink" href="#openviewer" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.openViewer()">
+public <a class="reference internal" href="../viewers/NodeViewer.html#ca.nengo.ui.models.viewers.NodeViewer" title="ca.nengo.ui.models.viewers.NodeViewer">NodeViewer</a> <code class="descname">openViewer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.openViewer()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the Container Viewer</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">the Container viewer</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="preparefordestroy">
+<h3>prepareForDestroy<a class="headerlink" href="#preparefordestroy" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.prepareForDestroy()">
+protected void <code class="descname">prepareForDestroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.prepareForDestroy()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="savecontainerconfig">
+<h3>saveContainerConfig<a class="headerlink" href="#savecontainerconfig" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.saveContainerConfig()">
+public abstract void <code class="descname">saveContainerConfig</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.saveContainerConfig()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the configuration of this node container</p>
+</dd></dl>
+
+</div>
+<div class="section" id="savemodel">
+<h3>saveModel<a class="headerlink" href="#savemodel" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.models.nodes.UINodeViewable.saveModel(File)">
+public void <code class="descname">saveModel</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/io/File.html" title="java.io.File">File</a><em> file</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.models.nodes.UINodeViewable.saveModel(File)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="UINeuron.html" title="previous chapter (use the left arrow)">UINeuron</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="widgets/package-index.html" title="next chapter (use the right arrow)">ca.nengo.ui.models.nodes.widgets</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="widgets/package-index.html" title="ca.nengo.ui.models.nodes.widgets"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="UINeuron.html" title="UINeuron"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.ui.models.nodes</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

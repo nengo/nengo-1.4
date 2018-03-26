@@ -1,0 +1,357 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>TimeSeriesImpl &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="simulator-ui" href="../../../../../simulator-ui-api/packages.html" />
+    <link rel="prev" title="TimeSeries1DImplTest" href="TimeSeries1DImplTest.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../simulator-ui-api/packages.html" title="simulator-ui"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="TimeSeries1DImplTest.html" title="TimeSeries1DImplTest"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.util.impl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.util.impl</a></li>
+              
+              <li>TimeSeriesImpl</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="timeseriesimpl">
+<h1>TimeSeriesImpl<a class="headerlink" href="#timeseriesimpl" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.util.impl.TimeSeriesImpl">
+public class <code class="descname">TimeSeriesImpl</code> implements <a class="reference internal" href="../TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a><a class="headerlink" href="#ca.nengo.util.impl.TimeSeriesImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default implementation of TimeSeriesND.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>TimeSeriesImpl<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.util.impl.TimeSeriesImpl.TimeSeriesImpl(float[], float[][], Units[])">
+public <code class="descname">TimeSeriesImpl</code><span class="sig-paren">(</span>float[]<em> times</em>, float[][]<em> values</em>, <a class="reference internal" href="../../model/Units.html#ca.nengo.model.Units" title="ca.nengo.model.Units">Units</a>[]<em> units</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.util.impl.TimeSeriesImpl.TimeSeriesImpl(float[], float[][], Units[])" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>times</strong> – &#64;see ca.bpt.cn.util.TimeSeries#getTimes()</li>
+<li><strong>values</strong> – &#64;see ca.bpt.cn.util.TimeSeries#getValues()</li>
+<li><strong>units</strong> – &#64;see ca.bpt.cn.util.TimeSeries#getUnits()</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>TimeSeriesImpl<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.util.impl.TimeSeriesImpl.TimeSeriesImpl(float[], float[][], Units[], String[])">
+public <code class="descname">TimeSeriesImpl</code><span class="sig-paren">(</span>float[]<em> times</em>, float[][]<em> values</em>, <a class="reference internal" href="../../model/Units.html#ca.nengo.model.Units" title="ca.nengo.model.Units">Units</a>[]<em> units</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a>[]<em> labels</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.util.impl.TimeSeriesImpl.TimeSeriesImpl(float[], float[][], Units[], String[])" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>times</strong> – &#64;see ca.nengo.util.TimeSeries#getTimes()</li>
+<li><strong>values</strong> – &#64;see ca.nengo.util.TimeSeries#getValues()</li>
+<li><strong>units</strong> – &#64;see ca.nengo.util.TimeSeries#getUnits()</li>
+<li><strong>labels</strong> – &#64;see ca.nengo.util.TimeSeries#getLabels()</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="clone">
+<h3>clone<a class="headerlink" href="#clone" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.util.impl.TimeSeriesImpl.clone()">
+public <a class="reference internal" href="../TimeSeries.html#ca.nengo.util.TimeSeries" title="ca.nengo.util.TimeSeries">TimeSeries</a> <code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.util.impl.TimeSeriesImpl.clone()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getdimension">
+<h3>getDimension<a class="headerlink" href="#getdimension" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.util.impl.TimeSeriesImpl.getDimension()">
+public int <code class="descname">getDimension</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.util.impl.TimeSeriesImpl.getDimension()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../TimeSeries.html#ca.nengo.util.TimeSeries.getDimension()" title="ca.nengo.util.TimeSeries.getDimension()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.util.TimeSeries.getDimension()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getlabels">
+<h3>getLabels<a class="headerlink" href="#getlabels" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.util.impl.TimeSeriesImpl.getLabels()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a>[] <code class="descname">getLabels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.util.impl.TimeSeriesImpl.getLabels()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../TimeSeries.html#ca.nengo.util.TimeSeries.getLabels()" title="ca.nengo.util.TimeSeries.getLabels()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.util.TimeSeries.getLabels()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getname">
+<h3>getName<a class="headerlink" href="#getname" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.util.impl.TimeSeriesImpl.getName()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.util.impl.TimeSeriesImpl.getName()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../TimeSeries.html#ca.nengo.util.TimeSeries.getName()" title="ca.nengo.util.TimeSeries.getName()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.util.TimeSeries.getName()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="gettimes">
+<h3>getTimes<a class="headerlink" href="#gettimes" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.util.impl.TimeSeriesImpl.getTimes()">
+public float[] <code class="descname">getTimes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.util.impl.TimeSeriesImpl.getTimes()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.util.TimeSeries1D.getTimes()</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getunits">
+<h3>getUnits<a class="headerlink" href="#getunits" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.util.impl.TimeSeriesImpl.getUnits()">
+public <a class="reference internal" href="../../model/Units.html#ca.nengo.model.Units" title="ca.nengo.model.Units">Units</a>[] <code class="descname">getUnits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.util.impl.TimeSeriesImpl.getUnits()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.util.TimeSeries1D.getUnits()</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getvalues">
+<h3>getValues<a class="headerlink" href="#getvalues" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.util.impl.TimeSeriesImpl.getValues()">
+public float[][] <code class="descname">getValues</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.util.impl.TimeSeriesImpl.getValues()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.util.TimeSeries1D.getValues()</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setlabel">
+<h3>setLabel<a class="headerlink" href="#setlabel" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.util.impl.TimeSeriesImpl.setLabel(int, String)">
+public void <code class="descname">setLabel</code><span class="sig-paren">(</span>int<em> index</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> label</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.util.impl.TimeSeriesImpl.setLabel(int, String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>index</strong> – Index of dimension for which to change label</li>
+<li><strong>label</strong> – New label for given dimension</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setname">
+<h3>setName<a class="headerlink" href="#setname" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.util.impl.TimeSeriesImpl.setName(String)">
+public void <code class="descname">setName</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.util.impl.TimeSeriesImpl.setName(String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Name of the TimeSeries</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setunits">
+<h3>setUnits<a class="headerlink" href="#setunits" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.util.impl.TimeSeriesImpl.setUnits(int, Units)">
+public void <code class="descname">setUnits</code><span class="sig-paren">(</span>int<em> index</em>, <a class="reference internal" href="../../model/Units.html#ca.nengo.model.Units" title="ca.nengo.model.Units">Units</a><em> units</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.util.impl.TimeSeriesImpl.setUnits(int, Units)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>index</strong> – Index of dimension for which to change units</li>
+<li><strong>units</strong> – New units for given dimension</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="TimeSeries1DImplTest.html" title="previous chapter (use the left arrow)">TimeSeries1DImplTest</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="../../../../../simulator-ui-api/packages.html" title="next chapter (use the right arrow)">simulator-ui</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../simulator-ui-api/packages.html" title="simulator-ui"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="TimeSeries1DImplTest.html" title="TimeSeries1DImplTest"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.util.impl</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

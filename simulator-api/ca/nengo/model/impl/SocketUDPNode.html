@@ -1,0 +1,604 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>SocketUDPNode &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="SpikeOutputImpl" href="SpikeOutputImpl.html" />
+    <link rel="prev" title="RealOutputImplTest" href="RealOutputImplTest.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="SpikeOutputImpl.html" title="SpikeOutputImpl"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="RealOutputImplTest.html" title="RealOutputImplTest"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.model.impl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.model.impl</a></li>
+              
+              <li>SocketUDPNode</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="socketudpnode">
+<h1>SocketUDPNode<a class="headerlink" href="#socketudpnode" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.model.impl.SocketUDPNode">
+public class <code class="descname">SocketUDPNode</code> implements <a class="reference internal" href="../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>, <a class="reference internal" href="../Resettable.html#ca.nengo.model.Resettable" title="ca.nengo.model.Resettable">Resettable</a><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Node that sends and receives data through sockets via a UDP connection.</p>
+<p>This can be useful if an input to a Network is actually routed to multiple destinations, but you want to handle this connectivity within the Network rather than expose multiple terminations.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="origin">
+<h3>ORIGIN<a class="headerlink" href="#origin" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.model.impl.SocketUDPNode.ORIGIN">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">ORIGIN</code><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.ORIGIN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default name for an origin</p>
+</dd></dl>
+
+</div>
+<div class="section" id="termination">
+<h3>TERMINATION<a class="headerlink" href="#termination" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.model.impl.SocketUDPNode.TERMINATION">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">TERMINATION</code><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.TERMINATION" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default name for a termination</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>SocketUDPNode<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.impl.SocketUDPNode.SocketUDPNode(String, int, int, int, String, int, int, boolean)">
+public <code class="descname">SocketUDPNode</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, int<em> dimension</em>, int<em> recvDimension</em>, int<em> localPort</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> destAddress</em>, int<em> destPort</em>, int<em> socketTimeout</em>, boolean<em> ignoreTimestamp</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.SocketUDPNode(String, int, int, int, String, int, int, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor for a SocketUDPNode that sends and receives data.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – Node name</li>
+<li><strong>dimension</strong> – Dimension of data passing through</li>
+<li><strong>localPort</strong> – Port number on the local machine to bind to. Set to 0 to bind to first available port.</li>
+<li><strong>destAddress</strong> – Destination address to connect to</li>
+<li><strong>destPort</strong> – Destination port to connect to</li>
+<li><strong>socketTimeout</strong> – Timeout on socket in milliseconds (socket blocks until timeout expires)</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>SocketException</strong> – </li>
+<li><strong>UnknownHostException</strong> – </li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>SocketUDPNode<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.impl.SocketUDPNode.SocketUDPNode(String, int, int, int, int)">
+public <code class="descname">SocketUDPNode</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, int<em> dimension</em>, int<em> recvDimension</em>, int<em> localPort</em>, int<em> socketTimeout</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.SocketUDPNode(String, int, int, int, int)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor for a SocketUDPNode that only receives data.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Node name</li>
+<li><strong>dimension</strong> – Dimension of data passing through</li>
+<li><strong>localPort</strong> – Port number on the local machine to bind to. Set to 0 to bind to first available port.</li>
+<li><strong>socketTimeout</strong> – Timeout on socket in milliseconds (socket blocks until timeout expires)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>SocketUDPNode<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.impl.SocketUDPNode.SocketUDPNode(String, int, int, int, int, boolean)">
+public <code class="descname">SocketUDPNode</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, int<em> dimension</em>, int<em> recvDimension</em>, int<em> localPort</em>, int<em> socketTimeout</em>, boolean<em> ignoreTimestamp</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.SocketUDPNode(String, int, int, int, int, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor for a SocketUDPNode that only receives data, with an option to ignore the timestamp on incoming packets.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Node name</li>
+<li><strong>dimension</strong> – Dimension of data passing through</li>
+<li><strong>localPort</strong> – Port number on the local machine to bind to. Set to 0 to bind to first available port.</li>
+<li><strong>ignoreTimestamp</strong> – Set to true to ignore timestamps on incoming packets.</li>
+<li><strong>socketTimeout</strong> – Timeout on socket in milliseconds (socket blocks until timeout expires)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3>SocketUDPNode<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.impl.SocketUDPNode.SocketUDPNode(String, int, String, int)">
+public <code class="descname">SocketUDPNode</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, int<em> dimension</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> destAddress</em>, int<em> destPort</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.SocketUDPNode(String, int, String, int)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor for a SocketUDPNode that only sends data.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Node name</li>
+<li><strong>dimension</strong> – Dimension of data passing through</li>
+<li><strong>destAddress</strong> – Destination address to connect to</li>
+<li><strong>destPort</strong> – Destination port to connect to</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="addchangelistener">
+<h3>addChangeListener<a class="headerlink" href="#addchangelistener" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.addChangeListener(Listener)">
+public void <code class="descname">addChangeListener</code><span class="sig-paren">(</span><a class="reference internal" href="../../../../../simulator-ui-api/ca/nengo/ui/lib/world/WorldObject-Listener.html#ca.nengo.ui.lib.world.WorldObject.Listener" title="ca.nengo.ui.lib.world.WorldObject.Listener">Listener</a><em> listener</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.addChangeListener(Listener)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.util.VisiblyMutable.addChangeListener(ca.nengo.util.VisiblyMutable.Listener)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="addtermination">
+<h3>addTermination<a class="headerlink" href="#addtermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.addTermination(String, float[][])">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> transform</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.addTermination(String, float[][])" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="clone">
+<h3>clone<a class="headerlink" href="#clone" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.clone()">
+public <a class="reference internal" href="../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a> <code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.clone()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="close">
+<h3>close<a class="headerlink" href="#close" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.close()">
+public void <code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.close()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getchildren">
+<h3>getChildren<a class="headerlink" href="#getchildren" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getChildren()">
+public <a class="reference internal" href="../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>[] <code class="descname">getChildren</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getChildren()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getdestinetaddress">
+<h3>getDestInetAddress<a class="headerlink" href="#getdestinetaddress" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getDestInetAddress()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/net/InetAddress.html" title="java.net.InetAddress">InetAddress</a> <code class="descname">getDestInetAddress</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getDestInetAddress()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getdestport">
+<h3>getDestPort<a class="headerlink" href="#getdestport" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getDestPort()">
+public int <code class="descname">getDestPort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getDestPort()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getdimension">
+<h3>getDimension<a class="headerlink" href="#getdimension" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getDimension()">
+public int <code class="descname">getDimension</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getDimension()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getdocumentation">
+<h3>getDocumentation<a class="headerlink" href="#getdocumentation" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getDocumentation()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getDocumentation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getDocumentation()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../Node.html#ca.nengo.model.Node.getDocumentation()" title="ca.nengo.model.Node.getDocumentation()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Node.getDocumentation()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getignoretimestamp">
+<h3>getIgnoreTimestamp<a class="headerlink" href="#getignoretimestamp" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getIgnoreTimestamp()">
+public boolean <code class="descname">getIgnoreTimestamp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getIgnoreTimestamp()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getlocalport">
+<h3>getLocalPort<a class="headerlink" href="#getlocalport" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getLocalPort()">
+public int <code class="descname">getLocalPort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getLocalPort()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getmode">
+<h3>getMode<a class="headerlink" href="#getmode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getMode()">
+public <a class="reference internal" href="../SimulationMode.html#ca.nengo.model.SimulationMode" title="ca.nengo.model.SimulationMode">SimulationMode</a> <code class="descname">getMode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getMode()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../SimulationMode-ModeConfigurable.html#ca.nengo.model.SimulationMode.ModeConfigurable.getMode()" title="ca.nengo.model.SimulationMode.ModeConfigurable.getMode()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.SimulationMode.ModeConfigurable.getMode()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getname">
+<h3>getName<a class="headerlink" href="#getname" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getName()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getName()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../Node.html#ca.nengo.model.Node.getName()" title="ca.nengo.model.Node.getName()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Node.getName()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getorigin">
+<h3>getOrigin<a class="headerlink" href="#getorigin" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getOrigin(String)">
+public <a class="reference internal" href="../Origin.html#ca.nengo.model.Origin" title="ca.nengo.model.Origin">Origin</a> <code class="descname">getOrigin</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getOrigin(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Node.getOrigin(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getorigins">
+<h3>getOrigins<a class="headerlink" href="#getorigins" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getOrigins()">
+public <a class="reference internal" href="../Origin.html#ca.nengo.model.Origin" title="ca.nengo.model.Origin">Origin</a>[] <code class="descname">getOrigins</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getOrigins()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../Node.html#ca.nengo.model.Node.getOrigins()" title="ca.nengo.model.Node.getOrigins()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Node.getOrigins()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getsockettimeout">
+<h3>getSocketTimeout<a class="headerlink" href="#getsockettimeout" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getSocketTimeout()">
+public int <code class="descname">getSocketTimeout</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getSocketTimeout()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="gettermination">
+<h3>getTermination<a class="headerlink" href="#gettermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getTermination(String)">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">getTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getTermination(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Node.getTermination(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getterminations">
+<h3>getTerminations<a class="headerlink" href="#getterminations" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.getTerminations()">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a>[] <code class="descname">getTerminations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.getTerminations()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../Node.html#ca.nengo.model.Node.getTerminations()" title="ca.nengo.model.Node.getTerminations()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Node.getTerminations()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="initialize">
+<h3>initialize<a class="headerlink" href="#initialize" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.initialize()">
+public void <code class="descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.initialize()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="isreceiver">
+<h3>isReceiver<a class="headerlink" href="#isreceiver" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.isReceiver()">
+public boolean <code class="descname">isReceiver</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.isReceiver()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="issender">
+<h3>isSender<a class="headerlink" href="#issender" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.isSender()">
+public boolean <code class="descname">isSender</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.isSender()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="releasememory">
+<h3>releaseMemory<a class="headerlink" href="#releasememory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.releaseMemory()">
+public void <code class="descname">releaseMemory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.releaseMemory()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="removechangelistener">
+<h3>removeChangeListener<a class="headerlink" href="#removechangelistener" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.removeChangeListener(Listener)">
+public void <code class="descname">removeChangeListener</code><span class="sig-paren">(</span><a class="reference internal" href="../../../../../simulator-ui-api/ca/nengo/ui/lib/world/WorldObject-Listener.html#ca.nengo.ui.lib.world.WorldObject.Listener" title="ca.nengo.ui.lib.world.WorldObject.Listener">Listener</a><em> listener</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.removeChangeListener(Listener)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.util.VisiblyMutable.removeChangeListener(ca.nengo.util.VisiblyMutable.Listener)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="reset">
+<h3>reset<a class="headerlink" href="#reset" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.reset(boolean)">
+public void <code class="descname">reset</code><span class="sig-paren">(</span>boolean<em> randomize</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.reset(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../Resettable.html#ca.nengo.model.Resettable.reset(boolean)" title="ca.nengo.model.Resettable.reset(boolean)"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Resettable.reset(boolean)</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="run">
+<h3>run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.run(float, float)">
+public void <code class="descname">run</code><span class="sig-paren">(</span>float<em> startTime</em>, float<em> endTime</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.run(float, float)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Node.run(float,float)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setbyteorder">
+<h3>setByteOrder<a class="headerlink" href="#setbyteorder" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.setByteOrder(ByteOrder)">
+public void <code class="descname">setByteOrder</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/nio/ByteOrder.html" title="java.nio.ByteOrder">ByteOrder</a><em> byteOrder</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.setByteOrder(ByteOrder)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id5">
+<h3>setByteOrder<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.setByteOrder(String)">
+public void <code class="descname">setByteOrder</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> byteOrder</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.setByteOrder(String)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setdimension">
+<h3>setDimension<a class="headerlink" href="#setdimension" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.setDimension(int)">
+public void <code class="descname">setDimension</code><span class="sig-paren">(</span>int<em> dimension</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.setDimension(int)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setdocumentation">
+<h3>setDocumentation<a class="headerlink" href="#setdocumentation" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.setDocumentation(String)">
+public void <code class="descname">setDocumentation</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> text</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.setDocumentation(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Node.setDocumentation(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setmode">
+<h3>setMode<a class="headerlink" href="#setmode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.setMode(SimulationMode)">
+public void <code class="descname">setMode</code><span class="sig-paren">(</span><a class="reference internal" href="../SimulationMode.html#ca.nengo.model.SimulationMode" title="ca.nengo.model.SimulationMode">SimulationMode</a><em> mode</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.setMode(SimulationMode)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does nothing (only DEFAULT mode is supported).</p>
+<p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.SimulationMode.ModeConfigurable.setMode(ca.nengo.model.SimulationMode)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setname">
+<h3>setName<a class="headerlink" href="#setname" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.setName(String)">
+public void <code class="descname">setName</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.setName(String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – The new name</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setupdateinterval">
+<h3>setUpdateInterval<a class="headerlink" href="#setupdateinterval" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.setUpdateInterval(float)">
+public void <code class="descname">setUpdateInterval</code><span class="sig-paren">(</span>float<em> interval</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.setUpdateInterval(float)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="toscript">
+<h3>toScript<a class="headerlink" href="#toscript" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.SocketUDPNode.toScript(HashMap)">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">toScript</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html" title="java.util.HashMap">HashMap</a>&lt;<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="java.lang.Object">Object</a>&gt;<em> scriptData</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.SocketUDPNode.toScript(HashMap)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="RealOutputImplTest.html" title="previous chapter (use the left arrow)">RealOutputImplTest</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="SpikeOutputImpl.html" title="next chapter (use the right arrow)">SpikeOutputImpl</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="SpikeOutputImpl.html" title="SpikeOutputImpl"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="RealOutputImplTest.html" title="RealOutputImplTest"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.model.impl</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

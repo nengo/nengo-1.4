@@ -1,0 +1,550 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>WorldImpl &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../search.html" />
+    <link rel="next" title="WorldImpl.CloseAllWindows" href="WorldImpl-CloseAllWindows.html" />
+    <link rel="prev" title="WorldGroundImpl.ChildFilter" href="WorldGroundImpl-ChildFilter.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="WorldImpl-CloseAllWindows.html" title="WorldImpl.CloseAllWindows"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="WorldGroundImpl-ChildFilter.html" title="WorldGroundImpl.ChildFilter"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.ui.lib.world.piccolo</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../../packages.html">simulator-ui</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.ui.lib.world.piccolo</a></li>
+              
+              <li>WorldImpl</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="worldimpl">
+<h1>WorldImpl<a class="headerlink" href="#worldimpl" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl">
+public class <code class="descname">WorldImpl</code> extends <a class="reference internal" href="WorldObjectImpl.html#ca.nengo.ui.lib.world.piccolo.WorldObjectImpl" title="ca.nengo.ui.lib.world.piccolo.WorldObjectImpl">WorldObjectImpl</a> implements <a class="reference internal" href="../World.html#ca.nengo.ui.lib.world.World" title="ca.nengo.ui.lib.world.World">World</a>, <a class="reference internal" href="../Interactable.html#ca.nengo.ui.lib.world.Interactable" title="ca.nengo.ui.lib.world.Interactable">Interactable</a><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of World. World holds World Objects and has navigation and interaction handlers.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Shu Wu</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>WorldImpl<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.WorldImpl(String, WorldGroundImpl)">
+public <code class="descname">WorldImpl</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="WorldGroundImpl.html#ca.nengo.ui.lib.world.piccolo.WorldGroundImpl" title="ca.nengo.ui.lib.world.piccolo.WorldGroundImpl">WorldGroundImpl</a><em> ground</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.WorldImpl(String, WorldGroundImpl)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – </li>
+<li><strong>ground</strong> – </li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>WorldImpl<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.WorldImpl(String, WorldSkyImpl, WorldGroundImpl)">
+public <code class="descname">WorldImpl</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="WorldSkyImpl.html#ca.nengo.ui.lib.world.piccolo.WorldSkyImpl" title="ca.nengo.ui.lib.world.piccolo.WorldSkyImpl">WorldSkyImpl</a><em> sky</em>, <a class="reference internal" href="WorldGroundImpl.html#ca.nengo.ui.lib.world.piccolo.WorldGroundImpl" title="ca.nengo.ui.lib.world.piccolo.WorldGroundImpl">WorldGroundImpl</a><em> ground</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.WorldImpl(String, WorldSkyImpl, WorldGroundImpl)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default constructor</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Name of this world</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="animatetoskyposition">
+<h3>animateToSkyPosition<a class="headerlink" href="#animatetoskyposition" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.animateToSkyPosition(double, double)">
+public void <code class="descname">animateToSkyPosition</code><span class="sig-paren">(</span>double<em> x</em>, double<em> y</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.animateToSkyPosition(double, double)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the view position of the sky, and animates to it.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>x</strong> – X Position relative to ground</li>
+<li><strong>y</strong> – Y Position relative to ground</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="closeallwindows">
+<h3>closeAllWindows<a class="headerlink" href="#closeallwindows" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.closeAllWindows()">
+public void <code class="descname">closeAllWindows</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.closeAllWindows()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes all windows which exist in this world</p>
+</dd></dl>
+
+</div>
+<div class="section" id="constructmenu">
+<h3>constructMenu<a class="headerlink" href="#constructmenu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.constructMenu(PopupMenuBuilder, Double, Double)">
+protected void <code class="descname">constructMenu</code><span class="sig-paren">(</span><a class="reference internal" href="../../util/menus/PopupMenuBuilder.html#ca.nengo.ui.lib.util.menus.PopupMenuBuilder" title="ca.nengo.ui.lib.util.menus.PopupMenuBuilder">PopupMenuBuilder</a><em> menu</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/Double.html" title="java.lang.Double">Double</a><em> posX</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/Double.html" title="java.lang.Double">Double</a><em> posY</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.constructMenu(PopupMenuBuilder, Double, Double)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create context menu</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Menu builder</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="constructselectionmenu">
+<h3>constructSelectionMenu<a class="headerlink" href="#constructselectionmenu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.constructSelectionMenu(Collection, PopupMenuBuilder)">
+protected void <code class="descname">constructSelectionMenu</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/Collection.html" title="java.util.Collection">Collection</a>&lt;<a class="reference internal" href="../WorldObject.html#ca.nengo.ui.lib.world.WorldObject" title="ca.nengo.ui.lib.world.WorldObject">WorldObject</a>&gt;<em> selection</em>, <a class="reference internal" href="../../util/menus/PopupMenuBuilder.html#ca.nengo.ui.lib.util.menus.PopupMenuBuilder" title="ca.nengo.ui.lib.util.menus.PopupMenuBuilder">PopupMenuBuilder</a><em> menu</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.constructSelectionMenu(Collection, PopupMenuBuilder)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getcontextmenu">
+<h3>getContextMenu<a class="headerlink" href="#getcontextmenu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.getContextMenu()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/javax/swing/JPopupMenu.html" title="javax.swing.JPopupMenu">JPopupMenu</a> <code class="descname">getContextMenu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.getContextMenu()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>getContextMenu<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.getContextMenu(double, double)">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/javax/swing/JPopupMenu.html" title="javax.swing.JPopupMenu">JPopupMenu</a> <code class="descname">getContextMenu</code><span class="sig-paren">(</span>double<em> posX</em>, double<em> posY</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.getContextMenu(double, double)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getground">
+<h3>getGround<a class="headerlink" href="#getground" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.getGround()">
+public <a class="reference internal" href="WorldGroundImpl.html#ca.nengo.ui.lib.world.piccolo.WorldGroundImpl" title="ca.nengo.ui.lib.world.piccolo.WorldGroundImpl">WorldGroundImpl</a> <code class="descname">getGround</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.getGround()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">ground</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getobjectbounds">
+<h3>getObjectBounds<a class="headerlink" href="#getobjectbounds" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.getObjectBounds(Collection)">
+public static <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Rectangle2D.html" title="java.awt.geom.Rectangle2D">Rectangle2D</a> <code class="descname">getObjectBounds</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/Collection.html" title="java.util.Collection">Collection</a>&lt;<a class="reference internal" href="../WorldObject.html#ca.nengo.ui.lib.world.WorldObject" title="ca.nengo.ui.lib.world.WorldObject">WorldObject</a>&gt;<em> objects</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.getObjectBounds(Collection)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getselection">
+<h3>getSelection<a class="headerlink" href="#getselection" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.getSelection()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/Collection.html" title="java.util.Collection">Collection</a>&lt;<a class="reference internal" href="../WorldObject.html#ca.nengo.ui.lib.world.WorldObject" title="ca.nengo.ui.lib.world.WorldObject">WorldObject</a>&gt; <code class="descname">getSelection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.getSelection()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Selection Currently Selected nodes</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getselectionhandler">
+<h3>getSelectionHandler<a class="headerlink" href="#getselectionhandler" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.getSelectionHandler()">
+public <a class="reference internal" href="../handlers/SelectionHandler.html#ca.nengo.ui.lib.world.handlers.SelectionHandler" title="ca.nengo.ui.lib.world.handlers.SelectionHandler">SelectionHandler</a> <code class="descname">getSelectionHandler</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.getSelectionHandler()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getselectionmenu">
+<h3>getSelectionMenu<a class="headerlink" href="#getselectionmenu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.getSelectionMenu(Collection)">
+public final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/javax/swing/JPopupMenu.html" title="javax.swing.JPopupMenu">JPopupMenu</a> <code class="descname">getSelectionMenu</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/Collection.html" title="java.util.Collection">Collection</a>&lt;<a class="reference internal" href="../WorldObject.html#ca.nengo.ui.lib.world.WorldObject" title="ca.nengo.ui.lib.world.WorldObject">WorldObject</a>&gt;<em> selection</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.getSelectionMenu(Collection)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Context menu for currently selected items, null is none is to be shown</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getsky">
+<h3>getSky<a class="headerlink" href="#getsky" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.getSky()">
+public <a class="reference internal" href="WorldSkyImpl.html#ca.nengo.ui.lib.world.piccolo.WorldSkyImpl" title="ca.nengo.ui.lib.world.piccolo.WorldSkyImpl">WorldSkyImpl</a> <code class="descname">getSky</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.getSky()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">sky</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getwindows">
+<h3>getWindows<a class="headerlink" href="#getwindows" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.getWindows()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/Collection.html" title="java.util.Collection">Collection</a>&lt;<a class="reference internal" href="objects/Window.html#ca.nengo.ui.lib.world.piccolo.objects.Window" title="ca.nengo.ui.lib.world.piccolo.objects.Window">Window</a>&gt; <code class="descname">getWindows</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.getWindows()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">A collection of all the windows in this world</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="isancestorof">
+<h3>isAncestorOf<a class="headerlink" href="#isancestorof" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.isAncestorOf(WorldObject)">
+public boolean <code class="descname">isAncestorOf</code><span class="sig-paren">(</span><a class="reference internal" href="../WorldObject.html#ca.nengo.ui.lib.world.WorldObject" title="ca.nengo.ui.lib.world.WorldObject">WorldObject</a><em> wo</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.isAncestorOf(WorldObject)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="isselectionmode">
+<h3>isSelectionMode<a class="headerlink" href="#isselectionmode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.isSelectionMode()">
+public boolean <code class="descname">isSelectionMode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.isSelectionMode()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">if true, selection mode is enabled. if false, navigation mode is enabled instead.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="istooltipsvisible">
+<h3>isTooltipsVisible<a class="headerlink" href="#istooltipsvisible" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.isTooltipsVisible()">
+public static boolean <code class="descname">isTooltipsVisible</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.isTooltipsVisible()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="minimizeallwindows">
+<h3>minimizeAllWindows<a class="headerlink" href="#minimizeallwindows" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.minimizeAllWindows()">
+public void <code class="descname">minimizeAllWindows</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.minimizeAllWindows()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Minimizes all windows that exist in this world</p>
+</dd></dl>
+
+</div>
+<div class="section" id="preparefordestroy">
+<h3>prepareForDestroy<a class="headerlink" href="#preparefordestroy" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.prepareForDestroy()">
+protected void <code class="descname">prepareForDestroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.prepareForDestroy()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setbounds">
+<h3>setBounds<a class="headerlink" href="#setbounds" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.setBounds(double, double, double, double)">
+public boolean <code class="descname">setBounds</code><span class="sig-paren">(</span>double<em> x</em>, double<em> y</em>, double<em> w</em>, double<em> h</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.setBounds(double, double, double, double)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setselectionmode">
+<h3>setSelectionMode<a class="headerlink" href="#setselectionmode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.setSelectionMode(boolean)">
+public void <code class="descname">setSelectionMode</code><span class="sig-paren">(</span>boolean<em> enabled</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.setSelectionMode(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>enabled</strong> – True if selection mode is enabled, False if navigation</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setstatusbarhandler">
+<h3>setStatusBarHandler<a class="headerlink" href="#setstatusbarhandler" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.setStatusBarHandler(AbstractStatusHandler)">
+public void <code class="descname">setStatusBarHandler</code><span class="sig-paren">(</span><a class="reference internal" href="../handlers/AbstractStatusHandler.html#ca.nengo.ui.lib.world.handlers.AbstractStatusHandler" title="ca.nengo.ui.lib.world.handlers.AbstractStatusHandler">AbstractStatusHandler</a><em> statusHandler</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.setStatusBarHandler(AbstractStatusHandler)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the status bar handler, there can be only one.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>statusHandler</strong> – New Status bar handler</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="settooltipsvisible">
+<h3>setTooltipsVisible<a class="headerlink" href="#settooltipsvisible" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.setTooltipsVisible(boolean)">
+public static void <code class="descname">setTooltipsVisible</code><span class="sig-paren">(</span>boolean<em> tooltipsVisible</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.setTooltipsVisible(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="showtooltip">
+<h3>showTooltip<a class="headerlink" href="#showtooltip" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.showTooltip(WorldObject)">
+public <a class="reference internal" href="objects/TooltipWrapper.html#ca.nengo.ui.lib.world.piccolo.objects.TooltipWrapper" title="ca.nengo.ui.lib.world.piccolo.objects.TooltipWrapper">TooltipWrapper</a> <code class="descname">showTooltip</code><span class="sig-paren">(</span><a class="reference internal" href="../WorldObject.html#ca.nengo.ui.lib.world.WorldObject" title="ca.nengo.ui.lib.world.WorldObject">WorldObject</a><em> objectSelected</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.showTooltip(WorldObject)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>objectSelected</strong> – Object to show the tooltip for</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Tooltip shown</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="skytoground">
+<h3>skyToGround<a class="headerlink" href="#skytoground" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.skyToGround(Point2D)">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Point2D.html" title="java.awt.geom.Point2D">Point2D</a> <code class="descname">skyToGround</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Point2D.html" title="java.awt.geom.Point2D">Point2D</a><em> position</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.skyToGround(Point2D)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>position</strong> – Position in sky</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Position on ground</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="zoomtobounds">
+<h3>zoomToBounds<a class="headerlink" href="#zoomtobounds" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.zoomToBounds(Rectangle2D)">
+public void <code class="descname">zoomToBounds</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Rectangle2D.html" title="java.awt.geom.Rectangle2D">Rectangle2D</a><em> bounds</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.zoomToBounds(Rectangle2D)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3>zoomToBounds<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.zoomToBounds(Rectangle2D, long)">
+public void <code class="descname">zoomToBounds</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Rectangle2D.html" title="java.awt.geom.Rectangle2D">Rectangle2D</a><em> bounds</em>, long<em> time</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.zoomToBounds(Rectangle2D, long)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Animate the sky to look at a portion of the ground at bounds</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>bounds</strong> – Bounds to look at</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">Reference to the activity which is animating the zoom and positioning</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="zoomtofit">
+<h3>zoomToFit<a class="headerlink" href="#zoomtofit" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.zoomToFit()">
+public void <code class="descname">zoomToFit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.zoomToFit()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="zoomtoobject">
+<h3>zoomToObject<a class="headerlink" href="#zoomtoobject" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.WorldImpl.zoomToObject(WorldObject)">
+public void <code class="descname">zoomToObject</code><span class="sig-paren">(</span><a class="reference internal" href="../WorldObject.html#ca.nengo.ui.lib.world.WorldObject" title="ca.nengo.ui.lib.world.WorldObject">WorldObject</a><em> object</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.WorldImpl.zoomToObject(WorldObject)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>object</strong> – Object to zoom to</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">reference to animation activity</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="WorldGroundImpl-ChildFilter.html" title="previous chapter (use the left arrow)">WorldGroundImpl.ChildFilter</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="WorldImpl-CloseAllWindows.html" title="next chapter (use the right arrow)">WorldImpl.CloseAllWindows</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="WorldImpl-CloseAllWindows.html" title="WorldImpl.CloseAllWindows"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="WorldGroundImpl-ChildFilter.html" title="WorldGroundImpl.ChildFilter"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.ui.lib.world.piccolo</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

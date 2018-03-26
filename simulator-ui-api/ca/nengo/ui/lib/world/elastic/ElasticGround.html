@@ -1,0 +1,365 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>ElasticGround &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../search.html" />
+    <link rel="next" title="ElasticGround.UpdateGraphResult" href="ElasticGround-UpdateGraphResult.html" />
+    <link rel="prev" title="ElasticEdge" href="ElasticEdge.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ElasticGround-UpdateGraphResult.html" title="ElasticGround.UpdateGraphResult"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ElasticEdge.html" title="ElasticEdge"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.ui.lib.world.elastic</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../../packages.html">simulator-ui</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.ui.lib.world.elastic</a></li>
+              
+              <li>ElasticGround</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="elasticground">
+<h1>ElasticGround<a class="headerlink" href="#elasticground" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround">
+public class <code class="descname">ElasticGround</code> extends <a class="reference internal" href="../piccolo/WorldGroundImpl.html#ca.nengo.ui.lib.world.piccolo.WorldGroundImpl" title="ca.nengo.ui.lib.world.piccolo.WorldGroundImpl">WorldGroundImpl</a><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="elastic-length-key">
+<h3>ELASTIC_LENGTH_KEY<a class="headerlink" href="#elastic-length-key" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.ELASTIC_LENGTH_KEY">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">ELASTIC_LENGTH_KEY</code><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.ELASTIC_LENGTH_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>ElasticGround<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.ElasticGround()">
+public <code class="descname">ElasticGround</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.ElasticGround()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="childadded">
+<h3>childAdded<a class="headerlink" href="#childadded" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.childAdded(WorldObject)">
+public void <code class="descname">childAdded</code><span class="sig-paren">(</span><a class="reference internal" href="../WorldObject.html#ca.nengo.ui.lib.world.WorldObject" title="ca.nengo.ui.lib.world.WorldObject">WorldObject</a><em> wo</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.childAdded(WorldObject)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="childremoved">
+<h3>childRemoved<a class="headerlink" href="#childremoved" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.childRemoved(WorldObject)">
+public void <code class="descname">childRemoved</code><span class="sig-paren">(</span><a class="reference internal" href="../WorldObject.html#ca.nengo.ui.lib.world.WorldObject" title="ca.nengo.ui.lib.world.WorldObject">WorldObject</a><em> wo</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.childRemoved(WorldObject)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getelasticchildren">
+<h3>getElasticChildren<a class="headerlink" href="#getelasticchildren" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.getElasticChildren()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/Iterable.html" title="java.lang.Iterable">Iterable</a>&lt;<a class="reference internal" href="ElasticObject.html#ca.nengo.ui.lib.world.elastic.ElasticObject" title="ca.nengo.ui.lib.world.elastic.ElasticObject">ElasticObject</a>&gt; <code class="descname">getElasticChildren</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.getElasticChildren()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getelasticposition">
+<h3>getElasticPosition<a class="headerlink" href="#getelasticposition" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.getElasticPosition(ElasticObject)">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Point2D.html" title="java.awt.geom.Point2D">Point2D</a> <code class="descname">getElasticPosition</code><span class="sig-paren">(</span><a class="reference internal" href="ElasticObject.html#ca.nengo.ui.lib.world.elastic.ElasticObject" title="ca.nengo.ui.lib.world.elastic.ElasticObject">ElasticObject</a><em> node</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.getElasticPosition(ElasticObject)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getgraph">
+<h3>getGraph<a class="headerlink" href="#getgraph" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.getGraph()">
+public SparseGraph <code class="descname">getGraph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.getGraph()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">The current graph representation of the Ground.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getworld">
+<h3>getWorld<a class="headerlink" href="#getworld" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.getWorld()">
+public <a class="reference internal" href="ElasticWorld.html#ca.nengo.ui.lib.world.elastic.ElasticWorld" title="ca.nengo.ui.lib.world.elastic.ElasticWorld">ElasticWorld</a> <code class="descname">getWorld</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.getWorld()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="iselasticmode">
+<h3>isElasticMode<a class="headerlink" href="#iselasticmode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.isElasticMode()">
+public boolean <code class="descname">isElasticMode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.isElasticMode()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="ispositionlocked">
+<h3>isPositionLocked<a class="headerlink" href="#ispositionlocked" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.isPositionLocked(ElasticObject)">
+public boolean <code class="descname">isPositionLocked</code><span class="sig-paren">(</span><a class="reference internal" href="ElasticObject.html#ca.nengo.ui.lib.world.elastic.ElasticObject" title="ca.nengo.ui.lib.world.elastic.ElasticObject">ElasticObject</a><em> node</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.isPositionLocked(ElasticObject)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="modifyedgedistances">
+<h3>modifyEdgeDistances<a class="headerlink" href="#modifyedgedistances" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.modifyEdgeDistances(ElasticObject, double)">
+public void <code class="descname">modifyEdgeDistances</code><span class="sig-paren">(</span><a class="reference internal" href="ElasticObject.html#ca.nengo.ui.lib.world.elastic.ElasticObject" title="ca.nengo.ui.lib.world.elastic.ElasticObject">ElasticObject</a><em> obj</em>, double<em> delta</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.modifyEdgeDistances(ElasticObject, double)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="preparefordestroy">
+<h3>prepareForDestroy<a class="headerlink" href="#preparefordestroy" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.prepareForDestroy()">
+protected void <code class="descname">prepareForDestroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.prepareForDestroy()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setelasticenabled">
+<h3>setElasticEnabled<a class="headerlink" href="#setelasticenabled" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.setElasticEnabled(boolean)">
+public void <code class="descname">setElasticEnabled</code><span class="sig-paren">(</span>boolean<em> enabled</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.setElasticEnabled(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setelasticposition">
+<h3>setElasticPosition<a class="headerlink" href="#setelasticposition" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.setElasticPosition(ElasticObject, double, double)">
+public void <code class="descname">setElasticPosition</code><span class="sig-paren">(</span><a class="reference internal" href="ElasticObject.html#ca.nengo.ui.lib.world.elastic.ElasticObject" title="ca.nengo.ui.lib.world.elastic.ElasticObject">ElasticObject</a><em> node</em>, double<em> x</em>, double<em> y</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.setElasticPosition(ElasticObject, double, double)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setpositionlocked">
+<h3>setPositionLocked<a class="headerlink" href="#setpositionlocked" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.setPositionLocked(ElasticObject, boolean)">
+public void <code class="descname">setPositionLocked</code><span class="sig-paren">(</span><a class="reference internal" href="ElasticObject.html#ca.nengo.ui.lib.world.elastic.ElasticObject" title="ca.nengo.ui.lib.world.elastic.ElasticObject">ElasticObject</a><em> node</em>, boolean<em> lockEnabled</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.setPositionLocked(ElasticObject, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locks the position of an elastic node so it isn’t affected by the layout runner</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>node</strong> – </li>
+<li><strong>lockEnabled</strong> – </li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="updatechildrenfromlayout">
+<h3>updateChildrenFromLayout<a class="headerlink" href="#updatechildrenfromlayout" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.updateChildrenFromLayout(Layout, boolean, boolean)">
+public void <code class="descname">updateChildrenFromLayout</code><span class="sig-paren">(</span>Layout<em> layout</em>, boolean<em> animateNodes</em>, boolean<em> zoomToLayout</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.updateChildrenFromLayout(Layout, boolean, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="updategraph">
+<h3>updateGraph<a class="headerlink" href="#updategraph" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticGround.updateGraph()">
+public <a class="reference internal" href="ElasticGround-UpdateGraphResult.html#ca.nengo.ui.lib.world.elastic.ElasticGround.UpdateGraphResult" title="ca.nengo.ui.lib.world.elastic.ElasticGround.UpdateGraphResult">UpdateGraphResult</a> <code class="descname">updateGraph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticGround.updateGraph()" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must be executed from the swing dispatcher thread because it must be synchronized with the Graphical children elements.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="ElasticEdge.html" title="previous chapter (use the left arrow)">ElasticEdge</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="ElasticGround-UpdateGraphResult.html" title="next chapter (use the right arrow)">ElasticGround.UpdateGraphResult</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ElasticGround-UpdateGraphResult.html" title="ElasticGround.UpdateGraphResult"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ElasticEdge.html" title="ElasticEdge"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.ui.lib.world.elastic</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

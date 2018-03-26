@@ -1,0 +1,431 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>NEFEnsembleFactoryImpl &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+    <link rel="next" title="NEFEnsembleImpl" href="NEFEnsembleImpl.html" />
+    <link rel="prev" title="DefaultExpressModel" href="DefaultExpressModel.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="NEFEnsembleImpl.html" title="NEFEnsembleImpl"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="DefaultExpressModel.html" title="DefaultExpressModel"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.model.nef.impl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.model.nef.impl</a></li>
+              
+              <li>NEFEnsembleFactoryImpl</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="nefensemblefactoryimpl">
+<h1>NEFEnsembleFactoryImpl<a class="headerlink" href="#nefensemblefactoryimpl" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl">
+public class <code class="descname">NEFEnsembleFactoryImpl</code> implements <a class="reference internal" href="../NEFEnsembleFactory.html#ca.nengo.model.nef.NEFEnsembleFactory" title="ca.nengo.model.nef.NEFEnsembleFactory">NEFEnsembleFactory</a>, java.<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/io/package-summary.html" title="java.io.package-summary">io</a>.<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html" title="java.io.Serializable">Serializable</a><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default implementation of NEFEnsembleFactory.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>NEFEnsembleFactoryImpl<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.NEFEnsembleFactoryImpl()">
+public <code class="descname">NEFEnsembleFactoryImpl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.NEFEnsembleFactoryImpl()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default constructor. Sets up factories.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="adddefaultorigins">
+<h3>addDefaultOrigins<a class="headerlink" href="#adddefaultorigins" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.addDefaultOrigins(NEFEnsemble)">
+protected void <code class="descname">addDefaultOrigins</code><span class="sig-paren">(</span><a class="reference internal" href="../NEFEnsemble.html#ca.nengo.model.nef.NEFEnsemble" title="ca.nengo.model.nef.NEFEnsemble">NEFEnsemble</a><em> ensemble</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.addDefaultOrigins(NEFEnsemble)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds standard decoded Origins to the given NEFEnsemble This method is exposed so that it can be over-ridden to change behaviour.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>ensemble</strong> – A new NEFEnsemble</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="../../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – </li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="bequiet">
+<h3>beQuiet<a class="headerlink" href="#bequiet" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.beQuiet()">
+public void <code class="descname">beQuiet</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.beQuiet()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the factory from printing out information to console during make process.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="construct">
+<h3>construct<a class="headerlink" href="#construct" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.construct(String, NEFNode[], float[][], ApproximatorFactory, float[][], float[])">
+protected <a class="reference internal" href="../NEFEnsemble.html#ca.nengo.model.nef.NEFEnsemble" title="ca.nengo.model.nef.NEFEnsemble">NEFEnsemble</a> <code class="descname">construct</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../NEFNode.html#ca.nengo.model.nef.NEFNode" title="ca.nengo.model.nef.NEFNode">NEFNode</a>[]<em> nodes</em>, float[][]<em> encoders</em>, <a class="reference internal" href="../../../math/ApproximatorFactory.html#ca.nengo.math.ApproximatorFactory" title="ca.nengo.math.ApproximatorFactory">ApproximatorFactory</a><em> af</em>, float[][]<em> evalPoints</em>, float[]<em> radii</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.construct(String, NEFNode[], float[][], ApproximatorFactory, float[][], float[])" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is exposed so that it can be over-ridden to change behaviour.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – Name of new Ensemble</li>
+<li><strong>nodes</strong> – Nodes that make up Ensemble</li>
+<li><strong>encoders</strong> – Encoding vector for each Node</li>
+<li><strong>af</strong> – Factory that produces LinearApproximators for decoding Ensemble output</li>
+<li><strong>evalPoints</strong> – States at which Node output is evaluated for decoding purposes</li>
+<li><strong>radii</strong> – Radius of encoded area in each dimension</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="../../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – </li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">New NEFEnsemble with given parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getapproximatorfactory">
+<h3>getApproximatorFactory<a class="headerlink" href="#getapproximatorfactory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.getApproximatorFactory()">
+public <a class="reference internal" href="../../../math/ApproximatorFactory.html#ca.nengo.math.ApproximatorFactory" title="ca.nengo.math.ApproximatorFactory">ApproximatorFactory</a> <code class="descname">getApproximatorFactory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.getApproximatorFactory()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../NEFEnsembleFactory.html#ca.nengo.model.nef.NEFEnsembleFactory.getApproximatorFactory()" title="ca.nengo.model.nef.NEFEnsembleFactory.getApproximatorFactory()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsembleFactory.getApproximatorFactory()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getdatabase">
+<h3>getDatabase<a class="headerlink" href="#getdatabase" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.getDatabase()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/io/File.html" title="java.io.File">File</a> <code class="descname">getDatabase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.getDatabase()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Directory for saving / loading ensembles</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getencoderfactory">
+<h3>getEncoderFactory<a class="headerlink" href="#getencoderfactory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.getEncoderFactory()">
+public <a class="reference internal" href="../../../util/VectorGenerator.html#ca.nengo.util.VectorGenerator" title="ca.nengo.util.VectorGenerator">VectorGenerator</a> <code class="descname">getEncoderFactory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.getEncoderFactory()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../NEFEnsembleFactory.html#ca.nengo.model.nef.NEFEnsembleFactory.getEncoderFactory()" title="ca.nengo.model.nef.NEFEnsembleFactory.getEncoderFactory()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsembleFactory.getEncoderFactory()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getevalpointfactory">
+<h3>getEvalPointFactory<a class="headerlink" href="#getevalpointfactory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.getEvalPointFactory()">
+public <a class="reference internal" href="../../../util/VectorGenerator.html#ca.nengo.util.VectorGenerator" title="ca.nengo.util.VectorGenerator">VectorGenerator</a> <code class="descname">getEvalPointFactory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.getEvalPointFactory()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../NEFEnsembleFactory.html#ca.nengo.model.nef.NEFEnsembleFactory.getEvalPointFactory()" title="ca.nengo.model.nef.NEFEnsembleFactory.getEvalPointFactory()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsembleFactory.getEvalPointFactory()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getnodefactory">
+<h3>getNodeFactory<a class="headerlink" href="#getnodefactory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.getNodeFactory()">
+public <a class="reference internal" href="../../impl/NodeFactory.html#ca.nengo.model.impl.NodeFactory" title="ca.nengo.model.impl.NodeFactory">NodeFactory</a> <code class="descname">getNodeFactory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.getNodeFactory()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../NEFEnsembleFactory.html#ca.nengo.model.nef.NEFEnsembleFactory.getNodeFactory()" title="ca.nengo.model.nef.NEFEnsembleFactory.getNodeFactory()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsembleFactory.getNodeFactory()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getnumevalpoints">
+<h3>getNumEvalPoints<a class="headerlink" href="#getnumevalpoints" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.getNumEvalPoints(int)">
+protected int <code class="descname">getNumEvalPoints</code><span class="sig-paren">(</span>int<em> dim</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.getNumEvalPoints(int)" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is exposed so that it can be over-ridden to change behaviour.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>dim</strong> – the dimension of the state represented by an Ensemble</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">The number of points at which to approximate decoded functions</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="make">
+<h3>make<a class="headerlink" href="#make" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.make(String, int, int)">
+public <a class="reference internal" href="../NEFEnsemble.html#ca.nengo.model.nef.NEFEnsemble" title="ca.nengo.model.nef.NEFEnsemble">NEFEnsemble</a> <code class="descname">make</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, int<em> n</em>, int<em> dim</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.make(String, int, int)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsembleFactory.make(java.lang.String,int,int)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>make<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.make(String, int, float[])">
+public <a class="reference internal" href="../NEFEnsemble.html#ca.nengo.model.nef.NEFEnsemble" title="ca.nengo.model.nef.NEFEnsemble">NEFEnsemble</a> <code class="descname">make</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, int<em> n</em>, float[]<em> radii</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.make(String, int, float[])" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsembleFactory.make(java.lang.String,int,float[])</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>make<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.make(String, int, int, String, boolean)">
+public <a class="reference internal" href="../NEFEnsemble.html#ca.nengo.model.nef.NEFEnsemble" title="ca.nengo.model.nef.NEFEnsemble">NEFEnsemble</a> <code class="descname">make</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, int<em> n</em>, int<em> dim</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> storageName</em>, boolean<em> overwrite</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.make(String, int, int, String, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsembleFactory.make(java.lang.String,int,int,java.lang.String,boolean)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3>make<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.make(String, int, float[], String, boolean)">
+public <a class="reference internal" href="../NEFEnsemble.html#ca.nengo.model.nef.NEFEnsemble" title="ca.nengo.model.nef.NEFEnsemble">NEFEnsemble</a> <code class="descname">make</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, int<em> n</em>, float[]<em> radii</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> storageName</em>, boolean<em> overwrite</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.make(String, int, float[], String, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsembleFactory.make(java.lang.String,int,int,java.lang.String,boolean)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setapproximatorfactory">
+<h3>setApproximatorFactory<a class="headerlink" href="#setapproximatorfactory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.setApproximatorFactory(ApproximatorFactory)">
+public void <code class="descname">setApproximatorFactory</code><span class="sig-paren">(</span><a class="reference internal" href="../../../math/ApproximatorFactory.html#ca.nengo.math.ApproximatorFactory" title="ca.nengo.math.ApproximatorFactory">ApproximatorFactory</a><em> factory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.setApproximatorFactory(ApproximatorFactory)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsembleFactory.setApproximatorFactory(ca.nengo.math.ApproximatorFactory)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setdatabase">
+<h3>setDatabase<a class="headerlink" href="#setdatabase" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.setDatabase(File)">
+public void <code class="descname">setDatabase</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/io/File.html" title="java.io.File">File</a><em> database</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.setDatabase(File)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>database</strong> – New directory for saving / loading ensembles</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setencoderfactory">
+<h3>setEncoderFactory<a class="headerlink" href="#setencoderfactory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.setEncoderFactory(VectorGenerator)">
+public void <code class="descname">setEncoderFactory</code><span class="sig-paren">(</span><a class="reference internal" href="../../../util/VectorGenerator.html#ca.nengo.util.VectorGenerator" title="ca.nengo.util.VectorGenerator">VectorGenerator</a><em> factory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.setEncoderFactory(VectorGenerator)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsembleFactory.setEncoderFactory(ca.nengo.util.VectorGenerator)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setevalpointfactory">
+<h3>setEvalPointFactory<a class="headerlink" href="#setevalpointfactory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.setEvalPointFactory(VectorGenerator)">
+public void <code class="descname">setEvalPointFactory</code><span class="sig-paren">(</span><a class="reference internal" href="../../../util/VectorGenerator.html#ca.nengo.util.VectorGenerator" title="ca.nengo.util.VectorGenerator">VectorGenerator</a><em> factory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.setEvalPointFactory(VectorGenerator)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsembleFactory.setEvalPointFactory(ca.nengo.util.VectorGenerator)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setnodefactory">
+<h3>setNodeFactory<a class="headerlink" href="#setnodefactory" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.setNodeFactory(NodeFactory)">
+public void <code class="descname">setNodeFactory</code><span class="sig-paren">(</span><a class="reference internal" href="../../impl/NodeFactory.html#ca.nengo.model.impl.NodeFactory" title="ca.nengo.model.impl.NodeFactory">NodeFactory</a><em> factory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.NEFEnsembleFactoryImpl.setNodeFactory(NodeFactory)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.nef.NEFEnsembleFactory.setNodeFactory(ca.nengo.model.impl.NodeFactory)</span></code></p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="DefaultExpressModel.html" title="previous chapter (use the left arrow)">DefaultExpressModel</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="NEFEnsembleImpl.html" title="next chapter (use the right arrow)">NEFEnsembleImpl</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="NEFEnsembleImpl.html" title="NEFEnsembleImpl"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="DefaultExpressModel.html" title="DefaultExpressModel"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.model.nef.impl</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

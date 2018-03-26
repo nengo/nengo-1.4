@@ -1,0 +1,339 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>Configuring ensembles &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Adding arbitary code to a model" href="simplenodes.html" />
+    <link rel="prev" title="Introduction to scripting" href="basics.html" />
+<link rel="stylesheet" type="text/css" href="../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="simplenodes.html" title="Adding arbitary code to a model"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="basics.html" title="Introduction to scripting"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Scripting</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tips.html">Tips and tricks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../index.html">Docs</a></li>
+              
+                <li><a href="index.html">Scripting</a></li>
+              
+              <li>Configuring ensembles</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="configuring-ensembles">
+<h1>Configuring ensembles<a class="headerlink" href="#configuring-ensembles" title="Permalink to this headline">¶</a></h1>
+<p>When creating a neural ensemble,
+a variety of parameters can be adjusted.
+Some of these parameters are set
+to reflect the physiological properties
+of the neurons being modelled,
+while others can be set
+to improve the accuracy
+of the transformations computed by the neurons.</p>
+<div class="section" id="membrane-time-constant-and-refractory-period">
+<h2>Membrane time constant and refractory period<a class="headerlink" href="#membrane-time-constant-and-refractory-period" title="Permalink to this headline">¶</a></h2>
+<p>The two parameters for leaky integrate-and-fire neurons
+are the membrane time constant (<code class="docutils literal"><span class="pre">tau_rc</span></code>)
+and the refractory period (<code class="docutils literal"><span class="pre">tau_ref</span></code>).
+These parameters are set when creating the ensemble,
+and default to 0.02 seconds for the membrane time constant,
+and 0.002 seconds for the refractory period:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Empirical data on the membrane time constants
+for different types of neurons
+in different parts of the brain
+can be found <a class="reference external" href="http://compneuro.uwaterloo.ca/research/constants-constraints/membrane-time-constant-tau_rc.html">here</a>.</p>
+</div>
+<div class="section" id="maximum-firing-rate">
+<h2>Maximum firing rate<a class="headerlink" href="#maximum-firing-rate" title="Permalink to this headline">¶</a></h2>
+<p>You can also specify the maximum firing rate for the neurons.
+It should be noted that it will always be possible
+to force these neurons to fire faster than this specified rate.
+Indeed, the actual maximum firing rate
+will always be <code class="docutils literal"><span class="pre">1/tau_ref</span></code>,
+since if enough current is forced into the simulated neuron,
+it will fire as fast as its refractory period will allow.
+However, what we can specify with this parameter
+is the <em>normal</em> operating range for the neurons.
+More technically, this is the maximum firing rate
+<em>assuming that the neurons are representing
+a value within the ensemble’s radius</em>.</p>
+<p>In most cases,
+we specify this by giving a range of maximum firing rates,
+and each neuron will have a maximum
+chosen uniformly from within this range.
+This gives a somewhat biologically realistic
+amount of diversity in the tuning curves.
+The following line makes neurons
+with maximums between 200 Hz and 400 Hz:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_rate</span><span class="o">=</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">400</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Alternatively, we can specify
+a particular set of maximum firing rates,
+and each neuron will take on the corresponding value
+from the provided list.
+If there are more neurons than elements in the list,
+the provided values will be re-used:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_rate</span><span class="o">=</span><span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">350</span><span class="p">,</span> <span class="mi">400</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The type of brackets used is important!
+Python has two types of brackets for this sort of situation:
+round brackets <code class="docutils literal"><span class="pre">()</span></code> and square brackets <code class="docutils literal"><span class="pre">[]</span></code>.
+Round brackets create a <em>tuple</em>,
+which we use to indicate a range of values
+to randomly choose within,
+and square brackets create a <em>list</em>,
+which we use to specify a list of particular values to use.</p>
+</div>
+</div>
+<div class="section" id="intercept">
+<h2>Intercept<a class="headerlink" href="#intercept" title="Permalink to this headline">¶</a></h2>
+<p>The intercept is the point on the tuning curve graph
+where the neuron starts firing.
+For example, for a one-dimensional ensemble,
+a neuron with a preferred direction vector of [1]
+and an intercept of 0.3
+will only fire when representing values above 0.3.
+If the preferred direction vector is [-1],
+then it will only fire for values below 0.3.
+In general, the neuron will only fire
+if the dot product of <strong>x</strong> (the value being represented)
+and the preferred direction vector (see below),
+divided by the radius, is greater than the intercept.
+Note that since we divide by the radius,
+the intercepts will always be normalized to be between -1 and 1.</p>
+<p>While this parameter can be used
+to help match the tuning curves observed in the system being modelled,
+another important use is to build neural models
+that can perfectly represent the value 0.
+For example, if a 1-dimensional neural ensemble
+is built with intercepts in the range (0.3, 1),
+then no neurons at all will fire for values between -0.3 and 0.3.
+This means that any value in that range (i.e., any small value)
+will be rounded down to exactly 0.
+This can be useful for optimizing thresholding
+and other functions where many of the output values are zero.</p>
+<p>By default, intercepts are uniformly distributed between -1 and 1.
+The intercepts can be specified by providing either a range,
+or a list of values:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">As with the maximum firing rate,
+the type of brackets used is important!
+<code class="docutils literal"><span class="pre">()</span></code> indicates a range of values,
+while <code class="docutils literal"><span class="pre">[]</span></code> indicates a list of specific values to use.</p>
+</div>
+</div>
+<div class="section" id="encoders-preferred-direction-vectors">
+<h2>Encoders (preferred direction vectors)<a class="headerlink" href="#encoders-preferred-direction-vectors" title="Permalink to this headline">¶</a></h2>
+<p>You can specify the encoders
+(preferred direction vectors)
+for the neurons in the ensemble.
+By default, the encoders are chosen uniformly from the unit sphere.
+Alternatively, you can specify those encoders by providing a list.
+The encoders given will automatically be normalized to unit length:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">encoders</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">encoders</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>This allows you to make complex sets of encoders
+by creating a list with the encoders you want.
+For example, the following code creates
+an ensemble with 100 neurons,
+half of which have encoders chosen from the unit circle,
+and the other half of which are aligned on the diagonals:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="n">encoders</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
+    <span class="c1"># choose a random direction between -pi and pi</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">pi</span><span class="p">)</span>
+    <span class="c1"># add the encoder</span>
+    <span class="n">encoders</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)])</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
+    <span class="c1"># add an aligned encoder</span>
+    <span class="n">encoders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]]))</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">encoders</span><span class="o">=</span><span class="n">encoders</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="basics.html" title="previous chapter (use the left arrow)">Introduction to scripting</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="simplenodes.html" title="next chapter (use the right arrow)">Adding arbitary code to a model</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="simplenodes.html" title="Adding arbitary code to a model"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="basics.html" title="Introduction to scripting"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Scripting</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

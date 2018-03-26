@@ -1,0 +1,301 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>BiasOrigin &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+    <link rel="next" title="BiasTermination" href="BiasTermination.html" />
+    <link rel="prev" title="AdditiveGaussianExpressModel" href="AdditiveGaussianExpressModel.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="BiasTermination.html" title="BiasTermination"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="AdditiveGaussianExpressModel.html" title="AdditiveGaussianExpressModel"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.model.nef.impl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.model.nef.impl</a></li>
+              
+              <li>BiasOrigin</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="biasorigin">
+<h1>BiasOrigin<a class="headerlink" href="#biasorigin" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.model.nef.impl.BiasOrigin">
+public class <code class="descname">BiasOrigin</code> extends <a class="reference internal" href="DecodedOrigin.html#ca.nengo.model.nef.impl.DecodedOrigin" title="ca.nengo.model.nef.impl.DecodedOrigin">DecodedOrigin</a><a class="headerlink" href="#ca.nengo.model.nef.impl.BiasOrigin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Part of a projection in which each of the Nodes making up an Ensemble is a source of only excitatory or inhibitory connections.</p>
+<p>The theory is presented in Parisien, Anderson &amp; Eliasmith (2007).</p>
+<p>Such a projection includes a “base” DecodedOrigin and DecodedTermination (a projection between these may have weights of mixed sign). The projection is expanded with a BiasOrigin a pair of BiasTerminations, and a new NEFEnsemble of interneurons. The make weight signs uniform, a projection is established between the BiasOrigin and BiasTermination, in parallel with the original projection. The effective synaptic weights that arise from the combination of these two projections are of uniform sign. However, the post-synaptic Ensemble receives extra bias current as a result. This bias current is cancelled by a projection from the BiasOrigin through the interneurons, to a second BiasTermination.</p>
+<p>TODO: account for transformations in the Termination, which can change sign and magnitude of weights</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>BiasOrigin<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.nef.impl.BiasOrigin.BiasOrigin(NEFEnsemble, String, Node[], String, float[][], int, boolean)">
+public <code class="descname">BiasOrigin</code><span class="sig-paren">(</span><a class="reference internal" href="../NEFEnsemble.html#ca.nengo.model.nef.NEFEnsemble" title="ca.nengo.model.nef.NEFEnsemble">NEFEnsemble</a><em> ensemble</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>[]<em> nodes</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> nodeOrigin</em>, float[][]<em> constantOutputs</em>, int<em> numInterneurons</em>, boolean<em> excitatory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.BiasOrigin.BiasOrigin(NEFEnsemble, String, Node[], String, float[][], int, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>ensemble</strong> – Parent ensemble</li>
+<li><strong>name</strong> – Origin name</li>
+<li><strong>nodes</strong> – Nodes in ensemble?</li>
+<li><strong>nodeOrigin</strong> – Name of origin to use for bias origin</li>
+<li><strong>constantOutputs</strong> – <p>?</p>
+</li>
+<li><strong>numInterneurons</strong> – Number of interneurons to create</li>
+<li><strong>excitatory</strong> – Excitatory or inhibitory?</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>StructuralException</strong> – if DecodedOrigin can’t be created</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="getinterneurons">
+<h3>getInterneurons<a class="headerlink" href="#getinterneurons" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.BiasOrigin.getInterneurons()">
+public <a class="reference internal" href="../NEFEnsemble.html#ca.nengo.model.nef.NEFEnsemble" title="ca.nengo.model.nef.NEFEnsemble">NEFEnsemble</a> <code class="descname">getInterneurons</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.BiasOrigin.getInterneurons()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">An ensemble of interneurons through which this Origin must project (in parallel with its direct projection) to compensate for the bias introduced by making all weights the same sign.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getrange">
+<h3>getRange<a class="headerlink" href="#getrange" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.BiasOrigin.getRange()">
+public float[] <code class="descname">getRange</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.BiasOrigin.getRange()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Vector of mininum and maximum output of this origin, ie {min, max}</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="optimizedecoders">
+<h3>optimizeDecoders<a class="headerlink" href="#optimizedecoders" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.BiasOrigin.optimizeDecoders(float[][], float[], boolean)">
+public void <code class="descname">optimizeDecoders</code><span class="sig-paren">(</span>float[][]<em> baseWeights</em>, float[]<em> biasEncoders</em>, boolean<em> excitatory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.BiasOrigin.optimizeDecoders(float[][], float[], boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method adjusts bias decoders so that the bias function is as flat as possible, without changing the bias encoders on the post-synaptic ensemble. Distortion can be minimized by calling this method and then calling optimizeInterneuronDomain().</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>baseWeights</strong> – Matrix of synaptic weights in the unbiased projection (ie the weights of mixed sign)</li>
+<li><strong>biasEncoders</strong> – Encoders of the bias dimension on the post-synaptic ensemble</li>
+<li><strong>excitatory</strong> – If true, weights are to be kept positive (otherwise negative)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="optimizeinterneurondomain">
+<h3>optimizeInterneuronDomain<a class="headerlink" href="#optimizeinterneurondomain" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.nef.impl.BiasOrigin.optimizeInterneuronDomain(DecodedTermination, DecodedTermination)">
+public void <code class="descname">optimizeInterneuronDomain</code><span class="sig-paren">(</span><a class="reference internal" href="DecodedTermination.html#ca.nengo.model.nef.impl.DecodedTermination" title="ca.nengo.model.nef.impl.DecodedTermination">DecodedTermination</a><em> interneuronTermination</em>, <a class="reference internal" href="DecodedTermination.html#ca.nengo.model.nef.impl.DecodedTermination" title="ca.nengo.model.nef.impl.DecodedTermination">DecodedTermination</a><em> biasTermination</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.nef.impl.BiasOrigin.optimizeInterneuronDomain(DecodedTermination, DecodedTermination)" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method adjusts the interneuron channel so that the interneurons are tuned to the range of values that is output by the bias function.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>interneuronTermination</strong> – The Termination on getInterneurons() that recieves input from this Origin</li>
+<li><strong>biasTermination</strong> – The BiasTermination to which the interneurons project (not the one to which this Origin projects directly)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="AdditiveGaussianExpressModel.html" title="previous chapter (use the left arrow)">AdditiveGaussianExpressModel</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="BiasTermination.html" title="next chapter (use the right arrow)">BiasTermination</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="BiasTermination.html" title="BiasTermination"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="AdditiveGaussianExpressModel.html" title="AdditiveGaussianExpressModel"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.model.nef.impl</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

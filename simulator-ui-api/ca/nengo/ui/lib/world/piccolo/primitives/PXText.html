@@ -1,0 +1,506 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>PXText &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../../search.html" />
+    <link rel="next" title="Path" href="Path.html" />
+    <link rel="prev" title="PXPath" href="PXPath.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Path.html" title="Path"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="PXPath.html" title="PXPath"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.ui.lib.world.piccolo.primitives</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../../../packages.html">simulator-ui</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.ui.lib.world.piccolo.primitives</a></li>
+              
+              <li>PXText</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="pxtext">
+<h1>PXText<a class="headerlink" href="#pxtext" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText">
+ class <code class="descname">PXText</code> extends <a class="reference internal" href="PXNode.html#ca.nengo.ui.lib.world.piccolo.primitives.PXNode" title="ca.nengo.ui.lib.world.piccolo.primitives.PXNode">PXNode</a><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>PText</strong> is a multi-line text node. The text will flow to base on the width of the node’s bounds.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Jesse Grosjean</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="default-font">
+<h3>DEFAULT_FONT<a class="headerlink" href="#default-font" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.DEFAULT_FONT">
+public static <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/Font.html" title="java.awt.Font">Font</a> <code class="descname">DEFAULT_FONT</code><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.DEFAULT_FONT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="default-greek-threshold">
+<h3>DEFAULT_GREEK_THRESHOLD<a class="headerlink" href="#default-greek-threshold" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.DEFAULT_GREEK_THRESHOLD">
+public static double <code class="descname">DEFAULT_GREEK_THRESHOLD</code><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.DEFAULT_GREEK_THRESHOLD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="property-code-font">
+<h3>PROPERTY_CODE_FONT<a class="headerlink" href="#property-code-font" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.PROPERTY_CODE_FONT">
+public static final int <code class="descname">PROPERTY_CODE_FONT</code><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.PROPERTY_CODE_FONT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="property-code-text">
+<h3>PROPERTY_CODE_TEXT<a class="headerlink" href="#property-code-text" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.PROPERTY_CODE_TEXT">
+public static final int <code class="descname">PROPERTY_CODE_TEXT</code><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.PROPERTY_CODE_TEXT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="property-font">
+<h3>PROPERTY_FONT<a class="headerlink" href="#property-font" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.PROPERTY_FONT">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">PROPERTY_FONT</code><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.PROPERTY_FONT" title="Permalink to this definition">¶</a></dt>
+<dd><p>The property name that identifies a change of this node’s font (see <a class="reference internal" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.getFont()" title="ca.nengo.ui.lib.world.piccolo.primitives.PXText.getFont()"><code class="xref java java-ref docutils literal"><span class="pre">getFont</span></code></a>). Both old and new value will be set in any property change event.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="property-text">
+<h3>PROPERTY_TEXT<a class="headerlink" href="#property-text" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.PROPERTY_TEXT">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">PROPERTY_TEXT</code><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.PROPERTY_TEXT" title="Permalink to this definition">¶</a></dt>
+<dd><p>The property name that identifies a change of this node’s text (see <a class="reference internal" href="Text.html#ca.nengo.ui.lib.world.piccolo.primitives.Text.getText()" title="ca.nengo.ui.lib.world.piccolo.primitives.Text.getText()"><code class="xref java java-ref docutils literal"><span class="pre">getText</span></code></a>). Both old and new value will be set in any property change event.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="greekthreshold">
+<h3>greekThreshold<a class="headerlink" href="#greekthreshold" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.greekThreshold">
+protected double <code class="descname">greekThreshold</code><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.greekThreshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>PXText<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.PXText()">
+public <code class="descname">PXText</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.PXText()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>PXText<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.PXText(String)">
+public <code class="descname">PXText</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> aText</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.PXText(String)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="computenextlayout">
+<h3>computeNextLayout<a class="headerlink" href="#computenextlayout" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.computeNextLayout(LineBreakMeasurer, float, int)">
+protected <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/font/TextLayout.html" title="java.awt.font.TextLayout">TextLayout</a> <code class="descname">computeNextLayout</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/font/LineBreakMeasurer.html" title="java.awt.font.LineBreakMeasurer">LineBreakMeasurer</a><em> measurer</em>, float<em> availibleWidth</em>, int<em> nextLineBreakOffset</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.computeNextLayout(LineBreakMeasurer, float, int)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getfont">
+<h3>getFont<a class="headerlink" href="#getfont" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.getFont()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/Font.html" title="java.awt.Font">Font</a> <code class="descname">getFont</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.getFont()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the font of this PText.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">the font of this PText.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getgreekthreshold">
+<h3>getGreekThreshold<a class="headerlink" href="#getgreekthreshold" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.getGreekThreshold()">
+public double <code class="descname">getGreekThreshold</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.getGreekThreshold()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current greek threshold. When the screen font size will be below this threshold the text is rendered as ‘greek’ instead of drawing the text glyphs.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="getjustification">
+<h3>getJustification<a class="headerlink" href="#getjustification" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.getJustification()">
+public float <code class="descname">getJustification</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.getJustification()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the justificaiton of the text in the bounds.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">float</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="gettext">
+<h3>getText<a class="headerlink" href="#gettext" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.getText()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getText</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.getText()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="gettextpaint">
+<h3>getTextPaint<a class="headerlink" href="#gettextpaint" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.getTextPaint()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/Paint.html" title="java.awt.Paint">Paint</a> <code class="descname">getTextPaint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.getTextPaint()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the paint used to paint this nodes text.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Paint</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getusegreekthreshold">
+<h3>getUseGreekThreshold<a class="headerlink" href="#getusegreekthreshold" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.getUseGreekThreshold()">
+public static boolean <code class="descname">getUseGreekThreshold</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.getUseGreekThreshold()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="internalupdatebounds">
+<h3>internalUpdateBounds<a class="headerlink" href="#internalupdatebounds" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.internalUpdateBounds(double, double, double, double)">
+protected void <code class="descname">internalUpdateBounds</code><span class="sig-paren">(</span>double<em> x</em>, double<em> y</em>, double<em> width</em>, double<em> height</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.internalUpdateBounds(double, double, double, double)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="isconstrainheighttotextheight">
+<h3>isConstrainHeightToTextHeight<a class="headerlink" href="#isconstrainheighttotextheight" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.isConstrainHeightToTextHeight()">
+public boolean <code class="descname">isConstrainHeightToTextHeight</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.isConstrainHeightToTextHeight()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="isconstrainwidthtotextwidth">
+<h3>isConstrainWidthToTextWidth<a class="headerlink" href="#isconstrainwidthtotextwidth" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.isConstrainWidthToTextWidth()">
+public boolean <code class="descname">isConstrainWidthToTextWidth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.isConstrainWidthToTextWidth()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="paint">
+<h3>paint<a class="headerlink" href="#paint" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.paint(PPaintContext)">
+protected void <code class="descname">paint</code><span class="sig-paren">(</span>PPaintContext<em> paintContext</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.paint(PPaintContext)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="paramstring">
+<h3>paramString<a class="headerlink" href="#paramstring" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.paramString()">
+protected <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">paramString</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.paramString()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a string representing the state of this node. This method is intended to be used only for debugging purposes, and the content and format of the returned string may vary between implementations. The returned string may be empty but may not be <code class="docutils literal"><span class="pre">null</span></code>.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">a string representation of this node’s state</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="recomputelayout">
+<h3>recomputeLayout<a class="headerlink" href="#recomputelayout" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.recomputeLayout()">
+public void <code class="descname">recomputeLayout</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.recomputeLayout()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the bounds of the text wrapped by this node. The text layout is wrapped based on the bounds of this node.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="setconstrainheighttotextheight">
+<h3>setConstrainHeightToTextHeight<a class="headerlink" href="#setconstrainheighttotextheight" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.setConstrainHeightToTextHeight(boolean)">
+public void <code class="descname">setConstrainHeightToTextHeight</code><span class="sig-paren">(</span>boolean<em> constrainHeightToTextHeight</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.setConstrainHeightToTextHeight(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Controls whether this node changes its height to fit the height of its text. If flag is true it does; if flag is false it doesn’t</p>
+</dd></dl>
+
+</div>
+<div class="section" id="setconstrainwidthtotextwidth">
+<h3>setConstrainWidthToTextWidth<a class="headerlink" href="#setconstrainwidthtotextwidth" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.setConstrainWidthToTextWidth(boolean)">
+public void <code class="descname">setConstrainWidthToTextWidth</code><span class="sig-paren">(</span>boolean<em> constrainWidthToTextWidth</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.setConstrainWidthToTextWidth(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Controls whether this node changes its width to fit the width of its text. If flag is true it does; if flag is false it doesn’t</p>
+</dd></dl>
+
+</div>
+<div class="section" id="setfont">
+<h3>setFont<a class="headerlink" href="#setfont" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.setFont(Font)">
+public void <code class="descname">setFont</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/Font.html" title="java.awt.Font">Font</a><em> aFont</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.setFont(Font)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the font of this PText. Note that in Piccolo if you want to change the size of a text object it’s often a better idea to scale the PText node instead of changing the font size to get that same effect. Using very large font sizes can slow performance.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="setgreekthreshold">
+<h3>setGreekThreshold<a class="headerlink" href="#setgreekthreshold" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.setGreekThreshold(double)">
+public void <code class="descname">setGreekThreshold</code><span class="sig-paren">(</span>double<em> threshold</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.setGreekThreshold(double)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the current greek threshold. When the screen font size will be below this threshold the text is rendered as ‘greek’ instead of drawing the text glyphs.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>threshold</strong> – minimum screen font size.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setjustification">
+<h3>setJustification<a class="headerlink" href="#setjustification" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.setJustification(float)">
+public void <code class="descname">setJustification</code><span class="sig-paren">(</span>float<em> just</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.setJustification(float)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the justificaiton of the text in the bounds.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>just</strong> – </li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="settext">
+<h3>setText<a class="headerlink" href="#settext" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.setText(String)">
+public void <code class="descname">setText</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> aText</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.setText(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the text for this node. The text will be broken up into multiple lines based on the size of the text and the bounds width of this node.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="settextpaint">
+<h3>setTextPaint<a class="headerlink" href="#settextpaint" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.setTextPaint(Paint)">
+public void <code class="descname">setTextPaint</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/Paint.html" title="java.awt.Paint">Paint</a><em> textPaint</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.setTextPaint(Paint)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the paint used to paint this node’s text background.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>textPaint</strong> – </li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setusegreekthreshold">
+<h3>setUseGreekThreshold<a class="headerlink" href="#setusegreekthreshold" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXText.setUseGreekThreshold(boolean)">
+public static void <code class="descname">setUseGreekThreshold</code><span class="sig-paren">(</span>boolean<em> state</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXText.setUseGreekThreshold(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="PXPath.html" title="previous chapter (use the left arrow)">PXPath</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="Path.html" title="next chapter (use the right arrow)">Path</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Path.html" title="Path"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="PXPath.html" title="PXPath"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.ui.lib.world.piccolo.primitives</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

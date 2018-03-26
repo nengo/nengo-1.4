@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>ElasticObject &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../search.html" />
+    <link rel="next" title="ElasticVertex" href="ElasticVertex.html" />
+    <link rel="prev" title="ElasticLayoutRunner.ElasticLengthFunction" href="ElasticLayoutRunner-ElasticLengthFunction.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ElasticVertex.html" title="ElasticVertex"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ElasticLayoutRunner-ElasticLengthFunction.html" title="ElasticLayoutRunner.ElasticLengthFunction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.ui.lib.world.elastic</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../../packages.html">simulator-ui</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.ui.lib.world.elastic</a></li>
+              
+              <li>ElasticObject</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="elasticobject">
+<h1>ElasticObject<a class="headerlink" href="#elasticobject" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject">
+public class <code class="descname">ElasticObject</code> extends <a class="reference internal" href="../piccolo/WorldObjectImpl.html#ca.nengo.ui.lib.world.piccolo.WorldObjectImpl" title="ca.nengo.ui.lib.world.piccolo.WorldObjectImpl">WorldObjectImpl</a><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>ElasticObject<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.ElasticObject()">
+public <code class="descname">ElasticObject</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.ElasticObject()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>ElasticObject<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.ElasticObject(PiccoloNodeInWorld)">
+public <code class="descname">ElasticObject</code><span class="sig-paren">(</span><a class="reference internal" href="../piccolo/primitives/PiccoloNodeInWorld.html#ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld" title="ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld">PiccoloNodeInWorld</a><em> node</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.ElasticObject(PiccoloNodeInWorld)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>ElasticObject<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.ElasticObject(String)">
+public <code class="descname">ElasticObject</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.ElasticObject(String)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3>ElasticObject<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.ElasticObject(String, PiccoloNodeInWorld)">
+public <code class="descname">ElasticObject</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../piccolo/primitives/PiccoloNodeInWorld.html#ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld" title="ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld">PiccoloNodeInWorld</a><em> node</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.ElasticObject(String, PiccoloNodeInWorld)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="getelasticworld">
+<h3>getElasticWorld<a class="headerlink" href="#getelasticworld" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.getElasticWorld()">
+protected <a class="reference internal" href="ElasticGround.html#ca.nengo.ui.lib.world.elastic.ElasticGround" title="ca.nengo.ui.lib.world.elastic.ElasticGround">ElasticGround</a> <code class="descname">getElasticWorld</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.getElasticWorld()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getoffset">
+<h3>getOffset<a class="headerlink" href="#getoffset" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.getOffset()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Point2D.html" title="java.awt.geom.Point2D">Point2D</a> <code class="descname">getOffset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.getOffset()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getoffsetreal">
+<h3>getOffsetReal<a class="headerlink" href="#getoffsetreal" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.getOffsetReal()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Point2D.html" title="java.awt.geom.Point2D">Point2D</a> <code class="descname">getOffsetReal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.getOffsetReal()" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the real getOffset function.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>x</strong> – </li>
+<li><strong>y</strong> – </li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getrepulsionrange">
+<h3>getRepulsionRange<a class="headerlink" href="#getrepulsionrange" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.getRepulsionRange()">
+public double <code class="descname">getRepulsionRange</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.getRepulsionRange()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="isanchored">
+<h3>isAnchored<a class="headerlink" href="#isanchored" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.isAnchored()">
+public boolean <code class="descname">isAnchored</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.isAnchored()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="ispositionlocked">
+<h3>isPositionLocked<a class="headerlink" href="#ispositionlocked" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.isPositionLocked()">
+public boolean <code class="descname">isPositionLocked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.isPositionLocked()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="preparefordestroy">
+<h3>prepareForDestroy<a class="headerlink" href="#preparefordestroy" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.prepareForDestroy()">
+protected void <code class="descname">prepareForDestroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.prepareForDestroy()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setanchored">
+<h3>setAnchored<a class="headerlink" href="#setanchored" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.setAnchored(boolean)">
+public void <code class="descname">setAnchored</code><span class="sig-paren">(</span>boolean<em> anchored</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.setAnchored(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setoffset">
+<h3>setOffset<a class="headerlink" href="#setoffset" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.setOffset(double, double)">
+public void <code class="descname">setOffset</code><span class="sig-paren">(</span>double<em> x</em>, double<em> y</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.setOffset(double, double)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">edu.umd.cs.piccolo.PNode.setOffset(double,double)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setoffsetreal">
+<h3>setOffsetReal<a class="headerlink" href="#setoffsetreal" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.setOffsetReal(double, double)">
+public void <code class="descname">setOffsetReal</code><span class="sig-paren">(</span>double<em> x</em>, double<em> y</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.setOffsetReal(double, double)" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the real setOffset function.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>x</strong> – </li>
+<li><strong>y</strong> – </li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setpositionlocked">
+<h3>setPositionLocked<a class="headerlink" href="#setpositionlocked" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.setPositionLocked(boolean)">
+public void <code class="descname">setPositionLocked</code><span class="sig-paren">(</span>boolean<em> lock</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.setPositionLocked(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setselected">
+<h3>setSelected<a class="headerlink" href="#setselected" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.elastic.ElasticObject.setSelected(boolean)">
+public void <code class="descname">setSelected</code><span class="sig-paren">(</span>boolean<em> isSelected</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.elastic.ElasticObject.setSelected(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="ElasticLayoutRunner-ElasticLengthFunction.html" title="previous chapter (use the left arrow)">ElasticLayoutRunner.ElasticLengthFunction</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="ElasticVertex.html" title="next chapter (use the right arrow)">ElasticVertex</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ElasticVertex.html" title="ElasticVertex"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ElasticLayoutRunner-ElasticLengthFunction.html" title="ElasticLayoutRunner.ElasticLengthFunction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.ui.lib.world.elastic</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

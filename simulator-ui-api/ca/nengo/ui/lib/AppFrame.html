@@ -1,0 +1,665 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>AppFrame &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="AppFrame.AboutAction" href="AppFrame-AboutAction.html" />
+    <link rel="prev" title="ca.nengo.ui.lib" href="package-index.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="AppFrame-AboutAction.html" title="AppFrame.AboutAction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="package-index.html" title="ca.nengo.ui.lib"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.ui.lib</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../packages.html">simulator-ui</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.ui.lib</a></li>
+              
+              <li>AppFrame</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="appframe">
+<h1>AppFrame<a class="headerlink" href="#appframe" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.ui.lib.AppFrame">
+public abstract class <code class="descname">AppFrame</code> extends <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/javax/swing/JFrame.html" title="javax.swing.JFrame">JFrame</a> implements ApplicationListener<a class="headerlink" href="#ca.nengo.ui.lib.AppFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class is based on PFrame by Jesse Grosjean</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Shu Wu</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="menu-shortcut-key-mask">
+<h3>MENU_SHORTCUT_KEY_MASK<a class="headerlink" href="#menu-shortcut-key-mask" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.AppFrame.MENU_SHORTCUT_KEY_MASK">
+public static int <code class="descname">MENU_SHORTCUT_KEY_MASK</code><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.MENU_SHORTCUT_KEY_MASK" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+</div>
+<div class="section" id="user-file-dir">
+<h3>USER_FILE_DIR<a class="headerlink" href="#user-file-dir" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.AppFrame.USER_FILE_DIR">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">USER_FILE_DIR</code><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.USER_FILE_DIR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the directory where UI Files are stored</p>
+</dd></dl>
+
+</div>
+<div class="section" id="world-tips">
+<h3>WORLD_TIPS<a class="headerlink" href="#world-tips" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.AppFrame.WORLD_TIPS">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">WORLD_TIPS</code><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.WORLD_TIPS" title="Permalink to this definition">¶</a></dt>
+<dd><p>A String which briefly describes some commands used in this application</p>
+</dd></dl>
+
+</div>
+<div class="section" id="editmenu">
+<h3>editMenu<a class="headerlink" href="#editmenu" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.AppFrame.editMenu">
+protected <a class="reference internal" href="util/menus/MenuBuilder.html#ca.nengo.ui.lib.util.menus.MenuBuilder" title="ca.nengo.ui.lib.util.menus.MenuBuilder">MenuBuilder</a> <code class="descname">editMenu</code><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.editMenu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="runmenu">
+<h3>runMenu<a class="headerlink" href="#runmenu" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.AppFrame.runMenu">
+protected <a class="reference internal" href="util/menus/MenuBuilder.html#ca.nengo.ui.lib.util.menus.MenuBuilder" title="ca.nengo.ui.lib.util.menus.MenuBuilder">MenuBuilder</a> <code class="descname">runMenu</code><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.runMenu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>AppFrame<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.AppFrame.AppFrame()">
+public <code class="descname">AppFrame</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.AppFrame()" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="addactivity">
+<h3>addActivity<a class="headerlink" href="#addactivity" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.addActivity(PActivity)">
+public boolean <code class="descname">addActivity</code><span class="sig-paren">(</span>PActivity<em> activity</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.addActivity(PActivity)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>activity</strong> – TODO</li>
+</ul>
+</dd>
+<dt class="field-name">Returns</dt><dd class="field-body"><p class="first last">TODO</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="addescapefullscreenmodelistener">
+<h3>addEscapeFullScreenModeListener<a class="headerlink" href="#addescapefullscreenmodelistener" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.addEscapeFullScreenModeListener()">
+public void <code class="descname">addEscapeFullScreenModeListener</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.addEscapeFullScreenModeListener()" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method adds a key listener that will take this PFrame out of full screen mode when the escape key is pressed. This is called for you automatically when the frame enters full screen mode.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="addworldwindow">
+<h3>addWorldWindow<a class="headerlink" href="#addworldwindow" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.addWorldWindow(Window)">
+public void <code class="descname">addWorldWindow</code><span class="sig-paren">(</span><a class="reference internal" href="world/piccolo/objects/Window.html#ca.nengo.ui.lib.world.piccolo.objects.Window" title="ca.nengo.ui.lib.world.piccolo.objects.Window">Window</a><em> window</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.addWorldWindow(Window)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>window</strong> – TODO</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="choosebestdisplaymode">
+<h3>chooseBestDisplayMode<a class="headerlink" href="#choosebestdisplaymode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.chooseBestDisplayMode(GraphicsDevice)">
+protected void <code class="descname">chooseBestDisplayMode</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/GraphicsDevice.html" title="java.awt.GraphicsDevice">GraphicsDevice</a><em> device</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.chooseBestDisplayMode(GraphicsDevice)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="constructshortcutkeys">
+<h3>constructShortcutKeys<a class="headerlink" href="#constructshortcutkeys" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.constructShortcutKeys(LinkedList)">
+protected void <code class="descname">constructShortcutKeys</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/LinkedList.html" title="java.util.LinkedList">LinkedList</a>&lt;<a class="reference internal" href="misc/ShortcutKey.html#ca.nengo.ui.lib.misc.ShortcutKey" title="ca.nengo.ui.lib.misc.ShortcutKey">ShortcutKey</a>&gt;<em> shortcuts</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.constructShortcutKeys(LinkedList)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="createdefaultcamera">
+<h3>createDefaultCamera<a class="headerlink" href="#createdefaultcamera" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.createDefaultCamera()">
+protected PCamera <code class="descname">createDefaultCamera</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.createDefaultCamera()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="createworld">
+<h3>createWorld<a class="headerlink" href="#createworld" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.createWorld()">
+protected abstract <a class="reference internal" href="world/elastic/ElasticWorld.html#ca.nengo.ui.lib.world.elastic.ElasticWorld" title="ca.nengo.ui.lib.world.elastic.ElasticWorld">ElasticWorld</a> <code class="descname">createWorld</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.createWorld()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="exitappframe">
+<h3>exitAppFrame<a class="headerlink" href="#exitappframe" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.exitAppFrame()">
+public void <code class="descname">exitAppFrame</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.exitAppFrame()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the user closes the Application window</p>
+</dd></dl>
+
+</div>
+<div class="section" id="getaboutstring">
+<h3>getAboutString<a class="headerlink" href="#getaboutstring" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.getAboutString()">
+public abstract <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getAboutString</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.getAboutString()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">String which describes what the application is about</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getactionmanager">
+<h3>getActionManager<a class="headerlink" href="#getactionmanager" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.getActionManager()">
+public <a class="reference internal" href="actions/ReversableActionManager.html#ca.nengo.ui.lib.actions.ReversableActionManager" title="ca.nengo.ui.lib.actions.ReversableActionManager">ReversableActionManager</a> <code class="descname">getActionManager</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.getActionManager()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Action manager responsible for managing actions. Enables undo, redo functionality.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getappname">
+<h3>getAppName<a class="headerlink" href="#getappname" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.getAppName()">
+public abstract <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getAppName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.getAppName()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Name of the application</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getappwindowtitle">
+<h3>getAppWindowTitle<a class="headerlink" href="#getappwindowtitle" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.getAppWindowTitle()">
+public abstract <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getAppWindowTitle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.getAppWindowTitle()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">TODO</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getbestdisplaymode">
+<h3>getBestDisplayMode<a class="headerlink" href="#getbestdisplaymode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.getBestDisplayMode(GraphicsDevice)">
+protected <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/DisplayMode.html" title="java.awt.DisplayMode">DisplayMode</a> <code class="descname">getBestDisplayMode</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/GraphicsDevice.html" title="java.awt.GraphicsDevice">GraphicsDevice</a><em> device</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.getBestDisplayMode(GraphicsDevice)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="gethelp">
+<h3>getHelp<a class="headerlink" href="#gethelp" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.getHelp()">
+protected <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">getHelp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.getHelp()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getpreferreddisplaymodes">
+<h3>getPreferredDisplayModes<a class="headerlink" href="#getpreferreddisplaymodes" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.getPreferredDisplayModes(GraphicsDevice)">
+protected <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/Collection.html" title="java.util.Collection">Collection</a>&lt;<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/DisplayMode.html" title="java.awt.DisplayMode">DisplayMode</a>&gt; <code class="descname">getPreferredDisplayModes</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/GraphicsDevice.html" title="java.awt.GraphicsDevice">GraphicsDevice</a><em> device</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.getPreferredDisplayModes(GraphicsDevice)" title="Permalink to this definition">¶</a></dt>
+<dd><p>By default return the current display mode. Subclasses may override this method to return other modes in the collection.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="getshortcutkeys">
+<h3>getShortcutKeys<a class="headerlink" href="#getshortcutkeys" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.getShortcutKeys()">
+protected <a class="reference internal" href="misc/ShortcutKey.html#ca.nengo.ui.lib.misc.ShortcutKey" title="ca.nengo.ui.lib.misc.ShortcutKey">ShortcutKey</a>[] <code class="descname">getShortcutKeys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.getShortcutKeys()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="gettopwindow">
+<h3>getTopWindow<a class="headerlink" href="#gettopwindow" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.getTopWindow()">
+public <a class="reference internal" href="world/piccolo/objects/Window.html#ca.nengo.ui.lib.world.piccolo.objects.Window" title="ca.nengo.ui.lib.world.piccolo.objects.Window">Window</a> <code class="descname">getTopWindow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.getTopWindow()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">TODO</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getuniverse">
+<h3>getUniverse<a class="headerlink" href="#getuniverse" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.getUniverse()">
+public <a class="reference internal" href="world/piccolo/primitives/Universe.html#ca.nengo.ui.lib.world.piccolo.primitives.Universe" title="ca.nengo.ui.lib.world.piccolo.primitives.Universe">Universe</a> <code class="descname">getUniverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.getUniverse()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Canvas which hold the zoomable UI</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getworld">
+<h3>getWorld<a class="headerlink" href="#getworld" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.getWorld()">
+public <a class="reference internal" href="world/elastic/ElasticWorld.html#ca.nengo.ui.lib.world.elastic.ElasticWorld" title="ca.nengo.ui.lib.world.elastic.ElasticWorld">ElasticWorld</a> <code class="descname">getWorld</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.getWorld()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">the top-most World associated with this frame</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="handleabout">
+<h3>handleAbout<a class="headerlink" href="#handleabout" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.handleAbout(ApplicationEvent)">
+public void <code class="descname">handleAbout</code><span class="sig-paren">(</span>ApplicationEvent<em> event</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.handleAbout(ApplicationEvent)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="handleopenapplication">
+<h3>handleOpenApplication<a class="headerlink" href="#handleopenapplication" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.handleOpenApplication(ApplicationEvent)">
+public void <code class="descname">handleOpenApplication</code><span class="sig-paren">(</span>ApplicationEvent<em> event</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.handleOpenApplication(ApplicationEvent)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="handleopenfile">
+<h3>handleOpenFile<a class="headerlink" href="#handleopenfile" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.handleOpenFile(ApplicationEvent)">
+public void <code class="descname">handleOpenFile</code><span class="sig-paren">(</span>ApplicationEvent<em> event</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.handleOpenFile(ApplicationEvent)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="handlepreferences">
+<h3>handlePreferences<a class="headerlink" href="#handlepreferences" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.handlePreferences(ApplicationEvent)">
+public void <code class="descname">handlePreferences</code><span class="sig-paren">(</span>ApplicationEvent<em> event</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.handlePreferences(ApplicationEvent)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="handleprintfile">
+<h3>handlePrintFile<a class="headerlink" href="#handleprintfile" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.handlePrintFile(ApplicationEvent)">
+public void <code class="descname">handlePrintFile</code><span class="sig-paren">(</span>ApplicationEvent<em> event</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.handlePrintFile(ApplicationEvent)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="handlequit">
+<h3>handleQuit<a class="headerlink" href="#handlequit" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.handleQuit(ApplicationEvent)">
+public void <code class="descname">handleQuit</code><span class="sig-paren">(</span>ApplicationEvent<em> event</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.handleQuit(ApplicationEvent)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="handlereopenapplication">
+<h3>handleReOpenApplication<a class="headerlink" href="#handlereopenapplication" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.handleReOpenApplication(ApplicationEvent)">
+public void <code class="descname">handleReOpenApplication</code><span class="sig-paren">(</span>ApplicationEvent<em> event</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.handleReOpenApplication(ApplicationEvent)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="initfilemenu">
+<h3>initFileMenu<a class="headerlink" href="#initfilemenu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.initFileMenu(MenuBuilder)">
+protected void <code class="descname">initFileMenu</code><span class="sig-paren">(</span><a class="reference internal" href="util/menus/MenuBuilder.html#ca.nengo.ui.lib.util.menus.MenuBuilder" title="ca.nengo.ui.lib.util.menus.MenuBuilder">MenuBuilder</a><em> menu</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.initFileMenu(MenuBuilder)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use this function to add menu items to the frame menu bar</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>menuBar</strong> – is attached to the frame</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="initlayout">
+<h3>initLayout<a class="headerlink" href="#initlayout" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.initLayout(Universe)">
+protected void <code class="descname">initLayout</code><span class="sig-paren">(</span><a class="reference internal" href="world/piccolo/primitives/Universe.html#ca.nengo.ui.lib.world.piccolo.primitives.Universe" title="ca.nengo.ui.lib.world.piccolo.primitives.Universe">Universe</a><em> canvas</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.initLayout(Universe)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="initviewmenu">
+<h3>initViewMenu<a class="headerlink" href="#initviewmenu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.initViewMenu(JMenuBar)">
+protected void <code class="descname">initViewMenu</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/javax/swing/JMenuBar.html" title="javax.swing.JMenuBar">JMenuBar</a><em> menuBar</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.initViewMenu(JMenuBar)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use this function to add menu items to the frame menu bar</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>menuBar</strong> – is attached to the frame</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="initialize">
+<h3>initialize<a class="headerlink" href="#initialize" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.initialize()">
+protected void <code class="descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.initialize()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="loadpreferences">
+<h3>loadPreferences<a class="headerlink" href="#loadpreferences" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.loadPreferences()">
+protected void <code class="descname">loadPreferences</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.loadPreferences()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads saved preferences related to the application</p>
+</dd></dl>
+
+</div>
+<div class="section" id="removeescapefullscreenmodelistener">
+<h3>removeEscapeFullScreenModeListener<a class="headerlink" href="#removeescapefullscreenmodelistener" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.removeEscapeFullScreenModeListener()">
+public void <code class="descname">removeEscapeFullScreenModeListener</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.removeEscapeFullScreenModeListener()" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method removes the escape full screen mode key listener. It will be called for you automatically when full screen mode exits, but the method has been made public for applications that wish to use other methods for exiting full screen mode.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="restoredefaulttitle">
+<h3>restoreDefaultTitle<a class="headerlink" href="#restoredefaulttitle" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.restoreDefaultTitle()">
+public void <code class="descname">restoreDefaultTitle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.restoreDefaultTitle()" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+</div>
+<div class="section" id="reversableactionsupdated">
+<h3>reversableActionsUpdated<a class="headerlink" href="#reversableactionsupdated" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.reversableActionsUpdated()">
+public void <code class="descname">reversableActionsUpdated</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.reversableActionsUpdated()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when reversable actions have changed. Updates the edit menu.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="savepreferences">
+<h3>savePreferences<a class="headerlink" href="#savepreferences" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.savePreferences()">
+protected void <code class="descname">savePreferences</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.savePreferences()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save preferences to file</p>
+</dd></dl>
+
+</div>
+<div class="section" id="setfullscreenmode">
+<h3>setFullScreenMode<a class="headerlink" href="#setfullscreenmode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.setFullScreenMode(boolean)">
+public void <code class="descname">setFullScreenMode</code><span class="sig-paren">(</span>boolean<em> fullScreenMode</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.setFullScreenMode(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>fullScreenMode</strong> – sets the screen to fullscreen</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="settopwindow">
+<h3>setTopWindow<a class="headerlink" href="#settopwindow" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.setTopWindow(Window)">
+public void <code class="descname">setTopWindow</code><span class="sig-paren">(</span><a class="reference internal" href="world/piccolo/objects/Window.html#ca.nengo.ui.lib.world.piccolo.objects.Window" title="ca.nengo.ui.lib.world.piccolo.objects.Window">Window</a><em> window</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.setTopWindow(Window)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>window</strong> – TODO</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="updateeditmenu">
+<h3>updateEditMenu<a class="headerlink" href="#updateeditmenu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.updateEditMenu()">
+protected void <code class="descname">updateEditMenu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.updateEditMenu()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the menu ‘edit’</p>
+</dd></dl>
+
+</div>
+<div class="section" id="updaterunmenu">
+<h3>updateRunMenu<a class="headerlink" href="#updaterunmenu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.updateRunMenu()">
+protected void <code class="descname">updateRunMenu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.updateRunMenu()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the menu ‘run’</p>
+</dd></dl>
+
+</div>
+<div class="section" id="updateworldmenu">
+<h3>updateWorldMenu<a class="headerlink" href="#updateworldmenu" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.AppFrame.updateWorldMenu()">
+protected void <code class="descname">updateWorldMenu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.AppFrame.updateWorldMenu()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the menu ‘world’</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="package-index.html" title="previous chapter (use the left arrow)">ca.nengo.ui.lib</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="AppFrame-AboutAction.html" title="next chapter (use the right arrow)">AppFrame.AboutAction</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="AppFrame-AboutAction.html" title="AppFrame.AboutAction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="package-index.html" title="ca.nengo.ui.lib"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.ui.lib</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

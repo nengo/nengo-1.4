@@ -1,0 +1,389 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>EnsembleImpl &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="EnsembleImplTest" href="EnsembleImplTest.html" />
+    <link rel="prev" title="DelayedLinearExponentialTermination" href="DelayedLinearExponentialTermination.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="EnsembleImplTest.html" title="EnsembleImplTest"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="DelayedLinearExponentialTermination.html" title="DelayedLinearExponentialTermination"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.model.impl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../packages.html">simulator</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.model.impl</a></li>
+              
+              <li>EnsembleImpl</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="ensembleimpl">
+<h1>EnsembleImpl<a class="headerlink" href="#ensembleimpl" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.model.impl.EnsembleImpl">
+public class <code class="descname">EnsembleImpl</code> extends <a class="reference internal" href="AbstractEnsemble.html#ca.nengo.model.impl.AbstractEnsemble" title="ca.nengo.model.impl.AbstractEnsemble">AbstractEnsemble</a> implements <a class="reference internal" href="../ExpandableNode.html#ca.nengo.model.ExpandableNode" title="ca.nengo.model.ExpandableNode">ExpandableNode</a><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default implementation of Ensemble.</p>
+<p>Origins or Terminations can be set up on Nodes before they are grouped into an Ensemble. After Nodes are added to an Ensemble, no Origins or Terminations should be added to them directly. Terminations can be added with EnsembleImpl.addTermination(…) If a Termination is added directly to a Node after the Node is added to the Ensemble, the Termination will not appear in Ensemble.getTerminations()</p>
+<p>TODO: test</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Bryan Tripp</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="myexpandablenodes">
+<h3>myExpandableNodes<a class="headerlink" href="#myexpandablenodes" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.model.impl.EnsembleImpl.myExpandableNodes">
+protected <a class="reference internal" href="../ExpandableNode.html#ca.nengo.model.ExpandableNode" title="ca.nengo.model.ExpandableNode">ExpandableNode</a>[] <code class="descname">myExpandableNodes</code><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.myExpandableNodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="myexpandedterminations">
+<h3>myExpandedTerminations<a class="headerlink" href="#myexpandedterminations" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.model.impl.EnsembleImpl.myExpandedTerminations">
+protected <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/Map.html" title="java.util.Map">Map</a>&lt;<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a>, <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a>&gt; <code class="descname">myExpandedTerminations</code><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.myExpandedTerminations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>EnsembleImpl<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.impl.EnsembleImpl.EnsembleImpl(String, Node[])">
+public <code class="descname">EnsembleImpl</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>[]<em> nodes</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.EnsembleImpl(String, Node[])" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – Name of Ensemble</li>
+<li><strong>nodes</strong> – Nodes that make up the Ensemble</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>EnsembleImpl<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.model.impl.EnsembleImpl.EnsembleImpl(String, NodeFactory, int)">
+public <code class="descname">EnsembleImpl</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, <a class="reference internal" href="NodeFactory.html#ca.nengo.model.impl.NodeFactory" title="ca.nengo.model.impl.NodeFactory">NodeFactory</a><em> factory</em>, int<em> n</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.EnsembleImpl(String, NodeFactory, int)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first simple">
+<li><strong>name</strong> – Name of Ensemble</li>
+<li><strong>factory</strong> – Factory class that will create nodes</li>
+<li><strong>n</strong> – Number of nodes to create</li>
+</ul>
+</dd>
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>StructuralException</strong> – if any problem halts construction</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="addtermination">
+<h3>addTermination<a class="headerlink" href="#addtermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.EnsembleImpl.addTermination(String, float[][], float, boolean)">
+public synchronized <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> weights</em>, float<em> tauPSC</em>, boolean<em> modulatory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.addTermination(String, float[][], float, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>weights</strong> – Each row is used as a 1 by m matrix of weights in a new termination on the nth expandable node</li>
+</ul>
+</dd>
+</dl>
+<p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.ExpandableNode.addTermination(java.lang.String,float[][],float,boolean)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>addTermination<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.EnsembleImpl.addTermination(String, float[][], PDF, PDF, boolean)">
+public synchronized <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">addTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em>, float[][]<em> weights</em>, <a class="reference internal" href="../../math/PDF.html#ca.nengo.math.PDF" title="ca.nengo.math.PDF">PDF</a><em> tauPSC</em>, <a class="reference internal" href="../../math/PDF.html#ca.nengo.math.PDF" title="ca.nengo.math.PDF">PDF</a><em> delays</em>, boolean<em> modulatory</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.addTermination(String, float[][], PDF, PDF, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>weights</strong> – Each row is used as a 1 by m matrix of weights in a new termination on the nth expandable node</li>
+<li><strong>tauPSC</strong> – PDF from which psc time constants will be sampled</li>
+</ul>
+</dd>
+</dl>
+<p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.ExpandableNode.addTermination(java.lang.String,float[][],float,boolean)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="clone">
+<h3>clone<a class="headerlink" href="#clone" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.EnsembleImpl.clone()">
+public <a class="reference internal" href="#ca.nengo.model.impl.EnsembleImpl" title="ca.nengo.model.impl.EnsembleImpl">EnsembleImpl</a> <code class="descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.clone()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getchildren">
+<h3>getChildren<a class="headerlink" href="#getchildren" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.EnsembleImpl.getChildren()">
+public <a class="reference internal" href="../Node.html#ca.nengo.model.Node" title="ca.nengo.model.Node">Node</a>[] <code class="descname">getChildren</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.getChildren()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getdimension">
+<h3>getDimension<a class="headerlink" href="#getdimension" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.EnsembleImpl.getDimension()">
+public int <code class="descname">getDimension</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.getDimension()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <a class="reference internal" href="../ExpandableNode.html#ca.nengo.model.ExpandableNode.getDimension()" title="ca.nengo.model.ExpandableNode.getDimension()"><code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.ExpandableNode.getDimension()</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="gettermination">
+<h3>getTermination<a class="headerlink" href="#gettermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.EnsembleImpl.getTermination(String)">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">getTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.getTermination(String)" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Node.getTermination(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="getterminations">
+<h3>getTerminations<a class="headerlink" href="#getterminations" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.EnsembleImpl.getTerminations()">
+public <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a>[] <code class="descname">getTerminations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.getTerminations()" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Ensemble.getTerminations()</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="removetermination">
+<h3>removeTermination<a class="headerlink" href="#removetermination" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.EnsembleImpl.removeTermination(String)">
+public synchronized <a class="reference internal" href="../Termination.html#ca.nengo.model.Termination" title="ca.nengo.model.Termination">Termination</a> <code class="descname">removeTermination</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a><em> name</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.removeTermination(String)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Throws</dt><dd class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="../StructuralException.html#ca.nengo.model.StructuralException" title="ca.nengo.model.StructuralException"><strong>StructuralException</strong></a> – if Termination does not exist</li>
+</ul>
+</dd>
+</dl>
+<p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.ExpandableNode.removeTermination(java.lang.String)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="reset">
+<h3>reset<a class="headerlink" href="#reset" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.EnsembleImpl.reset(boolean)">
+public void <code class="descname">reset</code><span class="sig-paren">(</span>boolean<em> randomize</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.reset(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setmode">
+<h3>setMode<a class="headerlink" href="#setmode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.EnsembleImpl.setMode(SimulationMode)">
+public void <code class="descname">setMode</code><span class="sig-paren">(</span><a class="reference internal" href="../SimulationMode.html#ca.nengo.model.SimulationMode" title="ca.nengo.model.SimulationMode">SimulationMode</a><em> mode</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.setMode(SimulationMode)" title="Permalink to this definition">¶</a></dt>
+<dd><p>This Ensemble does not support SimulationMode.DIRECT.</p>
+<p><strong>See also:</strong> <code class="xref java java-ref docutils literal"><span class="pre">ca.nengo.model.Ensemble.setMode(ca.nengo.model.SimulationMode)</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="toscript">
+<h3>toScript<a class="headerlink" href="#toscript" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.model.impl.EnsembleImpl.toScript(HashMap)">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">toScript</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html" title="java.util.HashMap">HashMap</a>&lt;<a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/Object.html" title="java.lang.Object">Object</a>&gt;<em> scriptData</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.model.impl.EnsembleImpl.toScript(HashMap)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="DelayedLinearExponentialTermination.html" title="previous chapter (use the left arrow)">DelayedLinearExponentialTermination</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="EnsembleImplTest.html" title="next chapter (use the right arrow)">EnsembleImplTest</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="EnsembleImplTest.html" title="EnsembleImplTest"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="DelayedLinearExponentialTermination.html" title="DelayedLinearExponentialTermination"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../packages.html" >simulator</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.model.impl</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

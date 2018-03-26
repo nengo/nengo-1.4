@@ -1,0 +1,456 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>PXEdge &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../../search.html" />
+    <link rel="next" title="PXEdge.EdgeShape" href="PXEdge-EdgeShape.html" />
+    <link rel="prev" title="PXCamera" href="PXCamera.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="PXEdge-EdgeShape.html" title="PXEdge.EdgeShape"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="PXCamera.html" title="PXCamera"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.ui.lib.world.piccolo.primitives</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../../../packages.html">simulator-ui</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.ui.lib.world.piccolo.primitives</a></li>
+              
+              <li>PXEdge</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="pxedge">
+<h1>PXEdge<a class="headerlink" href="#pxedge" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge">
+public class <code class="descname">PXEdge</code> extends <a class="reference internal" href="PXPath.html#ca.nengo.ui.lib.world.piccolo.primitives.PXPath" title="ca.nengo.ui.lib.world.piccolo.primitives.PXPath">PXPath</a> implements <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/beans/PropertyChangeListener.html" title="java.beans.PropertyChangeListener">PropertyChangeListener</a>, <a class="reference internal" href="../../Destroyable.html#ca.nengo.ui.lib.world.Destroyable" title="ca.nengo.ui.lib.world.Destroyable">Destroyable</a>, <a class="reference internal" href="PiccoloNodeInWorld.html#ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld" title="ca.nengo.ui.lib.world.piccolo.primitives.PiccoloNodeInWorld">PiccoloNodeInWorld</a><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge" title="Permalink to this definition">¶</a></dt>
+<dd><p>An edge with direction. An piccolo component.</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Shu Wu</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="default-min-arc-radius">
+<h3>DEFAULT_MIN_ARC_RADIUS<a class="headerlink" href="#default-min-arc-radius" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.DEFAULT_MIN_ARC_RADIUS">
+static final double <code class="descname">DEFAULT_MIN_ARC_RADIUS</code><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.DEFAULT_MIN_ARC_RADIUS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default radius of the arc shape used by this edge. Only applies when the shape of this edge is set to an arc.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>PXEdge<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.PXEdge(WorldObjectImpl, WorldObjectImpl)">
+public <code class="descname">PXEdge</code><span class="sig-paren">(</span><a class="reference internal" href="../WorldObjectImpl.html#ca.nengo.ui.lib.world.piccolo.WorldObjectImpl" title="ca.nengo.ui.lib.world.piccolo.WorldObjectImpl">WorldObjectImpl</a><em> startNode</em>, <a class="reference internal" href="../WorldObjectImpl.html#ca.nengo.ui.lib.world.piccolo.WorldObjectImpl" title="ca.nengo.ui.lib.world.piccolo.WorldObjectImpl">WorldObjectImpl</a><em> endNode</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.PXEdge(WorldObjectImpl, WorldObjectImpl)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>PXEdge<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.PXEdge(WorldObjectImpl, WorldObjectImpl, boolean)">
+public <code class="descname">PXEdge</code><span class="sig-paren">(</span><a class="reference internal" href="../WorldObjectImpl.html#ca.nengo.ui.lib.world.piccolo.WorldObjectImpl" title="ca.nengo.ui.lib.world.piccolo.WorldObjectImpl">WorldObjectImpl</a><em> startNode</em>, <a class="reference internal" href="../WorldObjectImpl.html#ca.nengo.ui.lib.world.piccolo.WorldObjectImpl" title="ca.nengo.ui.lib.world.piccolo.WorldObjectImpl">WorldObjectImpl</a><em> endNode</em>, boolean<em> isDirected</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.PXEdge(WorldObjectImpl, WorldObjectImpl, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new directed edge</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>startNode</strong> – Starting node</li>
+<li><strong>endNode</strong> – Ending node</li>
+<li><strong>isDirected</strong> – Whether the direction of this edge matters</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="destroy">
+<h3>destroy<a class="headerlink" href="#destroy" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.destroy()">
+public void <code class="descname">destroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.destroy()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getdefaultcolor">
+<h3>getDefaultColor<a class="headerlink" href="#getdefaultcolor" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.getDefaultColor()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/Color.html" title="java.awt.Color">Color</a> <code class="descname">getDefaultColor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.getDefaultColor()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getendnode">
+<h3>getEndNode<a class="headerlink" href="#getendnode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.getEndNode()">
+public <a class="reference internal" href="../WorldObjectImpl.html#ca.nengo.ui.lib.world.piccolo.WorldObjectImpl" title="ca.nengo.ui.lib.world.piccolo.WorldObjectImpl">WorldObjectImpl</a> <code class="descname">getEndNode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.getEndNode()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="gethighlightcolor">
+<h3>getHighlightColor<a class="headerlink" href="#gethighlightcolor" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.getHighlightColor()">
+public <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/Color.html" title="java.awt.Color">Color</a> <code class="descname">getHighlightColor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.getHighlightColor()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getstartnode">
+<h3>getStartNode<a class="headerlink" href="#getstartnode" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.getStartNode()">
+public <a class="reference internal" href="../WorldObjectImpl.html#ca.nengo.ui.lib.world.piccolo.WorldObjectImpl" title="ca.nengo.ui.lib.world.piccolo.WorldObjectImpl">WorldObjectImpl</a> <code class="descname">getStartNode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.getStartNode()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="getstate">
+<h3>getState<a class="headerlink" href="#getstate" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.getState()">
+public <a class="reference internal" href="PXEdge-EdgeState.html#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.EdgeState" title="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.EdgeState">EdgeState</a> <code class="descname">getState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.getState()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Edge state</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="getworldobject">
+<h3>getWorldObject<a class="headerlink" href="#getworldobject" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.getWorldObject()">
+public <a class="reference internal" href="../../WorldObject.html#ca.nengo.ui.lib.world.WorldObject" title="ca.nengo.ui.lib.world.WorldObject">WorldObject</a> <code class="descname">getWorldObject</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.getWorldObject()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="isanimating">
+<h3>isAnimating<a class="headerlink" href="#isanimating" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.isAnimating()">
+public boolean <code class="descname">isAnimating</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.isAnimating()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="isdirected">
+<h3>isDirected<a class="headerlink" href="#isdirected" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.isDirected()">
+public boolean <code class="descname">isDirected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.isDirected()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="ishidebydefault">
+<h3>isHideByDefault<a class="headerlink" href="#ishidebydefault" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.isHideByDefault()">
+public boolean <code class="descname">isHideByDefault</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.isHideByDefault()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">Whether this edge is visible when in it’s default state</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="propertychange">
+<h3>propertyChange<a class="headerlink" href="#propertychange" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.propertyChange(PropertyChangeEvent)">
+public void <code class="descname">propertyChange</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/beans/PropertyChangeEvent.html" title="java.beans.PropertyChangeEvent">PropertyChangeEvent</a><em> event</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.propertyChange(PropertyChangeEvent)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setdefaultcolor">
+<h3>setDefaultColor<a class="headerlink" href="#setdefaultcolor" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setDefaultColor(Color)">
+public void <code class="descname">setDefaultColor</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/Color.html" title="java.awt.Color">Color</a><em> defaultColor</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setDefaultColor(Color)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="sethidebydefault">
+<h3>setHideByDefault<a class="headerlink" href="#sethidebydefault" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setHideByDefault(boolean)">
+public void <code class="descname">setHideByDefault</code><span class="sig-paren">(</span>boolean<em> hideByDefault</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setHideByDefault(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>hideByDefault</strong> – If true, this edge is hidden in it’s default state.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="sethighlightcolor">
+<h3>setHighlightColor<a class="headerlink" href="#sethighlightcolor" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setHighlightColor(Color)">
+public void <code class="descname">setHighlightColor</code><span class="sig-paren">(</span><a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/Color.html" title="java.awt.Color">Color</a><em> highlightColor</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setHighlightColor(Color)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setlineshape">
+<h3>setLineShape<a class="headerlink" href="#setlineshape" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setLineShape(EdgeShape)">
+public void <code class="descname">setLineShape</code><span class="sig-paren">(</span><a class="reference internal" href="PXEdge-EdgeShape.html#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.EdgeShape" title="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.EdgeShape">EdgeShape</a><em> lineShape</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setLineShape(EdgeShape)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setminarcradius">
+<h3>setMinArcRadius<a class="headerlink" href="#setminarcradius" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setMinArcRadius(double)">
+public void <code class="descname">setMinArcRadius</code><span class="sig-paren">(</span>double<em> minArcRadius</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setMinArcRadius(double)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="setpointervisible">
+<h3>setPointerVisible<a class="headerlink" href="#setpointervisible" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setPointerVisible(boolean)">
+public void <code class="descname">setPointerVisible</code><span class="sig-paren">(</span>boolean<em> visible</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setPointerVisible(boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>visible</strong> – If true, the pointer will be visible. The pointer shows the direction of this edge.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setstate">
+<h3>setState<a class="headerlink" href="#setstate" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setState(EdgeState)">
+public final void <code class="descname">setState</code><span class="sig-paren">(</span><a class="reference internal" href="PXEdge-EdgeState.html#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.EdgeState" title="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.EdgeState">EdgeState</a><em> state</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setState(EdgeState)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>state</strong> – New edge state</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="setworldobject">
+<h3>setWorldObject<a class="headerlink" href="#setworldobject" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setWorldObject(WorldObject)">
+public void <code class="descname">setWorldObject</code><span class="sig-paren">(</span><a class="reference internal" href="../../WorldObject.html#ca.nengo.ui.lib.world.WorldObject" title="ca.nengo.ui.lib.world.WorldObject">WorldObject</a><em> worldObjectParent</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.setWorldObject(WorldObject)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="tolocal">
+<h3>toLocal<a class="headerlink" href="#tolocal" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.toLocal(WorldObject, double, double)">
+protected <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Point2D.html" title="java.awt.geom.Point2D">Point2D</a> <code class="descname">toLocal</code><span class="sig-paren">(</span><a class="reference internal" href="../../WorldObject.html#ca.nengo.ui.lib.world.WorldObject" title="ca.nengo.ui.lib.world.WorldObject">WorldObject</a><em> node</em>, double<em> x</em>, double<em> y</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.toLocal(WorldObject, double, double)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>toLocal<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.toLocal(WorldObject, Point2D)">
+protected <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Point2D.html" title="java.awt.geom.Point2D">Point2D</a> <code class="descname">toLocal</code><span class="sig-paren">(</span><a class="reference internal" href="../../WorldObject.html#ca.nengo.ui.lib.world.WorldObject" title="ca.nengo.ui.lib.world.WorldObject">WorldObject</a><em> node</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/geom/Point2D.html" title="java.awt.geom.Point2D">Point2D</a><em> point</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.toLocal(WorldObject, Point2D)" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="updateedgebounds">
+<h3>updateEdgeBounds<a class="headerlink" href="#updateedgebounds" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.updateEdgeBounds()">
+public void <code class="descname">updateEdgeBounds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.lib.world.piccolo.primitives.PXEdge.updateEdgeBounds()" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the edge when the start or end node has changed</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="PXCamera.html" title="previous chapter (use the left arrow)">PXCamera</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="PXEdge-EdgeShape.html" title="next chapter (use the right arrow)">PXEdge.EdgeShape</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="PXEdge-EdgeShape.html" title="PXEdge.EdgeShape"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="PXCamera.html" title="PXCamera"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.ui.lib.world.piccolo.primitives</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>

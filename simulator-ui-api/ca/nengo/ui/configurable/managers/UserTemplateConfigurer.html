@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  
+  <!-- Licensed under the Apache 2.0 License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/open-sans/stylesheet.css" />
+  <!-- Licensed under the SIL Open Font License -->
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/fonts/source-serif-pro/source-serif-pro.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/bootstrap-theme.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <title>UserTemplateConfigurer &#8212; Nengo 1.4 1.4 documentation</title>
+    <link rel="stylesheet" href="../../../../../../_static/guzzle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+    <link rel="next" title="VerticalLayoutPanel" href="VerticalLayoutPanel.html" />
+    <link rel="prev" title="UserConfigurer" href="UserConfigurer.html" />
+<link rel="stylesheet" type="text/css" href="../../../../../../_static/custom.css">
+
+
+  
+   
+
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="VerticalLayoutPanel.html" title="VerticalLayoutPanel"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="UserConfigurer.html" title="UserConfigurer"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" accesskey="U">ca.nengo.ui.configurable.managers</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="container-wrapper">
+
+      <div id="mobile-toggle">
+        <a href="#"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a>
+      </div>
+  <div id="left-column">
+    <div class="sphinxsidebar">
+        <a href="
+    ../../../../../../index.html" class="text-logo">Nengo 1.4</a>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <h2>Table Of Contents</h2>
+  </div>
+  <div class="sidebar-toc">
+    
+    
+      <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../videos/index.html">Video tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../tutorials/index.html">Written tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../demos/index.html">Demos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../scripting/index.html">Scripting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/basics.html">Introduction to scripting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/ensembles.html">Configuring ensembles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/simplenodes.html">Adding arbitary code to a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/speed.html">Speeding up network creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/weights.html">Connection weights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../scripting/tips.html">Tips and tricks</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../scripting/api.html">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../advanced/index.html">Advanced usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../nef_algorithm.html">The NEF Algorithm</a></li>
+</ul>
+
+    
+  </div>
+</div>
+        
+<div class="sidebar-block">
+  <div class="sidebar-wrapper">
+    <div id="main-search">
+      <form class="form-inline" action="../../../../../../search.html" method="GET" role="form">
+        <div class="input-group">
+          <input name="q" type="text" class="form-control" placeholder="Search...">
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div>
+    </div>
+  </div>
+        <div id="right-column">
+          
+          <div role="navigation" aria-label="breadcrumbs navigation">
+            <ol class="breadcrumb">
+              <li><a href="../../../../../../index.html">Docs</a></li>
+              
+                <li><a href="../../../../../../scripting/index.html">Scripting</a></li>
+              
+                <li><a href="../../../../../../scripting/api.html">API reference</a></li>
+              
+                <li><a href="../../../../../packages.html">simulator-ui</a></li>
+              
+                <li><a href="package-index.html">ca.nengo.ui.configurable.managers</a></li>
+              
+              <li>UserTemplateConfigurer</li>
+            </ol>
+          </div>
+          
+          <div class="document clearer body">
+            
+  <div class="section" id="usertemplateconfigurer">
+<h1>UserTemplateConfigurer<a class="headerlink" href="#usertemplateconfigurer" title="Permalink to this headline">¶</a></h1>
+<dl class="type">
+<dt id="ca.nengo.ui.configurable.managers.UserTemplateConfigurer">
+public class <code class="descname">UserTemplateConfigurer</code> extends <a class="reference internal" href="UserConfigurer.html#ca.nengo.ui.configurable.managers.UserConfigurer" title="ca.nengo.ui.configurable.managers.UserConfigurer">UserConfigurer</a><a class="headerlink" href="#ca.nengo.ui.configurable.managers.UserTemplateConfigurer" title="Permalink to this definition">¶</a></dt>
+<dd><p>A lot like UserConfigurer, except it allows the user to use templates to save and re-use values</p>
+<dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Author</dt><dd class="field-body">Shu Wu</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="default-template-name">
+<h3>DEFAULT_TEMPLATE_NAME<a class="headerlink" href="#default-template-name" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.configurable.managers.UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">DEFAULT_TEMPLATE_NAME</code><a class="headerlink" href="#ca.nengo.ui.configurable.managers.UserTemplateConfigurer.DEFAULT_TEMPLATE_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the default template</p>
+</dd></dl>
+
+</div>
+<div class="section" id="preferred-template-name">
+<h3>PREFERRED_TEMPLATE_NAME<a class="headerlink" href="#preferred-template-name" title="Permalink to this headline">¶</a></h3>
+<dl class="field">
+<dt id="ca.nengo.ui.configurable.managers.UserTemplateConfigurer.PREFERRED_TEMPLATE_NAME">
+public static final <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html" title="java.lang.String">String</a> <code class="descname">PREFERRED_TEMPLATE_NAME</code><a class="headerlink" href="#ca.nengo.ui.configurable.managers.UserTemplateConfigurer.PREFERRED_TEMPLATE_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="constructors">
+<h2>Constructors<a class="headerlink" href="#constructors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>UserTemplateConfigurer<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.configurable.managers.UserTemplateConfigurer.UserTemplateConfigurer(IConfigurable)">
+public <code class="descname">UserTemplateConfigurer</code><span class="sig-paren">(</span><a class="reference internal" href="../IConfigurable.html#ca.nengo.ui.configurable.IConfigurable" title="ca.nengo.ui.configurable.IConfigurable">IConfigurable</a><em> configurable</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.configurable.managers.UserTemplateConfigurer.UserTemplateConfigurer(IConfigurable)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>configurable</strong> – TODO</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>UserTemplateConfigurer<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.configurable.managers.UserTemplateConfigurer.UserTemplateConfigurer(IConfigurable, Container)">
+public <code class="descname">UserTemplateConfigurer</code><span class="sig-paren">(</span><a class="reference internal" href="../IConfigurable.html#ca.nengo.ui.configurable.IConfigurable" title="ca.nengo.ui.configurable.IConfigurable">IConfigurable</a><em> configurable</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/Container.html" title="java.awt.Container">Container</a><em> parent</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.configurable.managers.UserTemplateConfigurer.UserTemplateConfigurer(IConfigurable, Container)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>configurable</strong> – TODO</li>
+<li><strong>parent</strong> – TODO</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>UserTemplateConfigurer<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="constructor">
+<dt id="ca.nengo.ui.configurable.managers.UserTemplateConfigurer.UserTemplateConfigurer(IConfigurable, Container, boolean)">
+public <code class="descname">UserTemplateConfigurer</code><span class="sig-paren">(</span><a class="reference internal" href="../IConfigurable.html#ca.nengo.ui.configurable.IConfigurable" title="ca.nengo.ui.configurable.IConfigurable">IConfigurable</a><em> configurable</em>, <a class="reference external" href="http://docs.oracle.com/javase/8/docs/api/java/awt/Container.html" title="java.awt.Container">Container</a><em> parent</em>, boolean<em> isTemplateEditable</em><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.configurable.managers.UserTemplateConfigurer.UserTemplateConfigurer(IConfigurable, Container, boolean)" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Parameters</dt><dd class="field-body"><ul class="first last simple">
+<li><strong>configurable</strong> – TODO</li>
+<li><strong>parent</strong> – TODO</li>
+<li><strong>isTemplateEditable</strong> – TODO</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="createconfigdialog">
+<h3>createConfigDialog<a class="headerlink" href="#createconfigdialog" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.configurable.managers.UserTemplateConfigurer.createConfigDialog()">
+protected <a class="reference internal" href="ConfigDialog.html#ca.nengo.ui.configurable.managers.ConfigDialog" title="ca.nengo.ui.configurable.managers.ConfigDialog">ConfigDialog</a> <code class="descname">createConfigDialog</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.configurable.managers.UserTemplateConfigurer.createConfigDialog()" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="istemplateeditable">
+<h3>isTemplateEditable<a class="headerlink" href="#istemplateeditable" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="ca.nengo.ui.configurable.managers.UserTemplateConfigurer.isTemplateEditable()">
+public boolean <code class="descname">isTemplateEditable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ca.nengo.ui.configurable.managers.UserTemplateConfigurer.isTemplateEditable()" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils field-list" frame="void" rules="none">
+<dt class="field-name">Returns</dt><dd class="field-body">TODO</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+            
+  <div class="footer-relations">
+    
+      <div class="pull-left">
+        <a class="btn btn-default" href="UserConfigurer.html" title="previous chapter (use the left arrow)">UserConfigurer</a>
+      </div>
+    
+      <div class="pull-right">
+        <a class="btn btn-default" href="VerticalLayoutPanel.html" title="next chapter (use the right arrow)">VerticalLayoutPanel</a>
+      </div>
+    </div>
+    <div class="clearer"></div>
+  
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="VerticalLayoutPanel.html" title="VerticalLayoutPanel"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="UserConfigurer.html" title="UserConfigurer"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">Nengo 1.4 1.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../scripting/index.html" >Scripting</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../scripting/api.html" >API reference</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../../../../../packages.html" >simulator-ui</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="package-index.html" >ca.nengo.ui.configurable.managers</a> &#187;</li> 
+      </ul>
+    </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $(".toggle > *").hide();
+      $(".toggle .header").show();
+      $(".toggle .header").click(function() {
+        $(this).parent().children().not(".header").toggle(400);
+        $(this).parent().children(".header").toggleClass("open");
+      });
+    });
+  </script>
+
+<script type="text/javascript">
+  $("#mobile-toggle a").click(function () {
+    $("#left-column").toggle();
+  });
+</script>
+<script type="text/javascript" src="../../../../../../_static/js/bootstrap.js"></script>
+  <div class="footer">
+    &copy; Copyright 2006-2017, Bryan Tripp & Centre for Theoretical Neuroscience, University of Waterloo. Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  </body>
+</html>
