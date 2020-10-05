@@ -1,4 +1,0 @@
-sphinx==1.6.7
--e git+https://github.com/tbekolay/guzzle_sphinx_theme.git@use_smartypants#egg=guzzle_sphinx_theme
-ghp-import
-javasphinx

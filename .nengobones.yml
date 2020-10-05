@@ -1,0 +1,6 @@
+project_name: Nengo 1.4
+pkg_name: nengo
+repo_name: nengo/nengo-1.4
+copyright_start: 2006
+
+docs_conf_py: {}
